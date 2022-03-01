@@ -67,8 +67,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
                                      qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
   #endif
 #else
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QDesktopWidget * Desktop = QApplication::desktop();
     QRect defscreengeo = Desktop->availableGeometry(-1);
+#else
+    QRect defscreengeo =  QGuiApplication::primaryScreen()->availableGeometry();
+#endif
     setGeometry(0,0, defscreengeo.width(), defscreengeo.height());
     desktopSize=defscreengeo.size();
     windowlayout->setContentsMargins(qRound(defscreengeo.width() * 0.2), qRound(defscreengeo.height() * 0.2),

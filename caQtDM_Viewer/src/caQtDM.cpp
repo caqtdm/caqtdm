@@ -109,7 +109,7 @@ static void createMap(QMap<QString, QString> &map, const QString& option)
 {
     //qDebug() << "treat option" << option;
     // option of type KEY1=VALUE1,KEY2=VALUE2,KEY3=VALUE3
-    if(option != NULL) {
+    if(option != Q_NULLPTR) {
         QStringList vars = option.split(",", SKIP_EMPTY_PARTS);
         for(int i=0; i< vars.count(); i++) {
             int pos = vars.at(i).indexOf("=");

@@ -205,9 +205,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     OptionList = options;
 
     caQtDM_TimeOutEnabled = false;
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
-
+#else
+     qDebug() <<  "caQtDM -- desktop size:" <<  QGuiApplication::primaryScreen()->size();
+#endif
     // Set Window Title without the whole path
     QString title("caQtDM ");
     title.append(BUILDVERSION);
@@ -406,7 +408,14 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if(HTTPCONFIGURATOR) {
     // test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
     // then get from the choosen website and choosen config file the epics configuration and ui file to launch
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QSize desktopSize = qApp->desktop()->size();
+#else
+    QSize desktopSize = QGuiApplication::primaryScreen()->size();
+#endif
+
+
     //qDebug() <<  "desktop size in millimer" << qApp->desktop()->widthMM() << qApp->desktop()->heightMM();
  again:
     QList<QString> urls;
@@ -591,14 +600,14 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 
         /* If token is StartElement, we'll see if we can read it.*/
         if(token == QXmlStreamReader::StartElement) {
-            if(xml.name() == "configuration") continue;
+            if(xml.name() == QString("configuration")) continue;
 
-            if(xml.name() == "url") {
+            if(xml.name() == QString("url")) {
                 QXmlStreamAttributes attributes = xml.attributes();
                 if(attributes.hasAttribute("value")) urls.append(attributes.value("value").toString());
             }
 
-            if(xml.name() == "config") {
+            if(xml.name() == QString("config")) {
                 QXmlStreamAttributes attributes = xml.attributes();
                 if(attributes.hasAttribute("value")) files.append(attributes.value("value").toString());
             }
@@ -920,8 +929,12 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     // center the window if requested (only for windows)
 #if defined(WIN32) && !defined(__GNUC__)
      if(centerwindow)  {
+        #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QDesktopWidget * Desktop = QApplication::desktop();
-            QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
+            QRect defscreengeo = Desktop->availableGeometry(-1);
+        #else
+            QRect defscreengeo =  QGuiApplication::primaryScreen()->availableGeometry();
+        #endif
             int mainw_width = mainWindow->width();
             int mainw_height = mainWindow->height();
             int movx = (defscreengeo.width() / 2) - (mainw_width / 2);
@@ -1652,14 +1665,23 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     h = qMax(h,minSize.height());
 
     if ((m & XNegative)) {
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         x = qApp->desktop()->width()  + x - w;
+#else
+        x = QGuiApplication::primaryScreen()->availableGeometry().width()  + x - w;
+#endif
         x -= (widget->frameGeometry().width() - widget->width()) / 2;
     } else {
         x += (widget->geometry().x() - widget->x());
     }
 
     if ((m & YNegative)) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         y = qApp->desktop()->height() + y - h;
+#else
+        y = QGuiApplication::primaryScreen()->availableGeometry().height() + y - h;
+#endif
     } else {
         y += (widget->geometry().y() - widget->y());
     }
