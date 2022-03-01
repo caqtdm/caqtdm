@@ -33,6 +33,20 @@ unix:!macx:!ios:!android{
    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
+contains(QT_VER_MAJ, 6) {
+    QT     += core gui svg uitools network opengl
+    CONFIG += qt warn_on thread widgets
+    unix:!macx:!ios:!android{
+        QT     += x11extras
+    }
+    !ios:!android {
+        QT     += printsupport
+     }
+
+}
+
+
+
 TARGET = caQtDM
 TEMPLATE = app
 
