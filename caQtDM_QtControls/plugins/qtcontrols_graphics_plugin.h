@@ -59,7 +59,11 @@ public:
     virtual QString name() const { return d_name; }
     virtual QString toolTip() const { return d_toolTip; }
     virtual QString whatsThis() const { return d_whatsThis; }
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+    void initialize(QDesignerFormEditorInterface *core) override;
+#else
     virtual void initialize(QDesignerFormEditorInterface *);
+#endif
 
 protected:
     QString d_name; 
