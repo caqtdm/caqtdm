@@ -839,6 +839,11 @@ caQtDM_Viewer {
                         CONFIG += Define_Build_epics_controls
                         CONFIG += Define_Build_caQtDM_Lib Define_Symbols
                         CONFIG += Define_Build_OutputDir
+                        contains(QT_VER_MAJ, 6) {
+                            QMAKE_LFLAGS += /entry:mainCRTStartup
+                            QMAKE_LFLAGS += /STACK:32000000
+                        }
+
                 }
 
                 win32-g++ {

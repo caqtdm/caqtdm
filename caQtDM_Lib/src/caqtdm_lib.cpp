@@ -2272,7 +2272,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QHBoxLayout *boxLayout = new QHBoxLayout;
         SETMARGIN_QT456(boxLayout,0);
         boxLayout->setSpacing(0);
+
         QFrame *frame = new QFrame();
+
         QColor thisFrameColor= includeWidget->getFrameColor();
         QColor thisLightColor = thisFrameColor.lighter();
         QColor thisDarkColor = thisFrameColor.darker();
