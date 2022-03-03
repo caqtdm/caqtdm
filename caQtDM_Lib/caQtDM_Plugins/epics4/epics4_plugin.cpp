@@ -1998,7 +1998,8 @@ int Epics4Plugin::TerminateIO() {
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling epics4_callbackThread->stop();\n";
     epics4_callbackThread->stop();
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO returning true;\n";
-
+    //providerN->destroy();
+    providerN=Q_NULLPTR;
     return true;
 }
 
