@@ -66,7 +66,11 @@ caByteController::caByteController(QWidget *parent) : QWidget(parent)
         prvTextcolor[i] = Qt::white;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(signalMapper, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
+#else
+    connect(signalMapper, SIGNAL(mappedInt(int)),this, SIGNAL(clicked(int)));
+#endif
 
     arrangeCells();
 
