@@ -34,7 +34,12 @@ myQProcess::myQProcess(QObject *parent) : QObject(parent), started(false)
     process = new QProcess(this);
     process->setWorkingDirectory(".");
     process->setProcessChannelMode(QProcess::MergedChannels);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(process, SIGNAL(error(QProcess::ProcessError)), SLOT(error(QProcess::ProcessError)));
+#else
+    connect(process, SIGNAL(errorOccurred(QProcess::ProcessError)), SLOT(error(QProcess::ProcessError)));
+#endif
+
     connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), SLOT(finished(int, QProcess::ExitStatus)));
 }
 
