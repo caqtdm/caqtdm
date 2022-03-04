@@ -80,7 +80,7 @@ unix:!ios {
       QMAKE_LFLAGS_PLUGIN += -bundle
       LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
       LIBS += -L $(CAQTDM_COLLECT) -lqtcontrols
-      QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
+
    }
 }
 

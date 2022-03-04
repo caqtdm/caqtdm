@@ -461,7 +461,6 @@ caQtDM_Lib {
 #for epics 3.15 and gcc we need this
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
-      		QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
                 LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
                 LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
       		LIBS += ${EPICSLIB}/libCom.dylib

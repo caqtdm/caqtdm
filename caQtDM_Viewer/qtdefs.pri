@@ -50,6 +50,10 @@ unix {
     QMAKE_CFLAGS_RELEASE += "-g"
 }
 
+
+# Set the overall Deployment Target for MACOSX
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 12.0
+
 # at psi the designer in 4.8.2 is patched in order to display tooltip description (not a nice test, but for now ok)
 # when the qt version is higher then 5.5.0 then we can also compile the plugins with description texts
 # be carefull with this, while when the designer does not recognize tooltip descriptions, the widgets will not be shown
