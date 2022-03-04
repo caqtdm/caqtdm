@@ -42,7 +42,7 @@ extern "C" char filePrefix[128];
 
 // pointer used by external C
 extern "C" {
-    myParserEDM* myParserPtr;
+    myParserEDM* myParserEDMPtr;
 }
 
 // constructor
@@ -170,7 +170,7 @@ void myParserEDM::writeCloseTag(const QString& type)
 
 void myParserEDM::Init(myParserEDM* edlParser)
 {
-    myParserPtr = edlParser;
+    myParserEDMPtr = edlParser;
 }
 
 void myParserEDM::writeMessage(char *mess) {
