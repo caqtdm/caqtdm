@@ -36,6 +36,12 @@
 
 #include <QDebug>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#define ENDL Qt::endl
+#else
+#define ENDL endl
+#endif
+
 XmlWriter::XmlWriter( QIODevice *device, QTextCodec *codec )
     : indentSize( 4 ), autoNewLine( false ), atBeginningOfLine( true )
 {
@@ -53,7 +59,7 @@ XmlWriter::XmlWriter( QIODevice *device, QTextCodec *codec )
 XmlWriter::~XmlWriter()
 {
     if ( autoNewLine && !atBeginningOfLine )
-    out << Qt::endl;
+    out << ENDL;
 }
 
 QString XmlWriter::protect( const QString& string )
@@ -96,7 +102,7 @@ void XmlWriter::writePendingIndent()
 
 void XmlWriter::newLine()
 {
-    out << Qt::endl;
+    out << ENDL;
     atBeginningOfLine = true;
 }
 
