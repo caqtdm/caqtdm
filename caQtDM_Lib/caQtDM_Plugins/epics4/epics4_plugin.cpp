@@ -1050,19 +1050,19 @@ void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
     kData.edata.accessR = 1;
     kData.edata.accessW = 1;
     switch (accessr) {
-        case none:
+        case AccessRights::none:
             {
                 kData.edata.accessR = 0;
                 kData.edata.accessW = 0;
             }
             break;
-        case read:
+        case AccessRights::read:
             {
                 kData.edata.accessR = 1;
                 kData.edata.accessW = 0;
             }
             break;
-        case readWrite:
+        case AccessRights::readWrite:
             {
                 kData.edata.accessR = 1;
                 kData.edata.accessW = 1;
