@@ -65,6 +65,11 @@
 #  include <unistd.h>
 #endif
 
+#ifdef __APPLE__
+#  include <sys/time.h>
+#  include <unistd.h>
+#endif
+
 #include "caqtdm_lib.h"
 #include "parsepepfile.h"
 #ifdef ADL_EDL_FILES
