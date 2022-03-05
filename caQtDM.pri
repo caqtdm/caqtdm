@@ -293,7 +293,6 @@ epics4_plugin {
 
         epics7 {
                 message("epics4_plugin (with epics version 7) configuration unix:!macx:!ios:!android")
-
                 INCLUDEPATH   += $(EPICSINCLUDE)
                 INCLUDEPATH   += $(EPICSINCLUDE)/pv
                 INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
@@ -378,7 +377,10 @@ epics4_plugin {
                     CONFIG +=Define_Symbols
                     QMAKE_CXXFLAGS     -= -Zc:externConstexpr
                     QMAKE_CXXFLAGS     -= -permissive-
-                    QMAKE_CXXFLAGS     +=-Zc:referenceBinding
+                    # by some reason this gets into the centos compilation ?????
+                    !unix: {
+                        QMAKE_CXXFLAGS     += -Zc:referenceBinding
+                    }
 		  }
  		
  

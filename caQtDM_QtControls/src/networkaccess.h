@@ -31,6 +31,16 @@
 #include <QMessageBox>
 #include <QEventLoop>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#ifndef Q_NULLPTR
+#if __cplusplus >= 201103L
+    #define Q_NULLPTR nullptr
+#else
+    #define Q_NULLPTR 0
+#endif
+#endif
+#endif
+
 class QNetworkAccessManager;
 
 class NetworkAccess:public QObject

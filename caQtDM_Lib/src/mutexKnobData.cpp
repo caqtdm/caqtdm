@@ -831,10 +831,10 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
 #endif
 
-#endif
-
         QString uAs(uA, 3);
         QString uJs(uJ, 3);
+
+#endif
 
         // replace special characters
         StringUnits.replace(Egrad, Grad);
