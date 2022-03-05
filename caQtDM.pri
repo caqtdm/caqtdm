@@ -945,8 +945,12 @@ Define_Build_Python {
 	    }
 	    unix:macx {
 	       DEFINES += PYTHON
-	       INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
-	       LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
+               #INCLUDEPATH += /System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/include/python$(PYTHONVERSION)/
+               #LIBS += -L/System/Library/Frameworks/Python.framework/Versions/$(PYTHONVERSION)/lib/ -lpython$(PYTHONVERSION)
+
+               #this has to be done in a better way, but works!
+               LIBS += -L/usr/local/Cellar/python/3.7.1/Frameworks/Python.framework/Versions/3.7/lib/ -lpython3.7
+               INCLUDEPATH += /usr/local/Cellar/python/3.7.1/Frameworks/Python.framework/Versions/3.7/include/python3.7m/
 	    }
         }
         }
