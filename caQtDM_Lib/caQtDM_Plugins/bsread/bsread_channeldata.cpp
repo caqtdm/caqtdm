@@ -23,6 +23,7 @@
  *    helge.brands@psi.ch
  */
 #include "bsread_channeldata.h"
+#include "bsread_Plugin.h"
 
 bsread_channeldata::bsread_channeldata(QObject *parent) : QObject(parent)
 {
