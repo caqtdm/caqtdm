@@ -28,6 +28,11 @@
 #include <QModbusTcpClient>
 #include <QMapIterator>
 #include <QByteArray>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <QRegExp>
+#else
+    #include <QRegularExpression>
+#endif
 #include "controlsinterface.h"
 #include "modbus_decode.h"
 #include <postfix.h>
@@ -66,10 +71,17 @@ QString modbus_decode::removeEPICSExtensions(QString pv)
 QString modbus_decode::getEPICSExtensions(QString pv)
 {
     QString toCapture = "(?:({.+}.))\\w+";
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QRegExp rx_json = QRegExp(toCapture);
     rx_json.indexIn(pv);
-
     QStringList list = rx_json.capturedTexts();
+#else
+    QRegularExpression rx_json(toCapture);
+    QRegularExpressionMatch match = rx_json.match(pv);
+    QStringList list =match.capturedTexts();
+#endif
+
     if (list.length()>0)
      return list.at(0);
      else return "";
