@@ -42,17 +42,17 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     setWindowModality (Qt::WindowModal);
 
 #if defined(MOBILE_IOS)
-    if(qApp->desktop()->size().height() < 500) {
+    if(qApp->primaryScreen()->size().height() < 500) {
         thisWidth=430;  // normal for iphone
         thisHeight=150;
     }
     Specials special;
-    special.setNewStyleSheet(this, qApp->desktop()->size(), 16, 10);
+    special.setNewStyleSheet(this, qApp->primaryScreen()->size(), 16, 10);
     QPalette palette;
     palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->primaryScreen()->availableGeometry()));
 #elif defined(MOBILE_ANDROID)
     QPalette palette;
     palette.setBrush(QPalette::Window, QColor(255,255,224,255));

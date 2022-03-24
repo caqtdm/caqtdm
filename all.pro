@@ -47,7 +47,7 @@ error("Use at least Qt 4.6.")
 TEMPLATE = subdirs
 SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer
 SUBDIRS += qtcontrols_controllers qtcontrols_graphics qtcontrols_monitors qtcontrols_utilities
-SUBDIRS += caQtDM_Plugins
+SUBDIRS += caQtDM_Plugins caQtDM_Parsers
 
 android {
   SUBDIRS += caQtDM_AndroidFunctions
@@ -68,8 +68,9 @@ qtcontrols_utilities.depends = caQtDM_QtControls caQtDM_Lib
 caQtDM_Plugins.file = caQtDM_Lib/caQtDM_Plugins/csplugins.pro 
 caQtDM_Plugins.depends = caQtDM_Lib
 
+
 !MOBILE {
-   SUBDIRS +=  caQtDM_Parsers parser
+   SUBDIRS +=   parser
    unix:{
         SUBDIRS += parserEDM
    }
@@ -97,7 +98,7 @@ archiveSF.depends = caQtDM_QtControls caQtDM_Lib
 archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
 
 iosArchitectures=armv7
-iosTarget=5.0
+iosTarget=13.0
 
 # Set "Architectures"
 QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures

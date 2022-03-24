@@ -30,8 +30,9 @@ contains(QT_VER_MAJ, 6) {
       CONFIG  += qwt plugin
       ios | android {
             QT += uiplugin
+      }else {
+        QT += designer
       }
-      QT += designer
 }
 CONFIG += warn_on
 CONFIG += console
@@ -140,8 +141,6 @@ SOURCES	+= \
     src/replacemacro.cpp \
     src/JSON.cpp \
     src/JSONValue.cpp \
-    src/pvdialog.cpp \
-    src/pvtaskmenu.cpp \
     src/textedit.cpp
 
 ADL_EDL_FILES {
@@ -154,6 +153,8 @@ XDR_HACK {
 }
 
 !MOBILE {
+    SOURCES +=  src/pvtaskmenu.cpp src/pvdialog.cpp
+    HEADERS +=  src/pvtaskmenu.h src/pvdialog.h
     SOURCES +=  src/cadoubletabwidgetextensionfactory.cpp  src/cadoubletabwidgetextension.cpp
     SOURCES +=  src/capolylinetaskmenu.cpp src/capolylinedialog.cpp
     HEADERS +=  src/cadoubletabwidgetextension.h
@@ -167,8 +168,6 @@ HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/replacemacro.h \
     src/JSON.h \
     src/JSONValue.h \
-    src/pvtaskmenu.h \
-    src/pvdialog.h \
     src/networkmodel.h \
     src/textedit.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp

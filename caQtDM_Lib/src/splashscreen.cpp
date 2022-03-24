@@ -36,6 +36,7 @@
 #include <QStyleOptionProgressBarV2>
 #include <QDesktopWidget>
 #else
+#include <QtGui>
 #include <QStyleOptionProgressBar>
 #endif
 #include <QApplication>
@@ -55,7 +56,7 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(), m_progress(0)
 
 #if defined(MOBILE_IOS)
     pixmapLoad.load(":caQtDM-logos.png");
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     if(size.height() < 500) {
        pixmap = pixmapLoad.scaled(pixmapLoad.size().width()/2, pixmapLoad.size().height()/2);
     } else {

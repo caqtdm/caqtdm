@@ -3491,17 +3491,17 @@ void CaQtDM_Lib::UndefinedMacrosWindow()
     macroWindow->setWindowTitle(QString::fromUtf8("undefined Macro's"));
 
 #if defined(MOBILE_IOS)
-    if(qApp->desktop()->size().height() < 500) {
+    if(qApp->primaryScreen()->size().height() < 500) {
         thisWidth=430;  // normal for iphone
         thisHeight=200;
     }
     Specials special;
-    special.setNewStyleSheet(this, qApp->desktop()->size(), 16, 10);
+    special.setNewStyleSheet(this, qApp->primaryScreen()->size(), 16, 10);
     QPalette palette;
     palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     macroWindow->setPalette(palette);
     macroWindow->setAutoFillBackground(true);
-    macroWindow->setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+    macroWindow->setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->primaryScreen()->availableGeometry()));
 #elif defined(MOBILE_ANDROID)
     QPalette palette;
     palette.setBrush(QPalette::Window, QColor(255,255,224,255));
