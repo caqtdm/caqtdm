@@ -54,7 +54,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #ifdef MOBILE
   #ifdef MOBILE_IOS
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    if(qApp->desktop()->heightMM() > 100) { // probably an ipad
+    if(qApp->primaryScreen()->physicalSize().rheight() > 100) { // probably an ipad
         windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25),
                                          qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
     } else { // probably an iphone

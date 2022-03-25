@@ -293,7 +293,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     OptionList.remove("updatetype");
 
 #ifdef MOBILE
-    specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
+    specials.setNewStyleSheet(messageWindow, qApp->primaryScreen()->size(), 16, 10);
 #endif
     messageWindow->setAllowedAreas(Qt::TopDockWidgetArea);
     QGridLayout *gridLayoutCentral = new QGridLayout(this->ui.centralwidget);
@@ -976,7 +976,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 #ifdef MOBILE_IOS
     // this is needed for the status bar
     mainWindow->setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea,false);
-    QRect availscreengeo = QApplication::desktop()->availableGeometry(-1);
+    QRect availscreengeo = qApp->primaryScreen()->availableGeometry();
     //QRect screengeo = QApplication::desktop()->geometry();
     //qDebug() << "IOS screen" << screengeo<< availscreengeo;
     QSize winsize=mainWindow->size();

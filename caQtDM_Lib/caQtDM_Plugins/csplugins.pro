@@ -21,13 +21,13 @@ SUBDIRS = demo epics3 archive environment
 
 }
 
+epics4: {
+ SUBDIRS += epics4
+}
 
 
 
 !MOBILE {
-    epics4: {
-     SUBDIRS += epics4
-    }
     bsread: {
       SUBDIRS += bsread
     }

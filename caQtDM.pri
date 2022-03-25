@@ -360,8 +360,10 @@ epics4_plugin {
                 message("epics4_plugin configuration : ios or android")
                 CONFIG += staticlib
                 LIBS += $$OUT_PWD/../../libcaQtDM_Lib.a
+                INCLUDEPATH   += $(EPICSINCLUDE)
                 ios {
                         INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
+                        INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
                 }
                 android {
                         INCLUDEPATH += $(EPICSINCLUDE)/os/android
@@ -636,7 +638,7 @@ caQtDM_Viewer {
 
                     message( $$OUT_PWD )
 
-                    CONFIG += staticlib
+                    CONFIG += static
                     CONFIG += release
                     LIBS += $$OUT_PWD/../caQtDM_Lib/libcaQtDM_Lib.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/libqtcontrols.a
@@ -655,6 +657,14 @@ caQtDM_Viewer {
                     }
                     gps {
                         LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/gps/libgps_plugin.a
+                    }
+                    epics7{
+                        LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics4/libepics4_plugin.a
+                        LIBS += $(EPICSLIB)/libpvAccess.a
+                        LIBS += $(EPICSLIB)/libpvAccessCA.a
+                        LIBS += $(EPICSLIB)/libpvData.a
+                        LIBS += $(EPICSLIB)/libpvaClient.a
+                        LIBS += $(EPICSLIB)/libnt.a
                     }
 
                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
@@ -683,14 +693,17 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 12.0
+                    target.value = 15.0
 
                     QMAKE_MAC_XCODE_SETTINGS += target
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
                     assetIcon.value = AppIcon
                     launchImage.name = ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME
                     launchImage.value = LaunchImage
-                    QMAKE_MAC_XCODE_SETTINGS += assetIcon launchImage
+                    searchheader.name=ALWAYS_SEARCH_USER_PATHS
+                    searchheader.value=NO
+
+                    QMAKE_MAC_XCODE_SETTINGS += assetIcon launchImage searchheader
 
                     QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
                     QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
@@ -700,8 +713,8 @@ caQtDM_Viewer {
                     iphonesimulator {
                          message("caQtDM_viewer configuration : iphonesimulator")
                          # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
-                         LIBS += $$(EPICSLIB)/static/libca.a
-                         LIBS += $$(EPICSLIB)/static/libCom.a
+                         LIBS += $$(EPICSLIB)/libca.a
+                         LIBS += $$(EPICSLIB)/libCom.a
                          LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
                          #LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
                          # build simulator only for 32 bit
@@ -710,8 +723,8 @@ caQtDM_Viewer {
                     iphoneos {
                         message("caQtDM_viewer configuration : iphoneos")
 
-                         LIBS += $$(EPICSLIB)/static/libca.a
-                         LIBS += $$(EPICSLIB)/static/libCom.a
+                         LIBS += $$(EPICSLIB)/libca.a
+                         LIBS += $$(EPICSLIB)/libCom.a
                          LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
 
                          ###############################################################################
