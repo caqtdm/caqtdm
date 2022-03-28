@@ -28,7 +28,7 @@
 myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 {
     bool showMax = false;
-    Qt::WindowFlags flags = Qt::Dialog;
+    Qt::WindowFlags flags = Qt::Dialog| Qt::Popup;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 

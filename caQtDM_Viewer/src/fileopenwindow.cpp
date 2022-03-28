@@ -1185,6 +1185,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 // all these past commands will only give you a notification in the taskbar
 // in case of x windows, we will pop the window really up
 #ifdef CAQTDM_X11
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName()== QLatin1String("xcb")){
+        #endif
+
                 static Atom  NET_ACTIVE_WINDOW = 0;
                 XClientMessageEvent xev;
                 if (NET_ACTIVE_WINDOW == 0) {
@@ -1201,6 +1205,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
                 xev.data.l[1] = xev.data.l[2] = xev.data.l[3] = xev.data.l[4] = 0;
                 XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        }
+        #endif
+
 #endif //CAQTDM_X11
 
                 return;
@@ -1220,7 +1228,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     if(fileNameFound.isNull()) {
         QString message = QString(FileName);
         message.append(" does not exist");
-        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog, true);
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
         m->show();
     } else {
         qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
@@ -1240,7 +1248,7 @@ void FileOpenWindow::Callback_ActionAbout()
 {
     QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\nPlatform support is supported by H.Brands\n");
     message = message.arg(BUILDVERSION, QT_VERSION_STR, BUILDARCH, SUPPORT);
-    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog, true);
+    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
     m->show();
 }
 
