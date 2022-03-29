@@ -637,7 +637,7 @@ caQtDM_Viewer {
                     #DESTDIR = $(CAQTDM_COLLECT)
 
                     message( $$OUT_PWD )
-
+                    QMAKE_LFLAGS += -Wl,-e,_qt_main_wrapper
                     CONFIG += static
                     CONFIG += release
                     LIBS += $$OUT_PWD/../caQtDM_Lib/libcaQtDM_Lib.a
@@ -707,7 +707,7 @@ caQtDM_Viewer {
 
                     QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
                     QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
-
+                    QMAKE_IOS_LAUNCH_SCREEN += $$PWD/caQtDM_Viewer/src/IOS/LaunchScreen.storyboard
 #actually, I have a problem with ios, it seems that iphonesimulator is defined too and wants than the library of simlator
 # I comment it out now
                     iphonesimulator {
