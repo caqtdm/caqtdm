@@ -6,14 +6,14 @@ error("Use at least Qt 4.6.")
 include (../caQtDM_Viewer/qtdefs.pri)
 
 TEMPLATE = subdirs
-SUBDIRS = adlParserStaticLib
+SUBDIRS += adlParserStaticLib
 !MOBILE:{
-    SUBDIRS = adlParserSharedLib
+    SUBDIRS += adlParserSharedLib
 }
 unix:{
     SUBDIRS += edlParserStaticLib
     !MOBILE:{
-        SUBDIRS = edlParserSharedLib
+        SUBDIRS += edlParserSharedLib
     }
 
 }
