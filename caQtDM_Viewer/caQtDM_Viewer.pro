@@ -36,6 +36,15 @@ unix:!macx:!ios:!android{
 contains(QT_VER_MAJ, 6) {
     QT     += core gui svg uitools network opengl
     CONFIG += qt warn_on thread widgets
+    modbus{
+       QT += serialbus
+       DEFINES += CAQTDM_MODBUS
+    }
+    gps{
+       QT += positioning
+       DEFINES += CAQTDM_GPS
+    }
+
     unix:!macx:!ios:!android{
         QT     += x11extras
     }

@@ -140,7 +140,7 @@ isEmpty(_CAQTDM_MODBUS) {
 message("Modbus Plugin will not be build")
 }
 else {
-    contains(QT_VER_MAJ, 5) {
+    greaterThan(QT_VER_MAJ, 4) {
         unix:!macx:!ios:!android  {
             packagesExist(serialbus){
                 CONFIG += modbus
@@ -159,7 +159,7 @@ isEmpty(_CAQTDM_GPS) {
 message("GPS Plugin will not be build")
 }
 else {
-    contains(QT_VER_MAJ, 5) {
+    greaterThan(QT_VER_MAJ, 4) {
         unix:!macx:!ios:!android {
             packagesExist(positioning){
                 CONFIG += gps

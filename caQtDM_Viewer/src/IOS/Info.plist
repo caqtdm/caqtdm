@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>4.3.1</string>
+	<string>4.4.0</string>
 	<key>CFBundleSignature</key>
 	<string>APPL</string>
 	<key>CFBundleVersion</key>
@@ -35,7 +35,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>needs only access for GPS channels</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>caQtDM don't need to access any photos</string>
+	<string>caQtDM don&apos;t need to access any photos</string>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>UIAppFonts</key>

@@ -55,13 +55,14 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
   #ifdef MOBILE_IOS
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
     if(qApp->primaryScreen()->physicalSize().rheight() > 100) { // probably an ipad
-        windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25),
-                                         qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
+        windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.20),
+                                         qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.20));
     } else { // probably an iphone
         windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.1), qRound(desktopSize.height() * 0.05),
                                          qRound(desktopSize.width() * 0.1), qRound(desktopSize.height() * 0.07));
     }
-  #else
+
+#else
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
     windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.15),
                                      qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
@@ -120,7 +121,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frameLayout->addWidget(title, 0, Qt::AlignCenter);
 
     // first layout for first group
-    QGridLayout *clearLayout = new QGridLayout;
+    QHBoxLayout *clearLayout = new QHBoxLayout;
     clearLayout->setSpacing(2);
     clearLayout->setContentsMargins(3, 3, 3, 3);
 
@@ -132,15 +133,23 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     QString str= QString::number((int) NumberOfFiles());
     QLabel *label = new QLabel("Number:");
     fileCountLabel = new QLabel(str);
-    clearLayout->addWidget(label, 0, 0);
-    clearLayout->addWidget(fileCountLabel, 0, 1);
+
+    height = fileCountLabel->minimumSizeHint().height();
+    fileCountLabel->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
+
+    height = label->minimumSizeHint().height();
+    label->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
+
+
+    clearLayout->addWidget(label, 0);
+    clearLayout->addWidget(fileCountLabel, 1);
 
     // first group, clear config button
     QPushButton* clearConfigButton = new QPushButton("Reset configuration");
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearConfigButton, desktopSize, 22, 15, buttonStyle, 2);
 #endif
-    clearLayout->addWidget(clearConfigButton, 0, 2);
+    clearLayout->addWidget(clearConfigButton, 2);
     connect(clearConfigButton, SIGNAL(clicked()), this, SLOT(clearConfigClicked()) );
 
     // adjust height
@@ -152,7 +161,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearUiButton, desktopSize, 22, 15, buttonStyle, 2);
 #endif
-    clearLayout->addWidget(clearUiButton, 0, 3);
+    clearLayout->addWidget(clearUiButton, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
 
     // adjust height
@@ -161,7 +170,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // first group, messages label
     QLabel *debugLabel = new QLabel(" Messages:");
-    clearLayout->addWidget(debugLabel, 0, 4);
+    height = debugLabel->minimumSizeHint().height();
+    debugLabel->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
+
+    clearLayout->addWidget(debugLabel, 4);
 
     // first group, combo yes/no
     debugComboBox = new QComboBox();
@@ -169,7 +181,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     debugComboBox->addItem("No");
     debugComboBox->addItem("Yes");
     debugComboBox->setCurrentIndex(0);
-    clearLayout->addWidget(debugComboBox, 0, 5);
+    clearLayout->addWidget(debugComboBox, 5);
 
     // adjust height
     height = debugComboBox->minimumSizeHint().height();
