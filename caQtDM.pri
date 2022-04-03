@@ -10,8 +10,8 @@ archive_plugin {
 
         macx {
                 message("archive_plugin configuration macx")
-                LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-                LIBS += $(CAQTDM_COLLECT)/libqtcontrols.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libqtcontrols.dylib
                 CONFIG += release
         }
 
@@ -50,7 +50,7 @@ demo_plugin {
         macx {
                 message("demo_plugin configuration macx")
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	CONFIG += release
         }
 
@@ -93,7 +93,7 @@ gps_plugin {
         macx {
                 message("gps_plugin configuration macx")
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-                LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
                 CONFIG += release
         }
 
@@ -136,9 +136,10 @@ bsread_Plugin {
         macx {
                 message(“bsread_plugin configuration macx”)
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libqtcontrols.dylib
         	plugins.path = Contents/PlugIns/controlsystems
-                plugins.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
+                plugins.files += $$(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
         	CONFIG += release
 
         }
@@ -178,7 +179,7 @@ epics3_plugin {
                 message("epics3_plugin configuration macx")
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Darwin
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
- 		LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
  		LIBS += $$(EPICSLIB)/libca.dylib
  		LIBS += $$(EPICSLIB)/libCom.dylib
                 CONFIG += release
@@ -240,16 +241,16 @@ environment_Plugin {
 
                 !modbus:!gps:{
                     plugins.path = Contents/PlugIns/controlsystems
-                    plugins.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                    plugins.files += $$(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
                 }
 
                 modbus: {
                     plugins.path = Contents/PlugIns/controlsystems
-                    plugins.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+                    plugins.files += $$(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
                 }
                 gps: {
                     plugins.path = Contents/PlugIns/controlsystems
-                    plugins.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
+                    plugins.files += $$(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
                 }
 
                 CONFIG += release
@@ -331,26 +332,19 @@ epics4_plugin {
 	
         macx {
                 message("epics4_plugin configuration macx")
-                INCLUDEPATH   += $(EPICSINCLUDE)
+                INCLUDEPATH += $(EPICSINCLUDE)
 		INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+                INCLUDEPATH += $(EPICSINCLUDE)/compiler/clang
+                INCLUDEPATH += $(EPICSINCLUDE)/pv
 
-                INCLUDEPATH   += $(EPICS4LOCATION)/pvDataCPP/include
-                INCLUDEPATH   += $(EPICS4LOCATION)/pvAccessCPP/include
-                INCLUDEPATH   += $(EPICS4LOCATION)/pvaClientCPP/include
-                INCLUDEPATH   += $(EPICS4LOCATION)/normativeTypesCPP/include
+                LIBS += $$(EPICSLIB)/libpvAccess.dylib
+                LIBS += $$(EPICSLIB)/libpvAccessCA.dylib
+                LIBS += $$(EPICSLIB)/libpvData.dylib
+                LIBS += $$(EPICSLIB)/libpvaClient.dylib
+                LIBS += $$(EPICSLIB)/libnt.dylib
 
-                EPICS4LOC1 = $(EPICS4LOCATION)/pvAccessCPP/lib/$(EPICS_HOST_ARCH)
-                EPICS4LOC2 = $(EPICS4LOCATION)/pvDataCPP/lib/$(EPICS_HOST_ARCH)
-                EPICS4LOC3 = $(EPICS4LOCATION)/pvaClientCPP/lib/$(EPICS_HOST_ARCH)
-                EPICS4LOC4 = $(EPICS4LOCATION)/normativeTypesCPP/lib/$(EPICS_HOST_ARCH)
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
 
-                LIBS += $${EPICS4LOC1}/libpvAccess.a
-                LIBS += $${EPICS4LOC2}/libpvData.a
-                LIBS += $${EPICS4LOC3}/libpvaClient.a
-                LIBS += $${EPICS4LOC4}/libnt.a
-
-        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
-        	LIBS += $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
         	LIBS += $$(EPICSLIB)/libca.dylib
         	LIBS += $$(EPICSLIB)/libCom.dylib
                 CONFIG += release
@@ -452,7 +446,7 @@ caQtDM_Lib {
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
       		OBJECTS_DIR = ./obj
-      		DESTDIR = $(CAQTDM_COLLECT)
+                DESTDIR = $(CAQTDM_COLLECT)
                 QMAKE_CXXFLAGS += "-g"
                 QMAKE_CFLAGS_RELEASE += "-g"
                 CONFIG += Define_Build_Python
@@ -466,9 +460,9 @@ caQtDM_Lib {
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
                 LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
-                LIBS += -L$(CAQTDM_COLLECT) -lqtcontrols
+                LIBS += -L$$(CAQTDM_COLLECT) -lqtcontrols
       		LIBS += ${EPICSLIB}/libCom.dylib
-      		DESTDIR = $(CAQTDM_COLLECT)
+                DESTDIR = $$(CAQTDM_COLLECT)
       		OBJECTS_DIR = ./obj
       		CONFIG += Define_Build_Python
 
@@ -547,24 +541,37 @@ caQtDM_Viewer {
                 message("caQtDM_viewer configuration : macx (only mac)")
 
 #for epics 3.15 and gcc we need this
-                INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
-                DESTDIR = $(CAQTDM_COLLECT)
+                exists( $(EPICSINCLUDE)/compiler/gcc/compilerSpecific.h) {
+                    INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
+                }
+                exists( $(EPICSINCLUDE)/compiler/clang/compilerSpecific.h) {
+                    INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
+                }
+
+                DESTDIR = $$(CAQTDM_COLLECT)
                 QMAKE_INFO_PLIST = ./src/Mac/Info.plist
+                QMAKE_TARGET_BUNDLE_PREFIX=ch.psi
+                QMAKE_BUNDLE=caQtDM.osx
                 APP-FONTS.files = lucida-sans-typewriter.ttf
                 APP-FONTS.path = Contents/Resources/fonts
                 QMAKE_BUNDLE_DATA += APP-FONTS
+                #QMAKE_BUNDLE_NAME = ch.psi.caQtDM.osx
                 CONFIG += app_bundle
                 ICON = ./src/caQtDM.icns
+
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(CAQTDM_COLLECT)/libqtcontrols.dylib
+
                 plugins.path = Contents/PlugIns/designer
-                plugins.files = $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
-                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib
-                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.dylib
-                plugins.files += $(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.dylib
+                plugins.files = $$(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin.dylib
+                plugins.files += $$(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin.dylib
+                plugins.files += $$(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin.dylib
+                plugins.files += $$(CAQTDM_COLLECT)/designer/libqtcontrols_utilities_plugin.dylib
                 caqtdmlibs.path = Contents/Frameworks/
-                caqtdmlibs.files = $(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $(CAQTDM_COLLECT)/libqtcontrols.dylib
+                caqtdmlibs.files = $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib $$(CAQTDM_COLLECT)/libqtcontrols.dylib
                 ADL_EDL_FILES {
-                           caqtdmlibs.files += $(CAQTDM_COLLECT)/libadlParser.dylib
-                           caqtdmlibs.files += $(CAQTDM_COLLECT)/libedlParser.dylib
+                           caqtdmlibs.files += $$(CAQTDM_COLLECT)/libadlParser.dylib
+                           caqtdmlibs.files += $$(CAQTDM_COLLECT)/libedlParser.dylib
                 }
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
                 calib.path = Contents/Frameworks
@@ -592,23 +599,23 @@ caQtDM_Viewer {
                 qwtframework.files = $$(QWTHOME)/lib/$$(QWTLIBNAME).framework
                 QMAKE_BUNDLE_DATA += calib comlib qwtframework
                 plugins_epics3.path = Contents/PlugIns/controlsystems
-                plugins_epics3.files += $(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
+                plugins_epics3.files += $$(CAQTDM_COLLECT)/controlsystems/libepics3_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_epics3
                 plugins_demo.path = Contents/PlugIns/controlsystems
-                plugins_demo.files += $(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
+                plugins_demo.files += $$(CAQTDM_COLLECT)/controlsystems/libdemo_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_demo
                 plugins_environment.path = Contents/PlugIns/controlsystems
-                plugins_environment.files += $(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
+                plugins_environment.files += $$(CAQTDM_COLLECT)/controlsystems/libenvironment_plugin.dylib
                 QMAKE_BUNDLE_DATA += plugins_environment
 
                 epics4: {
                                     plugins_epics4.path = Contents/PlugIns/controlsystems
-                                    plugins_epics4.files += $(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
+                                    plugins_epics4.files += $$(CAQTDM_COLLECT)/controlsystems/libepics4_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_epics4
                                 }
                 bsread:{
                                     plugins_bsread.path = Contents/PlugIns/controlsystems
-                                    plugins_bsread.files += $(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
+                                    plugins_bsread.files += $$(CAQTDM_COLLECT)/controlsystems/libbsread_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_bsread
                                     zmqlibrary.path = Contents/Frameworks
                                     zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
@@ -616,18 +623,18 @@ caQtDM_Viewer {
                                 }
                 archiveSF:{
                                     plugins_archiveSF.path = Contents/PlugIns/controlsystems
-                                    plugins_archiveSF.files += $(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.dylib
+                                    plugins_archiveSF.files += $$(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_archiveSF
                                 }
                 modbus: {
                                     plugins_modbus.path = Contents/PlugIns/controlsystems
-                                    plugins_modbus.files += $(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
+                                    plugins_modbus.files += $$(CAQTDM_COLLECT)/controlsystems/libmodbus_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_modbus
                                 }
 
                 gps: {
                                     plugins_gps.path = Contents/PlugIns/controlsystems
-                                    plugins_gps.files += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
+                                    plugins_gps.files += $$(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_gps
                                 }
         }
@@ -702,8 +709,9 @@ caQtDM_Viewer {
                     launchImage.value = LaunchImage
                     searchheader.name=ALWAYS_SEARCH_USER_PATHS
                     searchheader.value=NO
-
-                    QMAKE_MAC_XCODE_SETTINGS += assetIcon launchImage searchheader
+                    weakobjc.name=CLANG_ENABLE_OBJC_WEAK
+                    weakobjc.value=YES
+                    QMAKE_MAC_XCODE_SETTINGS += assetIcon launchImage searchheader weakobjc
 
                     QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
                     QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets

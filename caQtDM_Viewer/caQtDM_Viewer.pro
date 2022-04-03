@@ -66,7 +66,7 @@ VPATH += ./src
 INCLUDEPATH += ./src
 UI_DIR += ./src
 
-INCLUDEPATH += $(QWTINCLUDE)
+INCLUDEPATH += $$(QWTINCLUDE)
 INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += ../caQtDM_Lib/src
 INCLUDEPATH += ../caQtDM_Lib/caQtDM_Plugins
