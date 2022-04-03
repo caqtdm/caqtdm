@@ -1987,18 +1987,19 @@ int Epics4Plugin::FlushIO() {
 
 void Epics4Plugin::closeEvent(){
    TerminateIO();
+   Epics4Plugin::setDebug(true);
+   if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::closeEvent calling ClientFactory::stop();\n";
+   ClientFactory::stop();
+   if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::closeEvent calling CAClientFactory::stop();\n";
+   CAClientFactory::stop();
+   if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::closeEvent calling epics4_callbackThread->stop();\n";
+   epics4_callbackThread->stop();
+   providerN=Q_NULLPTR;
+
 }
 
 int Epics4Plugin::TerminateIO() {
-    Epics4Plugin::setDebug(true);
-    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling ClientFactory::stop();\n";
-    ClientFactory::stop();
-    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling CAClientFactory::stop();\n";
-    CAClientFactory::stop();
-    if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO calling epics4_callbackThread->stop();\n";
-    epics4_callbackThread->stop();
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::TerminateIO returning true;\n";
-    providerN=Q_NULLPTR;
     return true;
 }
 
