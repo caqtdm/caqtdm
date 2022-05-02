@@ -361,7 +361,16 @@ QString caWaveTable::setValue(double value, DataType dataType)
                 snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
             }
         } else {
-            snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
+            switch (thisFormatType) {
+             case hexadecimal:
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int64_t)value);
+                break;
+            case octal:
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int64_t)value);
+                break;
+            default:
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
+            }
         }
     } else if(dataType == longs) {
         if(thisUnsigned) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (uint) value);
