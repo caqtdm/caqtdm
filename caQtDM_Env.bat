@@ -52,6 +52,7 @@ REM ============================================================================
   set QTDM_BININSTALL=X:\qt\4.8.5\bin
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
+  set TIMESTAPER="http://timestamp.digicert.com"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
@@ -92,6 +93,7 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.11\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
+  set TIMESTAPER="http://timestamp.digicert.com"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
@@ -142,6 +144,7 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.11\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
+  set TIMESTAPER="http://timestamp.digicert.com"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   set ZMQ=X:/Qt/ZMQ
