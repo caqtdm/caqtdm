@@ -221,6 +221,8 @@ private:
     int maximumX, maximumY;
     double thisXfactor;
     double thisYfactor;
+    double thisXresizefactor;
+    double thisYresizefactor;
     QList<QWidget*> thisChildsList;
 
 #ifdef PRC

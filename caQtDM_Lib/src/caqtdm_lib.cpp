@@ -4587,7 +4587,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             if (resizeX.isValid()) factX = this->property("RESIZEX").value<double>();
             if (resizeY.isValid()) factY = this->property("RESIZEY").value<double>();
 
-            qDebug() << "we got a position at " << data.specData[1] << data.edata.rvalue << data.pv;
+            //qDebug() << "we got a position at " << data.specData[1] << data.edata.rvalue << data.pv;
             int adjustMargin = data.specData[2];
             if(data.specData[0] == 1) {
                 includeWidget->updateXpositionsList(data.specData[1], (int) data.edata.rvalue);
@@ -4623,19 +4623,19 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 //includeWidget->getIncludeFrame()->resize(resizedata.width(),resizedata.height());
 
 
-                qDebug()<< "includeWidget->resize(1)"<<maximumX<<adjustMargin<<factX<<resizedata.width()<<resizedata.height();
+                //qDebug()<< "includeWidget->resize(1)"<<maximumX<<adjustMargin<<factX<<resizedata.width()<<resizedata.height();
 
 
 
 
                 if (includeWidget->getStacking() == caInclude::Positions){
-                    QList<QVariant> integerList;
-                    integerList.insert(0, includeWidget->geometry().x());
-                    integerList.insert(1, includeWidget->geometry().y());
-                    integerList.insert(2, maximumX);
-                    integerList.insert(3, maximumY);
+//                    QList<QVariant> integerList;
+//                    integerList.insert(0, includeWidget->geometry().x());
+//                    integerList.insert(1, includeWidget->geometry().y());
+//                    integerList.insert(2, maximumX);
+//                    integerList.insert(3, maximumY);
                     //includeWidget->setProperty("GeometryList", integerList);
-                    qDebug()<< "includeWidget->resize(2)"<<maximumX <<maximumY;
+                    //qDebug()<< "includeWidget->resize(2)"<<maximumX <<maximumY;
                     includeWidget->update_geometrysave();
                 }
                 includeWidget->updateGeometry();
@@ -8707,11 +8707,11 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
 */
             if(includeWidget->getAdjustSize()) {
 
-                foreach(QWidget* l ,includeWidget->findChildren<QWidget *>()){
-                   QRect resizedata=l->childrenRect();
-                   if ((resizedata.width()>0) && (resizedata.height()>0))
-                   l->resize(resizedata.width(),resizedata.height());
-                }
+                //foreach(QWidget* l ,includeWidget->findChildren<QWidget *>()){
+                //   QRect resizedata=l->childrenRect();
+                //   if ((resizedata.width()>0) && (resizedata.height()>0))
+                //   l->resize(resizedata.width(),resizedata.height());
+                //}
 
                 QRect resizedata=includeWidget->childrenRect();
                 includeWidget->resize(resizedata.width(),resizedata.height());
@@ -8722,7 +8722,10 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
                 //includeWidget->getIncludeFrame()->resize(resizedata.width(),resizedata.height());
                 //includeWidget->resize(resizedata.width(),resizedata.height());
                  // when the include is packed into a scroll area, set the minimumsize too
-                //ResizeScrollBars(includeWidget, factX * (maximumX + adjustMargin), factY * (maximumY + adjustMargin));
+                maximumX = includeWidget->getXmaximum() + widget->width();
+                maximumY = includeWidget->getYmaximum() + widget->height();
+
+                ResizeScrollBars(includeWidget, factX * (maximumX + adjustMargin), factY * (maximumY + adjustMargin));
             }
 
         } else {

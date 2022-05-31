@@ -53,26 +53,27 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisPalette = palette();
 
     boxLayout = Q_NULLPTR;
-    //boxLayout = new QHBoxLayout();
-    //boxLayout->setMargin(0);
-    //boxLayout->setSpacing(0);
+    boxLayout = new QHBoxLayout();
+    boxLayout->setMargin(0);
+    boxLayout->setSpacing(0);
     frame = new QFrame(this);
     frame->setObjectName("caIncFrame_"+this->objectName());
     thisFrameShape = NoFrame;
     thisFrameShadow = QFrame::Plain;
     thisFrameLineWidth = 1;
 
-    //boxLayout->addWidget(frame);
+    boxLayout->addWidget(frame);
 
     gridLayout=Q_NULLPTR;
-    //gridLayout = new QGridLayout(Q_NULLPTR);
-    //gridLayout->setMargin(0);
-    //gridLayout->setSpacing(0);
+    gridLayout = new QGridLayout(Q_NULLPTR);
+    gridLayout->setMargin(0);
+    gridLayout->setSpacing(0);
 
     effectiveSize = QSize(100,100);
-    //frame->setLayout(gridLayout);
+    frame->setLayout(gridLayout);
 
     thisXfactor = thisYfactor = 1.0;
+    thisXresizefactor=thisYresizefactor=1.0;
 
     setPropertyVisible(maximumLines, false);
     setPropertyVisible(xCorrectionFactor, false);
@@ -480,7 +481,7 @@ void caInclude::setFileName(QString const &filename)
     }
 }
 void caInclude::update_position(QWidget* w,int x,int y){
-qDebug()<<"update_position:"<<w<<x<<y;
+//qDebug()<<"update_position:"<<w<<x<<y;
 
 
 if (w){
@@ -506,12 +507,12 @@ void caInclude::update_geometrysave(){
             QString className(l->metaObject()->className());
 
             QList<QVariant> integerList;
-            integerList.insert(0, l->geometry().x());
-            integerList.insert(1, l->geometry().y());
-            integerList.insert(2, l->geometry().width());
-            integerList.insert(3, l->geometry().height());
+            integerList.insert(0, l->geometry().x()*(1/thisXresizefactor));
+            integerList.insert(1, l->geometry().y()*(1/thisYresizefactor));
+            integerList.insert(2, l->geometry().width()*(1/thisXresizefactor));
+            integerList.insert(3, l->geometry().height()*(1/thisYresizefactor));
             l->setProperty("GeometryList", integerList);
-        qDebug() << className << integerList;
+        //qDebug() << className<< l->objectName() << integerList;
         }
     }
 
@@ -519,12 +520,19 @@ void caInclude::update_geometrysave(){
 
 
     QList<QVariant> integerList;
-    integerList.insert(0, this->geometry().x());
-    integerList.insert(1, this->geometry().y());
-    integerList.insert(2, this->geometry().width());
-    integerList.insert(3, this->geometry().height());
+    integerList.insert(0, this->geometry().x()*(1/thisXresizefactor));
+    integerList.insert(1, this->geometry().y()*(1/thisYresizefactor));
+    integerList.insert(2, this->geometry().width()*(1/thisXresizefactor));
+    integerList.insert(3, this->geometry().height()*(1/thisYresizefactor));
     this->setProperty("GeometryList", integerList);
-    qDebug() << className << integerList;
+    integerList.clear();
+    integerList.insert(0, 0);
+    integerList.insert(1, 0);
+    integerList.insert(2, this->geometry().width()*(1/thisXresizefactor));
+    integerList.insert(3, this->geometry().height()*(1/thisYresizefactor));
+    if (frame) frame->setProperty("GeometryList", integerList);
+
+    //qDebug() << className << integerList;
 
 }
 QRect caInclude::scanChildsneededArea(){
@@ -536,25 +544,29 @@ QRect caInclude::scanChildsneededArea(){
     return this->childrenRect();
 }
 void caInclude::childResizeCall(double factX,double factY){
+    thisXresizefactor=factX;
+    thisYresizefactor=factY;
+
+
     //foreach(QWidget *l, thisLoadedWidgets) {
-    if (getStacking()== caInclude::Positions) qDebug() << "childResizeCall :"<<this->objectName()<< thisLoadedWidgets.count()<< this->findChildren<QWidget *>().count();
-    foreach(QObject *l, this->findChildren<QObject *>()){
-        QString className(l->metaObject()->className());
-        qDebug() << className;
-        if(QGridLayout *testWidget = qobject_cast<QGridLayout *>(l)){
-            qDebug() <<"QGridLayout:" <<testWidget->contentsRect();
+//    if (getStacking()== caInclude::Positions) qDebug() << "childResizeCall :"<<this->objectName()<< thisLoadedWidgets.count()<< this->findChildren<QWidget *>().count();
+//    foreach(QObject *l, this->findChildren<QObject *>()){
+//        QString className(l->metaObject()->className());
+//        qDebug() << className;
+//        if(QGridLayout *testWidget = qobject_cast<QGridLayout *>(l)){
+//            qDebug() <<"QGridLayout:" <<testWidget->contentsRect();
 
-        }
-        if(QHBoxLayout *testWidget = qobject_cast<QHBoxLayout *>(l)){
-            qDebug() <<"QHBoxLayout:" <<testWidget->contentsRect();
-        }
-        if(QFrame *testWidget = qobject_cast<QFrame *>(l)){
-            //testWidget->updateGeometry();
-            qDebug() <<"QFrame:"<< testWidget->objectName()<<testWidget->pos()<<testWidget->contentsRect();
-            qDebug() <<"Parent:" <<testWidget->parentWidget()->objectName()<<testWidget->parentWidget()->pos()<<testWidget->parentWidget()->contentsRect();
-        }
+//        }
+//        if(QHBoxLayout *testWidget = qobject_cast<QHBoxLayout *>(l)){
+//            qDebug() <<"QHBoxLayout:" <<testWidget->contentsRect();
+//        }
+//        if(QFrame *testWidget = qobject_cast<QFrame *>(l)){
+//            //testWidget->updateGeometry();
+//            qDebug() <<"QFrame:"<< testWidget->objectName()<<testWidget->pos()<<testWidget->contentsRect();
+//            qDebug() <<"Parent:" <<testWidget->parentWidget()->objectName()<<testWidget->parentWidget()->pos()<<testWidget->parentWidget()->contentsRect();
+//        }
 
-    }
+//    }
 
     //QObject
     foreach(QWidget *l, this->findChildren<QWidget *>()){
@@ -569,29 +581,29 @@ void caInclude::childResizeCall(double factX,double factY){
                 //qDebug() << var;
                 double x,y,width,height;
                 if (!var.isNull()){
-                    qDebug() << "!var.isNull()"<<this->objectName();
+                    //qDebug() << "!var.isNull()"<<this->objectName();
                     QVariantList list = var.toList();
                     x = (double) list.at(0).toInt() * factX;
                     y = (double) list.at(1).toInt() * factY;
                     width = (double) list.at(2).toInt() *factX;
                     height = (double) list.at(3).toInt() *factY;
-                    qDebug()<<"childResizeCall:"<<factX<<factY<<list.at(0).toInt()<< list.at(1).toInt()<< list.at(2).toInt()<<list.at(3).toInt();
+                    //qDebug()<<"childResizeCall:"<<factX<<factY<<list.at(0).toInt()<< list.at(1).toInt()<< list.at(2).toInt()<<list.at(3).toInt();
                 }else{
                     x = 0;//(double) l->x() * factX;
                     y = 0;//(double) l->y() * factY;
                     width = (double) l->width() *factX;
                     height = (double)l->height() *factY;
                 }
-                if (getStacking()== caInclude::Positions) {
-                    qDebug() << "caInclude::Positions";
-                    if (this->objectName().contains("AR_LLM")){
-                        qDebug() << "Include :" << qRound(x)<< qRound(y)<< qRound(width)<< qRound(height)<<l;
+//                if (getStacking()== caInclude::Positions) {
+//                    qDebug() << "caInclude::Positions";
+//                    if (this->objectName().contains("AR_LLM")){
+//                        qDebug() << "Include :" << qRound(x)<< qRound(y)<< qRound(width)<< qRound(height)<<l;
 
-                    }
-                    //else qDebug() <<this->objectName();
-                }
-                //l->setGeometry(QRect(qRound(x), qRound(y), qRound(width), qRound(height)));
-                //l->updateGeometry();
+//                    }
+//                    //else qDebug() <<this->objectName();
+//                }
+                l->setGeometry(QRect(qRound(x), qRound(y), qRound(width), qRound(height)));
+                l->updateGeometry();
 
             }
         }
@@ -734,7 +746,7 @@ void caInclude::updateYpositionsList(int pos, int value)
 
 bool caInclude::getXposition(int indx, int &posX, int width, QString &pos) {
     Q_UNUSED(width);
-    qDebug()<< "thisXpositionsList: "<< thisXpositionsList;
+    //qDebug()<< "thisXpositionsList: "<< thisXpositionsList;
     if(indx < thisXpositionsList.count()) {
         bool ok;
         pos =  thisXpositionsList[indx];
