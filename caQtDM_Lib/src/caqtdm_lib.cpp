@@ -2264,6 +2264,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         if(gridLayout) frame->setLayout(gridLayout);
 
+
         //  we set the shape and in case of box, we have to set margins correctly
         switch(includeWidget->getFrameShape()) {
             case caInclude::NoFrame:
@@ -2534,7 +2535,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         posX=0;
                         posY=0;
                         if(!includeWidget->getXposition(j, posX, thisW->width(), pos)) {
-                            qDebug() << posX << thisW->width()<< " x position could be a channel";
                             specData[0] = 1;   // x position
                             specData[1] = j;   // actual position in array;
                             specData[2] = adjustMargin;
@@ -2545,7 +2545,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         }
 
                         if(!includeWidget->getYposition(j, posY, thisW->height(), pos)) {
-                            qDebug() << posY << " x position could be a channel";
                             specData[0] = 2;   // x position
                             specData[1] = j;   // actual position in array;
                             specData[2] = adjustMargin;
@@ -2565,10 +2564,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         if(maxY > maximumY) maximumY = maxY;
 
 
-                        qDebug()<< "caInclude Pos:"<< xpos << ypos<<posX<<includeWidget->getXcorrection()<<pos <<xpos + adjustMargin/2 << includeWidget->width()<<includeWidget->height();
+                        //qDebug()<< "caInclude Pos:"<< xpos << ypos<<posX<<includeWidget->getXcorrection()<<pos <<xpos + adjustMargin/2 << includeWidget->width()<<includeWidget->height();
 
                     }
-                     frame->setLayout(gridLayout);
+                    //frame->setLayout(gridLayout);
                     //includeWidget->setLineSize(0);
                     level++;
 
@@ -2640,6 +2639,9 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if((thisW != (QWidget *) Q_NULLPTR ) && (!prcFile) && includeWidget->getAdjustSize() && includeWidget->getStacking() != caInclude::Positions) {
             includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
                                   maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+            includeWidget->getIncludeFrame()->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                                     maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+
         } else if((thisW != (QWidget *) Q_NULLPTR ) && (!prcFile) && includeWidget->getAdjustSize() && includeWidget->getStacking() == caInclude::Positions) {
 
 
@@ -2663,6 +2665,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // when the include is packed into a scroll area, set the minimumsize too
         if((thisW != (QWidget *) Q_NULLPTR ) && (!prcFile) && includeWidget->getAdjustSize()) {
             if(includeWidget->getStacking() != caInclude::Positions) {
+                includeWidget->updateGeometry();
                 ResizeScrollBars(includeWidget, maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
                                  maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
             } else {
@@ -8729,7 +8732,6 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             }
 
         } else {
-
             // when the include is packed into a scroll area, set the minimumsize too
             ResizeScrollBars(includeWidget, factX * (list.at(2).toInt() + adjustMargin), factY * (list.at(3).toInt() + adjustMargin));
 
