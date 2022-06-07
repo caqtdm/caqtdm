@@ -99,7 +99,10 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
             }
         }
     }
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+    // This is needed for debugging
     connect(this, &QObject::objectNameChanged, this, &caInclude::caincludeNameChanged);
+#endif
     clearChildsList();
 }
 
