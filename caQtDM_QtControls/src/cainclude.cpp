@@ -22,7 +22,7 @@
  *  Contact details:
  *    anton.mezger@psi.ch
  */
-
+#include <QDebug>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QApplication>
@@ -57,24 +57,29 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
 
     thisPalette = palette();
 
+    boxLayout = Q_NULLPTR;
     boxLayout = new QHBoxLayout();
-    SETMARGIN_QT456(boxLayout,0);
-    boxLayout->setSpacing(0);
+    if (boxLayout)SETMARGIN_QT456(boxLayout,0);
+    if (boxLayout)boxLayout->setSpacing(0);
 
 
     frame = new QFrame();
     thisFrameShape = NoFrame;
     thisFrameShadow = QFrame::Plain;
     thisFrameLineWidth = 1;
+
     boxLayout->addWidget(frame);
 
+    gridLayout = Q_NULLPTR;
     gridLayout = new QGridLayout();
-    SETMARGIN_QT456(gridLayout,0);
-    gridLayout->setSpacing(0);
+    if (gridLayout) SETMARGIN_QT456(gridLayout,0);
+    if (gridLayout) gridLayout->setSpacing(0);
+
     effectiveSize = QSize(100,100);
-    frame->setLayout(gridLayout);
+    if (gridLayout) frame->setLayout(gridLayout);
 
     thisXfactor = thisYfactor = 1.0;
+    thisXresizefactor=thisYresizefactor=1.0;
 
     setPropertyVisible(maximumLines, false);
     setPropertyVisible(xCorrectionFactor, false);
@@ -94,16 +99,24 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
             }
         }
     }
-
+    connect(this, &QObject::objectNameChanged, this, &caInclude::caincludeNameChanged);
     clearChildsList();
 }
 
 caInclude::~ caInclude()
 {
-    delete boxLayout;
+    if (boxLayout) delete boxLayout;
     frame->deleteLater();
-    delete gridLayout;
+    if (gridLayout) delete gridLayout;
 }
+
+void caInclude::caincludeNameChanged(const QString &objectName){
+    if (frame) frame->setObjectName("caIncFrame_"+objectName);
+    if (gridLayout) gridLayout->setObjectName("caIncgrLay_"+objectName);
+    if (boxLayout) boxLayout->setObjectName("caIncBoxLay_"+objectName);
+}
+
+
 
 bool caInclude::isPropertyVisible(Properties property)
 {
@@ -121,7 +134,7 @@ void caInclude::removeIncludedWidgets()
 
         // remove from gridlayout and / or qframe
         foreach(QWidget *l, thisLoadedWidgets) {
-            gridLayout->removeWidget(l);
+            if (gridLayout) gridLayout->removeWidget(l);
             l->hide();
             l->setParent(NULL);
             l->deleteLater();
@@ -227,9 +240,10 @@ void caInclude::setFileName(QString const &filename)
             thisPalette.setColor(QPalette::Window, thisFrameColor);
             frame->setPalette(thisPalette);
 
-            gridLayout->setVerticalSpacing(thisSpacingVertical);
-            gridLayout->setHorizontalSpacing(thisSpacingHorizontal);
-
+            if (gridLayout) {
+                gridLayout->setVerticalSpacing(thisSpacingVertical);
+                gridLayout->setHorizontalSpacing(thisSpacingHorizontal);
+            }
             if(thisLoadedWidgets.count() > 0) {
                 int j = 0;
 
@@ -250,12 +264,12 @@ void caInclude::setFileName(QString const &filename)
                     int posY = 0;
                     // find the row, column to add this widget
                     if(thisStacking == Row) {
-                        gridLayout->addWidget(l, j, 0);
+                        if (gridLayout)  gridLayout->addWidget(l, j, 0);
                         row++;
                         maxRows = row;
                         maxColumns = 1;
                     } else if(thisStacking == Column) {
-                        gridLayout->addWidget(l, 0, j);
+                        if (gridLayout) gridLayout->addWidget(l, 0, j);
                         column++;
                         maxColumns = column;
                         maxRows = 1;
@@ -264,7 +278,7 @@ void caInclude::setFileName(QString const &filename)
                             row=0;
                             column++;
                         }
-                        gridLayout->addWidget(l, row, column);
+                        if (gridLayout) gridLayout->addWidget(l, row, column);
                         row++;
                         if(row > maxRows) maxRows = row;
                         maxColumns = column + 1;
@@ -273,7 +287,7 @@ void caInclude::setFileName(QString const &filename)
                             row++;
                             column=0;
                         }
-                        gridLayout->addWidget(l, row, column);
+                        if (gridLayout) gridLayout->addWidget(l, row, column);
                         column++;
                         if(column > maxColumns) maxColumns = column;
                         maxRows = row + 1;
@@ -328,9 +342,9 @@ void caInclude::setFileName(QString const &filename)
                 if(file1 == file2) return;
             }
         }
-
-        frame->setLayout(gridLayout);
-
+        if(thisStacking != Positions){
+            if (gridLayout) frame->setLayout(gridLayout);
+        }
         if(newFileName.contains(".prc")) {
             fileName = newFileName;
             thisAdjust = false;
@@ -400,12 +414,12 @@ void caInclude::setFileName(QString const &filename)
 
             // find the row, column to add this widget
             if(thisStacking == Row) {
-                gridLayout->addWidget(loadedWidget, j, 0);
+                if (gridLayout)  gridLayout->addWidget(loadedWidget, j, 0);
                 row++;
                 maxRows = row;
                 maxColumns = 1;
             } else if(thisStacking == Column) {
-                gridLayout->addWidget(loadedWidget, 0, j);
+                if (gridLayout) gridLayout->addWidget(loadedWidget, 0, j);
                 column++;
                 maxColumns = column;
                 maxRows = 1;
@@ -414,7 +428,7 @@ void caInclude::setFileName(QString const &filename)
                     row=0;
                     column++;
                 }
-                gridLayout->addWidget(loadedWidget, row, column);
+                if (gridLayout) gridLayout->addWidget(loadedWidget, row, column);
                 row++;
                 if(row > maxRows) maxRows = row;
                 maxColumns = column + 1;
@@ -462,7 +476,7 @@ void caInclude::setFileName(QString const &filename)
             QWidget *contents = (QWidget*) parent();
             contents->setMinimumSize(maximumX + adjustMargin, maximumY + adjustMargin);
         }
-
+        update_geometrysave();
         prvFileName = newFileName;
         prvStacking = thisStacking;
         prvItemCount = thisItemCount;
@@ -473,6 +487,137 @@ void caInclude::setFileName(QString const &filename)
         prvAdjust = thisAdjust;
     }
 }
+void caInclude::update_position(QWidget* w,int x,int y){
+//qDebug()<<"update_position:"<<w<<x<<y;
+
+
+if (w){
+    QVariant var=w->property("GeometryList");
+    if (!var.isNull()){
+        //qDebug() << "!var.isNull()"<<this->objectName();
+        QVariantList integerList = var.toList();
+
+        integerList.replace(0, x);
+        integerList.replace(1, y);
+        w->setProperty("GeometryList", integerList);
+      }
+    }
+}
+
+
+void caInclude::update_geometrysave(){
+//    foreach(QWidget *l, thisLoadedWidgets) {
+
+
+    foreach(QWidget *l, this->getChildsList()) {
+        if (l){
+            QString className(l->metaObject()->className());
+
+            QList<QVariant> integerList;
+            integerList.insert(0, l->geometry().x()*(1/thisXresizefactor));
+            integerList.insert(1, l->geometry().y()*(1/thisYresizefactor));
+            integerList.insert(2, l->geometry().width()*(1/thisXresizefactor));
+            integerList.insert(3, l->geometry().height()*(1/thisYresizefactor));
+            l->setProperty("GeometryList", integerList);
+        //qDebug() << className<< l->objectName() << integerList;
+        }
+    }
+
+    QString className(this->metaObject()->className());
+
+
+    QList<QVariant> integerList;
+    integerList.insert(0, this->geometry().x()*(1/thisXresizefactor));
+    integerList.insert(1, this->geometry().y()*(1/thisYresizefactor));
+    integerList.insert(2, this->geometry().width()*(1/thisXresizefactor));
+    integerList.insert(3, this->geometry().height()*(1/thisYresizefactor));
+    this->setProperty("GeometryList", integerList);
+    integerList.clear();
+    integerList.insert(0, 0);
+    integerList.insert(1, 0);
+    integerList.insert(2, this->geometry().width()*(1/thisXresizefactor));
+    integerList.insert(3, this->geometry().height()*(1/thisYresizefactor));
+    if (frame) frame->setProperty("GeometryList", integerList);
+
+    //qDebug() << className << integerList;
+
+}
+QRect caInclude::scanChildsneededArea(){
+    foreach(QWidget* l ,this->findChildren<QWidget *>()){
+       QRect resizedata=l->childrenRect();
+       if ((resizedata.width()>0) && (resizedata.height()>0));
+         l->resize(resizedata.width(),resizedata.height());
+    }
+    return this->childrenRect();
+}
+void caInclude::childResizeCall(double factX,double factY){
+    thisXresizefactor=factX;
+    thisYresizefactor=factY;
+
+
+    //foreach(QWidget *l, thisLoadedWidgets) {
+//    if (getStacking()== caInclude::Positions) qDebug() << "childResizeCall :"<<this->objectName()<< thisLoadedWidgets.count()<< this->findChildren<QWidget *>().count();
+//    foreach(QObject *l, this->findChildren<QObject *>()){
+//        QString className(l->metaObject()->className());
+//        qDebug() << className;
+//        if(QGridLayout *testWidget = qobject_cast<QGridLayout *>(l)){
+//            qDebug() <<"QGridLayout:" <<testWidget->contentsRect();
+
+//        }
+//        if(QHBoxLayout *testWidget = qobject_cast<QHBoxLayout *>(l)){
+//            qDebug() <<"QHBoxLayout:" <<testWidget->contentsRect();
+//        }
+//        if(QFrame *testWidget = qobject_cast<QFrame *>(l)){
+//            //testWidget->updateGeometry();
+//            qDebug() <<"QFrame:"<< testWidget->objectName()<<testWidget->pos()<<testWidget->contentsRect();
+//            qDebug() <<"Parent:" <<testWidget->parentWidget()->objectName()<<testWidget->parentWidget()->pos()<<testWidget->parentWidget()->contentsRect();
+//        }
+
+//    }
+
+    //QObject
+    foreach(QWidget *l, this->findChildren<QWidget *>()){
+        if (l){
+            QString className(l->metaObject()->className());
+            //qDebug() << className;
+            if(     className.contains("QMainWindow")||
+
+                    className.contains("QWidget")  ){
+
+                QVariant var=l->property("GeometryList");
+                //qDebug() << var;
+                double x,y,width,height;
+                if (!var.isNull()){
+                    //qDebug() << "!var.isNull()"<<this->objectName();
+                    QVariantList list = var.toList();
+                    x = (double) list.at(0).toInt() * factX;
+                    y = (double) list.at(1).toInt() * factY;
+                    width = (double) list.at(2).toInt() *factX;
+                    height = (double) list.at(3).toInt() *factY;
+                    //qDebug()<<"childResizeCall:"<<factX<<factY<<list.at(0).toInt()<< list.at(1).toInt()<< list.at(2).toInt()<<list.at(3).toInt();
+                }else{
+                    x = 0;//(double) l->x() * factX;
+                    y = 0;//(double) l->y() * factY;
+                    width = (double) l->width() *factX;
+                    height = (double)l->height() *factY;
+                }
+//                if (getStacking()== caInclude::Positions) {
+//                    qDebug() << "caInclude::Positions";
+//                    if (this->objectName().contains("AR_LLM")){
+//                        qDebug() << "Include :" << qRound(x)<< qRound(y)<< qRound(width)<< qRound(height)<<l;
+
+//                    }
+//                    //else qDebug() <<this->objectName();
+//                }
+                l->setGeometry(QRect(qRound(x), qRound(y), qRound(width), qRound(height)));
+                l->updateGeometry();
+
+            }
+        }
+    }
+
+}
+
 
 void caInclude::setLineSize(int size )
 {
@@ -628,6 +773,8 @@ void caInclude::updateYpositionsList(int pos, int value)
 }
 
 bool caInclude::getXposition(int indx, int &posX, int width, QString &pos) {
+    Q_UNUSED(width);
+    //qDebug()<< "thisXpositionsList: "<< thisXpositionsList;
     if(indx < thisXpositionsList.count()) {
         bool ok;
         pos =  thisXpositionsList[indx];
@@ -637,7 +784,7 @@ bool caInclude::getXposition(int indx, int &posX, int width, QString &pos) {
         }
         posX = pos.toInt(&ok);
         if(!ok) {
-            posX = posX + width;
+            posX = 0;
             return false;
         } else {
             return true;
@@ -670,7 +817,7 @@ int caInclude::getXmaximum()
 {
     int maximum = 0;
     QString pos;
-    int posX;
+    int posX=0;
 
     for(int i=0; i <  thisXpositionsList.count(); i++) {
         getXposition(i, posX, 0, pos);
@@ -684,7 +831,7 @@ int caInclude::getXmaximum()
 int caInclude::getYmaximum() {
     int maximum = 0;
     QString pos;
-    int posY;
+    int posY=0;
 
     for(int i=0; i <  thisYpositionsList.count(); i++) {
         getYposition(i, posY, 0, pos);

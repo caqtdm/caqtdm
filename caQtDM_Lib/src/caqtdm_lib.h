@@ -243,6 +243,7 @@ public:
             printf("caQtDM image file save failed\n");
         }
     }
+
 protected:
     virtual void timerEvent(QTimerEvent *e);
     void resizeEvent ( QResizeEvent * event );
@@ -339,6 +340,7 @@ private:
     bool parseForQRectConst(QString &input,double* valueArray);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
+    QRect widgetResize(QWidget *w, double factX, double factY);
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
     void shellCommand(QString command);
 

@@ -2278,11 +2278,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         QUiLoader loader;
         bool prcFile = false;
 
-        QHBoxLayout *boxLayout = new QHBoxLayout;
-        SETMARGIN_QT456(boxLayout,0);
-        boxLayout->setSpacing(0);
-
-        QFrame *frame = new QFrame();
+        QHBoxLayout *boxLayout = includeWidget->getIncludeboxLayout();//new QHBoxLayout;
+        if (boxLayout) SETMARGIN_QT456(boxLayout,0);
+        if (boxLayout) boxLayout->setSpacing(0);
+        QFrame *frame = includeWidget->getIncludeFrame();//new QFrame();
 
         QColor thisFrameColor= includeWidget->getFrameColor();
         QColor thisLightColor = thisFrameColor.lighter();
@@ -2297,16 +2296,22 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         frame->setFrameShadow(includeWidget->getFrameShadow());
         frame->setLineWidth(includeWidget->getFrameLineWidth());
         frame->setPalette(thisPalette);
-
-        boxLayout->addWidget(frame);
-        includeWidget->setLayout(boxLayout);
+        frame->setGeometry(includeWidget->geometry());
+        frame->move(0,0);
 
         // define a layout for adding the includes
-        QGridLayout *gridLayout = new QGridLayout;
-        gridLayout->setContentsMargins(0,0,0,0);
+        QGridLayout *gridLayout =  includeWidget->getIncludegridLayout();//new QGridLayout;
+        if(gridLayout){
+            gridLayout->setContentsMargins(0,0,0,0);
         SETMARGIN_QT456(gridLayout,0);
-        gridLayout->setVerticalSpacing(spacingVertical);
-        gridLayout->setHorizontalSpacing(spacingHorizontal);
+            gridLayout->setVerticalSpacing(spacingVertical);
+            gridLayout->setHorizontalSpacing(spacingHorizontal);
+        }
+        if (boxLayout) includeWidget->setLayout(boxLayout);
+        if (boxLayout) boxLayout->addWidget(frame);
+
+        if(gridLayout) frame->setLayout(gridLayout);
+
 
         //  we set the shape and in case of box, we have to set margins correctly
         switch(includeWidget->getFrameShape()) {
@@ -2539,14 +2544,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     includeWidgetList.append(thisW);
                     includeWidget->appendChildToList(thisW);
 
+                    includeWidget->update_geometrysave();
                     // add includeWidget to the gui
                     if(includeWidget->getStacking() == caInclude::Row) {
-                        gridLayout->addWidget(thisW, j, 0);
+                        if(gridLayout) gridLayout->addWidget(thisW, j, 0);
                         row++;
                         maxRows = row;
                         maxColumns = 1;
                     } else if(includeWidget->getStacking() == caInclude::Column) {
-                       gridLayout->addWidget(thisW, 0, j);
+                       if(gridLayout) gridLayout->addWidget(thisW, 0, j);
                        column++;
                        maxColumns = column;
                        maxRows = 1;
@@ -2555,7 +2561,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             row=0;
                             column++;
                         }
-                        gridLayout->addWidget(thisW, row, column);
+                        if(gridLayout) gridLayout->addWidget(thisW, row, column);
                         row++;
                         if(row > maxRows) maxRows = row;
                         maxColumns = column + 1;
@@ -2564,16 +2570,19 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             row++;
                             column=0;
                         }
-                        gridLayout->addWidget(thisW, row, column);
+                        if(gridLayout) gridLayout->addWidget(thisW, row, column);
                         column++;
                         if(column > maxColumns) maxColumns = column;
                         maxRows = row + 1;
                     } else {
                         thisW->setParent(frame);
 
+                        //qDebug() << "Frame: "<< frame->children();
+                        //qDebug() << "thisW: "<< thisW->children();
                         QString pos;
+                        posX=0;
+                        posY=0;
                         if(!includeWidget->getXposition(j, posX, thisW->width(), pos)) {
-                            //qDebug() << posX << " x position could be a channel";
                             specData[0] = 1;   // x position
                             specData[1] = j;   // actual position in array;
                             specData[2] = adjustMargin;
@@ -2584,7 +2593,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         }
 
                         if(!includeWidget->getYposition(j, posY, thisW->height(), pos)) {
-                            //qDebug() << posY << " x position could be a channel";
                             specData[0] = 2;   // x position
                             specData[1] = j;   // actual position in array;
                             specData[2] = adjustMargin;
@@ -2597,15 +2605,18 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         int xpos = qRound((double) posX * includeWidget->getXcorrection());
                         int ypos = qRound((double) posY * includeWidget->getYcorrection());
                         thisW->move(xpos + adjustMargin/2, ypos + adjustMargin/2);
+
                         int maxX = xpos + thisW->width();
                         int maxY = ypos + thisW->height();
                         if(maxX > maximumX) maximumX = maxX;
                         if(maxY > maximumY) maximumY = maxY;
+
+
+                        //qDebug()<< "caInclude Pos:"<< xpos << ypos<<posX<<includeWidget->getXcorrection()<<pos <<xpos + adjustMargin/2 << includeWidget->width()<<includeWidget->height();
+
                     }
-
-                    frame->setLayout(gridLayout);
-                    includeWidget->setLineSize(0);
-
+                    //frame->setLayout(gridLayout);
+                    //includeWidget->setLineSize(0);
                     level++;
 
                     // keep actual filename
@@ -2676,13 +2687,33 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if((thisW != (QWidget *) Q_NULLPTR ) && (!prcFile) && includeWidget->getAdjustSize() && includeWidget->getStacking() != caInclude::Positions) {
             includeWidget->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
                                   maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+            includeWidget->getIncludeFrame()->resize(maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
+                                                     maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
+
         } else if((thisW != (QWidget *) Q_NULLPTR ) && (!prcFile) && includeWidget->getAdjustSize() && includeWidget->getStacking() == caInclude::Positions) {
+
+
+
+            //QRect resizedata=includeWidget->childrenRect();
+            //includeWidget->resize(resizedata.width(),resizedata.height());
+            //QRect resizedata=thisW->childrenRect();
+            //qDebug()<<"childrenRect"<<resizedata;
+            //frame->resize(resizedata.width(),resizedata.height());
+            //includeWidget->resize(resizedata.width(),resizedata.height());
+
+            //QRect resizedata=includeWidget->scanChildsneededArea();
+            //includeWidget->resize(resizedata.width(),resizedata.height());
+
             includeWidget->resize(maximumX + adjustMargin, maximumY + adjustMargin);
-        }
+            includeWidget->getIncludeFrame()->resize(maximumX + adjustMargin, maximumY + adjustMargin);
+            includeWidget->update_geometrysave();
+
+             }
 
         // when the include is packed into a scroll area, set the minimumsize too
         if((thisW != (QWidget *) Q_NULLPTR ) && (!prcFile) && includeWidget->getAdjustSize()) {
             if(includeWidget->getStacking() != caInclude::Positions) {
+                includeWidget->updateGeometry();
                 ResizeScrollBars(includeWidget, maxColumns * thisW->width() + (maxColumns-1) * spacingHorizontal + adjustMargin,
                                  maxRows * thisW->height() + (maxRows-1) * spacingVertical + adjustMargin);
             } else {
@@ -4661,14 +4692,44 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             // move to correct position
             int xpos = qRound((double) posX * includeWidget->getXcorrection() * factX);
             int ypos = qRound((double) posY * includeWidget->getYcorrection() * factY);
-            dispW->move(xpos + adjustMargin/2*factX, ypos + adjustMargin/2*factY);
 
+            dispW->move(xpos + adjustMargin/2*factX, ypos + adjustMargin/2*factY);
+            if (includeWidget->getStacking() == caInclude::Positions){
+               includeWidget->update_position(dispW,xpos + adjustMargin/2,ypos + adjustMargin/2);
+            }
             // recalculate eventually the size
             if(includeWidget->getAdjustSize()) {
                 int maximumX = includeWidget->getXmaximum() + dispW->width();
                 int maximumY = includeWidget->getYmaximum() + dispW->height();
-                includeWidget->resize((maximumX + adjustMargin) * factX, (maximumY + adjustMargin) * factY);
 
+                //includeWidget->resize((maximumX + adjustMargin) * factX, (maximumY + adjustMargin) * factY);
+                foreach(QWidget* l ,includeWidget->findChildren<QWidget *>()){
+                   QRect resizedata=l->childrenRect();
+                   if ((resizedata.width()>0) && (resizedata.height()>0))
+                   l->resize(resizedata.width(),resizedata.height());
+                }
+
+                QRect resizedata=includeWidget->childrenRect();
+                includeWidget->resize(resizedata.width(),resizedata.height());
+                //includeWidget->getIncludeFrame()->resize(resizedata.width(),resizedata.height());
+
+
+                //qDebug()<< "includeWidget->resize(1)"<<maximumX<<adjustMargin<<factX<<resizedata.width()<<resizedata.height();
+
+
+
+
+                if (includeWidget->getStacking() == caInclude::Positions){
+//                    QList<QVariant> integerList;
+//                    integerList.insert(0, includeWidget->geometry().x());
+//                    integerList.insert(1, includeWidget->geometry().y());
+//                    integerList.insert(2, maximumX);
+//                    integerList.insert(3, maximumY);
+                    //includeWidget->setProperty("GeometryList", integerList);
+                    //qDebug()<< "includeWidget->resize(2)"<<maximumX <<maximumY;
+                    includeWidget->update_geometrysave();
+                }
+                includeWidget->updateGeometry();
                 // when the include is packed into a scroll area, set the scrollbars too
                 ResizeScrollBars(includeWidget, factX * (maximumX + adjustMargin), factY * (maximumY + adjustMargin));
             }
@@ -8542,6 +8603,24 @@ qreal CaQtDM_Lib::fontResize(double factX, double factY, QVariantList list, int 
     return fontSize;
 }
 
+QRect CaQtDM_Lib::widgetResize(QWidget* w,double factX, double factY){
+    QVariant var=w->property("GeometryList");
+    if (var.isValid()){
+        QVariantList list = var.toList();
+        double x = (double) list.at(0).toInt() * factX;
+        double y = (double) list.at(1).toInt() * factY;
+        double width = (double) list.at(2).toInt() *factX;
+        double height = (double) list.at(3).toInt() *factY;
+        if(width < 1.0) width=1.0;
+        if(height < 1.0) height = 1.0;
+        return QRect(qRound(x), qRound(y), qRound(width), qRound(height));
+    }else{
+      qDebug()<<"widgetResize Problem :"<< w;
+      return w->rect();
+    }
+}
+
+
 void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY)
 {
     // for horizontal or vertical line we still have to set the linewidth and for a frame the border framewidth
@@ -8559,8 +8638,10 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             line->setLineWidth(qRound(linewidth));
         } else {
             //qDebug() << "resize frame" << widget << (double) list.at(5).toInt() * qMin(factX, factY);
-            linewidth = (double) list.at(5).toInt() * qMin(factX, factY);
-            line->setLineWidth(qRound(linewidth));
+            if ((list.count()>=5) && list.at(5).isValid()){
+                linewidth = (double) list.at(5).toInt() * qMin(factX, factY);
+                line->setLineWidth(qRound(linewidth));
+            }
         }
     }
 
@@ -8716,9 +8797,10 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
         int adjustMargin = includeWidget->getMargin();
         int maximumX = 10;
         int maximumY = 10;
-	
+        includeWidget->childResizeCall(factX,factY);
         // in case of absolute positioning, reposition the elements
         if(includeWidget->getStacking() == caInclude::Positions) {
+/*
             QList<QWidget*> list =  includeWidget->getChildsList();
             for(int j=0; j<list.count(); j++) {
                 QString pos;
@@ -8731,21 +8813,35 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
                 // move to correct position
                 int xpos = qRound((double) posX * includeWidget->getXcorrection() * factX);
                 int ypos = qRound((double) posY * includeWidget->getYcorrection() * factY);
-
                 widget->move(xpos + adjustMargin/2*factX, ypos + adjustMargin/2*factY);
-
                 maximumX = includeWidget->getXmaximum() + widget->width();
                 maximumY = includeWidget->getYmaximum() + widget->height();
-            }
-
+             }
+*/
             if(includeWidget->getAdjustSize()) {
-                includeWidget->resize((maximumX + adjustMargin) * factX, (maximumY + adjustMargin) * factY);
-               // when the include is packed into a scroll area, set the minimumsize too
+
+                //foreach(QWidget* l ,includeWidget->findChildren<QWidget *>()){
+                //   QRect resizedata=l->childrenRect();
+                //   if ((resizedata.width()>0) && (resizedata.height()>0))
+                //   l->resize(resizedata.width(),resizedata.height());
+                //}
+
+                QRect resizedata=includeWidget->childrenRect();
+                includeWidget->resize(resizedata.width(),resizedata.height());
+
+                //QRect resizedata=includeWidget->scanChildsneededArea();
+                //qDebug()<<"resizedata in resizespezial:"<< resizedata;
+
+                //includeWidget->getIncludeFrame()->resize(resizedata.width(),resizedata.height());
+                //includeWidget->resize(resizedata.width(),resizedata.height());
+                 // when the include is packed into a scroll area, set the minimumsize too
+                maximumX = includeWidget->getXmaximum() + widget->width();
+                maximumY = includeWidget->getYmaximum() + widget->height();
+
                 ResizeScrollBars(includeWidget, factX * (maximumX + adjustMargin), factY * (maximumY + adjustMargin));
             }
 
         } else {
-
             // when the include is packed into a scroll area, set the minimumsize too
             ResizeScrollBars(includeWidget, factX * (list.at(2).toInt() + adjustMargin), factY * (list.at(3).toInt() + adjustMargin));
 
@@ -9170,6 +9266,7 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                 !className.contains("QRubberBand")  &&
                 !className.contains("Qwt")    &&
                 !className.contains("QWidget")    &&
+
                 (className.contains("ca") || className.contains("Q") || className.contains("Line") || !className.compare("wmSignalPropagator") ||
                  className.compare("replacemacro"))
                 ) {
@@ -9177,15 +9274,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
             // if this widget is managed by a layout, do not do anything
             // parent is a layout and must be resized and repositioned
 
-            if((w->layout() != (QObject*) 0) && (w->objectName().contains("layoutWidget"))) {
-                QVariant var=w->property("GeometryList");
-                QVariantList list = var.toList();
-                double x = (double) list.at(0).toInt() * factX;
-                double y = (double) list.at(1).toInt() * factY;
-                double width = (double) list.at(2).toInt() *factX;
-                double height = (double) list.at(3).toInt() *factY;
-                QRect rectnew = QRect(qRound(x), qRound(y), qRound(width), qRound(height));
-                w->setGeometry(rectnew);
+            if((w->layout() != (QObject*) Q_NULLPTR) && (w->objectName().contains("layoutWidget"))) {
+                w->setGeometry(widgetResize(w,factX,factY));
                 w->updateGeometry();
 
                 // not a layout, widget has to be resized and repositioned
@@ -9205,14 +9295,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         list[3].setValue(widget->height()/factY);
                     }
 
-                    double x = (double) list.at(0).toInt() * factX;
-                    double y = (double) list.at(1).toInt() * factY;
-                    double width = (double) list.at(2).toInt() * factX;
-                    double height = (double) list.at(3).toInt() * factY;
-                    if(width < 1.0) width=1.0;
-                    if(height < 1.0) height = 1.0;
-                    QRect rectnew = QRect(qRound(x), qRound(y), qRound(width), qRound(height));
-
                     /* we have to correct first the led width and height before changing the geometry */
                     if (!className.compare("caLed")) {
                         caLed *ledWidget = (caLed *) widget;
@@ -9223,7 +9305,6 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         ledWidget->setLedHeight(qRound(height));
                         ledWidget->setLedWidth(qRound(width));
                     }
-
                     // this is something new (Qt5.13), probably a bug for android and a very dirty fix
 #ifdef MOBILE_ANDROID
                     if (!className.compare("caMenu")) {
@@ -9231,9 +9312,11 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
                         rectnew.setWidth(width/2.5);
                     }
 #endif
-                    widget->setGeometry(rectnew);
+
+                    widget->setGeometry(widgetResize(widget,factX,factY));
                     resizeSpecials(className, widget, list, factX, factY);
                     widget->updateGeometry();
+
                 }
             }
 
