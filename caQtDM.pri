@@ -4,7 +4,7 @@ archive_plugin {
 
         unix:!macx:!ios:!android {
                 message("archive_plugin configuration unix:!macx:!ios:!android")
-                LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+                LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 CONFIG += release
         }
 
@@ -43,7 +43,7 @@ demo_plugin {
         unix:!macx:!ios:!android {
                 message("demo_plugin configuration unix:!macx:!ios:!android")
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+                LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
 	}
 
@@ -86,7 +86,7 @@ gps_plugin {
         unix:!macx:!ios:!android {
                 message("gps_plugin configuration unix:!macx:!ios:!android")
                 INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
-                LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+                LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 CONFIG += release
         }
 
@@ -129,7 +129,7 @@ bsread_Plugin {
         unix:!macx:!ios:!android {
                 message(“bsread_plugin configuration unix:!macx:!ios:!android”)
  		INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
- 		LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
+                LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
  		CONFIG += release
 	}
 
