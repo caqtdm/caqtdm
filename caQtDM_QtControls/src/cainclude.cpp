@@ -68,7 +68,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     thisFrameShadow = QFrame::Plain;
     thisFrameLineWidth = 1;
 
-    boxLayout->addWidget(frame);
+    if (boxLayout) boxLayout->addWidget(frame);
 
     gridLayout = Q_NULLPTR;
     gridLayout = new QGridLayout();
