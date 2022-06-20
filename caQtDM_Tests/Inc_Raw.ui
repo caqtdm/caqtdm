@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>101</width>
-    <height>101</height>
+    <width>102</width>
+    <height>103</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>100</width>
-     <height>100</height>
+     <width>101</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="form">
@@ -42,6 +42,16 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="caLed" name="caled">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>130</y>
+     <width>30</width>
+     <height>30</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -53,6 +63,11 @@
    <class>caGraphics</class>
    <extends>QWidget</extends>
    <header>caGraphics</header>
+  </customwidget>
+  <customwidget>
+   <class>caLed</class>
+   <extends>QWidget</extends>
+   <header>caLed</header>
   </customwidget>
  </customwidgets>
  <resources/>

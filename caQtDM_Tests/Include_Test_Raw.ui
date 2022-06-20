@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1029</width>
-    <height>636</height>
+    <width>1032</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,6 +28,25 @@
     </property>
     <property name="filename" stdset="0">
      <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>2</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
     </property>
    </widget>
    <widget class="caInclude" name="cainclude_2">
@@ -78,6 +97,15 @@
     </property>
     <property name="adjustSizeToContents" stdset="0">
      <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>6</number>
     </property>
    </widget>
    <widget class="caInclude" name="cainclude_4">
@@ -183,6 +211,9 @@
     <property name="adjustSizeToContents" stdset="0">
      <bool>false</bool>
     </property>
+    <property name="frameLineWidth">
+     <number>0</number>
+    </property>
    </widget>
    <widget class="caInclude" name="cainclude_7">
     <property name="geometry">
@@ -215,7 +246,7 @@
    <widget class="caCalc" name="cacalc_2">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>889</x>
       <y>580</y>
       <width>70</width>
       <height>20</height>
@@ -237,7 +268,7 @@
    <widget class="caCalc" name="cacalc_3">
     <property name="geometry">
      <rect>
-      <x>870</x>
+      <x>960</x>
       <y>580</y>
       <width>70</width>
       <height>20</height>
@@ -259,7 +290,7 @@
    <widget class="caCalc" name="cacalc_4">
     <property name="geometry">
      <rect>
-      <x>700</x>
+      <x>816</x>
       <y>580</y>
       <width>70</width>
       <height>20</height>
@@ -281,7 +312,7 @@
    <widget class="caCalc" name="cacalc_5">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>889</x>
       <y>610</y>
       <width>70</width>
       <height>20</height>
@@ -303,7 +334,7 @@
    <widget class="caCalc" name="cacalc_6">
     <property name="geometry">
      <rect>
-      <x>700</x>
+      <x>816</x>
       <y>610</y>
       <width>70</width>
       <height>20</height>
@@ -320,6 +351,82 @@
     </property>
     <property name="initialValue">
      <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_8">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>570</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=S,B=S, [0,0]</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>2</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_9">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>570</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=S,B=S, [0,0]</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Panel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>2</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
     </property>
    </widget>
   </widget>
