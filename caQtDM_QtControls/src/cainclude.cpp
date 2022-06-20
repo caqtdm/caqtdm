@@ -250,9 +250,7 @@ void caInclude::setFileName(QString const &filename)
             if(thisLoadedWidgets.count() > 0) {
                 int j = 0;
 
-                if(thisFrameShape == Box) adjustMargin = 4*thisFrameLineWidth;
-                else if(thisFrameShape == NoFrame) adjustMargin = 0;
-                else adjustMargin = 2*thisFrameLineWidth;
+               adjustMargin = getMargin();
 
                 // remove from gridlayout and / or qframe
                 foreach(QWidget *l, thisLoadedWidgets) {

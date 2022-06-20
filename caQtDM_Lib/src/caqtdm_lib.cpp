@@ -2282,6 +2282,14 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if (boxLayout) SETMARGIN_QT456(boxLayout,0);
         if (boxLayout) boxLayout->setSpacing(0);
         QFrame *frame = includeWidget->getIncludeFrame();//new QFrame();
+        // define a layout for adding the includes
+        QGridLayout *gridLayout =  includeWidget->getIncludegridLayout();//new QGridLayout;
+        if(gridLayout){
+            gridLayout->setContentsMargins(0,0,0,0);
+            SETMARGIN_QT456(gridLayout,0);
+            gridLayout->setVerticalSpacing(spacingVertical);
+            gridLayout->setHorizontalSpacing(spacingHorizontal);
+        }
 
         QColor thisFrameColor= includeWidget->getFrameColor();
         QColor thisLightColor = thisFrameColor.lighter();
@@ -2292,6 +2300,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         thisPalette.setColor(QPalette::Light, thisLightColor);
         thisPalette.setColor(QPalette::Dark, thisDarkColor);
         thisPalette.setColor(QPalette::Window, thisFrameColor);
+        if (boxLayout) includeWidget->setLayout(boxLayout);
+        if (boxLayout) boxLayout->addWidget(frame);
+
+        if(gridLayout) frame->setLayout(gridLayout);
+
 
         frame->setFrameShadow(includeWidget->getFrameShadow());
         frame->setLineWidth(includeWidget->getFrameLineWidth());
@@ -2299,18 +2312,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         frame->setGeometry(includeWidget->geometry());
         frame->move(0,0);
 
-        // define a layout for adding the includes
-        QGridLayout *gridLayout =  includeWidget->getIncludegridLayout();//new QGridLayout;
-        if(gridLayout){
-            gridLayout->setContentsMargins(0,0,0,0);
-        SETMARGIN_QT456(gridLayout,0);
-            gridLayout->setVerticalSpacing(spacingVertical);
-            gridLayout->setHorizontalSpacing(spacingHorizontal);
-        }
-        if (boxLayout) includeWidget->setLayout(boxLayout);
-        if (boxLayout) boxLayout->addWidget(frame);
 
-        if(gridLayout) frame->setLayout(gridLayout);
 
 
         //  we set the shape and in case of box, we have to set margins correctly
@@ -8638,8 +8640,8 @@ void CaQtDM_Lib::resizeSpecials(QString className, QWidget *widget, QVariantList
             line->setLineWidth(qRound(linewidth));
         } else {
             //qDebug() << "resize frame" << widget << (double) list.at(5).toInt() * qMin(factX, factY);
-            if ((list.count()>=5) && list.at(5).isValid()){
-                linewidth = (double) list.at(5).toInt() * qMin(factX, factY);
+            if ((list.count()>=5) && list.at(4).isValid()){
+                linewidth = (double) list.at(4).toInt() * qMin(factX, factY);
                 line->setLineWidth(qRound(linewidth));
             }
         }
