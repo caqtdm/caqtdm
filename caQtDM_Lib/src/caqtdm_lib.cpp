@@ -1102,7 +1102,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     QString className(w1->metaObject()->className());
     if(!className.contains("ca") && !className.contains("QTextBrowser") && !className.contains("replaceMacro") &&
-            !className.contains("QE") && !className.contains("QTabWidget")) return;
+            !className.contains("QE") && !className.contains("QTabWidget")&& !className.contains("QGroupBox")) return;
 
     int nbMonitors = 0;
 
@@ -1115,7 +1115,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
     //qDebug() << w1->metaObject()->className() << w1->objectName();
 
-    if(className.contains("ca") || className.contains("QTextBrowser") || className.contains("replaceMacro") || className.contains("QTabWidget")) {
+    if(className.contains("ca") || className.contains("QTextBrowser") || className.contains("replaceMacro") || className.contains("QTabWidget")|| className.contains("QGroupBox")) {
         PRINT(printf("\n%*c %s macro=<%s>", 15 * level, '+', qasc(w1->objectName()), qasc(macro)));
         map = createMap(macro);
         // insert special macro into map
@@ -1331,7 +1331,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             QString text =  tabWidget->tabText(i);
             if(reaffectText(map, &text, w1)) tabWidget->setTabText(i, text);
         }
-
+    // not a ca widget, but offer the possibility to change the title text by using macros
+        //==================================================================================================================
+      } else if(QGroupBox* groupBoxWidget = qobject_cast<QGroupBox *>(w1)) {
+            qDebug()<<"groupBoxWidget:"<<groupBoxWidget->objectName();
+            QString text =  groupBoxWidget->title();
+            if(reaffectText(map, &text, w1)) groupBoxWidget->setTitle(text);
     // not a ca widget, but offer the possibility to load files into the text browser by using macros
     //==================================================================================================================
     } else if(QTextBrowser* browserWidget = qobject_cast<QTextBrowser *>(w1)) {
