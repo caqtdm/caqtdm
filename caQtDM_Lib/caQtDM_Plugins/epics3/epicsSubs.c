@@ -772,10 +772,12 @@ void connectCallback(struct connection_handler_args args)
         PRINT(printf("%s with channel %d has just disconnected, evid=%d\n", ca_name(args.chid), args.chid, info->evID));
         if(info->evAdded) {
             if (info->connected){
-                //status = ca_clear_event(info->evID);
-                if (status != ECA_NORMAL) {
-                   PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
-               }
+                if (info->evID){
+                    status = ca_clear_event(info->evID);
+                    if (status != ECA_NORMAL) {
+                       PRINT(printf("ca_clear_event:\n"" %s\n", ca_message_text[CA_EXTRACT_MSG_NO(status)]));
+                    }
+                }
             }
         }
         info->connected = false;
