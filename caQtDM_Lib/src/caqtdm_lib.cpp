@@ -1334,7 +1334,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     // not a ca widget, but offer the possibility to change the title text by using macros
         //==================================================================================================================
       } else if(QGroupBox* groupBoxWidget = qobject_cast<QGroupBox *>(w1)) {
-            qDebug()<<"groupBoxWidget:"<<groupBoxWidget->objectName();
+            \\qDebug()<<"groupBoxWidget:"<<groupBoxWidget->objectName();
             QString text =  groupBoxWidget->title();
             if(reaffectText(map, &text, w1)) groupBoxWidget->setTitle(text);
     // not a ca widget, but offer the possibility to load files into the text browser by using macros
