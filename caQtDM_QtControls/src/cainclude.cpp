@@ -62,7 +62,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     if (boxLayout)SETMARGIN_QT456(boxLayout,0);
     if (boxLayout)boxLayout->setSpacing(0);
 
-
+    this->setLineSize(0);
     frame = new QFrame();
     thisFrameShape = NoFrame;
     thisFrameShadow = QFrame::Plain;
