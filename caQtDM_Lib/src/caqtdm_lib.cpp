@@ -4712,12 +4712,17 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                 //includeWidget->resize((maximumX + adjustMargin) * factX, (maximumY + adjustMargin) * factY);
                 foreach(QWidget* l ,includeWidget->findChildren<QWidget *>()){
                    QRect resizedata=l->childrenRect();
-                   if ((resizedata.width()>0) && (resizedata.height()>0))
-                   l->resize(resizedata.width(),resizedata.height());
+                   if ((resizedata.width()>0) && (resizedata.height()>0)){
+                       QRect sizedata=l->rect();
+                       if ((sizedata.height()*sizedata.width())<(resizedata.height()*resizedata.width())) {
+                             l->resize(resizedata.width(),resizedata.height());
+                       }
+
+                   }
                 }
 
-                QRect resizedata=includeWidget->childrenRect();
-                includeWidget->resize(resizedata.width(),resizedata.height());
+                //QRect resizedata=includeWidget->childrenRect();
+                //includeWidget->resize(resizedata.width(),resizedata.height());
                 //includeWidget->getIncludeFrame()->resize(resizedata.width(),resizedata.height());
 
 
@@ -4734,7 +4739,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 //                    integerList.insert(3, maximumY);
                     //includeWidget->setProperty("GeometryList", integerList);
                     //qDebug()<< "includeWidget->resize(2)"<<maximumX <<maximumY;
-                    includeWidget->update_geometrysave();
+                    QRect resizedata=includeWidget->childrenRect();
+                    QRect sizedata=includeWidget->rect();
+                    if ((sizedata.height()*sizedata.width())<(resizedata.height()*resizedata.width())) {
+                        //qDebug ()<<"resizedata to:"<<resizedata;
+                        includeWidget->resize(resizedata.width(),resizedata.height());
+                        includeWidget->update_geometrysave();
+                    }
+                    //qDebug ()<<"sizedata"<<sizedata<<"resizedata"<<resizedata<<includeWidget;
+
+
+
+                    //includeWidget->update_geometrysave();
                 }
                 includeWidget->updateGeometry();
                 // when the include is packed into a scroll area, set the scrollbars too
