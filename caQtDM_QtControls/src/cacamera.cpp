@@ -1148,7 +1148,7 @@ template <typename pureData>
 void caCamera::calcImageMono (pureData *ptr,  uint *LineData, long &i, int &ystart, int &yend, float correction, int datasize, QSize resultSize,
                               uint Max[2], uint Min[2])
 {
-    if(i > datasize) return;
+    if(ptr &&(i > datasize)) return;
     if(thisColormap == as_is || thisColormap == color_to_mono) {
         if(i < datasize) {
             for(int k=0; k<(yend-ystart)*resultSize.width(); ++k) {
@@ -1897,22 +1897,26 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
         break;
     }
     case Zlib:{
-        uchar* data2=(uchar*)data;
-        ulong expectedSize = uint((data2[0] << 24) | (data2[1] << 16) |
-                                      (data2[2] <<  8) | (data2[3]      ))+16384;
-        data2=data2+4;
-        decompressedData.resize(expectedSize);
-        ZLIB_ULONG newsize=expectedSize;
-        int error=uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
+        if(data && ( datasize-4)>0){
+            uchar* data2=(uchar*)data;
+            ulong expectedSize = uint((data2[0] << 24) | (data2[1] << 16) |
+                    (data2[2] <<  8) | (data2[3]      ))+16384;
+            data2=data2+4;
+            decompressedData.resize(expectedSize);
+            ZLIB_ULONG newsize=expectedSize;
+            int error=uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
 
-        //decompressedData=qUncompress((uchar*)data, datasize);
-        //datasize=decompressedData->size();
+            //decompressedData=qUncompress((uchar*)data, datasize);
+            //datasize=decompressedData->size();
 
-        data=(char*)decompressedData.constData();
-        savedData = data;
-        //printf("datasize=%d:%d (%i)\n",datasize,decompressedData.size(),error);
-        datasize=(int)newsize;//decompressedData.size();
-
+            data=(char*)decompressedData.constData();
+            savedData = data;
+            //printf("datasize=%d:%d (%i)\n",datasize,decompressedData.size(),error);
+            datasize=(int)newsize;//decompressedData.size();
+        }else{
+            datasize=0;
+            return (QImage *) Q_NULLPTR;
+        }
         break;
     }
     case JPG:{
