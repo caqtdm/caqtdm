@@ -258,6 +258,10 @@ popd
 	cp %{_builddir}/%{name}-%{version}/caQtDM_Lib/caQtDM_Plugins/*.h     %{buildroot}/usr/local/include/caqtdm/caQtDM_Plugins
 	
         cp %{_builddir}/%{name}-%{version}/caQtDM_Viewer/src/*.h     %{buildroot}/usr/local/include/caqtdm
+        
+        cp %{_builddir}/%{name}-%{version}/caQtDM_QtControls/doc/*.qch     %{buildroot}/opt/caqtdm/doc
+	cp %{_builddir}/%{name}-%{version}/caQtDM_QtControls/doc/*.html     %{buildroot}/opt/caqtdm/doc
+	cp %{_builddir}/%{name}-%{version}/caQtDM_QtControls/doc/*.css     %{buildroot}/opt/caqtdm/doc
 	
 	cp -R %{_builddir}/%{name}-%{version}/build/* %{buildroot}
 
