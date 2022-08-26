@@ -9332,6 +9332,13 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 #ifdef MOBILE_ANDROID
                     if (!className.compare("caMenu")) {
                         widget->setMinimumWidth(10);
+                        double x = (double) list.at(0).toInt() * factX;
+                        double y = (double) list.at(1).toInt() * factY;
+                        double width = (double) list.at(2).toInt() * factX;
+                        double height = (double) list.at(3).toInt() * factY;
+                        if(width < 1.0) width=1.0;
+                        if(height < 1.0) height = 1.0;
+                        QRect rectnew = QRect(qRound(x), qRound(y), qRound(width), qRound(height));
                         rectnew.setWidth(width/2.5);
                     }
 #endif

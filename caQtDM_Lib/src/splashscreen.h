@@ -29,6 +29,7 @@
 
 #include <QSplashScreen>
 #include <QApplication>
+#include <QScreen>
 
 #include "caQtDM_Lib_global.h"
 
