@@ -296,6 +296,10 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     canvas->setAutoFillBackground( false );   // use in ui file this parameter for transparency
     #endif
 #endif
+    ignorefirst_MinY=true;
+    ignorefirst_MaxY=true;
+    ignorefirst_MinX=true;
+    ignorefirst_MaxX=true;
 
     installEventFilter(this);
 }
@@ -605,6 +609,14 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
         zoomer->setZoomBase();
 
         replot();
+        if (thisXscaling==Auto){
+            emit getAutoScaleXMin(axisScaleDiv(xBottom).lowerBound());
+            emit getAutoScaleXMax(axisScaleDiv(xBottom).upperBound());
+        }
+        if (thisYscaling==Auto){
+            emit getAutoScaleYMin(axisScaleDiv(yLeft).lowerBound());
+            emit getAutoScaleYMax(axisScaleDiv(yLeft).upperBound());
+        }
     }
 }
 
@@ -629,6 +641,9 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 setXscaling(User); setAxisScale(xBottom, -10.0, 10.0);
                 if(x[i] < SMALLEST) x[i] = SMALLEST;
                 if(x[i] > BIGGEST) x[i] = BIGGEST;
+                emit getAutoScaleXMin(-10.0);
+                emit getAutoScaleXMax(10.0);
+
                 printf("caCartesianPlot::setSamplesData: infinite x value detected, scale set to -10 to 10\n");
                 fflush(stdout);
                 break;
@@ -650,6 +665,8 @@ void caCartesianPlot::setSamplesData(int index, double *x, double *y, int size, 
                 setYscaling(User); setAxisScale(yLeft, -10.0, 10.0);
                 if(y[i] < SMALLEST) y[i] = SMALLEST;
                 if(y[i] > BIGGEST) y[i] = BIGGEST;
+                emit getAutoScaleYMin(-10.0);
+                emit getAutoScaleYMax(10.0);
                 printf("caCartesianPlot::setSamplesData: ininite y value detected, scale set to -10 to 10\n");
                 fflush(stdout);
                 break;
@@ -955,6 +972,11 @@ void caCartesianPlot::setXscaling(axisScaling s)
     thisXscaling = s;
     if(s == Auto) setAxisAutoScale(xBottom, true);
     replot();
+    if(s == Auto){
+        emit getAutoScaleXMin(axisScaleDiv(xBottom).lowerBound());
+        emit getAutoScaleXMax(axisScaleDiv(xBottom).upperBound());
+    }
+
 }
 
 void caCartesianPlot::setYscaling(axisScaling s)
@@ -962,6 +984,10 @@ void caCartesianPlot::setYscaling(axisScaling s)
     thisYscaling = s;
     if(s == Auto) setAxisAutoScale(yLeft, true);
     replot();
+    if(s == Auto){
+        emit getAutoScaleYMin(axisScaleDiv(yLeft).lowerBound());
+        emit getAutoScaleYMax(axisScaleDiv(yLeft).upperBound());
+    }
 }
 
 void caCartesianPlot::setXaxisLimits(QString const &newX)
@@ -1068,8 +1094,16 @@ void caCartesianPlot::setScaleX(double minX, double maxX)
 {
     if(minX == maxX) {
         setAxisScale(xBottom, 0.0, 10.0);
+        if(thisXscaling == Auto){
+            emit getAutoScaleXMin(0.0);
+            emit getAutoScaleXMax(10.0);
+        }
     } else {
         setAxisScale(xBottom, minX, maxX);
+        if(thisXscaling == Auto){
+            emit getAutoScaleXMin(axisScaleDiv(xBottom).lowerBound());
+            emit getAutoScaleXMax(axisScaleDiv(xBottom).upperBound());
+        }
     }
     replot();
 }
@@ -1078,8 +1112,17 @@ void caCartesianPlot::setScaleY(double minY, double maxY)
 {
     if(minY == maxY) {
         setAxisScale(yLeft, 0.0, 10.0);
+        if(thisYscaling == Auto){
+            emit getAutoScaleYMin(0.0);
+            emit getAutoScaleYMax(10.0);
+        }
+
     } else {
         setAxisScale(yLeft, minY, maxY);
+        if(thisYscaling == Auto){
+            emit getAutoScaleYMin(minY);
+            emit getAutoScaleYMax(maxY);
+        }
     }
     replot();
 }
@@ -1304,6 +1347,94 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
     }
     updateLegend();
 #endif
+
+}
+
+void caCartesianPlot::setMinXResize(double value){
+    double data_minX;
+    double data_maxX;
+    if (fabs(filter_MinX-value)>std::numeric_limits<double>::epsilon()*10){
+        filter_MinX=value;
+        if (!ignorefirst_MinX){
+            setXscaling(User);
+            data_minX=axisScaleDiv(xBottom).lowerBound();
+            data_maxX=axisScaleDiv(xBottom).upperBound();
+            if (fabs(data_minX-value)>std::numeric_limits<double>::epsilon()*10){
+                data_minX=value;
+                setScaleX(data_minX, data_maxX);
+                //qDebug()<< "setMinXResize: "<< data_minX << data_maxX;
+            }
+        }else{
+           ignorefirst_MinX=false;
+        }
+
+    }
+}
+
+void caCartesianPlot::setMaxXResize(double value){
+    double data_minX;
+    double data_maxX;
+    // filter to avoid signal storms witout any use
+    if (fabs(filter_MaxX-value)>std::numeric_limits<double>::epsilon()*10){
+        filter_MaxX=value;
+        if (!ignorefirst_MaxX){
+            setXscaling(User);
+            data_minX=axisScaleDiv(xBottom).lowerBound();
+            data_maxX=axisScaleDiv(xBottom).upperBound();
+            if (fabs(data_maxX-value)>std::numeric_limits<double>::epsilon()*10){
+                data_maxX=value;
+                setScaleX(data_minX, data_maxX);
+                //qDebug()<< "setMaxXResize: "<< data_minX << data_maxX;
+            }
+        }else{
+           ignorefirst_MaxX=false;
+        }
+
+    }
+
+
+}
+
+void caCartesianPlot::setMinYResize(double value){
+    double data_minY;
+    double data_maxY;
+    if (fabs(filter_MinY-value)>std::numeric_limits<double>::epsilon()*10){
+        filter_MinY=value;
+        if (!ignorefirst_MinY){
+            setYscaling(User);
+            data_minY=axisScaleDiv(yLeft).lowerBound();
+            data_maxY=axisScaleDiv(yLeft).upperBound();
+            if (fabs(data_minY-value)>std::numeric_limits<double>::epsilon()*10){
+                data_minY=value;
+                setScaleY(data_minY, data_maxY);
+                //qDebug()<< "setMinYResize: "<< data_minY << data_maxY;
+            }
+        }else{
+           ignorefirst_MinY=false;
+        }
+    }
+
+}
+
+void caCartesianPlot::setMaxYResize(double value){
+    double data_minY;
+    double data_maxY;
+    if (fabs(filter_MaxY-value)>std::numeric_limits<double>::epsilon()*10){
+        filter_MaxY=value;
+        if (!ignorefirst_MaxY){
+            setYscaling(User);
+            data_minY=axisScaleDiv(yLeft).lowerBound();
+            data_maxY=axisScaleDiv(yLeft).upperBound();
+
+            if (fabs(data_maxY-value)>std::numeric_limits<double>::epsilon()*10){
+                data_maxY=value;
+                setScaleY(data_minY, data_maxY);
+                //qDebug()<< "setMaxYResize: "<< data_minY << data_maxY;
+            }
+        }else{
+           ignorefirst_MaxY=false;
+        }
+    }
 
 }
 

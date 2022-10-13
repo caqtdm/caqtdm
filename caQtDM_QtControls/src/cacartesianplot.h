@@ -407,8 +407,6 @@ public:
     QString getPV(int indx) const {return thisPV[indx].join(";");}
     void setPV(QString const &newPV, int indx)  {if(newPV.size() > 0) thisPV[indx] = newPV.split(";"); else thisPV[indx]=QStringList();}
 
-    void resetZoom();
-
     void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
 public slots:
@@ -419,9 +417,27 @@ public slots:
     void hideObject(bool hideit) {
 #include "hideobjectcode.h"
     }
+    void setMinXResize(double value);
+    void setMaxXResize(double value);
+    void setMinYResize(double value);
+    void setMaxYResize(double value);
+    void triggerXAutoScale(){
+       setXscaling(Auto);
+    }
+    void triggerYAutoScale(){
+       setYscaling(Auto);
+    }
+    void resetZoom();
+
+
 
 signals:
     void ShowContextMenu(const QPoint&);
+    void getAutoScaleXMin(double xmin);
+    void getAutoScaleXMax(double xmax);
+    void getAutoScaleYMin(double ymin);
+    void getAutoScaleYMax(double ymax);
+
 
 protected:
 
@@ -482,7 +498,8 @@ private:
     bool whiteColors;
 
     double symbolSizeFactor;
-
+    double filter_MinY,filter_MaxY,filter_MinX,filter_MaxX;
+    bool   ignorefirst_MinY,ignorefirst_MaxY,ignorefirst_MinX,ignorefirst_MaxX;
 };
 
 #endif

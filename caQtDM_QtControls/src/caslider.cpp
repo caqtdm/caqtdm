@@ -261,6 +261,42 @@ void caSlider::setSliderValue(double const &value){
     setValue(value);
 }
 
+void caSlider::set_Max_Value(int max)
+{
+    set_Max_Value(double(max));
+}
+
+void caSlider::set_Max_Value(double max)
+{
+    if (fabs(thisMaximum-max)>std::numeric_limits<double>::epsilon()*10){
+        qDebug()<< "Max:"<< max;
+        thisMaximum=max;
+#if QWT_VERSION < 0x060100
+        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
+#else
+        setScale(thisMinimum, thisMaximum);
+#endif
+    }
+
+
+}
+
+void caSlider::set_Min_Value(int min)
+{
+    set_Min_Value(double(min));
+}
+
+void caSlider::set_Min_Value(double min)
+{
+  thisMinimum=min;
+#if QWT_VERSION < 0x060100
+        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
+#else
+        setScale(thisMinimum, thisMaximum);
+#endif
+
+}
+
 void caSlider::setIncrementValue(double const &value){
     thisIncrement = value;
     setDirection(thisDirection);
