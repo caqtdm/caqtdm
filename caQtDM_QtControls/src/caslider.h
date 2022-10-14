@@ -30,7 +30,8 @@
  #define QWT_DLL
 #endif
 
-
+#include <QtCore>
+#include <limits>
 
 #include <qtcontrols_global.h>
 #include <qwt_slider.h>

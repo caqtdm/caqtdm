@@ -56,6 +56,7 @@
 #endif
 
 #include <stdint.h>
+#include <limits>
 #include "caPropHandleDefs.h"
 
 class QTCON_EXPORT caCartesianPlot : public QwtPlot

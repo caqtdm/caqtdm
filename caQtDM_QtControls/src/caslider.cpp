@@ -269,7 +269,7 @@ void caSlider::set_Max_Value(int max)
 void caSlider::set_Max_Value(double max)
 {
     if (fabs(thisMaximum-max)>std::numeric_limits<double>::epsilon()*10){
-        qDebug()<< "Max:"<< max;
+        //qDebug()<< "Max:"<< max;
         thisMaximum=max;
 #if QWT_VERSION < 0x060100
         setRange(thisMinimum, thisMaximum, thisIncrement, 1);
