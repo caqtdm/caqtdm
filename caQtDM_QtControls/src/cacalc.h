@@ -152,7 +152,7 @@ public slots:
     void setValue(double value);
     void setValue(QRect value);
     void setValue(int value);
-
+    void setValue(bool value);
 signals:
     void changeValue(double value);
 

@@ -168,8 +168,18 @@ void caCalc::setValue(QRect value)
 void caCalc::setValue(int value)
 {
     Q_UNUSED(value)
+    double data=(int) value;
     QRect empty;
     setValue(empty);
+    setValue(data);
+}
+
+void caCalc::setValue(bool value)
+{
+    QRect empty;
+    setValue(empty);
+    int data=(int) value;
+    setValue((double) data);
 }
 
 
