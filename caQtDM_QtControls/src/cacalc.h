@@ -155,7 +155,7 @@ public slots:
     void setValue(bool value);
 signals:
     void changeValue(double value);
-
+    void reduced_emitSignal(double value);
 private:
     QString thisChannelA, thisChannelB, thisChannelC, thisChannelD, thisVariable;
     QString thisCalc;
@@ -170,6 +170,8 @@ private:
     QColor m_BackColor;
     bool checkSignal_value_bool;
     int  checkSignal_value_int;
+    double checkSignal_value_double;
+    double changeValue_value_double;
     QRect checkSignal_value_QRect;
     int value_QRect_const[MAX_QRECT_PARAMS];
     bool value_QRect_is_const[MAX_QRECT_PARAMS];

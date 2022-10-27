@@ -258,7 +258,9 @@ void caSlider::setMinValue(double const &minim){
 
 void caSlider::setSliderValue(double const &value){
     thisValue = value;
+    //qDebug() <<"setSliderValue"<<value<< this;
     setValue(value);
+
 }
 
 void caSlider::set_Max_Value(int max)
@@ -288,13 +290,14 @@ void caSlider::set_Min_Value(int min)
 
 void caSlider::set_Min_Value(double min)
 {
-  thisMinimum=min;
+    if (fabs(thisMinimum-min)>std::numeric_limits<double>::epsilon()*10){
+        thisMinimum=min;
 #if QWT_VERSION < 0x060100
         setRange(thisMinimum, thisMaximum, thisIncrement, 1);
 #else
         setScale(thisMinimum, thisMaximum);
 #endif
-
+    }
 }
 
 void caSlider::setIncrementValue(double const &value){

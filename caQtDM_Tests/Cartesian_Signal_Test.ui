@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>763</width>
-    <height>645</height>
+    <width>776</width>
+    <height>1019</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,120 +39,14 @@
     <property name="LegendEnabled">
      <bool>true</bool>
     </property>
-   </widget>
-   <widget class="caCalc" name="cacalc">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>550</y>
-      <width>70</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="variable">
-     <string notr="true">scrollmax</string>
-    </property>
-    <property name="initialValue">
-     <double>50.000000000000000</double>
-    </property>
-    <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
-    </property>
-   </widget>
-   <widget class="caSlider" name="caslider">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>550</y>
-      <width>241</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="upperBound">
-     <double>50.000000000000000</double>
-    </property>
-    <property name="totalSteps">
-     <UInt>50</UInt>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">scrollmax</string>
-    </property>
-    <property name="direction">
-     <enum>caSlider::Right</enum>
-    </property>
-    <property name="highLimitMode">
-     <enum>caSlider::User</enum>
-    </property>
-    <property name="maxValue">
-     <double>50.000000000000000</double>
-    </property>
-    <property name="lowLimitMode">
-     <enum>caSlider::User</enum>
-    </property>
-    <property name="minValue">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="value" stdset="0">
-     <double>30.000000000000000</double>
-    </property>
-   </widget>
-   <widget class="caCalc" name="cacalc_7">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>580</y>
-      <width>70</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="variable">
-     <string notr="true">scrollmin</string>
-    </property>
-    <property name="initialValue">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="eventSignal">
-     <enum>caCalc::onAnyChange</enum>
-    </property>
-   </widget>
-   <widget class="caSlider" name="caslider_2">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>580</y>
-      <width>241</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="upperBound">
-     <double>50.000000000000000</double>
-    </property>
-    <property name="totalSteps">
-     <UInt>50</UInt>
-    </property>
-    <property name="channel" stdset="0">
-     <string notr="true">scrollmin</string>
-    </property>
-    <property name="direction">
-     <enum>caSlider::Right</enum>
-    </property>
-    <property name="highLimitMode">
-     <enum>caSlider::User</enum>
-    </property>
-    <property name="maxValue">
-     <double>50.000000000000000</double>
-    </property>
-    <property name="lowLimitMode">
-     <enum>caSlider::User</enum>
-    </property>
-    <property name="minValue">
-     <double>0.000000000000000</double>
+    <property name="XaxisSyncGroup">
+     <number>1</number>
     </property>
    </widget>
    <widget class="caSlider" name="caslider_4">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>660</x>
       <y>258</y>
       <width>21</width>
       <height>231</height>
@@ -186,7 +80,7 @@
    <widget class="caSlider" name="caslider_5">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>690</x>
       <y>258</y>
       <width>21</width>
       <height>231</height>
@@ -223,7 +117,7 @@
    <widget class="caCalc" name="cacalc_8">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>690</x>
       <y>230</y>
       <width>70</width>
       <height>20</height>
@@ -231,6 +125,9 @@
     </property>
     <property name="variable">
      <string notr="true">scrollmaxy</string>
+    </property>
+    <property name="calc">
+     <string notr="true"/>
     </property>
     <property name="initialValue">
      <double>5.000000000000000</double>
@@ -242,7 +139,7 @@
    <widget class="caCalc" name="cacalc_9">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>610</x>
       <y>230</y>
       <width>70</width>
       <height>20</height>
@@ -256,19 +153,6 @@
     </property>
     <property name="eventSignal">
      <enum>caCalc::onAnyChange</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>180</y>
-      <width>181</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Plot Reset</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="groupBox">
@@ -370,6 +254,25 @@
      </property>
      <property name="initialValue">
       <double>1.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_14">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>30</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">simul1</string>
+     </property>
+     <property name="variableType">
+      <enum>caCalc::vector</enum>
+     </property>
+     <property name="channels" stdset="0">
+      <string>v1;v1;v2;v2;v1;v1;v3;v3;v3;v3;v1;v2;v1;v4;v2;v4;v1;v1;v1;v2;v1;v1;v4;v4;v4;v2;v2;v2;v2;v1;v1;v1;v1;v1;v1;v1</string>
      </property>
     </widget>
    </widget>
@@ -482,6 +385,389 @@
      </property>
     </widget>
    </widget>
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>630</y>
+      <width>531</width>
+      <height>341</height>
+     </rect>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Cartesian_Signal_Test_include.ui</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>271</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Rescale with delay</string>
+    </property>
+    <widget class="caMessageButton" name="camessagebutton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>81</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">Global_Rescale</string>
+     </property>
+     <property name="label">
+      <string notr="true">Global_Rescale</string>
+     </property>
+     <property name="releaseMessage">
+      <string notr="true">0</string>
+     </property>
+     <property name="pressMessage">
+      <string notr="true">1</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_20">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">Global_Rescale.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:150}}</string>
+     </property>
+     <property name="calc">
+      <string notr="true"/>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::Never</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_16">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">start.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:50}}</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A&lt;100?A+1:A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">start.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:50}}</string>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_17">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">trigger</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A&gt;10?1:0</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">start</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onFirstChange</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_21">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">trigger_delay</string>
+     </property>
+     <property name="calc">
+      <string notr="true">A&gt;15?1:0</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">start</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onFirstChange</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caCalc" name="cacalc_18">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>480</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">Local_Rescale.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:150}}</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">Global_Rescale.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:150}}</string>
+    </property>
+    <property name="eventSignal">
+     <enum>caCalc::TriggerZeroToOne</enum>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>520</y>
+      <width>531</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>X-Scrolling with min/max and delayed values</string>
+    </property>
+    <widget class="caCalc" name="cacalc_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">scrollmin</string>
+     </property>
+     <property name="initialValue">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_15">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>20</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">B=1?A:0</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">_Automax</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">trigger</string>
+     </property>
+     <property name="initialValue">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">scrollmax</string>
+     </property>
+     <property name="calc">
+      <string notr="true"/>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true"/>
+     </property>
+     <property name="channelB">
+      <string notr="true"/>
+     </property>
+     <property name="channelC">
+      <string notr="true"/>
+     </property>
+     <property name="initialValue">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caSlider" name="caslider_2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>50</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="upperBound">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="totalSteps">
+      <UInt>50</UInt>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">scrollmin</string>
+     </property>
+     <property name="direction">
+      <enum>caSlider::Right</enum>
+     </property>
+     <property name="highLimitMode">
+      <enum>caSlider::User</enum>
+     </property>
+     <property name="maxValue">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="lowLimitMode">
+      <enum>caSlider::User</enum>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_23">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">B=1?A:0</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">_Automin</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">trigger_delay</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_19">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>50</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">B=1?A:0</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">_Automin</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">trigger</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caSlider" name="caslider">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>20</y>
+       <width>241</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="upperBound">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="totalSteps">
+      <UInt>50</UInt>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">scrollmax</string>
+     </property>
+     <property name="direction">
+      <enum>caSlider::Right</enum>
+     </property>
+     <property name="highLimitMode">
+      <enum>caSlider::User</enum>
+     </property>
+     <property name="maxValue">
+      <double>50.000000000000000</double>
+     </property>
+     <property name="lowLimitMode">
+      <enum>caSlider::User</enum>
+     </property>
+     <property name="minValue">
+      <double>0.000000000000000</double>
+     </property>
+     <property name="value" stdset="0">
+      <double>30.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_22">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>20</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">B=1?A:0</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">_Automax</string>
+     </property>
+     <property name="channelB">
+      <string notr="true">trigger_delay</string>
+     </property>
+     <property name="initialValue">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
  <customwidgets>
@@ -489,6 +775,16 @@
    <class>caSlider</class>
    <extends>QWidget</extends>
    <header>caSlider</header>
+  </customwidget>
+  <customwidget>
+   <class>caMessageButton</class>
+   <extends>QPushButton</extends>
+   <header>caMessageButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
   </customwidget>
   <customwidget>
    <class>caCartesianPlot</class>
@@ -504,30 +800,14 @@
  <resources/>
  <connections>
   <connection>
-   <sender>cacalc</sender>
-   <signal>emitSignal(double)</signal>
-   <receiver>cacartesianplot</receiver>
-   <slot>setMaxXResize(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>139</x>
-     <y>561</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>292</x>
-     <y>354</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cacalc_7</sender>
    <signal>emitSignal(double)</signal>
    <receiver>cacartesianplot</receiver>
    <slot>setMinXResize(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>592</y>
+     <x>62</x>
+     <y>562</y>
     </hint>
     <hint type="destinationlabel">
      <x>235</x>
@@ -542,7 +822,7 @@
    <slot>setMinYResize(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>571</x>
+     <x>661</x>
      <y>244</y>
     </hint>
     <hint type="destinationlabel">
@@ -558,7 +838,7 @@
    <slot>setMaxYResize(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>636</x>
+     <x>726</x>
      <y>244</y>
     </hint>
     <hint type="destinationlabel">
@@ -600,54 +880,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>cacartesianplot</receiver>
-   <slot>resetZoom()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>82</x>
-     <y>189</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>259</x>
-     <y>256</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>cacartesianplot</receiver>
-   <slot>triggerXAutoScale()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>89</x>
-     <y>192</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>284</x>
-     <y>265</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>cacartesianplot</receiver>
-   <slot>triggerYAutoScale()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>56</x>
-     <y>192</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>282</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>cacartesianplot</sender>
    <signal>getAutoScaleYMax(double)</signal>
    <receiver>cacalc_13</receiver>
@@ -665,22 +897,6 @@
   </connection>
   <connection>
    <sender>cacartesianplot</sender>
-   <signal>getAutoScaleXMax(double)</signal>
-   <receiver>caslider</receiver>
-   <slot>set_Max_Value(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>466</x>
-     <y>427</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>562</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacartesianplot</sender>
    <signal>getAutoScaleYMax(double)</signal>
    <receiver>caslider_5</receiver>
    <slot>set_Max_Value(double)</slot>
@@ -690,24 +906,8 @@
      <y>417</y>
     </hint>
     <hint type="destinationlabel">
-     <x>616</x>
+     <x>706</x>
      <y>425</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cacartesianplot</sender>
-   <signal>getAutoScaleXMin(double)</signal>
-   <receiver>caslider</receiver>
-   <slot>set_Min_Value(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>418</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>418</x>
-     <y>557</y>
     </hint>
    </hints>
   </connection>
@@ -722,8 +922,8 @@
      <y>467</y>
     </hint>
     <hint type="destinationlabel">
-     <x>415</x>
-     <y>587</y>
+     <x>355</x>
+     <y>557</y>
     </hint>
    </hints>
   </connection>
@@ -738,8 +938,8 @@
      <y>451</y>
     </hint>
     <hint type="destinationlabel">
-     <x>402</x>
-     <y>597</y>
+     <x>342</x>
+     <y>567</y>
     </hint>
    </hints>
   </connection>
@@ -754,7 +954,7 @@
      <y>425</y>
     </hint>
     <hint type="destinationlabel">
-     <x>613</x>
+     <x>703</x>
      <y>401</y>
     </hint>
    </hints>
@@ -770,7 +970,7 @@
      <y>477</y>
     </hint>
     <hint type="destinationlabel">
-     <x>577</x>
+     <x>667</x>
      <y>358</y>
     </hint>
    </hints>
@@ -786,8 +986,152 @@
      <y>480</y>
     </hint>
     <hint type="destinationlabel">
-     <x>585</x>
+     <x>675</x>
      <y>386</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_18</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>cacartesianplot</receiver>
+   <slot>triggerXAutoScale()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>622</x>
+     <y>460</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>461</x>
+     <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_18</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>cacartesianplot</receiver>
+   <slot>triggerYAutoScale()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>592</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>473</x>
+     <y>475</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>cacartesianplot</receiver>
+   <slot>setMaxXResize(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>79</x>
+     <y>531</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>292</x>
+     <y>354</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_19</sender>
+   <signal>reduced_emitSignal(double)</signal>
+   <receiver>caslider</receiver>
+   <slot>set_Min_Value(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>493</x>
+     <y>576</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>352</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_22</sender>
+   <signal>reduced_emitSignal(double)</signal>
+   <receiver>cacalc</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>585</x>
+     <y>541</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>91</x>
+     <y>528</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_15</sender>
+   <signal>reduced_emitSignal(double)</signal>
+   <receiver>caslider</receiver>
+   <slot>set_Max_Value(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>509</x>
+     <y>539</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>334</x>
+     <y>536</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_19</sender>
+   <signal>reduced_emitSignal(double)</signal>
+   <receiver>caslider_2</receiver>
+   <slot>set_Min_Value(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>511</x>
+     <y>566</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>356</x>
+     <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_15</sender>
+   <signal>reduced_emitSignal(double)</signal>
+   <receiver>caslider_2</receiver>
+   <slot>set_Max_Value(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>519</x>
+     <y>544</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>348</x>
+     <y>562</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_23</sender>
+   <signal>reduced_emitSignal(double)</signal>
+   <receiver>cacalc_7</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>604</x>
+     <y>572</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>75</x>
+     <y>557</y>
     </hint>
    </hints>
   </connection>
