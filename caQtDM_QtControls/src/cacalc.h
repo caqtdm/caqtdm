@@ -26,6 +26,7 @@
 #ifndef CACALC_H
 #define CACALC_H
 
+#include <QtCore>
 #include <QWidget>
 #include <QLabel>
 #include <limits>
