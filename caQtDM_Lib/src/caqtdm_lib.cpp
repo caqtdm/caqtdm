@@ -8922,7 +8922,7 @@ void CaQtDM_Lib::send_delayed_popup_signal(){
         QString geometry="";
 
         dynVars = w->property("delayed_popup_filename");
-        qDebug() << dynVars;
+        //qDebug() << dynVars;
         if(dynVars.canConvert<QString>()){
             Filename =dynVars.toString();
         }
