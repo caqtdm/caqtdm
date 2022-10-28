@@ -28,6 +28,7 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <limits>
 #include "esimplelabel.h"
 #include <qtcontrols_global.h>
 #include "caPropHandleDefs.h"
