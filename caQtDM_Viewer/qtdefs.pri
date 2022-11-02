@@ -302,6 +302,11 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+# 4.4.1
+# caQtDM can be compiled with Qt6
+# new signals for caCartesianplot
+# fix for caInclude with upscaling
+
 # 4.4.0
 # fileopenwindow: options changes
 # fix for converted adl files
