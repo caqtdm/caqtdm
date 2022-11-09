@@ -115,10 +115,12 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // title
     QLabel *title = new QLabel("Start settings");
-    specials.setNewStyleSheet(title, desktopSize, 22, 15, "background-color : #aaffff; color : black; ", 4);
-
+   specials.setNewStyleSheet(title, desktopSize, 22, 15, "background-color : #aaffff; color : black; ", 4);
+   title->adjustSize();
     title->setAlignment(Qt::AlignCenter);
     frameLayout->addWidget(title, 0, Qt::AlignCenter);
+   // title->setMaximumWidth(title->fontMetrics().boundingRect(title->text()).width());
+   // title->setMaximumHeight(title->fontMetrics().boundingRect(title->text()).height());
 
     // first layout for first group
     QHBoxLayout *clearLayout = new QHBoxLayout;
