@@ -1714,6 +1714,15 @@ void FileOpenWindow::closeEvent(QCloseEvent* ce)
     Callback_ActionExit();
     ce->ignore();
 }
+#ifdef MOBILE
+bool FileOpenWindow::event(QEvent *e)
+{
+    if (e->type() == QEvent::WindowActivate) {
+        if (!debugWindow) cycleWindows();
+    }
+    return QWidget::event(e);
+}
+#endif
 
 bool FileOpenWindow::eventFilter(QObject *obj, QEvent *event)
 {
