@@ -1717,8 +1717,9 @@ void FileOpenWindow::closeEvent(QCloseEvent* ce)
 #ifdef MOBILE
 bool FileOpenWindow::event(QEvent *e)
 {
-    if (e->type() == QEvent::WindowActivate) {
-        if (!debugWindow) cycleWindows();
+    if (e->type() == QEvent::Show) {
+        qDebug()<<"QEvent::Show!";
+        if (!debugWindow) this->showMinimized();
     }
     return QWidget::event(e);
 }
