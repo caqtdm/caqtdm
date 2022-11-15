@@ -105,6 +105,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frame->setAutoFillBackground(true);
     frame->setObjectName("topFrame");
     frame->setStyleSheet("QFrame#topFrame {border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,150);}");
+    frame->adjustSize();
 
     windowlayout->addWidget(frame); // add frame to layout
 
