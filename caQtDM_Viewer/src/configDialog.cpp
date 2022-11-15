@@ -286,6 +286,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     #endif
     QLabel *version = new QLabel(message);
     version->setAlignment(Qt::AlignRight);
+    version->adjustSize();
     specials.setNewStyleSheet(version, desktopSize, 22, 13, "background-color: transparent;", -4);
 
     // add it
