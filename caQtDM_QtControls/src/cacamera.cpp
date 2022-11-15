@@ -250,7 +250,9 @@ void caCamera::setDecodemodeNum(double mode)
     int intermed = (int)mode;
     m_init = true;
     thisColormode = (colormode) intermed; // direct not allowed on Windows (C2440)
-    if(colormodeCombo != (QComboBox*)Q_NULLPTR) colormodeCombo->setCurrentIndex(thisColormode);
+    if(colormodeCombo != (QComboBox*)Q_NULLPTR)
+        if (colormodeCombo->count()<thisColormode)
+            colormodeCombo->setCurrentIndex(thisColormode);
 }
 
 void caCamera::setPackingmodeNum(int mode)
@@ -265,14 +267,18 @@ void caCamera::setPackingmodeNum(double mode)
     //printf("packingmodeset with %d\n", (int) mode);
     int intermed = (int)mode;
     thisPackingmode = (packingmode) intermed;// direct not allowed on Windows (C2440)
-    if(packingmodeCombo != (QComboBox*)Q_NULLPTR) packingmodeCombo->setCurrentIndex(thisPackingmode);
+    if(packingmodeCombo != (QComboBox*)Q_NULLPTR)
+        if (packingmodeCombo->count()<thisPackingmode)
+            packingmodeCombo->setCurrentIndex(thisPackingmode);
 }
 
 void caCamera::setCompressionmodeNum(int mode)
 {
     //printf("compressionmodeset with %d\n", mode);
     thisCompressionmode = (compressionmode) mode;
-    if(compressionmodeCombo != (QComboBox*)Q_NULLPTR) compressionmodeCombo->setCurrentIndex(thisCompressionmode);
+    if(compressionmodeCombo != (QComboBox*)Q_NULLPTR)
+        if (compressionmodeCombo->count()<thisCompressionmode)
+            compressionmodeCombo->setCurrentIndex(thisCompressionmode);
 }
 
 void caCamera::setCompressionmodeNum(double mode)
@@ -280,7 +286,9 @@ void caCamera::setCompressionmodeNum(double mode)
     //printf("compressionmodeset with %d\n", (int) mode);
     int intermed = (int)mode;
     thisCompressionmode = (compressionmode) intermed;
-    if(compressionmodeCombo != (QComboBox*)Q_NULLPTR) compressionmodeCombo->setCurrentIndex(thisCompressionmode);
+    if(compressionmodeCombo != (QComboBox*)Q_NULLPTR)
+       if (compressionmodeCombo->count()<thisCompressionmode)
+            compressionmodeCombo->setCurrentIndex(thisCompressionmode);
 }
 
 

@@ -143,7 +143,7 @@ public:
 
     enum packingmode {packNo, MSB12Bit, LSB12Bit, Reversed};
 
-    enum compressionmode {non, Zlib, JPG };
+    enum compressionmode {non = 0, Zlib, JPG };
 
     enum Properties { customcolormap = 0, discretecolormap};
 
