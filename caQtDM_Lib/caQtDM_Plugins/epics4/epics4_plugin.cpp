@@ -1741,6 +1741,8 @@ int Epics4Plugin::initCommunicationLayer(MutexKnobData *mutexKnobDataP, MessageW
 {
     Q_UNUSED(options);
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::initCommunicationLayer\n";
+    QString msg=QString("Epics4Plugin: epics version: %1").arg(EPICS_VERSION_STRING);
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     mutexKnobData = mutexKnobDataP;
     ClientFactory::start();
     CAClientFactory::start();
@@ -1748,6 +1750,7 @@ int Epics4Plugin::initCommunicationLayer(MutexKnobData *mutexKnobDataP, MessageW
     requester = Epics4RequesterPtr(new Epics4Requester(messageWindow));
     if(Epics4Plugin::getDebug()) cout << "Epics4Plugin::initCommunicationLayer return true\n";
     return true;
+
 }
 
 int Epics4Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)

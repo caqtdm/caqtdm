@@ -113,6 +113,8 @@ int bsreadPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
+    QString msg=QString("bsreadPlugin: ZMQ version: %1").arg(ZMQ_VERSION);
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
 
 
     initValue = 0.0;
