@@ -384,9 +384,9 @@ epics4_plugin {
                     CONFIG +=Define_Build_epicsPV_controls Define_Build_epics_controls
                     CONFIG +=Define_Symbols
                     QMAKE_CXXFLAGS     -= -Zc:externConstexpr
-                    QMAKE_CXXFLAGS     += /Zc:twoPhase-
-                    # by some reason this gets into the centos compilation ?????
+                    # by some reason this gets into the centos+RHL compilation ?????
                     !unix: {
+                        QMAKE_CXXFLAGS     += /Zc:twoPhase-
                         QMAKE_CXXFLAGS     += -Zc:referenceBinding
                     }
 		  }
