@@ -1761,6 +1761,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // default format, format from ui file will be used normally except for channel precision
         textentryWidget->setFormat(1);
 
+
+        QString text =  treatMacro(map, textentryWidget->text(), &doNothing, w1->objectName());
+        text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
+        textentryWidget->setText(text);
+
         // get focus away
         textentryWidget->clearFocus();
         myWidget->setFocus();
@@ -1822,6 +1827,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         if(reaffectText(map, &text, w1))  lineeditWidget->setToolTip(text);
         text= lineeditWidget->statusTip();
         if(reaffectText(map, &text, w1))  lineeditWidget->setStatusTip(text);
+
+        text =  treatMacro(map, lineeditWidget->text(), &doNothing, w1->objectName());
+        text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
+        lineeditWidget->setText(text);
 
 
         // insert dataindex list

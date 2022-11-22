@@ -123,6 +123,13 @@ void caLineEdit::setFromTextEntry()
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
 }
 
+void caLineEdit::triggertextChange(bool send)
+{
+    if (send){
+        emit textChanged(text());
+    }
+}
+
 void caLineEdit::setValueType(bool isvalue)
 {
     isValue = isvalue;
