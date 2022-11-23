@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>911</width>
-    <height>478</height>
+    <height>685</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,81 +20,21 @@
       <x>23</x>
       <y>74</y>
       <width>857</width>
-      <height>393</height>
+      <height>451</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0">
-     <item row="2" column="0">
-      <widget class="caLabel" name="calabel_11">
+    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+     <item row="5" column="1">
+      <widget class="caLabel" name="calabel_17">
        <property name="text">
-        <string>$(TEST)$(TEST1)$(TEST)$(TEST1)$(TEST)$(TEST1)</string>
+        <string>123451234512345123451234512345</string>
        </property>
       </widget>
      </item>
-     <item row="9" column="0">
-      <widget class="caLabel" name="calabel_7">
+     <item row="15" column="1">
+      <widget class="caLabel" name="calabel_31">
        <property name="text">
-        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A&quot;})</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="caLabel" name="calabel_12">
-       <property name="text">
-        <string>$(TEST{Bla})$(TEST1)$(TEST)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="caLabel" name="calabel_15">
-       <property name="text">
-        <string>xyz$$876_A1245______</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QLabel" name="label_2">
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>A45</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="0">
-      <widget class="caLabel" name="calabel_21">
-       <property name="text">
-        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\1&quot;})</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="caLabel" name="calabel_9">
-       <property name="text">
-        <string>xyz$$876_$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\1&quot;})______</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="caLabel" name="calabel_10">
-       <property name="text">
-        <string>$(TEST)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="caLabel" name="calabel_8">
-       <property name="text">
-        <string>______$(TEST{&quot;regex&quot;:&quot;[1-2]+&quot;,&quot;value&quot;:&quot;HUI1HUIHUI&quot;})</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
+        <string>RegExConst</string>
        </property>
       </widget>
      </item>
@@ -105,6 +45,27 @@
        </property>
       </widget>
      </item>
+     <item row="6" column="0">
+      <widget class="caLabel" name="calabel_12">
+       <property name="text">
+        <string>$(TEST{Bla})$(TEST1)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="caLabel" name="calabel_20">
+       <property name="text">
+        <string>HUI2HUIHUI 12345 abcd12345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="caLabel" name="calabel_23">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="1">
       <widget class="caLabel" name="calabel_14">
        <property name="text">
@@ -112,54 +73,27 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
-      <widget class="caLabel" name="calabel">
+     <item row="4" column="0">
+      <widget class="caLabel" name="calabel_9">
        <property name="text">
-        <string>$(TEST2)</string>
+        <string>xyz$$876_$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\1&quot;})______</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
-      <widget class="caLabel" name="calabel_2">
+     <item row="16" column="1">
+      <widget class="caLabel" name="calabel_32">
        <property name="text">
-        <string>$(TEST)$(TEST)$(TEST)$(TEST)$(TEST)$(TEST)</string>
+        <string>12345</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
+     <item row="3" column="0">
+      <widget class="caLabel" name="calabel_8">
        <property name="text">
-        <string>A345</string>
+        <string>______$(TEST{&quot;regex&quot;:&quot;[1-2]+&quot;,&quot;value&quot;:&quot;HUI1HUIHUI&quot;})</string>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <pointsize>15</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>A1245</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="caLabel" name="calabel_19">
-       <property name="text">
-        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;HUI2HUIHUI&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
       </widget>
      </item>
@@ -178,10 +112,116 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="caLabel" name="calabel_16">
+     <item row="5" column="0">
+      <widget class="caLabel" name="calabel_2">
        <property name="text">
-        <string>______HUI2HUIHUI345</string>
+        <string>$(TEST)$(TEST)$(TEST)$(TEST)$(TEST)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="0">
+      <widget class="caLabel" name="calabel_27">
+       <property name="text">
+        <string> $(TEST=Error!!)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="caLabel" name="calabel_15">
+       <property name="text">
+        <string>xyz$$876_A1245______</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="1">
+      <widget class="caLabel" name="calabel_34">
+       <property name="text">
+        <string>chain constant test</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="0">
+      <widget class="caLabel" name="calabel_37">
+       <property name="text">
+        <string>$(TEST5=$(TEST4=$(TEST3=$(TEST1))))</string>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="1">
+      <widget class="caLabel" name="calabel_39">
+       <property name="text">
+        <string>abcd</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="caLabel" name="calabel_11">
+       <property name="text">
+        <string>$(TEST)$(TEST1)$(TEST)$(TEST1)$(TEST)$(TEST1)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="caLabel" name="calabel_7">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A&quot;})</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="caLabel" name="calabel_19">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;HUI2HUIHUI&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="0">
+      <widget class="caLabel" name="calabel_25">
+       <property name="text">
+        <string>$(TEST5=This) $(TEST5=is) $(TEST5=a) $(TEST5=macro) $(TEST5=test)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="0">
+      <widget class="caLabel" name="calabel_33">
+       <property name="text">
+        <string>$(TEST5{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}=chain constant test)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A345</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="caLabel" name="calabel_21">
+       <property name="text">
+        <string>$(TEST{&quot;regex&quot;:&quot;([1,2]+)([3])&quot;,&quot;value&quot;:&quot;A\\1&quot;})</string>
+       </property>
+      </widget>
+     </item>
+     <item row="15" column="0">
+      <widget class="caLabel" name="calabel_29">
+       <property name="text">
+        <string>$(TEST5{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}=RegExConst)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="1">
+      <widget class="caLabel" name="calabel_36">
+       <property name="text">
+        <string>chain constant test</string>
        </property>
       </widget>
      </item>
@@ -192,6 +232,63 @@
        </property>
       </widget>
      </item>
+     <item row="16" column="0">
+      <widget class="caLabel" name="calabel_30">
+       <property name="text">
+        <string>$(TEST5{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}=$(TEST))</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="caLabel" name="calabel_16">
+       <property name="text">
+        <string>______HUI2HUIHUI345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0">
+      <widget class="caLabel" name="calabel_35">
+       <property name="text">
+        <string>$(TEST5=$(TEST4=$(TEST3=chain constant test)))</string>
+       </property>
+      </widget>
+     </item>
+     <item row="14" column="1">
+      <widget class="caLabel" name="calabel_28">
+       <property name="text">
+        <string>12345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="1">
+      <widget class="caLabel" name="calabel_26">
+       <property name="text">
+        <string>This is a macro test</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="caLabel" name="calabel_10">
+       <property name="text">
+        <string>$(TEST)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>A45</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
      <item row="6" column="1">
       <widget class="caLabel" name="calabel_18">
        <property name="text">
@@ -199,24 +296,18 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
-      <widget class="caLabel" name="calabel_20">
-       <property name="text">
-        <string>HUI2HUIHUI 12345 abcd12345</string>
+     <item row="10" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>15</pointsize>
+        </font>
        </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="caLabel" name="calabel_17">
        <property name="text">
-        <string>123451234512345123451234512345</string>
+        <string>A1245</string>
        </property>
-      </widget>
-     </item>
-     <item row="12" column="0">
-      <widget class="caLabel" name="calabel_23">
-       <property name="text">
-        <string>$(TEST{&quot;regex&quot;:&quot;\\S+&quot;,&quot;value&quot;:&quot;$(TEST1)&quot;}) $(TEST{Bla}) $(TEST1)$(TEST)</string>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -224,6 +315,27 @@
       <widget class="caLabel" name="calabel_24">
        <property name="text">
         <string>abcd 12345 abcd12345</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="caLabel" name="calabel">
+       <property name="text">
+        <string>$(TEST2)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="0">
+      <widget class="caLabel" name="calabel_40">
+       <property name="text">
+        <string>$(TEST5=$(TEST=$(TEST3=$(TEST4))))</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="1">
+      <widget class="caLabel" name="calabel_42">
+       <property name="text">
+        <string>12345</string>
        </property>
       </widget>
      </item>
@@ -275,6 +387,32 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+   </widget>
+   <widget class="caLabel" name="calabel_38">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>600</y>
+      <width>424</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>chain constant test</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_41">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>550</y>
+      <width>424</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>abcd</string>
+    </property>
    </widget>
   </widget>
  </widget>

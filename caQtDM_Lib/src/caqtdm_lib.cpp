@@ -3423,6 +3423,19 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                     QString toReplace = "$(" + i.key() + ")";
                     //qDebug() << "replace in" << newText << toReplace << "with" << i.value();
                     newText.replace(toReplace, i.value());
+
+                    toReplace = "$(" + i.key() + "=";
+                    int position=newText.indexOf(toReplace);
+                    if (position!=-1){
+                        // find end of the constant
+                        int endofconstant=newText.indexOf(QString(")"), position+toReplace.length());
+                        if (endofconstant!=-1){
+                            newText=newText.remove(position+toReplace.length(),endofconstant);
+                        }
+                    }
+
+                    newText.replace(toReplace, i.value());
+
                 }
                 if (newText_Backup.compare(newText)==0){
                     //qDebug() << "finish Loop simple Macro Replace";
@@ -3502,6 +3515,37 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                 }
 
             }
+            // unresolved macros with a own constant
+            if(newText.contains("$(")){
+
+                recursive_counter=0;
+                recursive_continue=true;
+                while (recursive_continue) {
+                    QString newText_Backup=newText;
+                    QString unresMacro = "";
+                    QString tofind = "$(";
+                    int position=newText.indexOf(tofind);
+                    while (position != (-1)){
+                        int constmacro_start=(position-2)+tofind.length();
+                        int constmacro_end  =newText.indexOf(QString("="), constmacro_start);
+                        if ((constmacro_end!=-1)&&(position >= 0)&&(position < newText.length())){
+                            //qDebug()<<"newText.mid"<<newText.mid(constmacro_start, constmacro_end-constmacro_start+1);
+                            newText=newText.remove(constmacro_start, constmacro_end-constmacro_start+1);
+                            //qDebug()<<"newText"<<newText;
+                            if (newText.indexOf(")")!=-1) newText=newText.remove(newText.indexOf(")"),1);
+                        }
+                        position=newText.indexOf(tofind,position+1);
+                    }
+
+                    if (newText_Backup.compare(newText)==0){
+                        //qDebug() << "finish Loop simple Macro Replace";
+                        recursive_continue=false;
+                    }
+                    if(recursive_counter++ > 10) break;
+                }
+            }
+
+
             // unresolved macros
             if(newText.contains("$(")){
                 QString unresMacro = "";
