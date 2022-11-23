@@ -3364,7 +3364,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->grabGesture(Qt::TapAndHoldGesture);
         w1->installEventFilter(this);
 #else
-        if(nbMonitors> 0 && !thisFileFull.contains(POPUPDEFENITION)) w1->installEventFilter(this);
+        if(!thisFileFull.contains(POPUPDEFENITION)) w1->installEventFilter(this);
 #endif
     }
 
