@@ -3354,7 +3354,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
     // make a context menu for object having a monitor
     //if(className.contains("ca") && !className.contains("caRel") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) {
     if((className.contains("ca") && !className.contains("caTable") && !className.contains("caShellCommand") && nbMonitors > 0) || className.contains("caRel") ||
-            className.contains("caScript")) {
 
         w1->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(w1, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(ShowContextMenu(const QPoint&)));
