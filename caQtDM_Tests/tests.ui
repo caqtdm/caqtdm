@@ -4563,7 +4563,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>220</x>
-          <y>370</y>
+          <y>360</y>
           <width>100</width>
           <height>100</height>
          </rect>
@@ -4583,6 +4583,15 @@ p, li { white-space: pre-wrap; }
           <green>26</green>
           <blue>28</blue>
          </color>
+        </property>
+        <property name="visibility">
+         <enum>caInclude::StaticV</enum>
+        </property>
+        <property name="visibilityCalc">
+         <string notr="true">A&gt;1?1:1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">ACM:COUNT:1</string>
         </property>
         <property name="caqtdmPopupUI" stdset="0">
          <string>popup.ui; DEVICE=ACM:COUNT:1</string>
