@@ -306,6 +306,13 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # caQtDM can be compiled with Qt6
 # new signals for caCartesianplot
 # fix for caInclude with upscaling
+# fix for undefined macros to define a standard value in macro
+# fix for popup panels to get a panel without data monitors
+# fix for caLineEdit and caTextEntry to handle strings with Signal/Slot
+# fix for the start screen on some mobile iOS devices
+# cleanup of data plugin messages
+# fix for Qt6.4 compiler settings with EPICS4 header on Windows
+# fix the PV data selector in designer, missed environment
 
 # 4.4.0
 # fileopenwindow: options changes
