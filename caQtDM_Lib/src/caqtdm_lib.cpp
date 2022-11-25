@@ -9027,7 +9027,7 @@ bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
                 }
                 QPoint pos = QCursor::pos();
                 geometry=QString("+%1+%2\0").arg(pos.x()+5).arg(pos.y()+5);
-                qDebug() << geometry;
+                //qDebug() << geometry;
                 QVariant delayVars = w->property("caqtdmPopupUI_Delay");
                 if(!delayVars.isNull()) {
                     if(delayVars.canConvert<int>())  {

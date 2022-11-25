@@ -1231,7 +1231,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
         m->show();
     } else {
-        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
         QPoint position(0,0);
         QMainWindow *mainWindow = loadMainWindow(position, fileNameFound, macroString, resizeString, printandexit, false, (geometry == ""));//if geometry is empty center window (for windows)
         if(geometry != "") {
