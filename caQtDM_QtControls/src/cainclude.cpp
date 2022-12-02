@@ -211,7 +211,7 @@ void caInclude::setFileName(QString const &filename)
            thisSpacingHorizontal != prvSpacingHorizontal || thisSpacingVertical != prvSpacingVertical || thisFrameUpdate) {
             thisFrameUpdate = false;
 
-            setLayout(boxLayout);
+            if (boxLayout) setLayout(boxLayout);
             SETMARGIN_QT456(gridLayout,0);
 
             switch(thisFrameShape) {
@@ -316,9 +316,16 @@ void caInclude::setFileName(QString const &filename)
                     l->show();
                 }
 
-                if(thisAdjust && (thisStacking != Positions)) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
-                                      maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
-                else if(thisAdjust && (thisStacking == Positions)) resize(maximumX + adjustMargin, maximumY + adjustMargin);
+                if(thisAdjust && (thisStacking != Positions)) {
+                    int new_width=maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin;
+                    int new_height=maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin;
+                    if ((new_width>width()) || (new_height>height()))
+                         resize(new_width,new_height);
+                }
+                    else if(thisAdjust && (thisStacking == Positions)) {
+                    if ((maximumX>width()) || (maximumY>height()))
+                         resize(maximumX + adjustMargin, maximumY + adjustMargin);
+                }
                 prvAdjust = thisAdjust;
 
                 if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(parent()->parent())) {
@@ -468,9 +475,16 @@ void caInclude::setFileName(QString const &filename)
             loadedWidget->show();
         }
 
-        if(thisAdjust  && (thisStacking != Positions)) resize(maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin,
-                              maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin);
-        else if(thisAdjust && (thisStacking == Positions)) resize(maximumX + adjustMargin, maximumY + adjustMargin);
+        if(thisAdjust  && (thisStacking != Positions)) {
+            int new_width=maxColumns * effectiveSize.width() + (maxColumns-1) * thisSpacingHorizontal + adjustMargin;
+            int new_height=maxRows * effectiveSize.height() + (maxRows-1) * thisSpacingVertical + adjustMargin;
+            if ((new_width>width()) || (new_height>height()))   resize(new_width,new_height);
+        }
+        else
+            if(thisAdjust && (thisStacking == Positions)) {
+                if ((maximumX>width()) || (maximumY>height()))
+                    resize(maximumX + adjustMargin, maximumY + adjustMargin);
+            }
 
         if(QScrollArea* scrollWidget = qobject_cast<QScrollArea *>(parent()->parent())) {
             Q_UNUSED(scrollWidget);
