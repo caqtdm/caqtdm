@@ -13,10 +13,10 @@
 # build qt5 support (or not)
 %global qt5 1
 #############################################################################
-Name:    caQtDM
+Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
 Version: 4.4.1
-Release: 1%{?dist}
+Release: 4%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm
@@ -275,6 +275,7 @@ popd
         echo "fi" >>  %{buildroot}/usr/local/bin/caqtdm
         echo " " >>  %{buildroot}/usr/local/bin/caqtdm
 
+%if 0%{?qt4}
         echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
         echo "SOURCE=\"\${BASH_SOURCE[0]}\"" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
         echo "while [ -h \"\$SOURCE\" ]; do # resolve $SOURCE until the file is no longer a symlink" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
@@ -288,6 +289,7 @@ popd
         echo "assistant-qt4 -register \$CAQTDM_HOME/doc/caQtDM.qch" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
         echo "export QT_PLUGIN_PATH=\$CAQTDM_HOME/lib/qt4" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
         echo "designer-qt4 \$@" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
+%endif
 
         echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
         echo "SOURCE=\"\${BASH_SOURCE[0]}\"" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
@@ -333,6 +335,7 @@ ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/edl2ui
 #ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/caQtDM
 ln -sfv /opt/caqtdm/lib/qt4/caQtDM /usr/local/bin/caQtDM
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/caqtdm_designer
+assistant-qt4 -register /opt/caqtdm/doc/caQtDM.qch
 echo "check update"
 if [ "$1" = "2" ] ; then # upgrade
         echo "running update"
@@ -359,6 +362,7 @@ ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/adl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/edl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/caqtdm_designer
 ln -sfv /opt/caqtdm/lib/qt5/caQtDM /usr/local/bin/caQtDM
+assistant-qt5 -register /opt/caqtdm/doc/caQtDM.qch
 
 %preun qt5
 
@@ -377,10 +381,11 @@ if [ "$1" = "0" ] ; then # last uninstall
         %{__rm} -f  /usr/local/bin/edl2ui
         %{__rm} -f  /usr/local/bin/caQtDM
         %{__rm} -f  /usr/local/bin/caqtdm_designer
-
+	assistant-qt4 -unregister /opt/caqtdm/doc/caQtDM.qch
         if [ -z "$(ls -A /opt/caqtdm)" ]; then
            %{__rm} -rf /opt/caqtdm
         fi
+        
 fi
 %postun bin-qt4
 if [ "$1" = "0" ] ; then # last uninstall
@@ -403,7 +408,7 @@ if [ "$1" = "0" ] ; then # last uninstall
         %{__rm} -f  /usr/local/bin/caqtdm
         %{__rm} -f  /usr/local/bin/caQtDM
         %{__rm} -f  /usr/local/bin/caqtdm_designer
-
+	assistant-qt5 -unregister /opt/caqtdm/doc/caQtDM.qch
         if [ -z "$(ls -A /opt/caqtdm)" ]; then
            %{__rm} -rf /opt/caqtdm
         fi
