@@ -377,7 +377,7 @@
      <item row="20" column="0">
       <widget class="caLabel" name="calabel_40">
        <property name="text">
-        <string>$(TEST5=-&gt;$(TEST=$(TEST3=$(TEST4))&lt;-))</string>
+        <string>$(TEST5=-&gt;$(TEST=$(TEST3=$(TEST4)))&lt;-)</string>
        </property>
       </widget>
      </item>

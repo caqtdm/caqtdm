@@ -3400,6 +3400,79 @@ void CaQtDM_Lib::updateTextBrowser()
     }
 }
 
+QString CaQtDM_Lib::handle_single_Macro(QString key, QString value, QString Text){
+    QString toReplace = "$(" + key+ ")";
+    //qDebug() << "replace in" << newText << toReplace << "with" << i.value();
+    Text.replace(toReplace,value);
+    return Text;
+}
+
+QString CaQtDM_Lib::handle_Macro_withConst(QString key, QString value, QString Text){
+    QString toReplace = "$(" + key + "=";
+    int position=Text.indexOf(toReplace);
+    if (position!=-1){
+        // find a macro in a constant
+        int macro_length=0;
+        int macro_count=0;
+        int nextmacro=Text.indexOf(QString("$("),position+toReplace.length());
+        // find end of the constant
+        int endofconstant=Text.indexOf(QString(")"), position+toReplace.length());
+        if ((nextmacro>=0)&&(nextmacro<endofconstant)){
+            macro_count++;
+            macro_length=nextmacro;
+            while (macro_count>0){
+                nextmacro=Text.indexOf(QString("$("),position+toReplace.length()+macro_length);
+                endofconstant=Text.indexOf(QString(")"), position+toReplace.length()+macro_length);
+                if (nextmacro!=-1){
+                    macro_length=nextmacro;
+                    macro_count++;
+                }
+                if (endofconstant!=-1){
+                    macro_count--;
+                }
+                //qDebug()<< "Positions:"<< nextmacro <<endofconstant <<"macro_count "<< macro_count ;
+            }
+        }
+        if (endofconstant!=-1){
+            Text=Text.remove(position+toReplace.length(),endofconstant-(position+toReplace.length())+1);
+        }
+
+        //qDebug() << "replace in" << Text << toReplace << "with" << value;
+        Text.replace(toReplace, value);
+    }
+    return Text;
+}
+
+QString CaQtDM_Lib::handle_Macro_Scan(QString Text,QMap<QString, QString> map,macro_parser parse){
+
+    QMapIterator<QString, QString> i(map);
+    int recursive_counter = 0;
+    bool recursive_continue=true;
+    while (recursive_continue) {
+        QString Text_Backup=Text;
+        while (i.hasNext()) {
+            i.next();
+            switch (parse){
+                case parse_simple:{
+                    Text=handle_single_Macro(i.key(),i.value(),Text);
+                    break;
+                }
+                case parse_withconst:{
+                    Text=handle_Macro_withConst(i.key(),i.value(),Text);
+                    break;
+                }
+            }
+        }
+        if (Text_Backup.compare(Text)==0){
+            //qDebug() << "finish Loop simple Macro Replace";
+            recursive_continue=false;
+        }
+        if(recursive_counter++ > 10) break;
+    }
+    return Text;
+
+}
+
 /**
   * this routine uses macro table to replace inside the pv the macro part
   */
@@ -3412,37 +3485,11 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
     if(!map.isEmpty()) {
         if(text.contains("$(") && text.contains(")")) {
             // normal macroexchange
+
+            newText=handle_Macro_Scan(newText,map,parse_simple);
+            newText=handle_Macro_Scan(newText,map,parse_withconst);
+
             QMapIterator<QString, QString> i(map);
-            int recursive_counter = 0;
-            bool recursive_continue=true;
-            while (recursive_continue) {
-                //recursive_continue=false;
-                QString newText_Backup=newText;
-                while (i.hasNext()) {
-                    i.next();
-                    QString toReplace = "$(" + i.key() + ")";
-                    //qDebug() << "replace in" << newText << toReplace << "with" << i.value();
-                    newText.replace(toReplace, i.value());
-
-                    toReplace = "$(" + i.key() + "=";
-                    int position=newText.indexOf(toReplace);
-                    if (position!=-1){
-                        // find end of the constant
-                        int endofconstant=newText.indexOf(QString(")"), position+toReplace.length());
-                        if (endofconstant!=-1){
-                            newText=newText.remove(position+toReplace.length(),endofconstant);
-                        }
-                    }
-
-                    newText.replace(toReplace, i.value());
-
-                }
-                if (newText_Backup.compare(newText)==0){
-                    //qDebug() << "finish Loop simple Macro Replace";
-                    recursive_continue=false;
-                }
-                if(recursive_counter++ > 10) break;
-            }
             i.toFront();
             if(newText.contains("$(")){
                 //qDebug() << "Spezial";
@@ -3518,8 +3565,8 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
             // unresolved macros with a own constant
             if(newText.contains("$(")){
 
-                recursive_counter=0;
-                recursive_continue=true;
+                int recursive_counter=0;
+                bool recursive_continue=true;
                 while (recursive_continue) {
                     QString newText_Backup=newText;
                     QString unresMacro = "";
@@ -3529,9 +3576,9 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                         int constmacro_start=(position-2)+tofind.length();
                         int constmacro_end  =newText.indexOf(QString("="), constmacro_start);
                         if ((constmacro_end!=-1)&&(position >= 0)&&(position < newText.length())){
-                            //qDebug()<<"newText.mid"<<newText.mid(constmacro_start, constmacro_end-constmacro_start+1);
+                            qDebug()<<"newText.mid"<<newText.mid(constmacro_start, constmacro_end-constmacro_start+1);
                             newText=newText.remove(constmacro_start, constmacro_end-constmacro_start+1);
-                            //qDebug()<<"newText"<<newText;
+                            qDebug()<<"newText"<<newText;
                             if (newText.indexOf(")")!=-1) newText=newText.remove(newText.indexOf(")"),1);
                         }
                         position=newText.indexOf(tofind,position+1);

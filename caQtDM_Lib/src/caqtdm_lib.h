@@ -99,7 +99,9 @@
 // 50 levels of includes should do it
 #define CAQTDM_MAX_INCLUDE_LEVEL 50
 
-
+enum macro_parser{
+    parse_simple,parse_withconst
+};
 
 namespace Ui {
 class CaQtDM_Lib;
@@ -441,6 +443,9 @@ private:
 
     QString defaultPlugin;
 
+    QString handle_single_Macro(QString key, QString value, QString Text);
+    QString handle_Macro_withConst(QString key, QString value, QString Text);
+    QString handle_Macro_Scan(QString Text, QMap<QString, QString> map, macro_parser parse);
 private slots:
     void Callback_CaCalc(double value) ;
     void Callback_UndefinedMacrowindowExit();
