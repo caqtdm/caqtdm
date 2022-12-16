@@ -2436,9 +2436,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 #endif
         }
 
+        //printf("\n caInclude Load:%s\n", qasc(fileName));
         QString macros = includeWidget->getMacro();
+        //printf("\n macros Load:%s\n", qasc(macros));
         //in case the macro $(B) has to be replaced by another macro  (ex: "B=NAME=ARIMA-CV-02ME;NAME=ARIMA-CV-03ME")
         macros = treatMacro(map, macros, &doNothing, w1->objectName());
+        //printf("\n treatMacro:%s\n", qasc(macros));
         QStringList macroList = macros.split(";", SKIP_EMPTY_PARTS);
 
         int adjustMargin = includeWidget->getMargin();
@@ -3575,11 +3578,14 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
                     while (position != (-1)){
                         int constmacro_start=(position-2)+tofind.length();
                         int constmacro_end  =newText.indexOf(QString("="), constmacro_start);
-                        if ((constmacro_end!=-1)&&(position >= 0)&&(position < newText.length())){
-                            qDebug()<<"newText.mid"<<newText.mid(constmacro_start, constmacro_end-constmacro_start+1);
-                            newText=newText.remove(constmacro_start, constmacro_end-constmacro_start+1);
-                            qDebug()<<"newText"<<newText;
-                            if (newText.indexOf(")")!=-1) newText=newText.remove(newText.indexOf(")"),1);
+                        int constmacro_noConst  =newText.indexOf(QString(")"), constmacro_start);
+                        if (constmacro_end<constmacro_noConst){
+                            if ((constmacro_end!=-1)&&(position >= 0)&&(position < newText.length())){
+                                //qDebug()<<"newText.mid"<<newText.mid(constmacro_start, constmacro_end-constmacro_start+1);
+                                newText=newText.remove(constmacro_start, constmacro_end-constmacro_start+1);
+                                //qDebug()<<"newText"<<newText;
+                                if (newText.indexOf(")")!=-1) newText=newText.remove(newText.indexOf(")"),1);
+                            }
                         }
                         position=newText.indexOf(tofind,position+1);
                     }
