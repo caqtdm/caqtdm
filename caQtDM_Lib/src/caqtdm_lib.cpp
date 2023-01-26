@@ -6248,7 +6248,7 @@ void CaQtDM_Lib::getStatesToggleAndLed(QWidget *widget, const knobData &data, co
         } else {
             state = Qt::PartiallyChecked;
         }
-    } else if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING) {
+    } else if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING|| data.edata.fieldtype == caCHAR) {
         int trueValue = trueString.toInt(&ok1);
         int falseValue = falseString.toInt(&ok2);
         state = Qt::PartiallyChecked;
