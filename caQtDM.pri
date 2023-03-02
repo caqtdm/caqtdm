@@ -926,6 +926,7 @@ caQtDM_xdl2ui{
 caQtDM_xdl2ui_Lib{
         unix:!macx {
             LIBS += $(CAQTDM_COLLECT)/libadlParser.a
+            LIBS += $(CAQTDM_COLLECT)/libedlParser.a
         }
 
         macx {
