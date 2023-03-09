@@ -9,6 +9,8 @@
 # build qt4 support (or not)
 %if 0%{?rhel} <  8
 %global qt4 1
+%else
+%global qt4 0
 %endif
 # build qt5 support (or not)
 %global qt5 1
@@ -271,29 +273,7 @@ popd
 	cp %{_builddir}/%{name}-%{version}/caQtDM_QtControls/doc/*.html     %{buildroot}/opt/caqtdm/doc
 	cp %{_builddir}/%{name}-%{version}/caQtDM_QtControls/doc/*.css     %{buildroot}/opt/caqtdm/doc
 
-
 	cp -R %{_builddir}/%{name}-%{version}/build/* %{buildroot}
-       
-
-	echo "echo \"CAQTDM_DISPLAY_PATH=\$CAQTDM_DISPLAY_PATH\"" >>  %{buildroot}/usr/local/bin/caqtdm
-	echo " " >>  %{buildroot}/usr/local/bin/caqtdm
-        echo "if [ -n \"\$SSH_CLIENT\" ]; then" >>  %{buildroot}/usr/local/bin/caqtdm
-        echo "  echo \"start from remote session\"" >>  %{buildroot}/usr/local/bin/caqtdm
-%if 0%{?qt4}	
-        echo "  caQtDM -style plastique -graphicssystem native \"\$@\" &" >>  %{buildroot}/usr/local/bin/caqtdm
-	echo "else" >>  %{buildroot}/usr/local/bin/caqtdm
-        echo "  caQtDM -style plastique \"\$@\" &" >>  %{buildroot}/usr/local/bin/caqtdm
-
-%endif
-%if 0%{?qt5}
-        echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/usr/local/bin/caqtdm
-	echo "else" >>  %{buildroot}/usr/local/bin/caqtdm
-        echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/usr/local/bin/caqtdm
-%endif
-        
-        echo "fi" >>  %{buildroot}/usr/local/bin/caqtdm
-        echo " " >>  %{buildroot}/usr/local/bin/caqtdm
-
 %if 0%{?qt4}
         echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
         echo "SOURCE=\"\${BASH_SOURCE[0]}\"" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
@@ -324,6 +304,29 @@ popd
         echo "export QT_PLUGIN_PATH=\$CAQTDM_HOME/lib/qt5" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
         echo "designer-qt5 \$@" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
 
+        
+        echo "echo \"CAQTDM_DISPLAY_PATH=\$CAQTDM_DISPLAY_PATH\"" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo " " >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo "if [ -n \"\$SSH_CLIENT\" ]; then" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo "  echo \"start from remote session\"" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo "else" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo "fi" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+        echo " " >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+
+
+%if 0%{?qt4}
+        echo "echo \"CAQTDM_DISPLAY_PATH=\$CAQTDM_DISPLAY_PATH\"" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo " " >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo "if [ -n \"\$SSH_CLIENT\" ]; then" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo "  echo \"start from remote session\"" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo "  caQtDM -style plastique -graphicssystem native \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo "else" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo "  caQtDM -style plastique \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo "fi" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+        echo " " >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
+%endif
 
 
 %files doc
@@ -338,17 +341,19 @@ popd
 /opt/caqtdm/lib/qt4
 %defattr(755,root,root)
 /opt/caqtdm/lib/qt4/caqtdm_designer
+/opt/caqtdm/lib/qt4/caqtdm
+
+
 
 %files qt4
 /usr/local/bin
 %defattr(755,root,root)
-/usr/local/bin/caqtdm
 
 
 %post qt4
 
 
-
+ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/caqtdm
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/adl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/edl2ui
 #ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/caQtDM
@@ -370,19 +375,13 @@ fi
 /opt/caqtdm/lib/qt5
 %defattr(755,root,root)
 /opt/caqtdm/lib/qt5/caqtdm_designer
-
+/opt/caqtdm/lib/qt5/caqtdm
 %files qt5
 /usr/local/bin
 
-/usr/lib64/qt5/plugins/designer
-
-
-
-
-%defattr(755,root,root)
-/usr/local/bin/caqtdm
 
 %post qt5
+ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/caqtdm
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/adl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/edl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/caqtdm_designer
@@ -413,6 +412,7 @@ if [ "$1" = "0" ] ; then # last uninstall
         %{__rm} -f  /usr/local/bin/adl2ui
         %{__rm} -f  /usr/local/bin/edl2ui
         %{__rm} -f  /usr/local/bin/caQtDM
+        %{__rm} -f  /usr/local/bin/caqtdm
         %{__rm} -f  /usr/local/bin/caqtdm_designer
 	assistant-qt4 -unregister /opt/caqtdm/doc/caQtDM.qch
         if [ -z "$(ls -A /opt/caqtdm)" ]; then
