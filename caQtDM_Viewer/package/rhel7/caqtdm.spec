@@ -18,7 +18,7 @@
 Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
 Version: 4.4.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm
@@ -96,6 +96,8 @@ Summary: Qt5 Widgets for Technical Applications
 Provides: caqtdm-qt5 = %{version}-%{release}
 Provides: caqtdm-qt5%{_isa} = %{version}-%{release}
 Provides: %{name}%{?_isa}
+Requires: %{name}-bin-qt5 = %{version}-%{release}
+Requires: %{name}-doc = %{version}-%{release}
 Conflicts: %{name}-qt4
 %description qt5
 %{summary}.
