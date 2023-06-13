@@ -35,9 +35,7 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-			    <?if $(env.CAQTDMQTVER) = QT4 ?>
-				  <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt4_x64.wxi ?>
-			    <?elseif $(env.CAQTDMQTVER) = QT6 ?>
+			    <?if $(env.CAQTDMQTVER) = QT6 ?>
 			    	  <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt6_x64.wxi ?>
 			    <?else?>
 			          <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt5_x64.wxi ?>
