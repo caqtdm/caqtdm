@@ -35,45 +35,14 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-                            <Component Id="Qt_5.15.0" Guid="FC03E65E-7757-4CAE-8BB5-F3FEAF29E12B" Win64="yes">
-                                <File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
-                                <File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
-                                <File Id="QT5QUICKPARTICLES.DLL" Name="Qt5QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt5QuickParticles.dll" />
-                                <File Id="QT5QUICKTEST.DLL" Name="Qt5QuickTest.dll" Source="$(env.QTHOME)\bin\Qt5QuickTest.dll" />
-                                <File Id="QT5QUICKWIDGETS.DLL" Name="Qt5QuickWidgets.dll" Source="$(env.QTHOME)\bin\Qt5QuickWidgets.dll" />
-                                <File Id="QT5SCRIPT.DLL" Name="Qt5Script.dll" Source="$(env.QTHOME)\bin\Qt5Script.dll" />
-                                <File Id="QT5SCRIPTTOOLS.DLL" Name="Qt5ScriptTools.dll" Source="$(env.QTHOME)\bin\Qt5ScriptTools.dll" />
-                                <File Id="QT5SENSORS.DLL" Name="Qt5Sensors.dll" Source="$(env.QTHOME)\bin\Qt5Sensors.dll" />
-                                <File Id="QT5SERIALPORT.DLL" Name="Qt5SerialPort.dll" Source="$(env.QTHOME)\bin\Qt5SerialPort.dll" />
-                                <File Id="QT5SERIALBUS.DLL" Name="Qt5SerialBus.dll" Source="$(env.QTHOME)\bin\Qt5SerialBus.dll" />
-                                <File Id="QT5SQL.DLL" Name="Qt5Sql.dll" Source="$(env.QTHOME)\bin\Qt5Sql.dll" />
-                                <File Id="QT5SVG.DLL" Name="Qt5Svg.dll" Source="$(env.QTHOME)\bin\Qt5Svg.dll" />
-                                <File Id="QT5TEST.DLL" Name="Qt5Test.dll" Source="$(env.QTHOME)\bin\Qt5Test.dll" />
-                                <File Id="QT5WEBSOCKETS.DLL" Name="Qt5WebSockets.dll" Source="$(env.QTHOME)\bin\Qt5WebSockets.dll" />
-                                <File Id="QT5WIDGETS.DLL" Name="Qt5Widgets.dll" Source="$(env.QTHOME)\bin\Qt5Widgets.dll" />
-                                <File Id="QT5WINEXTRAS.DLL" Name="Qt5WinExtras.dll" Source="$(env.QTHOME)\bin\Qt5WinExtras.dll" />
-                                <File Id="QT5XML.DLL" Name="Qt5Xml.dll" Source="$(env.QTHOME)\bin\Qt5Xml.dll" />
-                                <File Id="QT5XMLPATTERNS.DLL" Name="Qt5XmlPatterns.dll" Source="$(env.QTHOME)\bin\Qt5XmlPatterns.dll" />
-                                <File Id="LIBEGL.DLL" Name="libEGL.dll" Source="$(env.QTHOME)\bin\libEGL.dll" />
-                                <File Id="LIBGLESV2.DLL" Name="libGLESv2.dll" Source="$(env.QTHOME)\bin\libGLESv2.dll" />
-                                <File Id="QT5BLUETOOTH.DLL" Name="Qt5Bluetooth.dll" Source="$(env.QTHOME)\bin\Qt5Bluetooth.dll" />
-                                <File Id="QT5CONCURRENT.DLL" Name="Qt5Concurrent.dll" Source="$(env.QTHOME)\bin\Qt5Concurrent.dll" />
-                                <File Id="QT5CORE.DLL" Name="Qt5Core.dll" Source="$(env.QTHOME)\bin\Qt5Core.dll" />
-                                <File Id="QT5DESIGNER.DLL" Name="Qt5Designer.dll" Source="$(env.QTHOME)\bin\Qt5Designer.dll" />
-                                <File Id="QT5DESIGNERCOMPONENTS.DLL" Name="Qt5DesignerComponents.dll" Source="$(env.QTHOME)\bin\Qt5DesignerComponents.dll" />
-                                <File Id="QT5GUI.DLL" Name="Qt5Gui.dll" Source="$(env.QTHOME)\bin\Qt5Gui.dll" />
-                                <File Id="QT5HELP.DLL" Name="Qt5Help.dll" Source="$(env.QTHOME)\bin\Qt5Help.dll" />
-                                <File Id="QT5MULTIMEDIA.DLL" Name="Qt5Multimedia.dll" Source="$(env.QTHOME)\bin\Qt5Multimedia.dll" />
-                                <File Id="QT5MULTIMEDIAWIDGETS.DLL" Name="Qt5MultimediaWidgets.dll" Source="$(env.QTHOME)\bin\Qt5MultimediaWidgets.dll" />
-                                <File Id="QT5NETWORK.DLL" Name="Qt5Network.dll" Source="$(env.QTHOME)\bin\Qt5Network.dll" />
-                                <File Id="QT5NFC.DLL" Name="Qt5Nfc.dll" Source="$(env.QTHOME)\bin\Qt5Nfc.dll" />
-                                <File Id="QT5OPENGL.DLL" Name="Qt5OpenGL.dll" Source="$(env.QTHOME)\bin\Qt5OpenGL.dll" />
-                                <File Id="QT5POSITIONING.DLL" Name="Qt5Positioning.dll" Source="$(env.QTHOME)\bin\Qt5Positioning.dll" />
-                                <File Id="QT5PRINTSUPPORT.DLL" Name="Qt5PrintSupport.dll" Source="$(env.QTHOME)\bin\Qt5PrintSupport.dll" />
-                                <File Id="QT5QML.DLL" Name="Qt5Qml.dll" Source="$(env.QTHOME)\bin\Qt5Qml.dll" />
-                                <File Id="QT5QUICK.DLL" Name="Qt5Quick.dll" Source="$(env.QTHOME)\bin\Qt5Quick.dll" />
-                            </Component>
-                            <Component Id="Epics_7.0.4.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
+			    <?if $(env.CAQTDMQTVER) = QT4 ?>
+				  <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt4_x64.wxi ?>
+			    <?elseif $(env.CAQTDMQTVER) = QT6 ?>
+			    	  <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt6_x64.wxi ?>
+			    <?else?>
+			          <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt5_x64.wxi ?>
+			    <?endif ?>
+			    <Component Id="Epics_7.0.6.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\caRepeater.exe" />
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
@@ -188,8 +157,16 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="Qt_5.15.0" />
-            <ComponentRef Id="Epics_7.0.4.1" />
+	    <?if $(env.CAQTDMQTVER) = QT4 ?>
+		  <?include .\caQtDM_Qt4_x64.wxi ?>
+	    <?elseif $(env.CAQTDMQTVER) = QT6 ?>
+		  <ComponentRef Id="Qt_6.5.1" />
+	    <?else?>
+		  <ComponentRef Id="Qt_5.15.0" />
+	    <?endif ?>
+
+            
+            <ComponentRef Id="Epics_7.0.6.1" />
             <ComponentRef Id="qwt_6.1.5" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />

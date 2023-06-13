@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+<Component Id="Qt_6.5.1" Guid="F3DFC6F4-9D32-47EF-9200-E4625F071E90" Win64="yes">
+	<File Id="DESIGNER.EXE" Name="designer.exe" Source="$(env.QTHOME)\bin\designer.exe" />
+	<File Id="ASSISTANT.EXE" Name="assistant.exe" Source="$(env.QTHOME)\bin\assistant.exe" />
+	<File Id="QT6QUICKPARTICLES.DLL" Name="Qt6QuickParticles.dll" Source="$(env.QTHOME)\bin\Qt6QuickParticles.dll" />
+	<File Id="QT6QUICKTEST.DLL" Name="Qt6QuickTest.dll" Source="$(env.QTHOME)\bin\Qt6QuickTest.dll" />
+	<File Id="QT6QUICKWIDGETS.DLL" Name="Qt6QuickWidgets.dll" Source="$(env.QTHOME)\bin\Qt6QuickWidgets.dll" />
+	<File Id="QT6SENSORS.DLL" Name="Qt6Sensors.dll" Source="$(env.QTHOME)\bin\Qt6Sensors.dll" />
+	<File Id="QT6UITOOLS.DLL" Name="Qt6UiTools.dll" Source="$(env.QTHOME)\bin\Qt6UiTools.dll" />
+	<File Id="QT6OPENGLWIDGETS.DLL" Name="Qt6OpenGLWidgets.dll" Source="$(env.QTHOME)\bin\Qt6OpenGLWidgets.dll" />
+	<File Id="QT6SERIALPORT.DLL" Name="Qt6SerialPort.dll" Source="$(env.QTHOME)\bin\Qt6SerialPort.dll" />
+	<File Id="QT6SERIALBUS.DLL" Name="Qt6SerialBus.dll" Source="$(env.QTHOME)\bin\Qt6SerialBus.dll" />
+	<File Id="QT6SQL.DLL" Name="Qt6Sql.dll" Source="$(env.QTHOME)\bin\Qt6Sql.dll" />
+	<File Id="QT6SVG.DLL" Name="Qt6Svg.dll" Source="$(env.QTHOME)\bin\Qt6Svg.dll" />
+	<File Id="QT6TEST.DLL" Name="Qt6Test.dll" Source="$(env.QTHOME)\bin\Qt6Test.dll" />
+	<File Id="QT6WEBSOCKETS.DLL" Name="Qt6WebSockets.dll" Source="$(env.QTHOME)\bin\Qt6WebSockets.dll" />
+	<File Id="QT6WIDGETS.DLL" Name="Qt6Widgets.dll" Source="$(env.QTHOME)\bin\Qt6Widgets.dll" />
+	<File Id="QT6XML.DLL" Name="Qt6Xml.dll" Source="$(env.QTHOME)\bin\Qt6Xml.dll" />
+	<File Id="QT6BLUETOOTH.DLL" Name="Qt6Bluetooth.dll" Source="$(env.QTHOME)\bin\Qt6Bluetooth.dll" />
+	<File Id="QT6CONCURRENT.DLL" Name="Qt6Concurrent.dll" Source="$(env.QTHOME)\bin\Qt6Concurrent.dll" />
+	<File Id="QT6CORE.DLL" Name="Qt6Core.dll" Source="$(env.QTHOME)\bin\Qt6Core.dll" />
+	<File Id="QT6DESIGNER.DLL" Name="Qt6Designer.dll" Source="$(env.QTHOME)\bin\Qt6Designer.dll" />
+	<File Id="QT6DESIGNERCOMPONENTS.DLL" Name="Qt6DesignerComponents.dll" Source="$(env.QTHOME)\bin\Qt6DesignerComponents.dll" />
+	<File Id="QT6GUI.DLL" Name="Qt6Gui.dll" Source="$(env.QTHOME)\bin\Qt6Gui.dll" />
+	<File Id="QT6HELP.DLL" Name="Qt6Help.dll" Source="$(env.QTHOME)\bin\Qt6Help.dll" />
+	<File Id="QT6MULTIMEDIA.DLL" Name="Qt6Multimedia.dll" Source="$(env.QTHOME)\bin\Qt6Multimedia.dll" />
+	<File Id="QT6MULTIMEDIAWIDGETS.DLL" Name="Qt6MultimediaWidgets.dll" Source="$(env.QTHOME)\bin\Qt6MultimediaWidgets.dll" />
+	<File Id="QT6NETWORK.DLL" Name="Qt6Network.dll" Source="$(env.QTHOME)\bin\Qt6Network.dll" />
+	<File Id="QT6NFC.DLL" Name="Qt6Nfc.dll" Source="$(env.QTHOME)\bin\Qt6Nfc.dll" />
+	<File Id="QT6OPENGL.DLL" Name="Qt6OpenGL.dll" Source="$(env.QTHOME)\bin\Qt6OpenGL.dll" />
+	<File Id="QT6POSITIONING.DLL" Name="Qt6Positioning.dll" Source="$(env.QTHOME)\bin\Qt6Positioning.dll" />
+	<File Id="QT6PRINTSUPPORT.DLL" Name="Qt6PrintSupport.dll" Source="$(env.QTHOME)\bin\Qt6PrintSupport.dll" />
+	<File Id="QT6QML.DLL" Name="Qt6Qml.dll" Source="$(env.QTHOME)\bin\Qt6Qml.dll" />
+	<File Id="QT6QUICK.DLL" Name="Qt6Quick.dll" Source="$(env.QTHOME)\bin\Qt6Quick.dll" />
+</Component>
+</Include>
