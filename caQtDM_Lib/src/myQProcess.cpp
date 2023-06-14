@@ -50,8 +50,7 @@ void myQProcess::start(QString program, QIODevice::OpenMode mode)
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     process->start(program, mode);
 #else
-     QStringList arguments=QStringList();
-    process->start(program,arguments, mode);
+      process->startCommand(program, mode);
 #endif
 
     //qDebug() << process->readAllStandardOutput();
