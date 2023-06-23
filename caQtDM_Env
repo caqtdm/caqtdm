@@ -59,7 +59,7 @@
     echo
     echo ====== do not use psi trolltech directories
     echo
-    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
+    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
     fi
   else
     echo
