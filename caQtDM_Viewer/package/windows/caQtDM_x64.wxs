@@ -35,12 +35,12 @@
                 <Directory Id="INSTALLDIR" Name="caQTDM">
                     <Directory Name="bin" Id="BIN">
                         <Directory Name="windows-x64" Id="WINDOWS_X64">
-			    <?if $(env.CAQTDMQTVER) = QT6 ?>
-			    	  <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt6_x64.wxi ?>
-			    <?else?>
-			          <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt5_x64.wxi ?>
-			    <?endif ?>
-			    <Component Id="Epics_7.0.6.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
+                            <?if $(env.CAQTDMQTVER) = QT6 ?>
+                            <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt6_x64.wxi ?>
+                            <?else?>
+                            <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt5_x64.wxi ?>
+                            <?endif?>
+                            <Component Id="Epics_7.0.6.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\caRepeater.exe" />
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
@@ -96,6 +96,15 @@
                                 <File Id="QTCONTROLS_UTILITIES_PLUGIN.DLL" Name="qtcontrols_utilities_plugin.dll" Source="$(env.CAQTDM_COLLECT)\designer\qtcontrols_utilities_plugin.dll" />
                             </Component>
                         </Directory>
+                        <?if $(env.CAQTDMQTVER) = QT6 ?>
+                        <Directory Id="TLS" Name="tls">
+                            <Component Id="tls" Guid="3A184FF7-4600-4A6A-9464-485E8C837D8B" Win64="yes">
+                                <File Id="QOPENSSLBACKEND.DLL" Name="qopensslbackend.dll" Source="$(env.QTHOME)\plugins\tls\qopensslbackend.dll" />
+                                <File Id="QSCHANNELBACKEND.DLL" Name="qschannelbackend.dll" Source="$(env.QTHOME)\plugins\tls\qschannelbackend.dll" />
+				<File Id="QCERTONLYBACKEND.DLL" Name="qcertonlybackend.dll" Source="$(env.QTHOME)\plugins\tls\qcertonlybackend.dll" />
+                            </Component>
+                        </Directory>
+                        <?endif?>
                         <Directory Id="PLATFORMS" Name="platforms">
                             <Component Id="platforms" Guid="E774C793-5FDB-4609-A9F4-98B7796F04B1" Win64="yes">
                                 <File Id="QMINIMAL.DLL" Name="qminimal.dll" Source="$(env.QTHOME)\plugins\platforms\qminimal.dll" />
@@ -144,8 +153,7 @@
                         <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
                         <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
-                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[INSTALLDIR]bin\windows-x64\caQtDM.exe" Arguments=" -style plastique">
-                        </Shortcut>
+                        <Shortcut Id="CaQtDM_ShortCut" Name="CaQtDM" Target="[INSTALLDIR]bin\windows-x64\caQtDM.exe" Arguments=" -style plastique"></Shortcut>
                         <Shortcut Id="Designer_Shortcut" Name="Designer" Target="[INSTALLDIR]bin\windows-x64\designer.exe" />
                     </Component>
                 </Directory>
@@ -156,15 +164,14 @@
             </Component>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1" ConfigurableDirectory="INSTALLDIR">
-	    <?if $(env.CAQTDMQTVER) = QT4 ?>
-		  <?include .\caQtDM_Qt4_x64.wxi ?>
-	    <?elseif $(env.CAQTDMQTVER) = QT6 ?>
-		  <ComponentRef Id="Qt_6.5.1" />
-	    <?else?>
-		  <ComponentRef Id="Qt_5.15.0" />
-	    <?endif ?>
-
-            
+            <?if $(env.CAQTDMQTVER) = QT4 ?>
+            <?include .\caQtDM_Qt4_x64.wxi ?>
+            <?elseif $(env.CAQTDMQTVER) = QT6 ?>
+            <ComponentRef Id="Qt_6.5.1" />
+            <ComponentRef Id="tls" />
+            <?else?>
+            <ComponentRef Id="Qt_5.15.0" />
+            <?endif?>
             <ComponentRef Id="Epics_7.0.6.1" />
             <ComponentRef Id="qwt_6.1.5" />
             <ComponentRef Id="CaQtDM" />
