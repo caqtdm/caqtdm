@@ -4209,11 +4209,14 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
         }
 #else
         // Achtung setminimal der alten Implementierung ist noch nicht getested!!!!
+        // erster Test ok aber noch das eine oder andere Fragezeichen!
         QRegularExpression checkregexp(pattern);
-        QRegularExpressionMatch match = checkregexp.match(calcString,0, QRegularExpression::PartialPreferFirstMatch);
+        QRegularExpressionMatch match = checkregexp.match(calcString);
         qsizetype pos=match.capturedStart();
+        //qDebug() << "Regex calcString:"<< calcString;
         if (match.hasMatch()){
-            captured_Calc = match.captured();
+            captured_Calc = match.captured(1);
+            //qDebug() << "Regex captured_Calc:"<<captured_Calc;
         }
 #endif
 
@@ -4259,6 +4262,9 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 if (check_A.exactMatch(dataString)){
 #else
                 QRegularExpression check_A(captured_Calc);
+                //QRegularExpressionMatch match = check_A.match(calcString);
+                //qDebug() << "Regex: "<< captured_Calc << "Data:" << dataString;
+                //qDebug() << "Match: "<< match.hasMatch();
                 if (check_A.match(dataString,0, QRegularExpression::PartialPreferFirstMatch).hasMatch()){
 #endif
                     result=1;
