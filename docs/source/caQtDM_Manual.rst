@@ -8,8 +8,8 @@ caQtDM Manual
 | CH-5232 Villigen
 | Switzerland
 
-**This manual**
----------------
+About this manual
+-----------------
 
 This manual has been written in HTML and after conversion introduced in
 the Qt assistant in order to get help for the caQtDM system. It has to
@@ -19,7 +19,7 @@ of the existing MEDM manual.
 
 The HTML was converted to restructured text using pandoc, then hand-edited.
 
-**Introduction**
+Introduction
 ----------------
 
 caQtDM is a package based on Qt developed at PSI as a successor of
@@ -146,7 +146,7 @@ Install
    caQtDM_Binaries.
    To clean the Folder you should use caQtDM_CleanAll.bat.
 
-**Development history**
+Development history
 -----------------------
 
 The following list describe the new features and bug fixes for every
@@ -461,69 +461,63 @@ the used version has been solved.
 -  keeping the medm command line parameters.
 -  caQtDM runs in native mode on linux as well as on microsoft windows.
 
-**caQtDM Custom Widgets**
+caQtDM Custom Widgets
 -------------------------
 
-| The custom widgets used in caQtDM have been divide in three categories
-  as was done in MEDM. MEDM users are used to these cartegories and we
-  have therefore kept the categorisation in Graphics, Controller and
-  Monitors. As in MEDM, Graphics are items such as frames, labels,
-  graphical entities like rectangles, triangles, lines, ..., images and
-  composite objects (called here includes, while included from other ui
-  files. Monitors are objects that monitor the state or values of
-  process variables through display of values, plots, tables,
-  thermometers, dials, ... Controllers are objects that change the
-  values of process variables through many different objects. you will
-  find here an exact description of them with their properties: For all
-  objects, you have normally their geometry (position and size),,
-  sizepolicy and some other properties like tooltips. It has to be noted
-  that for many widgets their stylesheet will be overwritten in order to
-  get the representation that is requested when specifying for example
-  background, foreground, border colors or other properties. The
-  stylesheet can be influenced in some cases by specifying a stylesheet
-  for the mainwindow or in stylesheet.qss, a stylesheet found in the
-  caQtDM path. The adl2ui converter uses normally this stylesheet to
-  integrate these defaults into the generated ui file. You may delete
-  this stylesheet or change it to your convenience. However as mentioned
-  before, many styles will be overwritten.
-| The following table gives you an overview of all objects that are
-  actually available:
+The custom widgets used in caQtDM have been divide in three categories
+as was done in MEDM. MEDM users are used to these cartegories and we
+have therefore kept the categorisation in Graphics, Controller and
+Monitors. As in MEDM, Graphics are items such as frames, labels,
+graphical entities like rectangles, triangles, lines, ..., images and
+composite objects (called here includes, while included from other ui
+files. Monitors are objects that monitor the state or values of
+process variables through display of values, plots, tables,
+thermometers, dials, ... Controllers are objects that change the
+values of process variables through many different objects. you will
+find here an exact description of them with their properties: For all
+objects, you have normally their geometry (position and size),
+sizepolicy and some other properties like tooltips. It has to be noted
+that for many widgets their stylesheet will be overwritten in order to
+get the representation that is requested when specifying for example
+background, foreground, border colors or other properties. The
+stylesheet can be influenced in some cases by specifying a stylesheet
+for the mainwindow or in stylesheet.qss, a stylesheet found in the
+caQtDM path. The adl2ui converter uses normally this stylesheet to
+integrate these defaults into the generated ui file. You may delete
+this stylesheet or change it to your convenience. However as mentioned
+before, many styles will be overwritten.
 
-.. FIXME: empty cells, links
+.. csv-table:: Overview of the caQtDM Custom Widgets
+   :header: "Graphics", "Monitors", "Controllers"
 
-=========================================================== =================================== ====================================
-Graphics                                                    Monitors                            Controllers
-=========================================================== =================================== ====================================
-caGraphics: Rectangle, Circle, Arc, Triangle, Line, Arrow   caLineEdit                          caChoice
-caPolyline: polyline and polygon                            caLed                               caMenu
-caLabel: text                                               caCartesianPlot                     caMessageButton
-caFrame                                                     caLinearGauge, caCircularGauge      caRelatedDisplay
-caImage: any image format, mostly used for animated gif     caThermo                            caShellCommand
-caInclude: the equivalent to composite of MEDM              caStripPlot                         caSlider
-caDoubleTabWidget: a general purpose widget                 caByte                              caTextEntry
-.                                                           caCamera                            caNumeric, caApplyNumeric
-.                                                           caWaterfallPlot                     caToggleButton
-.                                                           caBitNames                          caScriptButton
-.                                                           caCalc                              caSpinBox
-.                                                           caTable
-=========================================================== =================================== ====================================
+   ":ref:`caGraphics`: Rectangle, Circle, Arc, Triangle, Line, Arrow", :ref:`caLineEdit <caLineEdit>`, :ref:`caChoice`
+   ":ref:`caPolyline`: polyline and polygon", :ref:`caLed`, :ref:`caMenu`
+   ":ref:`caLabel`: text", :ref:`caCartesianPlot`, :ref:`caMessageButton`
+   ":ref:`caFrame`", ":ref:`caLinearGauge`, :ref:`caCircularGauge`", ":ref:`caRelatedDisplay`"
+   ":ref:`caImage`: any image format, mostly used for animated gif", :ref:`caThermo`, ":ref:`caShellCommand`"
+   ":ref:`caInclude`: the equivalent to composite of MEDM", ":ref:`caStripPlot`", ":ref:`caSlider`"
+   ":ref:`caDoubleTabWidget`: a general purpose widget", ":ref:`caByte`", ":ref:`caTextEntry`"
+   "", ":ref:`caCamera`", ":ref:`caNumeric`, :ref:`caApplyNumeric`"
+   "", ":ref:`caWaterfallPlot`", ":ref:`caToggleButton`"
+   "", ":ref:`caBitNames`", ":ref:`caScriptButton`"
+   "", ":ref:`caCalc`", ":ref:`caSpinBox`"
+   "", ":ref:`caTable`", ""
 
-|
-| Their main properties are described below. It has to be noted that
-  through inheritance of Objects, other properties exist, that are not
-  necessary relevant here.
+Their main properties are described below. It has to be noted that
+through inheritance of Objects, other properties exist, that are not
+necessary relevant here.
 
-**all monitor objects**
+all monitor objects
 -----------------------
 
 .. _caLineEdit:
 
-caLineEdit, the most used graphical object for data monitoring
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``caLineEdit``, the most used graphical object for data monitoring
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Text Update in MEDM.
 
-   | `Geometry <geometry>`__ is used for any object
+   | :ref:`geometry` is used for any object
    | **Description:**
 
    **channel:**
@@ -574,8 +568,8 @@ is the equivalent of the Text Update in MEDM.
 
    **limitsMode:**
       +---------+-----------------------------------------------------------+
-      | Channel | Limits specified by the control system will be usd (HOPR, |
-      |         | LOPR for EPICS)                                           |
+      | Channel | Limits specified by the control system will be used       |
+      |         | (HOPR, LOPR for EPICS)                                    |
       +---------+-----------------------------------------------------------+
       | User    | Limits specified by the user will be used.                |
       +---------+-----------------------------------------------------------+
@@ -612,8 +606,8 @@ is the equivalent of the Text Update in MEDM.
       | compact                          | value encode in e or f format    |
       |                                  | using absolaute precision from   |
       |                                  | user or channel, format will     |
-      |                                  | switch to e format for values <  |
-      |                                  | 1.0e-4                           |
+      |                                  | switch to e format for values    |
+      |                                  | <1.0e-4                          |
       +----------------------------------+----------------------------------+
       | truncated, sexagesimal,          | not supported yet                |
       | sexagesimal_hms, sexagesimal_dms |                                  |
@@ -622,22 +616,24 @@ is the equivalent of the Text Update in MEDM.
       |                                  | hexadecimal format               |
       +----------------------------------+----------------------------------+
       | octal                            | value will be encoded in octal   |
-      |                                  | formatoct                        |
+      |                                  | format                           |
       +----------------------------------+----------------------------------+
       | string                           | will be treated as decimal       |
-      |                                  | formal                           |
+      |                                  | format                           |
       +----------------------------------+----------------------------------+
 
    Description:
 
 --------------
 
+.. _caThermo:
+
 caThermo
 ~~~~~~~~
 
 is the equivalent of the Bar Monitor in MEDM.
 
-   | `Geometry <geometry>`__ is used for any object
+   | :ref:`geometry` is used for any object
    | **Description:**
 
    **channel:**
@@ -688,12 +684,14 @@ is the equivalent of the Bar Monitor in MEDM.
 
 --------------
 
+.. _caLed:
+
 caLed
 ~~~~~
 
 has no equivalent in MEDM.
 
-   | `Geometry <geometry>`__ is used for any object
+   | :ref:`geometry` is used for any object
    | **Description:**
 
    **channel:**
@@ -716,25 +714,31 @@ has no equivalent in MEDM.
 
 --------------
 
+.. _caLinearGauge:
+
 caLinearGauge
 ~~~~~~~~~~~~~
 
 is the equivalent of the Bar Monitor in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caCircularGauge:
 
 caCircularGauge
 ~~~~~~~~~~~~~~~
 
 is the equivalent of the Meter Monitor in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caCartesianPlot:
 
 caCartesianPlot
 ~~~~~~~~~~~~~~~
@@ -742,7 +746,7 @@ caCartesianPlot
 is the equivalent of the Cartesian plot in MEDM and will plot up to 6
 curves
 
-   | `Geometry <geometry>`__ is used for any object
+   | :ref:`geometry` is used for any object
    | **Description:**
 
    **Title**
@@ -894,7 +898,7 @@ curves
       be separated by a semicolumn (see above).
       There are eight possible kinds of traces as seen in the following
       table. The traces for a given plot do not all have to be of the
-      same kind – they can be mixed. (In the table Nx is the number of
+      same kind - they can be mixed. (In the table Nx is the number of
       elements in the process variable specified for x, and Ny is the
       number of elements in the process variable specified for y. The
       letter n denotes a number greater than one, and a blank indicates
@@ -934,8 +938,9 @@ curves
       it would be otherwise. The points are plotted from i = 0 to
       NPoints - 1 and update as the values change. In the cases where
       one of the process variables is not specified, the history is
-      plotted on that axis against values from 0 to NPoints – 1 on the
+      plotted on that axis against values from 0 to NPoints - 1 on the
       other axis.
+
       If one of the process variables is an array with more than one
       element and the CA server of the process variable supports dynamic
       arrays, then when a zero is specified for Count, the number of
@@ -953,19 +958,21 @@ curves
       point is discarded, the others are moved down, and the latest is
       plotted at the end. In the cases where one of the process
       variables is not specified, the history is plotted on that axis
-      against values from 0 to Count – 1 on the other axis.
+      against values from 0 to Count - 1 on the other axis.
+
       The above behaviour still has to be tested thoroughly. It appeared
-      already that perhaps Count must be twice the value described above
-      ?
+      already that perhaps Count must be twice the value described above?
 
 --------------
+
+.. _caStripPlot:
 
 caStripPlot
 ~~~~~~~~~~~
 
 is the equivalent of the StripChart Monitor in MEDM.
 
-   | `Geometry <geometry>`__ is used for any object
+   | :ref:`geometry` is used for any object
    | **Description:**
 
    **Title**
@@ -1038,78 +1045,94 @@ is the equivalent of the StripChart Monitor in MEDM.
 
 --------------
 
+.. _caByte:
+
 caByte
 ~~~~~~
 
 is the equivalent of the Byte Monitor in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caCamera:
 
 caCamera
 ~~~~~~~~
 
 has no equivalent in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caCalc:
 
 caCalc
 ~~~~~~
 
 has no equivalent in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caWaterfallPlot:
 
 caWaterfallPlot
 ~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caBitNames:
 
 caBitNames
 ~~~~~~~~~~
 
 has no equivalent in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caTable:
 
 caTable
 ~~~~~~~
 
 has no equivalent in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
 
-**all graphical objects**
+all graphical objects
 -------------------------
+
+.. _caLabel:
 
 caLabel
 ~~~~~~~
 
 is the equivalent of Text in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caGraphics:
 
 caGraphics
 ~~~~~~~~~~
@@ -1117,27 +1140,31 @@ caGraphics
 is the equivalent of all primary graphical objects (like circles, lines,
 arcs, triangles, arrows, ...) in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caFrame:
 
 caFrame
 ~~~~~~~
 
 has no equivalent of Text in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caImage:
 
 caImage
 ~~~~~~~
 
 is the equivalent of image in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
    Qt supports many graphics format, try yours to see if it will be
    displayed. The most interesting format is however the animated GIF
@@ -1175,22 +1202,26 @@ is the equivalent of image in MEDM.
 
 --------------
 
+.. _caPolyLine:
+
 caPolyLine
 ~~~~~~~~~~
 
 is the equivalent of Polyline and Polygone in MEDM.
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caInclude:
 
 caInclude
 ~~~~~~~~~
 
 is the equivalent of the Composite in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:** Composite objects are created by the designer as a
    new ui file to be included in a main file. For many operations they
    are treated as one object. Its uses also visibility (Color Mode,
@@ -1201,23 +1232,27 @@ is the equivalent of the Composite in MEDM
 
 --------------
 
+.. _caDoubleTabWidget:
+
 caDoubleTabWidget
 ~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM and is not a controls object
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
-**all controller objects**
+all controller objects
 --------------------------
+
+.. _caNumeric:
 
 caNumeric
 ~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
    The WheelSwitch has arrow buttons above and below the digits that are
    used to change individual digits, and it also accepts keyboard input.
@@ -1234,54 +1269,64 @@ is the equivalent of the Wheelswitch in MEDM
 
 --------------
 
+.. _caApplyNumeric:
+
 caApplyNumeric
 ~~~~~~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
    The same behaviour as the Wheelswitch, with the difference that the
    value will be applied when pressing the apply button.
 
 --------------
 
+.. _caSlider:
+
 caSlider
 ~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
-   <`Geometry <geometry>`__ is used for any object
+   <:ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caShellCommand:
 
 caShellCommand
 ~~~~~~~~~~~~~~
 
 is the equivalent of the Shell command in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caMenu:
 
 caMenu
 ~~~~~~
 
 is the equivalent of the Menu in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caChoice:
 
 caChoice
 ~~~~~~~~
 
 is the equivalent of the Choice Button in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
    +------------+--------------------------------------------------------+
@@ -1299,12 +1344,14 @@ is the equivalent of the Choice Button in MEDM
 
 --------------
 
+.. _caRelatedDisplay:
+
 caRelatedDisplay
 ~~~~~~~~~~~~~~~~
 
 is the equivalent of the Related Display in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
    ================== ===================================================
@@ -1332,86 +1379,98 @@ is the equivalent of the Related Display in MEDM
 
 --------------
 
+.. _caTextEntry:
+
 caTextEntry
 ~~~~~~~~~~~
 
 is the equivalent of the Text Entry in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caMessageButton:
 
 caMessageButton
 ~~~~~~~~~~~~~~~
 
 is the equivalent of the Message Button in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caToggleButton:
 
 caToggleButton
 ~~~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caScriptButton:
 
 caScriptButton
 ~~~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
+
+.. _caSpinBox:
 
 caSpinBox
 ~~~~~~~~~
 
 represents a simplified Wheelswitch
 
-   `Geometry <geometry>`__ is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
 
 
-`Requirements <requirements>`__
+Requirements
 -------------------------------
 
-| caQtDM requires that Qt, qwt and EPICS are installed. Actually the
-  suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at
-  least qwt6.1. The synoptic editor (designer) is part of Qt and the
-  caQtDM objects are plugged into the designer. This help can be called
-  from the designer by pressing F1 on any object and requires the
-  assistant which is a part of Qt. caQtDM runs in principle on any
-  plattform and has been tested for several linux flavours and also on
-  Microsoft Windows. For MAC OS probably some work has to be done. Qt
-  requires actually on linux normally X11 on Microsoft Windows the
-  native window system.
-| caQtDM requires that Qt, qwt and EPICS are installed. Actually the
-  suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at
-  least qwt6.1. The synoptic editor (designer) is part of Qt and the
-  caQtDM objects are plugged into the designer. This help can be called
-  from the designer by pressing F1 on any object and requires the
-  assistant which is a part of Qt. caQtDM runs in principle on any
-  plattform and has been tested for several linux flavours and also on
-  Microsoft Windows. For MAC OS probably some work has to be done. Qt
-  requires actually on linux normally X11 on Microsoft Windows the
-  native window system.
+caQtDM requires that Qt, qwt and EPICS are installed. Actually the
+suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at
+least qwt6.1. The synoptic editor (designer) is part of Qt and the
+caQtDM objects are plugged into the designer. This help can be called
+from the designer by pressing F1 on any object and requires the
+assistant which is a part of Qt. caQtDM runs in principle on any
+plattform and has been tested for several linux flavours and also on
+Microsoft Windows. For MAC OS probably some work has to be done. Qt
+requires actually on linux normally X11 on Microsoft Windows the
+native window system.
 
-`Command Line Options <commandline>`__
+caQtDM requires that Qt, qwt and EPICS are installed. Actually the
+suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at
+least qwt6.1. The synoptic editor (designer) is part of Qt and the
+caQtDM objects are plugged into the designer. This help can be called
+from the designer by pressing F1 on any object and requires the
+assistant which is a part of Qt. caQtDM runs in principle on any
+plattform and has been tested for several linux flavours and also on
+Microsoft Windows. For MAC OS probably some work has to be done. Qt
+requires actually on linux normally X11 on Microsoft Windows the
+native window system.
+
+Command Line Options
 --------------------------------------
 
-| caQtDM can be executed with the same options as MEDM; this to be
-  compatible with its options. the following options are supported:
+caQtDM can be executed with the same options as MEDM; this to be
+compatible with its options. the following options are supported:
+
 | [-help \| -h \| -‌], *gives a description of the options*
 | [-x], *has no effect*
 | [-attach], *will attach to a running caQtDM*
@@ -1426,20 +1485,23 @@ represents a simplified Wheelswitch
   *specifies the geometry (location and size) of the synoptic display*.
 | Parameters in square brackets [] are optional.
 
-Examples:
-~~~~~~~~~
+Examples
+~~~~~~~~
 
-| Start up, performing macro substitution of all occurrences of $(a) and
-  $(c) in the display file, xyz.ui:
-| **caQtDM -macro "a=b,c=d" xyz.adl &**
-| Start up in execute mode; resize the display window corresponding to
-  abc.adl to 100 by 100 pixels and move it to the location, x = 100 and
-  y = 100; and move the display window corresponding to def.adl to x =
-  400 and y = 150:
-| **caQtDM –dg 100x100+100+100 abc.ui&**
+Start up, performing macro substitution of all occurrences of ``$(a)`` and
+``$(c)`` in the display file, xyz.ui::
+
+   caQtDM -macro "a=b,c=d" xyz.adl &
+
+Start up in execute mode; resize the display window corresponding to
+abc.adl to 100 by 100 pixels and move it to the location, x = 100 and
+y = 100; and move the display window corresponding to def.adl to x =
+400 and y = 150::
+
+   caQtDM -dg 100x100+100+100 abc.ui &
 
 Description Files
------------------------------
+-----------------
 
 | With the Qt designer you produce xml files with the extension .ui.
   These files are used as input for the synoptic viewer caQtDM. These
@@ -1451,7 +1513,7 @@ Description Files
   CAQTDM_DISPLAY_PATH. The directories are specified with the separator
   : for linux and ; for microsoft windows.
 
-`Connection Problems and Access Rights <connection>`__
+Connection Problems and Access Rights
 ------------------------------------------------------
 
 When caQtDM cannot connect the specified process variable normally white
@@ -1459,7 +1521,7 @@ colors will be drawn. A list of unconnected process variables can be
 called through the menu of the main window of caQtDM. When a process
 variable is not writeable the cursor will change to some special sign.
 
-`Fonts <fonts>`__
+Fonts
 -----------------
 
 | The custom widgets make extensively use of the Qt font *"Lucida Sans
@@ -1468,13 +1530,12 @@ variable is not writeable the cursor will change to some special sign.
   the appropriated font to display numbers and it is warmly advised to
   have this font installed.
 
-**General Properties**
+General Properties
 ----------------------
 
 .. _geometry:
 
 .. rubric:: Geometry
-   .. :name: geometry
 
 .. container::
 
@@ -1494,8 +1555,9 @@ variable is not writeable the cursor will change to some special sign.
 | Height     | Height of the object.                                  |
 +------------+--------------------------------------------------------+
 
+.. _visibility:
+
 .. rubric:: Visibility
-   :name: visibility
 
 .. container::
 
@@ -1503,9 +1565,10 @@ variable is not writeable the cursor will change to some special sign.
    which is not a control widget
 
 +-----------------+---------------------------------------------------+
-| Color Mode      | Color Mode for the object. only for caGraphics,   |
+| Color Mode      | Color Mode for the object. only for               |
+|                 | :ref:`caGraphics`,                                |
 |                 | caLabel and caPolyLine, See the                   |
-|                 | `ColorMode <#colormode>`__ property               |
+|                 | `ColorMode <color-mode>`__ property               |
 +-----------------+---------------------------------------------------+
 | Visibility      | Visibility mode for the object. See the           |
 |                 | `Visibility <#visibilitymode>`__ property         |
@@ -1534,10 +1597,9 @@ variable is not writeable the cursor will change to some special sign.
 |                 | replaced by the value of this process variable.   |
 +-----------------+---------------------------------------------------+
 
-.. rubric:: Color Mode
-   :name: color-mode
+.. _color-mode:
 
-|
+.. rubric:: Color Mode
 
 +--------+------------------------------------------------------------+
 | static | Show the object in its normal colors.                      |
@@ -1550,10 +1612,9 @@ variable is not writeable the cursor will change to some special sign.
 |        | record, for example).                                      |
 +--------+------------------------------------------------------------+
 
-.. rubric:: Visibility Mode
-   :name: visibility-mode
+.. _visibility-mode:
 
-|
+.. rubric:: Visibility Mode
 
 +-------------+-------------------------------------------------------+
 | static      | The object is displayed always. Updating objects are  |
@@ -1567,9 +1628,10 @@ variable is not writeable the cursor will change to some special sign.
 | calc        | Use calc expression to determine the visability.      |
 +-------------+-------------------------------------------------------+
 
-.. rubric:: Direction
-   :name: direction
+.. _direction:
 
+.. rubric:: Direction
+   :name:
 .. container::
 
    For the `Bar Monitor <#BarMonitor>`__ , `Byte
@@ -1588,10 +1650,9 @@ variable is not writeable the cursor will change to some special sign.
 |       | the same as right.                                          |
 +-------+-------------------------------------------------------------+
 
-|
+.. _label:
 
 .. rubric:: Label
-   :name: label
 
 .. container::
 
@@ -1618,10 +1679,9 @@ variable is not writeable the cursor will change to some special sign.
 |                | Slider).                                           |
 +----------------+----------------------------------------------------+
 
-.. rubric:: Text Align
-   :name: text-align
+.. _text-align:
 
-|
+.. rubric:: Text Align
 
 +-----------------+---------------------------------------------------+
 | horiz. left     | Align the text at the top left of the object.     |
@@ -1652,8 +1712,9 @@ variable is not writeable the cursor will change to some special sign.
 |                 | compatibility.                                    |
 +-----------------+---------------------------------------------------+
 
+.. _text-format:
+
 .. rubric:: Text Format
-   :name: text-format
 
 .. container::
 
@@ -1666,8 +1727,9 @@ variable is not writeable the cursor will change to some special sign.
    subsequent changes to the PREC do not affect the format until the
    synoptic display is reloaded.
 
+.. _calc-expressions:
+
 .. rubric:: CALC Expressions
-   :name: calc-expressions
 
 .. container::
 
@@ -1704,19 +1766,23 @@ K The PRECISION of Channel A.
 L The LOPR of Channel A.
 = ===========================
 
+
+.. TODO: make a table
+
 .. container::
 
    Examples are:
-   Show the object whenever the value of Channel A is zero: !A
-   Show the object whenever the value of Channel A is not zero: A
-   Show the object whenever the value of Channel A is 12: A=12
-   Show the object whenever the value of Channel A is not 12: A#12
-   Show the object whenever the values of Channel A, Channel B, and
-   Channel C are all negative: A<0&&B<0&&C<0
-   Show the object whenever the main process variable is within 90%
-   of its HOPR or LOPR limits: A<.9*L||A>.9*H
-   Show the object whenever the SEVERITY of the main process variable
-   is not 0: !J
+
+   * Show the object whenever the value of Channel A is zero: ``!A``
+   * Show the object whenever the value of Channel A is not zero: ``A``
+   * Show the object whenever the value of Channel A is 12: ``A=12``
+   * Show the object whenever the value of Channel A is not 12: ``A#12``
+   * Show the object whenever the values of Channel A, Channel B, and
+   * Channel C are all negative: ``A<0&&B<0&&C<0``
+   * Show the object whenever the main process variable is within 90%
+     of its HOPR or LOPR limits: ``A<.9*L||A>.9*H``
+   * Show the object whenever the SEVERITY of the main process variable
+     is not 0: ``!J``
 
 Macro Substitution
 ~~~~~~~~~~~~~~~~~~
@@ -1819,13 +1885,12 @@ Context Menu Customization
 |    | commands like Xwd, for example. only for linux                 |
 +----+----------------------------------------------------------------+
 
-|
-| Examples are:
-| export CAQTDM_EXEC_LIST='Probe;probe &P &:PV Name(s);echo &P'
-| export MEDM_EXEC_LIST='Full Name;echo &A:Short Name;echo &T'
-| export MEDM_EXEC_LIST='XTerm;xterm -fg black -bg white &'
-| export CAQTDM_EXEC_LIST=' Dump;xwd -id &X \| xwdtopnm \| pnmtops \|
-  lpr &'
+Examples are::
+
+   export CAQTDM_EXEC_LIST='Probe;probe &P &:PV Name(s);echo &P'
+   export MEDM_EXEC_LIST='Full Name;echo &A:Short Name;echo &T'
+   export MEDM_EXEC_LIST='XTerm;xterm -fg black -bg white &'
+   export CAQTDM_EXEC_LIST=' Dump;xwd -id &X \| xwdtopnm \| pnmtops \| lpr &'
 
 Help
 ~~~~
