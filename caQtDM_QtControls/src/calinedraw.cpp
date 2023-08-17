@@ -310,23 +310,19 @@ bool caLineDraw::rotateText(float degrees)
 
 void caLineDraw::paintEvent(QPaintEvent *)
 {
-    QFontMetrics fm(font());
-    int w = QMETRIC_QT456_FONT_WIDTH(fm,m_Text);
-    int h = QMETRIC_QT456_FONT_HEIGHT(fm,m_Text);
     QPainter painter(this);
-    //painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(m_ForeColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
-
     painter.fillRect(0,0, width(), height(), brush);
     painter.save();
-    painter.rotate(rotation);
 
     switch (m_Direction) {
 
     case Horizontal: {
-        QRect newRect(rect().top() + m_FrameLineWidth + 1, rect().left() + m_FrameLineWidth+1, rect().width() - 2 * m_FrameLineWidth - 2, rect().height() - 2 * m_FrameLineWidth - 2);
+        // Create a rectangle to draw text in, make it slightly smaller than the container and take frame width into account
+        const QRect newRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(width()-1-m_FrameLineWidth,height()-1-m_FrameLineWidth));
+
         switch (m_Alignment) {
         case Left:
             painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
@@ -342,35 +338,47 @@ void caLineDraw::paintEvent(QPaintEvent *)
     }
         break;
 
-    case Up:
+    case Up: {
+        const QRect newRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
+        // Move the coordinate system and rotate it, so the text is displayed upwards
+        painter.translate(QPoint(0,height()));
+        painter.rotate(rotation);
+
         switch (m_Alignment) {
         case Left:
-            painter.drawText(QPoint(-height()  + 2 * m_FrameLineWidth, width()/2 + h/2 -fm.descent()), m_Text);
+            painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
             break;
         case Right:
-            painter.drawText(QPoint(-w - 2 * m_FrameLineWidth, width()/2 + h/2 -fm.descent()), m_Text);
+            painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
             break;
         case Center:
         default:
-            painter.drawText(QPoint(-height()/2 - w/2, width()/2 + h/2 -fm.descent()), m_Text);
+            painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
             break;
         }
+    }
         break;
 
-    case Down:
+    case Down: {
+        const QRect newRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
+        // Move the coordinate system and rotate it, so the text is displayed downwards
+        painter.translate(QPoint(width(),0));
+        painter.rotate(rotation);
+
         switch (m_Alignment) {
         case Left:
-            painter.drawText(QPoint(0 + 2 * m_FrameLineWidth , -width()/2 + h/2 -fm.descent()), m_Text);
+            painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
             break;
         case Right:
-            painter.drawText(QPoint(height() -w - 2 * m_FrameLineWidth, -width()/2 + h/2 -fm.descent()), m_Text);
+            painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
             break;
         case Center:
         default:
-            painter.drawText(QPoint(height()/2 - w/2, -width()/2 + h/2 -fm.descent()), m_Text);
+            painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
             break;
         }
         break;
+    }
     }
 
     painter.restore();
