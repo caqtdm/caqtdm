@@ -7,8 +7,10 @@ Welcome to caQtDM's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 0
    :caption: Contents:
+
+   caQtDM_Manual
 
 
 
