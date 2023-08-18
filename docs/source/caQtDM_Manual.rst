@@ -13,11 +13,14 @@ About this manual
 
 This manual has been written in HTML and after conversion introduced in
 the Qt assistant in order to get help for the caQtDM system. It has to
-be noted that caQtDM is though as a replacement of the very known EPICS
-Display Manager MEDM, therefore this manual is of course also inspired
+be noted that caQtDM is though as a replacement of the very known EPICS [#]_
+Display Manager MEDM [#]_, therefore this manual is of course also inspired
 of the existing MEDM manual.
 
 The HTML was converted to restructured text using pandoc, then hand-edited.
+
+.. [#] EPICS: https://epics.anl.gov
+.. [#] MEDM: https://epics.anl.gov/extensions/medm
 
 Introduction
 ----------------
@@ -28,7 +31,7 @@ synoptic displays. The caQtDM package uses the standard Qt GUI (Qt
 designer) for designing synoptic displays, containing all the controls
 graphical elements necessary to visualize and control a facility. Qt
 designer uses the custom widgets designed for this purpose and writes
-a description file (.ui file) that will be used by the synoptic viewer
+a description file (``.ui`` file) that will be used by the synoptic viewer
 caQtDM. A reload function in caQtDM allows to rapidly see the changes
 made by the editor in order to accelerate the process of editing and
 viewing.
@@ -39,25 +42,28 @@ their properties below. Many objects have been built and more are
 introduced as soon as they are needed. The Qt system allows in a very
 easy way to add continuously new objects or to modify these.
 
-Technically the package consists of 3 class libraries with the
+Technically the package consists of three class libraries with the
 graphical objects, a class library used by the viewer or other
-applications and the viewer (caQtDM) itself as well as 3 libraries
+applications and the viewer (caQtDM) itself as well as three libraries
 with the plugin definitions for the Qt designer. The editor (Qt
 designer) is part of Qt. It has to be noted that the graphical objects
 are not control system aware. The graphical objects have properties
 and methods used by the editor. The control system knowledge is then
 integrated and handled by the viewer. This architecture allowed us to
-handle easily three control systems: epics, epics4 and an older in
-house control system. These are all handled by the viewer. This
-distribution supports per default epics 3. Epics4 can be integrated
+handle three control systems easily: epics3 [#]_, epics4 [#]_, and an older 
+in-house control system. These are all handled by the viewer. This
+distribution supports epics3 by default. Epics4 can be integrated
 when building it, but only a few tests could be done while not many
 process variables could be tested so far.
 
-Part of the package is also a converter (adl2ui) that can convert MEDM
-.adl files into .ui files used by the caQtDM package. In most cases
-this converter gives good results. Besides the already mentioned .ui
-files the viewer can also uses in house developed .prc files. These
-last files represent asci files to be edited with any text editor
+.. [#] *epics3* refers to Channel Access protocol
+.. [#] *epics4* refers to PV Access protocol, introduced in EPIS release 7
+
+Part of the package is also a converter (``adl2ui``) that can convert MEDM
+``.adl`` files into ``.ui`` files used by the caQtDM package. In most cases
+this converter gives good results. Besides the already mentioned ``.ui``
+files, the viewer can also use in-house developed ``.prc`` files. These
+last files represent ASCII files to be edited with any text editor
 using are in house syntax.
 
 The Qt system is widely used today on many platforms and is therefore
@@ -66,8 +72,8 @@ therefore that an application using this architecture will run on many
 platforms, so that caQtDM will run on linux as well as on windows
 systems.
 
-Designer: editor
---------------------
+Qt Designer: editor
+-------------------
 
 The designer coming with Qt is the editor used for developing the
 synoptic screens. In this manual we will not describe this editor
@@ -81,53 +87,56 @@ description of the graphical objects and their properties will be given
 below.
 
 Install
------------
+-------
 
-| Since version 3.1.4 of caQtDM a new build and installation procedure
-  working for several linux platforms are available.
-| First you will have to unpack the tar archive, which will create the
-  necessary directories and files. In the upper directory you will find
-  the necessary procedures to build the package, run it locally without
-  installing and also an installation procedure.
+.. todo:: Update for Qt & qwt supported now
+
+Since version 3.1.4 of caQtDM a new build and installation procedure
+working for several linux platforms are available.
+
+First you will have to unpack the tar archive, which will create the
+necessary directories and files. In the upper directory you will find
+the necessary procedures to build the package, run it locally without
+installing, and also an installation procedure.
 
 #. you will have to install Qt-4.8 and qwt-6 when they are not already
    installed. On modern systems Qt4 should already be installed, but the
    qt4-designer not necessarily and you should install it (eventually
    with sudo apt-get install qt4-designer). qwt is normally not
    installed and you should install this too.
-#. you will have to install EPICS
+#. you will have to install EPICS (base)
 #. all the environment variables used for the installation will be
-   defined in the script caQtDM_Env. When some of the variables are
+   defined in the script ``caQtDM_Env``. When some of the variables are
    already defined in your environment, the script will use them,
    otherwise they will be defined. It is up to you to edit this file and
    adapt the variables to your environment.
-#. the script caQtDM_BuildAll will build you the package now into the
-   directory ./caQtDM_Binaries. You should obtain there adl2ui, caQtDM,
-   libqtcontrols.so and libcaQtDM_Lib.so as well as a designer directory
-   containing 3 files libqtcontrols*_plugin.so. if you encounter a
+#. the script ``caQtDM_BuildAll`` will build you the package now into the
+   directory ``./caQtDM_Binaries``. You should obtain there ``adl2ui``, ``caQtDM``,
+   ``libqtcontrols.so`` and ``libcaQtDM_Lib.so`` as well as a ``designer`` directory
+   containing 3 files ``libqtcontrols*_plugin.so``. if you encounter a
    problem when building due to some environment variable problem or
    while not everything was installed before, you may correct your
    problem and run the script again. In case you want to cleanup you use
-   the script caQtDM_CleanAll, which will also delete the resulting
+   the script ``caQtDM_CleanAll``, which will also delete the resulting
    binaries.
 #. you may try to install the package: the package should normally be
    installed in the EPICS extensions and the environment variables are
    pointing to them.
-#. running caQtDM: when the package has been successfully build into the
-   directory ./caQtDM_Binaries, you can start caQtDM by using the script
-   startDM_Local and the qt4-designer by the script qtdesigner (all
+#. running ``caQtDM``: when the package has been successfully build into the
+   directory ``./caQtDM_Binaries``, you can start ``caQtDM`` by using the script
+   ``startDM_Local`` and the qt4-designer by the script ``qtdesigner`` (all
    located in the main directory where you expanded the tar file). These
    scripts will set some important environment variables in order to set
    the path, the plugin_path and to point to the test directory provided
-   with the package (./caQtDM_Tests). In this directory also the
+   with the package (``./caQtDM_Tests``). In this directory also the
    stylesheets are located to be used for a nice rendering. You may call
-   the test.ui file with the above mentioned scripts. In order to test
+   the ``test.ui`` file with the above mentioned scripts. In order to test
    the display some EPICS channels have to be defined. This can be done
-   by running a soft-ioc shell called with run-epics also provided in
+   by running a softIoc shell called with run-epics also provided in
    the test directory.
 #. in case you have qwt 6.1 you will have to use in
-   caQtDM_QtControls/src the files qwt_thermo_marker_61.\* instead of
-   qwt_thermo_marker.\*
+   caQtDM_QtControls/src the files qwt_thermo_marker_61. 
+   (*instead of qwt_thermo_marker*)
 #. in case you already use Qt5.1 with qwt6.1 the building should also be
    straight forward.
 #. Instructions for compiling caQtDM on Windows Requirements:
@@ -138,13 +147,16 @@ Install
    -  MS Visual Studio 2010
    -  Wix 3.0.5419.0
 
-   With caQtDM_Env.bat you can configure your system. All settings which
+   With ``caQtDM_Env.bat`` you can configure your system. All settings which
    are needed will be taken from here.
-   The building can be started with the batchfile : caQtDM_BuildAll.bat
-   The packaging is made with the batch file : caQtDM_Build_Package.bat
+
+   The building can be started with the batchfile : ``caQtDM_BuildAll.bat``
+
+   The packaging is made with the batch file : ``caQtDM_Build_Package.bat``
    This will generate a MSI installation file in the folder of
-   caQtDM_Binaries.
-   To clean the Folder you should use caQtDM_CleanAll.bat.
+   ``caQtDM_Binaries``.
+
+   To clean the Folder you should use ``caQtDM_CleanAll.bat``.
 
 Development history
 -----------------------
@@ -153,7 +165,9 @@ The following list describe the new features and bug fixes for every
 release. You can follow the development history and detect if a bug in
 the used version has been solved.
 
-| 3.7.2
+.. container::
+
+   3.7.2
 
 -  cagraphic lost its linecolor after no connection, corrected
 -  calineedit was not showing alarm colors in alarm_default mode,
@@ -418,7 +432,7 @@ the used version has been solved.
 
 -  When using correctly the layout possibilities offered by Qt, one can
    resize a window (you will find an example in
-   work/caQtDM/parser/proscanFiles/phaseslitsnew.ui).
+   ``work/caQtDM/parser/proscanFiles/phaseslitsnew.ui``).
 -  Up to now when using "includes" only a placeholder could be seen in
    the designer. Now the included ui file is displayed inside the
    designer.
@@ -464,26 +478,37 @@ the used version has been solved.
 caQtDM Custom Widgets
 -------------------------
 
-The custom widgets used in caQtDM have been divide in three categories
-as was done in MEDM. MEDM users are used to these cartegories and we
+The custom widgets used in caQtDM have been divided into three categories,
+as was done in MEDM. MEDM users are used to these categories and we
 have therefore kept the categorisation in Graphics, Controller and
-Monitors. As in MEDM, Graphics are items such as frames, labels,
-graphical entities like rectangles, triangles, lines, ..., images and
-composite objects (called here includes, while included from other ui
-files. Monitors are objects that monitor the state or values of
-process variables through display of values, plots, tables,
-thermometers, dials, ... Controllers are objects that change the
-values of process variables through many different objects. you will
-find here an exact description of them with their properties: For all
+Monitors. 
+
+Graphics:
+   Items such as frames, labels,
+   graphical entities like rectangles, triangles, lines, ..., images and
+   composite objects (called here *includes*, while included from other ``.ui``
+   files. 
+
+Monitors:
+   Objects that monitor the state or values of
+   process variables through display of values, plots, tables,
+   thermometers, dials, ... 
+
+Controllers:
+   Objects that change the
+   values of process variables through many different objects. You will
+   find here an exact description of them with their properties.
+
+For all
 objects, you have normally their geometry (position and size),
-sizepolicy and some other properties like tooltips. It has to be noted
+size policy and some other properties like tooltips. It has to be noted
 that for many widgets their stylesheet will be overwritten in order to
 get the representation that is requested when specifying for example
 background, foreground, border colors or other properties. The
 stylesheet can be influenced in some cases by specifying a stylesheet
-for the mainwindow or in stylesheet.qss, a stylesheet found in the
-caQtDM path. The adl2ui converter uses normally this stylesheet to
-integrate these defaults into the generated ui file. You may delete
+for the mainwindow or in ``stylesheet.qss``, a stylesheet found in the
+caQtDM path. The ``adl2ui`` converter uses normally this stylesheet to
+integrate these defaults into the generated ``.ui`` file. You may delete
 this stylesheet or change it to your convenience. However as mentioned
 before, many styles will be overwritten.
 
@@ -503,8 +528,8 @@ before, many styles will be overwritten.
    "", ":ref:`caCalc`", ":ref:`caSpinBox`"
    "", ":ref:`caTable`", ""
 
-Their main properties are described below. It has to be noted that
-through inheritance of Objects, other properties exist, that are not
+Their main properties are described below. It must be noted that
+through inheritance of Objects, other properties exist that are not
 necessary relevant here.
 
 all monitor objects
@@ -621,8 +646,6 @@ is the equivalent of the Text Update in MEDM.
       | string                           | will be treated as decimal       |
       |                                  | format                           |
       +----------------------------------+----------------------------------+
-
-   Description:
 
 --------------
 
@@ -1174,8 +1197,8 @@ is the equivalent of image in MEDM.
    the images or to display a specified frame. The default is to animate
    if there is more than one frame. To display a specific frame, enter
    an expression for the Image Calc that returns a frame number. Frame
-   numbers start with 0. The `syntax <#CalcExpression>`__ for the Image
-   Calc expression is the same as that for the Visibilty property, and
+   numbers start with 0. The `syntax <calc-expressions>`__ for the Image
+   Calc expression is the same as that for the :ref:`visibility` property, and
    it uses channels A-D in the Dynamic Attribute. The only difference is
    that the CALC expression should return a frame number, not True or
    False. The value will be rounded to the nearest integer. Frame
@@ -1186,10 +1209,16 @@ is the equivalent of image in MEDM.
    channel specified. A multiple-frame Image even with no process
    variables specified for the Dynamic Attribute does update with some
    speed. Use the Image Calc expression and the process variables in the
-   Dynamic Attribute to specify when to display each color. There is an
-   `EPICS extension <#EPICSExtension>`__\ called `Simple GIF Animator
-   (SGA) <https://web.archive.org/web/20221004231152/http://www.aps.anl.gov/epics/extensions/index.php>`__
+   Dynamic Attribute to specify when to display each color. 
+   
+   .. caution: SGA is 20 years old and may be archaic.  ImageMagick?
+
+   There is an
+   `EPICS extension <https://epics.anl.gov/extensions/index.php>`__
+   called `Simple GIF Animator
+   (SGA) <https://epics.anl.gov/extensions/sga/>`__ for linux/Unix
    that allows you to create and modify animated GIFs for use in caQTDM.
+
    There are also many other GIF animators available, especially for
    Microsoft Windows. It does not make any difference which platform you
    use to create or manipulate the images. You cannot use SGA or most of
@@ -1197,8 +1226,7 @@ is the equivalent of image in MEDM.
    and rearrange them plus modify some of the GIF parameters. There are
    many drawing and image editing programs that allow you to create and
    edit images. For UNIX, the `GNU Image Manipulation Program
-   (GIMP) <https://web.archive.org/web/20221004231152/http://www.gimp.org/>`__\ is
-   a good choice and is free.
+   (GIMP) <https://www.gimp.org/>`__\ is a good choice and is free.
 
 --------------
 
@@ -1226,7 +1254,7 @@ is the equivalent of the Composite in MEDM
    new ui file to be included in a main file. For many operations they
    are treated as one object. Its uses also visibility (Color Mode,
    Visibility, Visibility Calc, Channels A-D) properties. One can
-   specify `macros <#MacroSubstitution>`__. you can specify them by
+   specify `macros <macro-substitution>`__. you can specify them by
    placing a semi-colon after the file name and entering them as on the
    command line.
 
@@ -1373,7 +1401,7 @@ is the equivalent of the Related Display in MEDM
    |                     | Related Display clear. In EXECUTE mode, the   |
    |                     | `Execute-Mode Popup                           |
    |                     | Menu <#ExecuteModePopupMenu>`__ contains an   |
-   |                     | item to toggle the makring of hidden buttons  |
+   |                     | item to toggle the marking of hidden buttons  |
    |                     | in case the user cannot find them.            |
    +---------------------+-----------------------------------------------+
 
@@ -1443,6 +1471,8 @@ represents a simplified Wheelswitch
 Requirements
 -------------------------------
 
+.. todo:: Update for Qt & qwt supported now
+
 caQtDM requires that Qt, qwt and EPICS are installed. Actually the
 suported version are Qt4.6 and above, qwt6.0 and above. Qt5 needs at
 least qwt6.1. The synoptic editor (designer) is part of Qt and the
@@ -1471,25 +1501,27 @@ Command Line Options
 caQtDM can be executed with the same options as MEDM; this to be
 compatible with its options. the following options are supported:
 
-| [-help \| -h \| -‌], *gives a description of the options*
-| [-x], *has no effect*
-| [-attach], *will attach to a running caQtDM*
-| [-noMsg], *will iconize the main window*
-| [-noStyles], *no stylesheet will be loaded, works only when not
-  attaching*
-| [-print], *will print file and exit*
-| [-noResize], *will prevent resizing, works only when not attaching*
-| [-macro "*xxx*\ =\ *aaa*,\ *yyy*\ =\ *bbb*, ..."], *will apply macro
-  substitution to replace occurrences of $(xxx\ ) with value aaa\ .*
-| [-dg [*xpos*\ [x\ *ypos*]][+\ *xoffset*\ [+\ *yoffset*\ s]],
-  *specifies the geometry (location and size) of the synoptic display*.
-| Parameters in square brackets [] are optional.
+========================================= ===================================
+option                                    meaning
+========================================= ===================================
+``-help`` or ``-h`` or ``-``              describe the options
+``-x``                                    has no effect (MEDM's execute-only mode)
+``-attach``                               attach to a running caQtDM
+``-noMsg``                                iconize the main window
+``-noStyles``                             no stylesheet will be loaded, works only when not attaching
+``-print``                                print file and exit
+``-noResize``                             prevent resizing, works only when not attaching
+``-macro "xxx=aaa,yyy=bbb, ..."``         apply :ref:`macro substitution <macro-substitution>` to replace occurrences of ``$(xxx)`` with value ``aaa``.
+``-dg [xpos[xypos]][+xoffset[+yoffsets]`` specifies the geometry (location and size) of the synoptic display
+========================================= ===================================
+
+Parameters in square brackets [] are optional.
 
 Examples
 ~~~~~~~~
 
-Start up, performing macro substitution of all occurrences of ``$(a)`` and
-``$(c)`` in the display file, xyz.ui::
+Start up, performing :ref:`macro substitution <macro-substitution>` of all occurrences of ``$(a)`` and
+``$(c)`` in the display file, ``xyz.ui``::
 
    caQtDM -macro "a=b,c=d" xyz.adl &
 
@@ -1503,15 +1535,16 @@ y = 100; and move the display window corresponding to def.adl to x =
 Description Files
 -----------------
 
-| With the Qt designer you produce xml files with the extension .ui.
-  These files are used as input for the synoptic viewer caQtDM. These
-  xml ascii file can be edited by hand, but care has to be taken while
-  caQtDM and Qt designer do not forgive any error. Qt designer will
-  however tell you at what line the mistake is produced.
-| The files are normally loaded from the current directory and/or from
-  the directory specified by the environment variable
-  CAQTDM_DISPLAY_PATH. The directories are specified with the separator
-  : for linux and ; for microsoft windows.
+With the Qt designer, you produce xml files with the extension ``.ui``.
+These files are used as input for the synoptic viewer caQtDM. These
+xml ascii file can be edited by hand, but care has to be taken while
+caQtDM and Qt designer do not forgive any error. Qt designer will
+however tell you at what line the mistake is produced.
+
+The files are normally loaded from the current directory and/or from
+the directory specified by the environment variable
+CAQTDM_DISPLAY_PATH. The directories are specified with the separator
+``:`` for linux and ``;`` for microsoft windows.
 
 Connection Problems and Access Rights
 ------------------------------------------------------
@@ -1524,11 +1557,11 @@ variable is not writeable the cursor will change to some special sign.
 Fonts
 -----------------
 
-| The custom widgets make extensively use of the Qt font *"Lucida Sans
-  Typewriter"*. If this font does not exist in some cases it will fall
-  back to a font called "Monospace". However the "Lucida" font is really
-  the appropriated font to display numbers and it is warmly advised to
-  have this font installed.
+The custom widgets make extensively use of the Qt font *"Lucida Sans
+Typewriter"*. If this font does not exist in some cases it will fall
+back to a font called "Monospace". However the "Lucida" font is really
+the appropriated font to display numbers and it is warmly advised to
+have this font installed.
 
 General Properties
 ----------------------
@@ -1561,22 +1594,21 @@ General Properties
 
 .. container::
 
-   For the `graphical objects <#graphics>`__ except caDoubleTabWidget
+   For the `graphical objects <#graphics>`__ except :ref:`caDoubleTabWidget`
    which is not a control widget
 
 +-----------------+---------------------------------------------------+
 | Color Mode      | Color Mode for the object. only for               |
-|                 | :ref:`caGraphics`,                                |
-|                 | caLabel and caPolyLine, See the                   |
-|                 | `ColorMode <color-mode>`__ property               |
+|                 | :ref:`caGraphics`,  :ref:`caLabel`, and           |
+|                 | :ref:`caPolyLine`. See the :ref:`color-mode`      |
+|                 | property                                          |
 +-----------------+---------------------------------------------------+
 | Visibility      | Visibility mode for the object. See the           |
-|                 | `Visibility <#visibilitymode>`__ property         |
+|                 | :ref:`visibility-mode` property.                  |
 +-----------------+---------------------------------------------------+
 | Visibility Calc | A CALC expression that determines whether the     |
 |                 | object is displayed or not. The expression should |
 |                 | return 0 for False and anything else for True.    |
-|                 | See `CALC Expression <#calcexpression>`__ .       |
 +-----------------+---------------------------------------------------+
 | Channel A       | Name of the main process variable associated with |
 |                 | the object. An A in the CALC expression is        |
@@ -1596,6 +1628,8 @@ General Properties
 |                 | with the object. A D in the CALC expression is    |
 |                 | replaced by the value of this process variable.   |
 +-----------------+---------------------------------------------------+
+
+See :ref:`calc-expressions` for more details.
 
 .. _color-mode:
 
@@ -1631,7 +1665,7 @@ General Properties
 .. _direction:
 
 .. rubric:: Direction
-   :name:
+
 .. container::
 
    For the `Bar Monitor <#BarMonitor>`__ , `Byte
@@ -1699,17 +1733,17 @@ General Properties
 |                 | object, and the text will end at the right of the |
 |                 | object.)                                          |
 +-----------------+---------------------------------------------------+
-| vert. top       | No longer used. In ADL files MEDM treats this the |
-|                 | same as horiz. left (as it used to) for backward  |
-|                 | compatibility.                                    |
-+-----------------+---------------------------------------------------+
-| vert. centered  | No longer used. In ADL files MEDM treats this the |
-|                 | same as horiz. center (as it used to) for         |
+| vert. top       | No longer used. In ``.adl`` files, MEDM treats    |
+|                 | this the same as horiz. left (as it used to) for  |
 |                 | backward compatibility.                           |
 +-----------------+---------------------------------------------------+
-| vert. bottom    | No longer used. In ADL files MEDM treats this the |
-|                 | same as horiz. right (as it used to) for backward |
-|                 | compatibility.                                    |
+| vert. centered  | No longer used. In ``.adl`` files, MEDM treats    |
+|                 | this the same as horiz. center (as it used to)    |
+|                 | for backward compatibility.                       |
++-----------------+---------------------------------------------------+
+| vert. bottom    | No longer used. In ``.adl`` files, MEDM treats    |
+|                 | this the same as horiz. right (as it used to)     |
+|                 | for backward compatibility.                       |
 +-----------------+---------------------------------------------------+
 
 .. _text-format:
@@ -1734,15 +1768,14 @@ General Properties
 .. container::
 
    CALC expressions are used to determine visibility for graphical
-   objects and to determine the frame number for the
-   `caImage <#caImage>`__ , which also has a Dynamic Attribute. For
-   visibility the expression should return 0 for False and anything
+   objects and to determine the frame number for the :ref:`caImage`,
+   which also has a Dynamic Attribute. For
+   visibility, the expression should return 0 for False, and anything
    else for True. For the frame number for the Image it should return
    a number, which will be rounded to the nearest integer. Frame
    numbers start with 0. The complete syntax of the CALC expression
    is described in detail in the Record Reference Manual found in the
-   `Epics
-   Documentation <https://web.archive.org/web/20221004231152/http://www.aps.anl.gov/epics>`__
+   `Epics Documentation <https://www.aps.anl.gov/epics>`__
    under IOC software for any version of EPICS base, through at least
    Base 3.13. It is a case-independent C expression that can include
    functions such as ABS, SQR, MIN, MAX, CEIL, FLOOR, LOG, LOGE, EXP,
@@ -1751,73 +1784,73 @@ General Properties
    replaced by =. The letters A-L obtain their values from the
    Channels A-D and are replaced as follows.
 
-= ===========================
-A The value of Channel A.
-B The value of Channel B.
-C The value of Channel C.
-D The value of Channel D.
-E Reserved.
-F Reserved.
-G The COUNT of Channel A.
-H The HOPR of Channel A.
-I The STATUS of Channel A.
-J The SEVERITY of Channel A.
-K The PRECISION of Channel A.
-L The LOPR of Channel A.
-= ===========================
-
-
-.. TODO: make a table
+   = ===========================
+   A The value of Channel A.
+   B The value of Channel B.
+   C The value of Channel C.
+   D The value of Channel D.
+   E Reserved.
+   F Reserved.
+   G The COUNT of Channel A.
+   H The HOPR of Channel A.
+   I The STATUS of Channel A.
+   J The SEVERITY of Channel A.
+   K The PRECISION of Channel A.
+   L The LOPR of Channel A.
+   = ===========================
 
 .. container::
 
    Examples are:
 
-   * Show the object whenever the value of Channel A is zero: ``!A``
-   * Show the object whenever the value of Channel A is not zero: ``A``
-   * Show the object whenever the value of Channel A is 12: ``A=12``
-   * Show the object whenever the value of Channel A is not 12: ``A#12``
-   * Show the object whenever the values of Channel A, Channel B, and
-   * Channel C are all negative: ``A<0&&B<0&&C<0``
-   * Show the object whenever the main process variable is within 90%
-     of its HOPR or LOPR limits: ``A<.9*L||A>.9*H``
-   * Show the object whenever the SEVERITY of the main process variable
-     is not 0: ``!J``
+   ===================  ===============
+   expression           Show the object whenever the ...
+   ===================  ===============
+   ``!A``               ... value of Channel A is zero
+   ``A``                ... value of Channel A is not zero
+   ``A=12``             ... value of Channel A is 12
+   ``A#12``             ... value of Channel A is not 12
+   ``A<0&&B<0&&C<0``    ... values of Channels A, B, and C are all negative
+   ``A<.9*L||A>.9*H``   ... main process variable is within 90% of its HOPR or LOPR limits 
+   ``!J``               ... SEVERITY of the main process variable is not 0
+   ===================  ===============
+
+.. _macro-substitution:
 
 Macro Substitution
 ~~~~~~~~~~~~~~~~~~
 
-| Strings of the form $(name) in an ADL file can be replaced by some
-  other string, both on the command line and when calling a `related
-  display <#RelatedDisplay>`__. Specific directions for each of these
-  cases are given in the correspoonding sections of the manual. In
-  general, there is an argument string of the form
-  “name1=value1[,name2=value2]…”. All occurrences of “$(name1)” in the
-  ADL file are replaced with “value1”, then all occurences of $(name2)
-  are replaced by value2, *etc*. The substitition is recursive; that is,
-  if value1 contains an occurrence of $(name2), then when name2=value2
-  is processed, that occurrence will be replaced by value2.
+Strings of the form $(name) in a ``.adl`` file can be replaced by some
+other string, both on the command line and when calling a `related
+display <#RelatedDisplay>`__. Specific directions for each of these
+cases are given in the correspoonding sections of the manual. In
+general, there is an argument string of the form
+``name1=value1[,name2=value2]...``.  All occurrences of “$(name1)” in the
+``.adl`` file are replaced with “value1”, then all occurences of $(name2)
+are replaced by value2, *etc*. The substitition is recursive; that is,
+if value1 contains an occurrence of $(name2), then when name2=value2
+is processed, that occurrence will be replaced by value2.
 
 Drag-And-Drop
 ~~~~~~~~~~~~~
 
 you may drag and drop an item to some destination, however there is no
 drag and drop possible between Qt and X11. When using KDE you may drag
-and drop to a konsole. For simple cut and paste you can call the pv info
+and drop to a konsole. For simple cut and paste, you can call the pv info
 box and get the variable you want to paste.
 
 Main Window
 ~~~~~~~~~~~
 
-| The main window of caQTDM present messages, a menu bar and a status
-  bar.
-| The menu bar has the following items:
+The main window of caQTDM present messages, a menu bar and a status
+bar.
+The menu bar has the following items:
 
 +------------+-----------+-------------------------------------------+
-| Menu       | Open File | calls a dialog box for opening a .ui or   |
-|            |           | .prc file (.prc files represent psi       |
-|            |           | special ascii files for rapid             |
-|            |           | prototyping)                              |
+| Menu       | Open File | calls a dialog box for opening a ``.ui``  |
+|            |           | or ``.prc`` file (``.prc`` files          |
+|            |           | represent PSI special ASCII files for     |
+|            |           | rapid prototyping)                        |
 +------------+-----------+-------------------------------------------+
 |            | Reload    | will close and reload all displays; very  |
 |            |           | handy during editing                      |
@@ -1829,11 +1862,11 @@ Main Window
 +------------+-----------+-------------------------------------------+
 | PV         |           | will display a list of unconnected PV's   |
 +------------+-----------+-------------------------------------------+
-| UpdataType | Direct    | Wenn caQtDM is in this mode, all the      |
+| UpdataType | Direct    | When caQtDM is in this mode, all the      |
 |            |           | monitors will be displayed as soon as     |
 |            |           | they come                                 |
 +------------+-----------+-------------------------------------------+
-|            | Timed     | Wenn caQtDM is in this mode, all the      |
+|            | Timed     | When caQtDM is in this mode, all the      |
 |            |           | monitors will be displayed will be        |
 |            |           | displayed with a highest rate of 5Hz,     |
 |            |           | however this rate can be set on a         |
@@ -1844,11 +1877,13 @@ Main Window
 |            |           | where you can choose your display rate.   |
 +------------+-----------+-------------------------------------------+
 
-|
-| the Status bar will display the following information: memory used by
-  caQtDM, the number of connected and unconnected PV's, the number of
-  monitors per second, the number of displays per second and the monitor
-  with the highest rate.
+
+The Status bar will display the following information: memory used by
+caQtDM, the number of connected and unconnected PV's, the number of
+monitors per second, the number of displays per second and the monitor
+with the highest rate.
+
+.. _context.menu:
 
 Context Menu
 ~~~~~~~~~~~~
@@ -1857,21 +1892,26 @@ By pressing the right mouse button over an object you will get a context
 menu. This menu contains at least an item called PV info in order to get
 information about all the process variables associated with that object.
 For some other objects you will find other items for example for
-changing axes of the caStripplot and caCartesianplot or for interaction
-with caCamera.
+changing axes of the :ref:`caStripplot` and :ref:`caCartesianplot` or for interaction
+with :ref:`caCamera`.
+
+.. _context.menu.customization:
 
 Context Menu Customization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-| The context menu can be configured by adding other items with their
-  actions. This configuration is specified in the CAQTDM_EXEC_LIST
-  environment variable. This variable is of the form: name1;
-  program1[[:name2; program2]…].The items between colons represent each
-  menu item. All of the characters up to the first semi-colon in each
-  item are the text that appears on the menu. The remaining characters
-  represent the system command that will be executed when the item is
-  selected. The system command can include the following special
-  characters:
+The context menu can be configured by adding other items with their
+actions. This configuration is specified in the ``CAQTDM_EXEC_LIST``
+:ref:`environment variable <env.var>`. This variable is of the form::
+   
+   name1;program1[[:name2; program2]...]
+
+The items between colons represent each
+menu item. All of the characters up to the first semi-colon in each
+item are the text that appears on the menu. The remaining characters
+represent the system command that will be executed when the item is
+selected. The system command can include the following special
+characters:
 
 +----+----------------------------------------------------------------+
 | &P | The process variable will be automatically taken from the      |
@@ -1902,17 +1942,19 @@ should be registered by the Qt assistant.
 Resizing Displays
 ~~~~~~~~~~~~~~~~~
 
-| Displays With caQtDM you can resize the synoptic display windows
-  without using Qt layouts. You can build a display normally and
-  everything will be resized when you resize the window. Furthermore you
-  could try Qt designer layouts (for experts only)
+Displays With caQtDM you can resize the synoptic display windows
+without using Qt layouts. You can build a display normally and
+everything will be resized when you resize the window. Furthermore you
+could try Qt designer layouts (for experts only)
 
 Printing
 ~~~~~~~~
 
-| By pressing the right mouse button on the background of your synoptic
-  display you may get a context menu with the item "Print". Normally you
-  should get a print dialog.
+By pressing the right mouse button on the background of your synoptic
+display you may get a context menu with the item "Print". Normally you
+should get a print dialog.
+
+.. _env.var:
 
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
@@ -1928,8 +1970,6 @@ MEDM uses the following environment variables:
 |                     | your current directory or in this path        |
 +---------------------+-----------------------------------------------+
 | CAQTDM_EXEC_LIST    | A list of commands for the Context Menu . See |
-|                     | the `Context Menu <#contextcustomize>`__ for  |
+|                     | the :ref:`context.menu.customization` for     |
 |                     | the format.                                   |
 +---------------------+-----------------------------------------------+
-
-|
