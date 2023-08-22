@@ -314,71 +314,42 @@ void caLineDraw::paintEvent(QPaintEvent *)
     painter.setPen(m_ForeColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
-    painter.fillRect(0,0, width(), height(), brush);
+    painter.fillRect(rect(), brush);
     painter.save();
+    QRect textRect;
 
     switch (m_Direction) {
-
-    case Horizontal: {
-        // Create a rectangle to draw text in, make it slightly smaller than the container and take frame width into account
-        const QRect newRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(width()-1-m_FrameLineWidth,height()-1-m_FrameLineWidth));
-
-        switch (m_Alignment) {
-        case Left:
-            painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
-            break;
-        case Right:
-            painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
-            break;
-        case Center:
-        default:
-            painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
-            break;
-        }
-    }
+    case Horizontal:
+        //Create a rectangle to draw text in, make it slightly smaller than the container rect and take frame width into account
+        textRect=QRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(width()-1-m_FrameLineWidth,height()-1-m_FrameLineWidth));
         break;
-
-    case Up: {
-        const QRect newRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
-        // Move the coordinate system and rotate it, so the text is displayed upwards
+    case Up:
+        //Rectangle is slightly different than for Horizontal, because it needs to be rotated
+        textRect=QRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
+        //Move the coordinate system and rotate it, so the text is displayed upwards
         painter.translate(QPoint(0,height()));
         painter.rotate(rotation);
-
-        switch (m_Alignment) {
-        case Left:
-            painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
-            break;
-        case Right:
-            painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
-            break;
-        case Center:
-        default:
-            painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
-            break;
-        }
-    }
         break;
-
-    case Down: {
-        const QRect newRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
-        // Move the coordinate system and rotate it, so the text is displayed downwards
+    case Down:
+        //Rectangle is slightly different than for Horizontal, because it needs to be rotated
+        textRect=QRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
+        //Move the coordinate system and rotate it, so the text is displayed downwards
         painter.translate(QPoint(width(),0));
         painter.rotate(rotation);
-
-        switch (m_Alignment) {
-        case Left:
-            painter.drawText(newRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
-            break;
-        case Right:
-            painter.drawText(newRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
-            break;
-        case Center:
-        default:
-            painter.drawText(newRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
-            break;
-        }
-        break;
     }
+
+    //Now that textrect and rotation/translation is set, draw the text aligned correctly
+    switch (m_Alignment) {
+    case Left:
+        painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
+        break;
+    case Right:
+        painter.drawText(textRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
+        break;
+    case Center:
+    default:
+        painter.drawText(textRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
+        break;
     }
 
     painter.restore();
