@@ -63,6 +63,37 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     defaultForeColor = palette().windowText().color();
 
+    //Iterate over every parent QWidget and check if any styles have been applied to it in designer --> If at any point any styles have been applied, do not overwrite them, else set the style so it looks like before the update.
+    bool canSetStyle = true;
+    for(QWidget *checkWidget = this;checkWidget->parentWidget();checkWidget = checkWidget->parentWidget()){
+        if (!(checkWidget->styleSheet().isEmpty())){
+            //qDebug().noquote()<<QString("Style for a child widget of %1 is NOT set by object, preferring Style from designer").arg(this->parentWidget()->objectName());
+            canSetStyle = false;
+            break;
+        }
+    }
+    if (canSetStyle){
+        //qDebug().noquote()<<QString("Style for a child widget of %1 is set by object").arg(this->parentWidget()->objectName());
+        QPalette p = QPalette();
+        p.setColor(QPalette::AlternateBase, QColor(233, 231, 227));
+        setPalette(p);
+        setStyleSheet(
+            "QHeaderView::section{"
+            "border-right:1px solid #D8D8D8;"
+            "border-bottom: 1px solid #D8D8D8;"
+            "background-color:#f0f0f0;"
+            "}"
+            "QTableCornerButton::section{"
+            "border-right:1px solid #D8D8D8;"
+            "border-bottom: 1px solid #D8D8D8;"
+            "background-color:#f0f0f0;"
+            "}"
+            "QScrollBar{"
+            "border-right:1px solid #D8D8D8;"
+            "border-bottom:1px solid #D8D8D8"
+            "}");
+        //}
+    }
 #endif
     createActions();
     addAction(copyAct);
