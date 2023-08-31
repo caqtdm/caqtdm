@@ -92,7 +92,6 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
             "border-right:1px solid #D8D8D8;"
             "border-bottom:1px solid #D8D8D8"
             "}");
-        //}
     }
 #endif
     createActions();
