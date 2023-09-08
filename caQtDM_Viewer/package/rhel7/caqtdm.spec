@@ -18,7 +18,7 @@
 Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
 Version: 4.4.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm
@@ -306,7 +306,7 @@ popd
         echo "export QT_PLUGIN_PATH=\$CAQTDM_HOME/lib/qt5" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
         echo "designer-qt5 \$@" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
 
-        
+        echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
         echo "echo \"CAQTDM_DISPLAY_PATH=\$CAQTDM_DISPLAY_PATH\"" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
         echo " " >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
         echo "if [ -n \"\$SSH_CLIENT\" ]; then" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
@@ -319,6 +319,7 @@ popd
 
 
 %if 0%{?qt4}
+        echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
         echo "echo \"CAQTDM_DISPLAY_PATH=\$CAQTDM_DISPLAY_PATH\"" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
         echo " " >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
         echo "if [ -n \"\$SSH_CLIENT\" ]; then" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm
