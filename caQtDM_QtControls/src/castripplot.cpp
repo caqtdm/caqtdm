@@ -29,18 +29,22 @@
 #include <float.h>
 #define isnan _isnan
 #define QWT_DLL
-#if (_MSC_VER == 1600)
-  #define INFINITY (DBL_MAX+DBL_MAX)
-  #define NAN (INFINITY-INFINITY)
 #endif
-#endif
-
 #include <qapplication.h>
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qpainter.h>
 #include <QMetaProperty>
 #include "castripplot.h"
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 12, 0)
+#if !defined(NAN)
+  #define NAN (double)qQNaN()
+#endif
+#if !defined(INFINITY)
+  #define INFINITY qInf()
+#endif
+#endif
 
 
 
