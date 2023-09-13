@@ -32,12 +32,17 @@ git checkout $BRANCH_OR_TAG
 rm -rf .git
 cd ..
 if [ "$1" != "--rpmdev" ]; then
-    mv ./caqtdm.spec ./caqtdm.spec_old
+    mv ./caqtdm.spec "./caqtdm.spec_$(date +"%Y_%m_%d_%I_%M")"
     cp ./caqtdm/caQtDM_Viewer/package/rhel7/caqtdm.spec ./
 fi
 
 mv caqtdm caqtdm-${PACKAGE_VERSION}
 tar -czf caqtdm-${PACKAGE_VERSION}.tar.gz ./caqtdm-${PACKAGE_VERSION}
+
+if [ ! -d "../rpmbuild/SOURCES/" ]; then
+   mkdir -p "../rpmbuild/SOURCES/"
+fi
+
 rm -rf caqtdm-${PACKAGE_VERSION}
 
 export   EPICS_BASE_TARGET=/usr/local/epics/base-7.0.6;
