@@ -166,6 +166,397 @@ release. You can follow the development history and detect if a bug in
 the used version has been solved.
 
 .. container::
+   
+   4.4.1
+
+-  caQtDM can be compiled with Qt6
+-  new signals for caCartesianplot
+-  fix for caInclude with upscaling
+-  fix for undefined macros to define a standard value in macro
+-  fix for popup panels to get a panel without data monitors
+-  fix for caLineEdit and caTextEntry to handle strings with Signal/Slot
+-  fix for the start screen on some mobile iOS devices
+-  cleanup of data plugin messages
+-  fix for Qt6.4 compiler settings with EPICS4 header on Windows
+-  fix the PV data selector in designer, missed environment  
+
+.. container::
+
+   4.4.0
+   
+-  fileopenwindow: options changes
+-  fix for converted adl files
+-  fix for higher python versions
+-  fix cacartesianplot for minor ticks disappeared when changing number of ticks
+-  searchpaths handling for non ADL files
+-  catable fix for big numbers
+-  bsread fix null number counting messages
+-  epics3plugin fix for disconnected channels
+-  epics4plugin is now working with the epics 7 API and PVA can be used
+-  filter feature for epics 7 is now available
+-  caStripPlot: feature dynamic property "Legend" for rename the channel to a user defined
+-  PV-Editor for Designer with network based auto completion
+-  new command line option [-savetoimage] to save screenshots as PNG files
+-  added C entry points for python
+-  new decoding functions for camera images (Mono8,Mono10p,Mono10packed,Mono12p,Mono12packed)
+-  future use of compression for camera images (zLib+jpg)
+-  MacOS and iOS: Binaries already build with Qt6 Branch. The Reason is the dependency to the build environment
+
+   
+.. container::
+
+   4.3.0
+   
+-  POPUP status windows with possible delays
+-  dynamic Property caqtdmPopupUI and caqtdmPopupUI_Delay for POPUP windows (The filename must contain the word popup.ui)
+-  wmsignalpropergator can resize a panel
+-  fix for too long strings in channel names
+-  fix for some character problems
+-  fix for alarm status for caMenu
+-  fix for softPV Waveform Processing
+-  fix for softPV initialisation, wrong initial value, ui loader depending
+-  cleanup in the sf-archiver
+-  fix in caMenu, paintEvent removed
+-  more file status check before accessing (avoid AFS problems)
+-  fix the seg fault for the classname problem EPushButton
+-  softPV vector/scalar performance problem fixed
+-  start of EPICS 4 to EPICS 7 implementation
+-  fix for string length problems
+-  calinedraw emit textChanged
+-  optimized caCalc signal emitance
+-  caCamera add slots for zoom and position
+-  caQtDM can be compiled with VS2019
+-  Updates for Android and IOS
+-  fixes some problems with MOC and QWT
+-  build in ADL and EDL Parser
+-  shellcommand for Mac
+-  landscape version for Android
+-  fileopening with dynamic conversion causes problems using TEMP directory
+-  added for archivSF the redirection feature to access multiple data sources
+-  fix a floating point problem on RHL7 in the archiveSF
+-  two additional data plugins  
+
+.. container::
+
+   4.2.4
+   
+-  fixed a exception in bsread at closing
+-  added a userdefined format to caLinEdit,caTextEntry and caTextEntry
+-  add macroreplacment for tooltip and statustip on: caLineEdit, caMultilineString, caGraphics, caPolyline, caMessageButton and caLed
+-  fix TLS problem in sf archiver for old Qt Versions
+-  buffer overflow in sf_archiver plugin corrected
+-  extend macro replacement for cascript button
+-  reusing connected channels in epics3 plugin for seting data
+-  borderWidth designer problem with numbers >1, fixed
+-  changes for python3
+-  fix for backend check. Backend property will generate a message that the backend name is not known. but it will use it.
+-  too strict check on RegEx match for visibility
+-  caTextEntry value could be set beyond channel hopr or lopr limits. this has been corrected
+-  focus can be kept now in caTextEntry even on pointer leave by specifying a property
+-  instead of exchanging through shared memory directly for -attach, a queue has been integrated for attaching
+-  for caLineEdit in case of bsread, the unit will be acquired automatically through epics (PSI special)
+-  remove extra white spaces and special characters (lf, cr) form macrodefs
+-  added for caTextEntry a drop possibility when dragging into it.
+-  new bsread options
+-  in the unit, the u in uJ will be converted to a real mu
+
+.. container::
+
+   4.2.2
+
+-  shared memory key was not set correctly for -attach; corrected now
+
+.. container::
+
+   4.2.1
+   
+-  after write epics channel is cleared now
+-  performance enhancement for caCalc
+-  added some signals and slots
+-  internal macros added
+-  added property to caCartesianplot for changing size of symbols by a multiplicator
+-  bug fixes   
+
+.. container::
+
+   4.2.0
+   
+-  major changes in camera widget to support all possible epics data modes and camera modes
+-  rich text now also considered for fontscaling
+-  epics version number will now be printed in the message window
+-  added include definition for epics 3.15 and higher
+-  prevent too many messages when epics exceptions
+-  bsread support for 2D waveforms
+-  added ctrl+ and ctrl - to increase or decrease window size
+-  added a slot for executing the message button
+-  unresolved macros window implemented
+-  the problem of increasing open files solved
+-  added possibility to disconnect all channels in hidden tabs
+-  problem with autoscale and infinite values solved
+-  month number in date corrected
+-  soft variables were not always updating. eliminated test for update; soft variables will not be updated in hidden tab
+
+.. container::
+
+   4.1.7
+   
+-  cawavetable was not expanding anymore; corrected
+-  patch for Qt4.6
+-  made a performance increase for cacalc, but still has to be carefully tested
+-  added possible to get info for objects when the overlay widget has no monitors   
+
+.. container::
+   
+   4.1.6
+
+-  added to print date, time and filename
+-  added signals to cachoice, camessage so that setting of the index of a tabwidget will be possible
+-  changed all floats in archive plugins to doubles in order to get a better resolution of the time axis
+-  access security had a small bug when over a gateway
+-  command line option updatetype=direct added to set caQtDM in direct update mode
+-  camenu maske integriert, allows to make entries invisible
+-  cathermo marker has now variable size
+-  cursor shape did not change when on a cawidget and when access security changed
+-  regex expressions now possible when using a macro
+-  last index in array was not taken into account and scale was not updated for the wareerfallplot
+-  optimization of archive plugins
+-  added the possibility to update QtabWidget tab texts with a macro
+-  changed padding for bigger fonts in carowcolmenu
+-  added the possibility to modify colors of cacalc
+-  resize storming of carowcolmenu solved
+-  cascriptbutton got a property to hide the checkbox
+-  QTextBrowser can now also display afile speicied with an url in the searchpath (see texts.ui)
+-  a hide/show slot has been added to the ca widgets
+-  the wmsignalpropagator got signals to propagate the resizing factor of a window. this can be used in order to correct animations with absolute pixel positions.
+-  when propagating through a signal a value to cacalc, this value is displayed. However was not propgated for further use. This has been corrected
+-  the colors of the caspinbox could be wrong due to a ack of proper initialisation, this has been corrected.
+-  very big doubles were not set correctly, this has been corrected.
+-  static visibility (while no channels) can be used now.
+-  handle double encoded url's in camimedisplay.
+-  added hide/show slot in all ca widgets (permits to hide and show a widget when propagating a signal from cacalc)
+-  when using waveforms from the archive, flashing of the cacartesianplot is suppressed when no data.
+-  added propagation of signal QRECT to parent, this allows to move a cainclude
+-  absolute positioning of items added to cainclude; abolute positions can also be channels that can move the positions.
+-  due to some changes to internal stylesheet, the carelateddisplay could not be hidden, this has been corrected
+-  x scale of cartesian plot can now also be used with a time scale (milliseconds from epoch)
+-  for visibilitycalc, when no channels specified, static calculation will be done at startup
+-  archive retrieval revisited, while crashing and http requests had to be canceled at exit.
+-  added check for when git not present
+-  added an environment variable CAQTD_TIMEOUT_HOURS to be used to quit caQtDM automatically, mouse event will reset the timeout.
+-  it is now possible to use caCalc as a vector (waveform) by specifying associated pv's. the soft variable can then be used to display a waveform
+
+.. container::
+   
+   4.1.5
+   
+-  possibility to add a frame around a caInclude
+-  in case of epics 3.15 added DBE_PROPERTY
+-  modified caQtDM.pri for macos
+-  modified caLineEdit and caLineDraw for displaying long long instead of long when double to integer representation
+-  caled circle will stay a circle when resizing with another aspect ration; border color can be customized
+-  add vumeter simulation to caThermo
+-  calineargauge made correct size when no scale (in order to make all sizes the same)
+-  for caRelatedDisplay one can now set the position for the called window
+-  for caThermo a problem solved in case of alarm colors (not always refreshed with right color) and transparency added for background
+-  for caThermo offset of 4 pixels modified in case of noscale
+-  added horizontal and vertical spacing properties to caInclude
+-  added possibility to modify position and size of a control object by the function %QRect in caCalc using 1 to 4 channels
+-  loading of files through internet now also over https
+-  again compatible with Qt4.6
+-  cachoice bug when using bit offset corrected
+-  legend added to cacartesianplot
+-  calineargauge and cacirculargauge modifier in indor to be smaller and changed font algorithme.
+-  added possibility to have another http address for archiveSF
+-  added test to indicate that waveforms are not supported by the archive plugins.
+-  archive plugins added
+-  epics4 plugin finalized for normative types, thanks to Marty Kraimer
+-  window management widget implemented (close window, ...)
+-  careplacemacro widget implemented; allows to redefine macros during runtime
+-  utilities designer plugin added for widgets not directly related to the control system
+-  X/Y waveforms implemented in camera view
+-  bsread plugin developed by Helge Brands finalized
+
+.. container::
+
+   4.1.3
+   
+-  added for the cartesianplot resize of the fatdots plot
+-  softpv treatment was slowing done caQtDM and is corrected now
+-  camera has been more optimized for 16bit waveforms (the other types not yet, due to a lack of waveforms types)
+-  label and vertical label can gave a border now
+-  caChoice has now the possibility to display a row from the bottom to the top (rowInverse) and is optimized
+-  soft pv's without a name were not working, now automatically a name is generated
+-  in order to have cacalc's working correctly in includes, a macro can be used in order to individialize them
+-  zero values in cartesian plot are now replaced by the lowest non-zero value when logarithmic scale is used
+-  for infinite values, cartseian plot was taken unlimited resources for display, this should be corrected nw
+-  slots are added to cagraphics for animation of these objects (tilt angle, span angle, arc, .. can be set now through signals
+-  caCamera will now zoom by default on the middle of the image and otherwise around the last clicked point
+-  autorepeat on canumeric has been take out on request of the users
+-  default timing of the timed update loop has now a lower internal rate, may still be changed by a json string
+-  .ftvl field of epics is now used to distingues signed anand unsigned display in cawavetable
+-  in pep file you may add now the keyword -minwidth to an item in order to define the minimum width of it (default value=100).
+-   you can steer column width like that. also -comsize has been added for the comment to steer the fontsize.
+-  cachoice has been slightly modified in order to grow instead of shrink (for pep files this was an issue)
+-  searching of a pv for the infobox would find the pv independently of the associated plugin, giving therefore confusion
+-  caLineDemo has been renamed in caLineDraw and is now able to draw vertically
+-  cawavetable takes now information from channel.FTVL into account in order to define signed or unsigned data
+-  added CTRL+C to camultinestring for copying to clipboard   
+   
+.. container::
+
+   4.1.0
+   
+-  caslider and cathermo can now display also a value; caslider got also the possibility to set distinctly the lower and upper limit
+-  caQtDM will now display mu and grad on all platforms
+-  adapted cathermo and caslider so that it can take ito account a default style with fore and background colors; now Alarm is modified in Alarm_Default or Alarm_static
+-  now a widget can be added (see caLineDemo) without having to change caQtDM_lib. An interface has been defined in order to perform the datacuisition inside the widget class.
+-  caLineDemo widget is an example for a fast on QWidget based line monitor
+-  caMimeDisplay will now take macros into account
+-  fatDots implemented in cartesian plot
+-  more optimized image display
+-  tab order and focus considered
+-  trailing zeros of caspinbox and cawheelswitch suppressed
+-  toggle button for a soft pv was not working
+-  caQtDM uses now qwt6.1.1 in order to take advantage of multicore processing
+-  carowcolmenu performance enhancement
+-  options -url and -emptycache added
+-  shortcuts defined (Ex: Ctrl+R = reload window; Ctrl+Alt+R = reload all windows; Ctrl+O = Open File; Ctrl+P = Print)
+-  stylesheet entry for most of the cawidgets has been suppressed and for many cawidgets the influence of an external stylesheet can only be changed when setting default colormode
+-  it is now possible to pipe ui data to caQtDM
+-  reload management had to be changed due to some Qt memory management problem
+-  eliminated some memory leaks
+-  corrected wavetable string crash
+-  one can now define if the size of an included ui file will be size adjusted or not
+-  cabyte, cabytecontroller performance were bad and has to be be corrected
+-  camenu and catogglebutton color handling is now done by stylesheet and not with palette colors. This in order to prevent cascading stylesheets, that have precedence over palette colors, to interfere.
+-  default property for label set to transparent color
+-  window for included filenames shows now the number of times and average loadtime for loading.   
+
+.. container::
+   
+   4.0.2
+   
+-  new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins
+-  use now the QStringlList editor in Designer for semicolumn separated strings
+-  mobile handling of config files slightly modified
+-  adjustment of fonts for android modified / apply button of caapplynumeric is now resizable
+-  resizing was perturbed by a resize forced by incoming channel data.
+-  the vertical label has now an alignment property
+-  cacartesianplot was not always well triggered when a trigger channel was specified, now corrected
+-  camimebutton added in order to start applications defined through the file extension
+-  cawavetable can now adapt its rows and columns automatically when zero is specified.
+-  an enum can be display in calineedit as number when enumeric is specified as format (otherwise as string in all cases)
+-  a multistring widget has been added to display waveforms with chars and strings (in case of chars a \n will make a new line)
+-  initialisation of the first stripplot values with nan instead of zero. Value zero was confusing.
+-  added the possibility to clear the messages through the file menu
+-  in case of -attach with a huge macro, the shared memory was designed too small. now 2 kBytes can be transferred
+-  camultilinestring has been implemented in order to mainly display char waveforms where carriage returns (ascii code 13) will produce a new line
+-  cameter was not updating its label for Qt5; this has been corrected
+-  some possible buffer overrun conditions corrected
+-  one can choose now the number of divisions for x on castripplot
+-  tooltip for properties are now present in psi patched version of Qt4.8.2 and for Qt5.6.0 and higher
+-  tooltip for caQtDM objects will integrate the tooltip given by the designer
+-  signal emit of cacalc has now also its integer and double value (this way you can for example switch the tabwidget pages with a cacalc that is updated by a soft/real channel)
+-  pep emulation has been updated by cosylab
+-  some slots have been added in order to link signals and slots in designer
+-  QStackedWidget will also optimize its io for visible/hidden tabs
+-  color handling for calineedit has been slightly changed in order to be able to get white on red in case of a major alarm (wanted for pep handling)
+-  cartesianplots have now a group property in order to be able to align the horizontal scale (vertical label rectangle gets same width)
+-  when a pep file and an ui file were displayed by caQtDM, some resize problems and a problem with capolyline was detected; is now solved
+-  cainclude can handle now multiple instances of the same file in column, row or rowcolumn mode and use for each instance another macro
+
+.. container::
+
+   4.0.0
+
+-  caQtDM has now a controlsystem plugin structure. CS can be added by writing a plugin (see demo plugin) that will automatically be loaded. By specifying the plugin in front
+-  of the pv name (i.e epics3://somepv) that plugin will then be used.
+-  fixed a small problem while writing a string to epics (could crash)
+-  the build files have been simplified
+-  edl2ui enhanced (by Lucas Carvalho)
+-  several warnings (mainly on mac osx) solved
+-  capolyline was not resizing correctly, this has been now corrected
+-  a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
+-  cacamera and cascan2d got display of selected values and readback values with different representations and may therefore write values to the CS
+-  soft variable bug corrected (was not always found when writing)
+-  catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
+-  activ widgets were always brought in front. Now you can choose if you let the designer define the layer
+-  QTextBrowser can be used with macro substitution. The file that will be read in, will be watched for changes and will automatically be reloaded
+-  a vertical label has been implemented  
+   
+
+.. container::
+   
+   3.9.4
+   
+-  caQtDM will now also download from http when CAQTDM_URL_DISPLAY_PATH is defined
+-  When starting with the option -httpconfig you will get the configuration screen in order to use network files as in mobile apps.
+-  macros can now also be read when specifying -macrodefs filename
+-  caMessageButton can be disabled/enabled by a second channel
+-  configdialog for http configuration slightly changed
+-  Zai added some edl objects
+-  added cabytecontroller,for reading and setting individual bits
+-  camenu: prevented scrolling of menu with mouse scroll while it interferes with scrollareas
+-  changed default direction of caByte in parser.c in order to be compatible with MEDM
+-  softpv name can now contain a macro
+-  added calc string to info window * severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
+-  softpv's in include file enabled
+-  more colortables for caCamera, caScan2D, caWaterfallPlot
+-  caScan2D added
+-  added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
+-  added a new dial
+-  problem with soft pv corrected
+-  QTextBrowser can be used with macros in order to dynamically load files for display them in this textbrowser
+-  modified the configdialog for ios and android
+-  prevent caQtDM from crashing when maxvalue and minvalue have the same value.
+-  for some images, the last row was missing and is corrected now   
+
+.. container::
+   
+   3.9.2
+   
+-  severity of a char/string record was not considered and is corrected, Char waveforms longer as 1024 were not displayed in calineedit and is corrected.
+-  in edl2ui zais addons were integrated
+-  softpv's in include file enabled
+-  more colortables for caCamera, caScan2D, caWaterfallPlot
+-  caScan2D added
+
+.. container::
+
+   3.9.1
+   
+-  added a clock allowing to display normal time or reception time of a process variable; alarm handling can be enabled to colorize the clock
+-  added a new dial
+-  problem with soft pv corrected
+-  QTextBrowser can be used with macros in order to dynamically load files for display them in this textbrowser
+-  modified the configdialog for ios and android
+-  prevent caQtDM from crashing when maxvalue and minvalue have the same value.
+-  for some images, the last row was missing and is corrected now
+
+.. container::
+
+   3.8.10
+   
+-  caStripPlot was eating the CPU and has been optimized; refreshrate (low, medium, high) has been introduced, so that it can be adjusted by the user
+-  some crash conditions eliminated
+
+.. container::
+
+   3.8.9
+   
+-  change for g++ 4.4.7
+-  pixmaps on buttons are now rescaled
+-  modified cawavetable to display as matrix with a finite number of elements; elements can be modified and representation choosen
+-  caWaveTable can display now values as decimal, string, hex and octal
+-  on ipad the slider click and tapandhold interfered, this has been solved
+-  on ipad the autorepeat option of the wheelswitch has been disabled while interfering with tapandhold
+-  on ipad it is possible now to give multiple ip addresses in the EPICS_CA_ADDR_LIST separated by blancs
+-  eliminated some warnings
+-  test for null pointers added in case of absence of channels
+-  resizing of caTable and caWaveTable has been changed
+
+
+.. container::
 
    3.7.2
 
