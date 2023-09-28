@@ -1761,7 +1761,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         // default format, format from ui file will be used normally except for channel precision
         textentryWidget->setFormat(1);
 
-
         QString text =  treatMacro(map, textentryWidget->text(), &doNothing, w1->objectName());
         text.replace(QString::fromWCharArray(L"\u00A6"), " ");    // replace Â¦ with a blanc (was used in macros for creating blancs)
         textentryWidget->setText(text);
@@ -2456,19 +2455,16 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             }
 
             if(macroS.size() < 1) {
-                if(level>0){
+                if(level > 0){
                     //printf("\n    %*c get last macro=%s", 15 * level, ' ', qasc(savedMacro[level-1]));
                     macroS = savedMacro[level-1];
                 } else {
                     macroS = savedMacro[level];
                 }
-            } else {
-                //printf("\n    %*c macro=%s", 15 * level, ' ',  qasc(macroS));
-                savedMacro[level] = macroS;
             }
 
             macroS = treatMacro(map, macroS, &doNothing, w1->objectName());
-            savedMacro[level] = treatMacro(map, savedMacro[level], &doNothing, w1->objectName());
+            savedMacro[level] = macroS;
 
             // when file exist, then load parsed file
             QFileInfo fi(fileName);
@@ -2686,9 +2682,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     break;
                 #endif
             }
-
-            macroS = savedMacro[level];
-
         } // end for
 
         if(parseFile != (ParsePepFile *) Q_NULLPTR ) {
@@ -2766,20 +2759,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         if(macroS.size() < 1) {
             if(level > 0){
-                //printf("\n    %*c get macro from previous level=%s w=<%s> ", 15 * level, ' ', qasc(savedMacro[level-1]), qasc(w1->objectName()));
+                //printf("\n    %*c get last macro=%s", 15 * level, ' ', qasc(savedMacro[level-1]));
                 macroS = savedMacro[level-1];
-                savedMacro[level] = macroS;
             } else {
-                //macroS = savedMacro[level];
-                macroS=macro;
+                macroS = macro;
             }
-        } else {
-            //printf("\n    %*c macro=%s <%s>", 15 * level, ' ', qasc(macroS), qasc(w1->objectName()));
-            savedMacro[level] = macroS;
         }
 
         macroS = treatMacro(map, macroS, &doNothing, w1->objectName());
-        savedMacro[level] = treatMacro(map, savedMacro[level], &doNothing, w1->objectName());
+        savedMacro[level] = macroS;
 
         level++;
 
@@ -2789,8 +2777,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         scanWidgets(frameWidget->findChildren<QWidget *>(), macroS);
 
         level--;
-
-        macroS= savedMacro[level];
 
         frameWidget->setProperty("Taken", true);
 
