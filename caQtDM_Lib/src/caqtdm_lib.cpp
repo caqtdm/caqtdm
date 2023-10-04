@@ -4248,10 +4248,11 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                 if (check_A.exactMatch(dataString)){
 #else
                 QRegularExpression check_A(captured_Calc);
-                //QRegularExpressionMatch match = check_A.match(calcString);
+                //qDebug() << "4252" << check_A.match(dataString);
                 //qDebug() << "Regex: "<< captured_Calc << "Data:" << dataString;
                 //qDebug() << "Match: "<< match.hasMatch();
-                if (check_A.match(dataString,0, QRegularExpression::PartialPreferFirstMatch).hasMatch()){
+                // Ignore warning "Don't create temporary qRegularExpression objects...", when using a static expression the code doesn't work.
+                if (check_A.match(dataString).hasMatch()){
 #endif
                     result=1;
                     valid = true;
