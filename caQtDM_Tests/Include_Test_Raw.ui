@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1034</width>
+    <height>774</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caInclude" name="cainclude">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=S,B=S</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>2</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>30</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=0,B=0;A=1,B=0;A=2,B=0;A=0,B=1;A=1,B=1;A=2,B=1;</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::RowColumn</enum>
+    </property>
+    <property name="maximumLines" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=0,B=0;A=1,B=0;A=2,B=0;A=0,B=1;A=1,B=1;A=2,B=1;</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::RowColumn</enum>
+    </property>
+    <property name="maximumLines" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>6</number>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_4">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>30</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=0,B=0;A=1,B=0;A=2,B=0;A=0,B=1;A=1,B=1;A=2,B=1;</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Column</enum>
+    </property>
+    <property name="numberOfItems" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="maximumLines" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>171</y>
+      <width>260</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>256</width>
+       <height>117</height>
+      </rect>
+     </property>
+     <widget class="caInclude" name="cainclude_5">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>100</width>
+        <height>100</height>
+       </rect>
+      </property>
+      <property name="macro">
+       <string>A=0,B=0;A=1,B=0;A=2,B=0;A=0,B=1;A=1,B=1;A=2,B=1;</string>
+      </property>
+      <property name="filename" stdset="0">
+       <string notr="true">Inc_Raw.ui</string>
+      </property>
+      <property name="stacking">
+       <enum>caInclude::Column</enum>
+      </property>
+      <property name="numberOfItems" stdset="0">
+       <number>2</number>
+      </property>
+      <property name="maximumLines" stdset="0">
+       <number>2</number>
+      </property>
+      <property name="adjustSizeToContents" stdset="0">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="caInclude" name="cainclude_6">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>400</y>
+      <width>591</width>
+      <height>221</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=0,B=0;A=1,B=0;A=2,B=0;A=0,B=1;A=1,B=1;A=2,B=1;</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Column</enum>
+    </property>
+    <property name="maximumLines" stdset="0">
+     <number>2</number>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="frameLineWidth">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_7">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>170</y>
+      <width>421</width>
+      <height>391</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=0,B=1, [XTEST,YTEST];A=0,B=2, [XTEST1,YTEST1]</string>
+    </property>
+    <property name="xCorrectionFactor" stdset="0">
+     <double>1.000000000000000</double>
+    </property>
+    <property name="yCorrectionFactor" stdset="0">
+     <double>1.000000000000000</double>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_2">
+    <property name="geometry">
+     <rect>
+      <x>889</x>
+      <y>580</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">YTEST</string>
+    </property>
+    <property name="calc">
+     <string notr="true">100+SIN(A/360*2*3.41)*100</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">COUNTER</string>
+    </property>
+    <property name="initialValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_3">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>580</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">COUNTER</string>
+    </property>
+    <property name="calc">
+     <string notr="true">A&lt;360?A+1:0</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">COUNTER</string>
+    </property>
+    <property name="initialValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_4">
+    <property name="geometry">
+     <rect>
+      <x>816</x>
+      <y>580</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">XTEST</string>
+    </property>
+    <property name="calc">
+     <string notr="true">100+COS(A/360*2*3.41)*100</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">COUNTER</string>
+    </property>
+    <property name="initialValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_5">
+    <property name="geometry">
+     <rect>
+      <x>889</x>
+      <y>610</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">YTEST1</string>
+    </property>
+    <property name="calc">
+     <string notr="true">100+SIN((A+90)/360*2*3.41)*100</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">COUNTER</string>
+    </property>
+    <property name="initialValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_6">
+    <property name="geometry">
+     <rect>
+      <x>816</x>
+      <y>610</y>
+      <width>70</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">XTEST1</string>
+    </property>
+    <property name="calc">
+     <string notr="true">100+COS((A+90)/360*2*3.41)*100</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">COUNTER</string>
+    </property>
+    <property name="initialValue">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_8">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>570</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=S,B=S, [0,0]</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>2</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_9">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>570</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=S,B=S, [0,0]</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::Panel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>2</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+   <widget class="caInclude" name="cainclude_10">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>640</y>
+      <width>100</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="macro">
+     <string>A=S,B=S, [0,0]</string>
+    </property>
+    <property name="filename" stdset="0">
+     <string notr="true">Inc_Raw.ui</string>
+    </property>
+    <property name="stacking">
+     <enum>caInclude::Positions</enum>
+    </property>
+    <property name="adjustSizeToContents" stdset="0">
+     <bool>true</bool>
+    </property>
+    <property name="frameShape">
+     <enum>caInclude::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="frameLineWidth">
+     <number>0</number>
+    </property>
+    <property name="frameColor">
+     <color>
+      <red>255</red>
+      <green>0</green>
+      <blue>0</blue>
+     </color>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caInclude</class>
+   <extends>QWidget</extends>
+   <header>caInclude</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

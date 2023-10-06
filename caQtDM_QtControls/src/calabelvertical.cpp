@@ -128,7 +128,7 @@ bool caLabelVertical::rotateText(float degrees)
 void caLabelVertical::paintEvent(QPaintEvent *)
 {
     QFontMetrics fm(font());
-    int w = fm.width(thisText);
+    int w = QMETRIC_QT456_FONT_WIDTH(fm,thisText);
     int h = fm.height();
     QPainter painter(this);
     QBrush brush = QBrush(thisBackColor);
@@ -205,7 +205,7 @@ QSize caLabelVertical::sizeHint() const
     QFont f = font();
     f.setPointSize(4);
     QFontMetrics fm(f);
-    int w = fm.width(text());
+    int w = QMETRIC_QT456_FONT_WIDTH(fm,text());
     int h = fm.height();
     /* add some pixels... */
     w += 4;

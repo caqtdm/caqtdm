@@ -76,7 +76,7 @@ void EApplyNumeric::init()
     else
         box = new QHBoxLayout(this);
 
-	box->setMargin(0);
+    SETMARGIN_QT456(box,0);
     box->setSpacing(0);
 
 	if (!data)

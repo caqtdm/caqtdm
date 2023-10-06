@@ -47,16 +47,28 @@ error("Use at least Qt 4.6.")
 TEMPLATE = subdirs
 SUBDIRS = caQtDM_QtControls caQtDM_Lib caQtDM_Viewer
 SUBDIRS += caQtDM_Designer_Plugins
-SUBDIRS += caQtDM_Plugins
+SUBDIRS += caQtDM_Plugins caQtDM_Parsers
 
 android {
   SUBDIRS += caQtDM_AndroidFunctions
 }
 
 caQtDM_Designer_Plugins.depends = caQtDM_QtControls
+qtcontrols_controllers.file = caQtDM_QtControls/plugins/qtcontrols_controllers.pro 
+qtcontrols_controllers.depends = caQtDM_QtControls caQtDM_Lib
+
+qtcontrols_graphics.file = caQtDM_QtControls/plugins/qtcontrols_graphics.pro 
+qtcontrols_graphics.depends = caQtDM_QtControls caQtDM_Lib
+
+qtcontrols_monitors.file = caQtDM_QtControls/plugins/qtcontrols_monitors.pro 
+qtcontrols_monitors.depends = caQtDM_QtControls caQtDM_Lib
+
+qtcontrols_utilities.file = caQtDM_QtControls/plugins/qtcontrols_utilities.pro
+qtcontrols_utilities.depends = caQtDM_QtControls caQtDM_Lib
 
 caQtDM_Plugins.file = caQtDM_Lib/caQtDM_Plugins/csplugins.pro 
 caQtDM_Plugins.depends = caQtDM_Lib
+
 
 !MOBILE {
    SUBDIRS +=  caQtDM_Parsers parser
@@ -80,6 +92,7 @@ macx:{
     caQtDM_Viewer.depends += caQtDM_Plugins
 }
 
+caQtDM_QtControls.depends += caQtDM_Parsers
 
 
 caQtDM_Lib.depends += caQtDM_QtControls
@@ -95,15 +108,15 @@ archivePRO.depends = caQtDM_QtControls caQtDM_Lib
 archiveSF.depends = caQtDM_QtControls caQtDM_Lib
 archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
 
-#iosArchitectures=armv7
-#iosTarget=5.0
+iosArchitectures=armv7
+iosTarget=13.0
 
 # Set "Architectures"
-#QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures
+QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures
 
 # Set "Target"
-#QMAKE_IOS_DEPLOYMENT_TARGET = $$iosTarget
+QMAKE_IOS_DEPLOYMENT_TARGET = $$iosTarget
 
 # Set "Devices" (1=iPhone, 2=iPad, 1,2=Universal)
-#QMAKE_IOS_TARGETED_DEVICE_FAMILY = 2
+QMAKE_IOS_TARGETED_DEVICE_FAMILY = 2
 

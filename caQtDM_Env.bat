@@ -9,9 +9,9 @@ IF "%1"=="4" GOTO SELECT4
 
 echo =============================================================================================
 echo Select Build Environment
-echo 1) QT 4.8.5 QWT6.1.3  32 Bit VS2010  
-echo 2) QT 5.15.0 QWT6.1.5 64 Bit VS2019  
-echo 3) QT 5.15.0 QWT6.1.5 32 Bit VS2019
+echo 1) QT 4.8.5  QWT6.1.3 32 Bit VS2010  
+echo 2) QT 6.5.1  QWT6.2.0 64 Bit VS2019  
+echo 3) QT 5.15.0 QWT6.1.5 64 Bit VS2019
 set /P SELCTION=Select: 
 echo =============================================================================================
  
@@ -52,7 +52,7 @@ REM ============================================================================
   set QTDM_BININSTALL=X:\qt\4.8.5\bin
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.8\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc2010
-  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set TIMESTAPER="http://timestamp.digicert.com"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
@@ -71,13 +71,14 @@ REM ============================================================================
   call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
   d:	
  
-  set QTHOME=D:/qt/build/Qt-5.15.0_VS19_64bit
+  set QTHOME=D:/qt/build/Qt-6.5.1_VS19_64bit
   
-  set QWTHOME=D:/qt/build/qwt-Qt_5_15_0-Release
-  set QWTINCLUDE=D:/qt/qwt-6.1.5/src
+  set QWTHOME=D:/qt/qwt-6.2.0_Qt6.5.1_64bit
+  set QWTINCLUDE=D:/qt/qwt-6.2.0_Qt6.5.1_64bit/src
   set QWTLIB=%QWTHOME%/lib
   set QWTLIBNAME=qwt
-  set QWTVERSION=6.1
+  set QWTVERSION=6.2
+  set CAQTDMQTVER=QT6
 
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
     
@@ -93,7 +94,7 @@ REM ============================================================================
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.11\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
-  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set TIMESTAPER="http://timestamp.digicert.com"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
   
@@ -118,40 +119,41 @@ REM ============================================================================
 
 :SELECT3 
  
-  call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x86
+  call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
   d:
  
-  set QTHOME=D:/qt/build/Qt-5.15.0_VS19_32bit
+  set QTHOME=D:/qt/build/Qt-5.15.0_VS19_64bit
   
-  set QWTHOME=D:/qt/build/qwt-Qt_5_15_0-Release_32bit
+  set QWTHOME=D:/qt/build/qwt-Qt_5_15_0-Release
   set QWTINCLUDE=%QWTHOME%/include
   set QWTLIB=%QWTHOME%/lib
   set QWTVERSION=6.1
   set QWTLIBNAME=qwt
+  set CAQTDMQTVER=QT5
 
   set PATH=%PATH%;C:\Program Files (x86)\Git\bin
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
   
   set EPICS_BASE=D:\epics\Package\base
-  set EPICS_HOST_ARCH=win32-x86
+  set EPICS_HOST_ARCH=windows-x64
 
   set EPICSINCLUDE=%EPICS_BASE%/include
-  set QTCONTROLS_LIBS=D:/qt/caqtdm_project/caQtDM_QtControls_32Bit
-  set CAQTDM_COLLECT=D:/qt/caqtdm_project/caQtDM_Binaries_32Bit
-  set JOM=X:\qt\jom
+  set QTCONTROLS_LIBS=D:/qt/caqtdm_project/caQtDM_Binaries_64Bit
+  set CAQTDM_COLLECT=D:/qt/caqtdm_project/caQtDM_Binaries_64Bit
+  set JOM=D:\qt\jom
  
   set QTBASE=%QTCONTROLS_LIBS%
   
   set WIXHOME=C:\Program Files (x86)\WiX Toolset v3.11\bin
   set QMAKESPEC=%QTHOME%\mkspecs\win32-msvc
-  set TIMESTAPER="http://timestamp.verisign.com/scripts/timstamp.dll"
+  set TIMESTAPER="http://timestamp.digicert.com"
   set CAQTDM_SIGNER="Paul Scherrer Institut"
 
-  set ZMQ=X:/Qt/ZMQ
+  set ZMQ=D:\qt\zeromq-4.2.3
   set ZMQINC=%ZMQ%/include
   set ZMQLIB=%ZMQ%/lib/%EPICS_HOST_ARCH%
 
-  set SSL=X:\qt\openssl-1.0.2j_32bit
+  set SSL=D:\qt\openssl-1.0.2n_VS16_64bit
   set SSLINC=%SSL%\inc32
   set SSLLIB=%SSL%\out32dll
 

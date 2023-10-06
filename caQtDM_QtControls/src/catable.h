@@ -40,7 +40,7 @@ class QTCON_EXPORT caTable : public QTableWidget
     Q_OBJECT
 
     Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE false)
 
     Q_PROPERTY(QString columnSizes READ getColumnSizes WRITE setColumnSizes)
 

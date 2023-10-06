@@ -14,8 +14,8 @@ set WINCAQTDM_COLLECT=%CAQTDM_COLLECT:/=\%
 cd .\caQtDM_Viewer\package\windows
 
 IF %SELCTION%==1 GOTO BUILDQT4_32
-IF %SELCTION%==2 GOTO BUILDQT5_64
-IF %SELCTION%==3 GOTO BUILDQT5_32
+IF %SELCTION%==2 GOTO BUILDQT6_64
+IF %SELCTION%==3 GOTO BUILDQT5_64
 
 
 :BUILDQT4_32
@@ -27,6 +27,15 @@ signtool sign /fd SHA256 /n %CAQTDM_SIGNER% /t %TIMESTAPER% %WINCAQTDM_COLLECT%\
 
 GOTO FINISHED
 
+:BUILDQT6_64
+IF EXIST .\project_x64 (cd project_x64 && del /q /f /s *.*) ELSE (mkdir project_x64 && cd project_x64)
+candle ../caQtDM_x64.wxs -ext WixUIExtension -ext WixUtilExtension
+light caQtDM_x64.wixobj -ext WixUIExtension -ext WixUtilExtension
+copy caQtDM_x64.msi %WINCAQTDM_COLLECT% 
+signtool sign /fd SHA256 /n %CAQTDM_SIGNER% /t %TIMESTAPER% %WINCAQTDM_COLLECT%\caQtDM_x64.msi
+GOTO FINISHED
+
+
 :BUILDQT5_64
 IF EXIST .\project_x64 (cd project_x64 && del /q /f /s *.*) ELSE (mkdir project_x64 && cd project_x64)
 candle ../caQtDM_x64.wxs -ext WixUIExtension -ext WixUtilExtension
@@ -34,6 +43,9 @@ light caQtDM_x64.wixobj -ext WixUIExtension -ext WixUtilExtension
 copy caQtDM_x64.msi %WINCAQTDM_COLLECT% 
 signtool sign /fd SHA256 /n %CAQTDM_SIGNER% /t %TIMESTAPER% %WINCAQTDM_COLLECT%\caQtDM_x64.msi
 GOTO FINISHED
+
+
+
 
 :BUILDQT5_32
 IF EXIST .\project_x86 (cd project_x86 && del /q /f /s *.*) ELSE (mkdir project_x86 && cd project_x86)

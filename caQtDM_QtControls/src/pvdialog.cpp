@@ -15,7 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Copyright (c) 2010 - 2014
+ *  Copyright (c) 2010 - 2021
  *
  *  Author:
  *    Anton Mezger
@@ -40,7 +40,6 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
 {
     QString stylesheet("QDialog {background: rgb(154,192,205);} \
                        QLineEdit {color: black; background: rgb(255, 255, 127)};");
-
     QString PV("");
     QString trimmedPV("");
     QString dbndType("");
@@ -73,7 +72,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     int pos;
     QString prefix("");
     QStringList plugins;
-    plugins <<""<<"epics3"<<"epics4"<<"bsread"<<"modbus"<<"gps";
+    plugins <<""<<"epics3"<<"epics4"<<"bsread"<<"environment"<<"modbus"<<"gps";
 
     if(caLed *w = qobject_cast<caLed *>(tic)) PV = w->getPV();
     else if (caLinearGauge *w = qobject_cast<caLinearGauge*>(tic)) PV = w->getPV();
@@ -121,7 +120,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
         trimmedPV = PV.mid(0, pos);
         //std::cerr << "jsonstring=" << qasc(JSONString) << "\n";
 
-        JSONValue *main_object = JSON::Parse(JSONString.toAscii());
+        JSONValue *main_object = JSON::Parse(JSONString.toLatin1());
         if (main_object == NULL) {
             //print_out(L"failed to parse");
             errorMessage = "could not parse entered expression";
@@ -200,7 +199,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
                     if(QKey.contains("sync")) {  // camonitor 'ACM:COUNT:1.{"sync":{"while":"blue"}}’
                         //std::cerr <<  "Key: " << qasc(QKey) << " Value. " << qasc(QValue) << "\n";
                         syncPresent = true;
-                        JSONValue *main_object = JSON::Parse(QValue.toAscii());
+                        JSONValue *main_object = JSON::Parse(QValue.toLatin1());
                         if (main_object == NULL) {
                             //print_out(L"failed to parse");
                             errorMessage = "could not parse entered sync expression";
@@ -246,7 +245,7 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
                     // get array data
                     if(QKey.contains("arr")) {
                         arrayPresent = true;
-                        JSONValue *main_object = JSON::Parse(QValue.toAscii());
+                        JSONValue *main_object = JSON::Parse(QValue.toLatin1());
                         if (main_object == NULL) {
                             //print_out(L"failed to parse");
                             errorMessage = "could not parse entered array expression";
@@ -298,9 +297,34 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
 
     QGridLayout *mainLayout = new QGridLayout;
 
+    autocompletionCheckBox = new QCheckBox;
+    autocompletionCheckBox->setChecked(true);
+
     // channel
     pvLabel = new QLabel("PV:");
-    pvLine = new QLineEdit;
+    pvLine = new TextEdit;
+    pvLine->setAcceptRichText(false);
+    pvLine->setLineWrapMode(QTextEdit::NoWrap);
+
+    // error message
+    msgLine = new QLineEdit;
+    msgLine->setDisabled(true);
+
+    QFontMetrics metrics(pvLine->font());
+    int lineHeight = metrics.lineSpacing();
+    pvLine->setFixedHeight(1.5*lineHeight);
+    pvLine->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    pvLine->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    completer = new NetworkCompleter(this);
+    completer->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setWrapAround(false);
+    completer->setCompletionColumn(0);
+    completer->setErrorWidget(msgLine);
+    completer->setCompletionWidget(autocompletionCheckBox);
+    pvLine->setCompleter(completer);
+
     mainLayout->addWidget(pvLabel, 0, 0);
     mainLayout->addWidget(pvLine, 0, 1, 1, 7);
     pvLine->setText(trimmedPV);
@@ -432,14 +456,17 @@ PVDialog::PVDialog(QWidget *tic, QWidget *parent) : QDialog(parent)
     }
     rateLabel->setToolTip(rateToolTip);
 
+    // autocompletion checkbox
+    autoLabel = new QLabel("pv autocompletion:");
+    mainLayout->addWidget(autoLabel, 9, 0);
+    mainLayout->addWidget(autocompletionCheckBox, 9, 1);
+
     // error message
-    msgLine = new QLineEdit;
-    msgLine->setDisabled(true);
     mainLayout->addWidget(msgLine, 8,0,1,8);
     msgLine->setText(errorMessage);
 
     // buttonbox
-    mainLayout->addWidget(buttonBox, 9, 0, 1, 8);
+    mainLayout->addWidget(buttonBox, 9, 2, 2, 6);
 
     setLayout(mainLayout);
     setWindowTitle(tr("Edit PV"));
@@ -472,7 +499,7 @@ void PVDialog::saveState()
             = QDesignerFormWindowInterface::findFormWindow(entry)) {
 
         QString channel("");
-        QString pv = pvLine->text();
+        QString pv = pvLine->toPlainText();
         QString prefix = prefixComboBox->currentText();
         JSONObject root, root1, root2, root3;
         bool B_dbnd = dbndCheckBox->isChecked();
@@ -541,14 +568,12 @@ void PVDialog::saveState()
         }
 
         if (caCamera *w = qobject_cast<caCamera*>(entry)) {
+            Q_UNUSED(w);
             formWindow->cursor()->setProperty("channelData", channel);
         } else {
             formWindow->cursor()->setProperty("channel", channel);
         }
     }
-
-
-
 
     accept();
 }

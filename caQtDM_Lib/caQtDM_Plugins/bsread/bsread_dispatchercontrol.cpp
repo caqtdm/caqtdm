@@ -36,7 +36,7 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
     loop = new QEventLoop(this);
     connect(qApp, SIGNAL(aboutToQuit()),this, SLOT(closeEvent()));
-    mutexknobdataP = NULL;
+    mutexknobdataP = Q_NULLPTR;
     //Special Channels
     bsreadChannels.append("bsread:hash");
     bsreadChannels.append("bsread:pulse_id");
@@ -53,18 +53,18 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     bsread_internalchannel *opt;
 
     opt=new bsread_internalchannel(this,"bsread:bsmodulo","bsmodulo");
-    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setData(Q_NULLPTR,bsread_internalchannel::in_string);
     opt->setString("1");
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
     opt=new bsread_internalchannel(this,"bsread:bsoffset","bsoffset");
-    opt->setData(NULL,bsread_internalchannel::in_string);
+    opt->setData(Q_NULLPTR,bsread_internalchannel::in_string);
     opt->setString("0");
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
 
     opt=new bsread_internalchannel(this,"bsread:bsinconsistency","bsinconsistency");
-    opt->setData(NULL,bsread_internalchannel::in_enum);
+    opt->setData(Q_NULLPTR,bsread_internalchannel::in_enum);
     opt->addEnumString("drop");
     opt->addEnumString("keep-as-is");
     opt->addEnumString("adjust-individual");
@@ -73,7 +73,7 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
     opt=new bsread_internalchannel(this,"bsread:bsmapping","bsmapping");
-    opt->setData(NULL,bsread_internalchannel::in_enum);
+    opt->setData(Q_NULLPTR,bsread_internalchannel::in_enum);
     opt->addEnumString("provide-as-is");
     opt->addEnumString("drop");
     opt->addEnumString("fill-null");
@@ -81,7 +81,7 @@ bsread_dispatchercontrol::bsread_dispatchercontrol()
     DispatcherChannels_Connected.insert(opt->getPv_name(),opt);
 
     opt=new bsread_internalchannel(this,"bsread:bsstrategy","bsstrategy");
-    opt->setData(NULL,bsread_internalchannel::in_enum);
+    opt->setData(Q_NULLPTR,bsread_internalchannel::in_enum);
     opt->addEnumString("complete-all");
     opt->addEnumString("complete-latest");
     opt->setString("complete-all");
@@ -255,7 +255,11 @@ void bsread_dispatchercontrol::process()
             init_reconnection=false;
             QString data="{\"channels\":[ ";
             QMutexLocker lock(&ChannelLocker);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
+#else
+            QSet<QString> keys(Channels.keys().begin(),Channels.keys().end());
+#endif
             foreach( QString key,keys){
                 if (!key.startsWith("bsread:")){ //removes all header channels
                     if (!key.contains(".BSREADSHAPE")&&!key.contains(".ENC_GROUP")&&!key.contains(".ENC_TYPE")&&!key.contains(".ENC_SUBTYPE")){//removes shape waveform channels
@@ -275,8 +279,11 @@ void bsread_dispatchercontrol::process()
 
             if (!data.contains("channels\":[]")){
                 QByteArray transferdata;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 transferdata.append(data);
-
+#else
+                transferdata.append(data.toLatin1());
+#endif
                 msg="Dispatcher Request (";
                 msg.append(QString::number(Channels.count()));
                 msg.append(")");
@@ -681,7 +688,7 @@ void bsread_dispatchercontrol::finishReplyConnect()
 
         messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     }
-    if (MainMessageJ!=NULL){
+    if (MainMessageJ!=Q_NULLPTR){
         if(!MainMessageJ->IsObject()) {
             delete(MainMessageJ);
         } else {
@@ -703,8 +710,11 @@ void bsread_dispatchercontrol::finishReplyConnect()
                 bsreadconnections.last()->setKnobData(mutexknobdataP);
 
 
-                QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QSet<QString> keys=QSet<QString>::fromList(Channels.keys());
+#else
+            QSet<QString> keys(Channels.keys().begin(),Channels.keys().end());
+#endif
                 foreach( QString key,keys)
                     foreach(int value,Channels.values(key)){
                         //qDebug()<< "Register:("<< key << value << ")";
@@ -735,16 +745,16 @@ void bsread_dispatchercontrol::finishReplyConnect()
                 if (ExceptionError.startsWith("java.lang.IllegalArgumentException")){
                     if (jsonobj.find(L"message") != jsonobj.end() && jsonobj[L"message"]->IsString()) {
                         QString ErrorString=QString::fromWCharArray(jsonobj[L"message"]->AsString().c_str());
-                        QStringList ErrorChannels = ErrorString.split(",", QString::SkipEmptyParts);
+                        QStringList ErrorChannels = ErrorString.split(",", SKIP_EMPTY_PARTS);
                         if (ErrorChannels.count()>0){
 
                             qDebug()<< "ErrorChannels.count():" << ErrorChannels.count();
 
                             if (ErrorChannels.at(0).contains("recorded:")){
-                                tobeRemoved.append(ErrorChannels.at(0).split(": ", QString::SkipEmptyParts).at(1).split(" - ",QString::SkipEmptyParts).at(0));
+                                tobeRemoved.append(ErrorChannels.at(0).split(": ", SKIP_EMPTY_PARTS).at(1).split(" - ",SKIP_EMPTY_PARTS).at(0));
                                 if (ErrorChannels.count()>1){
                                     for (int x=1;x<ErrorChannels.count()-1;x++){
-                                        tobeRemoved.append(ErrorChannels.at(x).split(" - ",QString::SkipEmptyParts).at(0));
+                                        tobeRemoved.append(ErrorChannels.at(x).split(" - ",SKIP_EMPTY_PARTS).at(0));
                                     }
                                 }
 
@@ -858,7 +868,11 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
         ChannelsApprovePipeline.insert(candidate.channel,candidate.index);
     }
 
-    QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QSet<QString> keys=QSet<QString>::fromList(ChannelsToBeApprovePipeline.keys());
+#else
+            QSet<QString> keys(ChannelsToBeApprovePipeline.keys().begin(),ChannelsToBeApprovePipeline.keys().end());
+#endif
     foreach( QString key,keys){
         if (!key.startsWith("bsread:")){ //removes all header channels
             if (!key.contains(".BSREADSHAPE")){//removes shape waveform channels
@@ -872,7 +886,11 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
     data.append("]}");
     if (!data.contains("channels\":[]")){
         QByteArray transferdata;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         transferdata.append(data);
+#else
+        transferdata.append(data.toLatin1());
+#endif
         requestVerification.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
         replyVerification = manager->post(requestVerification,transferdata);
         //qDebug()<<"ChannelVerification() :"<<url.toString() <<" : "<<transferdata;
@@ -895,9 +913,9 @@ void bsread_dispatchercontrol::finishVerification()
 
     QString msg="bsread: ";
     msg.append(httpdata);
-    if (MainMessageJ!=NULL){
+    if (MainMessageJ!=Q_NULLPTR){
         if(!MainMessageJ->IsArray()) {
-            qDebug()<<"finishVerification() : MainMessageJ=NULL";
+            qDebug()<<"finishVerification() : MainMessageJ=Q_NULLPTR";
             delete(MainMessageJ);
         } else {
             jsonobj=MainMessageJ->AsArray();

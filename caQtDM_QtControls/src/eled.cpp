@@ -71,7 +71,7 @@ void ELed::setBorderColor(const QColor &c)
 void ELed::paintEvent(QPaintEvent *)
 {
     QPainter	painter(this);
-    QMatrix m;
+    //QMatrix m;
     int ledWidth, ledHeight;
     int w, h, w1, h1;
 

@@ -21,14 +21,20 @@ SUBDIRS = demo epics3 archive environment
     }
 
 }
+contains(QT_VER_MAJ, 6) {
+    modbus{
+      SUBDIRS += modbus
+    }
+    gps{
+      SUBDIRS += gps
+    }
+}
 
-
-
+epics4: {
+ SUBDIRS += epics4
+}
 
 !MOBILE {
-    epics4: {
-     SUBDIRS += epics4
-    }
     bsread: {
       SUBDIRS += bsread
     }

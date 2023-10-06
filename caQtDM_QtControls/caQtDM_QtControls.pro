@@ -8,14 +8,14 @@ CONFIG += caQtDM_Installation
 CAQTDM_INSTALL_LIB = qtcontrols
 include($$CAQTDM_TOP/caQtDM.pri)
 
-DEFINES += QT_NO_DEBUG_OUTPUT
+#DEFINES += QT_NO_DEBUG_OUTPUT
 
 contains(QT_VER_MAJ, 4) {
-      CONFIG += qwt plugin thread uitools
+      CONFIG += qwt plugin thread uitools network
       CONFIG += designer
 }
 contains(QT_VER_MAJ, 5) {
-      QT += widgets concurrent uitools opengl
+      QT += widgets concurrent uitools opengl network
       CONFIG  += qwt plugin
       DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
       ios | android {
@@ -28,7 +28,15 @@ contains(QT_VER_MAJ, 5) {
           QT += designer
       }
 }
-
+contains(QT_VER_MAJ, 6) {
+      QT += widgets concurrent uitools opengl core
+      CONFIG  += qwt plugin
+      ios | android {
+            QT += uiplugin
+      }else {
+        QT += designer
+      }
+}
 CONFIG += warn_on
 CONFIG += console
 
@@ -137,8 +145,7 @@ SOURCES	+= \
     src/replacemacro.cpp \
     src/JSON.cpp \
     src/JSONValue.cpp \
-    src/pvdialog.cpp \
-    src/pvtaskmenu.cpp
+    src/textedit.cpp
 
 ADL_EDL_FILES {
     SOURCES	+= src/parseotherfile.cpp
@@ -150,6 +157,8 @@ XDR_HACK {
 }
 
 !MOBILE {
+    SOURCES +=  src/pvtaskmenu.cpp src/pvdialog.cpp
+    HEADERS +=  src/pvtaskmenu.h src/pvdialog.h
     SOURCES +=  src/cadoubletabwidgetextensionfactory.cpp  src/cadoubletabwidgetextension.cpp
     SOURCES +=  src/capolylinetaskmenu.cpp src/capolylinedialog.cpp
     HEADERS +=  src/cadoubletabwidgetextension.h
@@ -163,8 +172,8 @@ HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/replacemacro.h \
     src/JSON.h \
     src/JSONValue.h \
-    src/pvtaskmenu.h \
-    src/pvdialog.h
+    src/networkmodel.h \
+    src/textedit.h
 SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
 
 contains(QWT_VER_MIN, 0) {

@@ -7,8 +7,14 @@ error("Use at least Qt 4.6.")
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 
 TEMPLATE = subdirs
-
-SUBDIRS = adlParserStaticLib adlParserSharedLib
+SUBDIRS += adlParserStaticLib
+!MOBILE:{
+    SUBDIRS += adlParserSharedLib
+}
 unix:{
-    SUBDIRS += edlParserStaticLib edlParserSharedLib
+    SUBDIRS += edlParserStaticLib
+    !MOBILE:{
+        SUBDIRS += edlParserSharedLib
+    }
+
 }

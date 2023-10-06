@@ -38,6 +38,12 @@
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qmath.h>
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+#include <functional>
+#endif
+
+
+
 
 
 static inline void qwtDrawLine( QPainter *painter, int pos,
@@ -316,7 +322,12 @@ void QwtThermoMarker::paintEvent( QPaintEvent *event )
     painter.setClipRegion( event->region() );
 
     QStyleOption opt;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     opt.init(this);
+#else
+    opt.initFrom(this);
+#endif
+
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
     const QRect tRect = pipeRect();
@@ -646,7 +657,7 @@ void QwtThermoMarker::redrawTimerExpired()
     if(d_data->orientation == Qt::Vertical && thisType == Pipe && getDecayOption()) {
         qreal decayTime = getDecayTime();  // 1-2 seconds
         // Decay the peak signal
-        const int elapsedMs = peakLevelChanged.elapsed();
+        const int elapsedMs = (int)peakLevelChanged.elapsed();
         const qreal decayAmount = qAbs(d_data->maxValue - d_data->minValue) * elapsedMs / 9000.0 / decayTime;   // 1s for 1/10 of bar
         //printf("value=%f elapsedMs=%d decayAmount=%lf prvValue=%lf\n", d_data->value, elapsedMs, decayAmount, d_data->prvValue);
         if (decayAmount < d_data->prvValue) {
@@ -696,7 +707,7 @@ void QwtThermoMarker::drawLiquid(QPainter *painter, const QRect &pipeRect ) cons
         painter->fillRect(decayingRect, color);
     }
 
-    if ( d_data->colorMap != NULL ) {
+    if ( d_data->colorMap != Q_NULLPTR ) {
         const QwtInterval interval = scaleDiv().interval().normalized();
 
         // Because the positions of the ticks are rounded
@@ -705,9 +716,19 @@ void QwtThermoMarker::drawLiquid(QPainter *painter, const QRect &pipeRect ) cons
         QVector<double> values = qwtTickList( scaleDraw()->scaleDiv() );
 
         if ( scaleMap.isInverting() ) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             qSort( values.begin(), values.end(), qGreater<double>() );
+#else
+            std::sort( values.begin(), values.end(), std::greater<double>() );
+#endif
         } else {
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             qSort( values.begin(), values.end(), qLess<double>() );
+#else
+            std::sort( values.begin(), values.end(), std::less<double>() );
+#endif
+
         }
 
         int from = 0;
@@ -1015,10 +1036,19 @@ QSize QwtThermoMarker::minimumSizeHint() const
     h += 2 * d_data->borderWidth;
 
     // finally add the margins
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int left, right, top, bottom;
     getContentsMargins( &left, &top, &right, &bottom );
     w += left + right;
     h += top + bottom;
+
+#else
+    QMargins content=contentsMargins();
+    w += content.left() + content.right();
+    h += content.top() + content.bottom();
+#endif
+
 
     return QSize( w, h );
 }

@@ -36,37 +36,11 @@ isEmpty(INSTALLTIONSUBDIR){
              }
         }
         win32 {
-                message("adl2ui configuration win32")
+
                 win32-msvc* || msvc{
-		    DebugBuild {
-			#DESTDIR = $$(CAQTDM_COLLECT)/debug/controlsystems
-                        caqtdm_dll.files = debug/*.dll
-                        caqtdm_dll.path = $$(CAQTDM_COLLECT)/debug/controlsystems
-                        caqtdm_lib.files = debug/*.lib
-                        caqtdm_lib.path = $$(CAQTDM_COLLECT)/debug/controlsystems
-                        caqtdm_exe.files = debug/*.exe
-                        caqtdm_exe.path = $$(CAQTDM_COLLECT)/debug/controlsystems
-                        INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
+                     target.path = $$_CAQTDM_COLLECT
+                     INSTALLS += target
 
-                     }
-		    ReleaseBuild {
-			#DESTDIR = $$(CAQTDM_COLLECT)/controlsystems
-                        for(a, CAQTDM_INSTALL_LIB):{
-                            caqtdm_dll.files = release/$${a}.dll
-                        }
-                        caqtdm_dll.path = $$_CAQTDM_COLLECT
-
-                        for(a, CAQTDM_INSTALL_LIB):{
-                            caqtdm_lib.files = release/$${a}.lib
-                        }
-                        caqtdm_lib.path = $$_CAQTDM_COLLECT
-
-                        for(a, CAQTDM_INSTALL_LIB):{
-                            caqtdm_exe.files = release/$${a}.exe
-                        }
-                        caqtdm_exe.path = $$_CAQTDM_COLLECT
-                        INSTALLS += caqtdm_dll caqtdm_lib caqtdm_exe
-		    }
                 }
                 win32-g++ {
                         DESTDIR = $$_CAQTDM_COLLECT/controlsystems

@@ -56,6 +56,7 @@
 #endif
 
 #include <stdint.h>
+#include <limits>
 #include "caPropHandleDefs.h"
 
 class QTCON_EXPORT caCartesianPlot : public QwtPlot
@@ -80,42 +81,42 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY(QString TitleY READ getTitleY WRITE setTitleY)
 
     Q_PROPERTY(QStringList channelList_1 READ getPV1List WRITE setPV1List STORED false)
-    Q_PROPERTY(QString channels_1 READ getPV_1 WRITE setPV_1 DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels_1 READ getPV_1 WRITE setPV_1 DESIGNABLE false)
 
     Q_PROPERTY(curvStyle Style_1 READ getStyle_1 WRITE setStyle_1)
     Q_PROPERTY(curvSymbol symbol_1 READ getSymbol_1 WRITE setSymbol_1)
     Q_PROPERTY(QColor color_1 READ getColor_1 WRITE setColor_1)
 
     Q_PROPERTY(QStringList channelList_2 READ getPV2List WRITE setPV2List STORED false)
-    Q_PROPERTY(QString channels_2 READ getPV_2 WRITE setPV_2  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels_2 READ getPV_2 WRITE setPV_2  DESIGNABLE false)
 
     Q_PROPERTY(curvStyle Style_2 READ getStyle_2 WRITE setStyle_2)
     Q_PROPERTY(curvSymbol symbol_2 READ getSymbol_2 WRITE setSymbol_2)
     Q_PROPERTY(QColor color_2 READ getColor_2 WRITE setColor_2)
 
     Q_PROPERTY(QStringList channelList_3 READ getPV3List WRITE setPV3List STORED false)
-    Q_PROPERTY(QString channels_3 READ getPV_3 WRITE setPV_3 DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels_3 READ getPV_3 WRITE setPV_3 DESIGNABLE false)
 
     Q_PROPERTY(curvStyle Style_3 READ getStyle_3 WRITE setStyle_3)
     Q_PROPERTY(curvSymbol symbol_3 READ getSymbol_3 WRITE setSymbol_3)
     Q_PROPERTY(QColor color_3 READ getColor_3 WRITE setColor_3)
 
     Q_PROPERTY(QStringList channelList_4 READ getPV4List WRITE setPV4List STORED false)
-    Q_PROPERTY(QString channels_4 READ getPV_4 WRITE setPV_4  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels_4 READ getPV_4 WRITE setPV_4  DESIGNABLE false)
 
     Q_PROPERTY(curvStyle Style_4 READ getStyle_4 WRITE setStyle_4)
     Q_PROPERTY(curvSymbol symbol_4 READ getSymbol_4 WRITE setSymbol_4)
     Q_PROPERTY(QColor color_4 READ getColor_4 WRITE setColor_4)
 
     Q_PROPERTY(QStringList channelList_5 READ getPV5List WRITE setPV5List STORED false)
-    Q_PROPERTY(QString channels_5 READ getPV_5 WRITE setPV_5  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels_5 READ getPV_5 WRITE setPV_5  DESIGNABLE false)
 
     Q_PROPERTY(curvStyle Style_5 READ getStyle_5 WRITE setStyle_5)
     Q_PROPERTY(curvSymbol symbol_5 READ getSymbol_5 WRITE setSymbol_5)
     Q_PROPERTY(QColor color_5 READ getColor_5 WRITE setColor_5)
 
     Q_PROPERTY(QStringList channelList_6 READ getPV6List WRITE setPV6List STORED false)
-    Q_PROPERTY(QString channels_6 READ getPV_6 WRITE setPV_6  DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels_6 READ getPV_6 WRITE setPV_6  DESIGNABLE false)
 
     Q_PROPERTY(curvStyle Style_6 READ getStyle_6 WRITE setStyle_6)
     Q_PROPERTY(curvSymbol symbol_6 READ getSymbol_6 WRITE setSymbol_6)
@@ -371,6 +372,7 @@ public:
     int getXaxisSyncGroup() {return thisXaxisSyncGroup;}
 
     caCartesianPlot(QWidget *parent);
+    ~caCartesianPlot();
 
     QwtSymbol::Style myMarker(curvSymbol m);
     QwtPlotCurve::CurveStyle myStyle(curvStyle s);
@@ -406,8 +408,6 @@ public:
     QString getPV(int indx) const {return thisPV[indx].join(";");}
     void setPV(QString const &newPV, int indx)  {if(newPV.size() > 0) thisPV[indx] = newPV.split(";"); else thisPV[indx]=QStringList();}
 
-    void resetZoom();
-
     void setLegendAttribute(QColor c, QFont f, LegendAtttribute sw);
 
 public slots:
@@ -418,9 +418,27 @@ public slots:
     void hideObject(bool hideit) {
 #include "hideobjectcode.h"
     }
+    void setMinXResize(double value);
+    void setMaxXResize(double value);
+    void setMinYResize(double value);
+    void setMaxYResize(double value);
+    void triggerXAutoScale(){
+       setXscaling(Auto);
+    }
+    void triggerYAutoScale(){
+       setYscaling(Auto);
+    }
+    void resetZoom();
+
+
 
 signals:
     void ShowContextMenu(const QPoint&);
+    void getAutoScaleXMin(double xmin);
+    void getAutoScaleXMax(double xmax);
+    void getAutoScaleYMin(double ymin);
+    void getAutoScaleYMax(double ymax);
+
 
 protected:
 
@@ -481,7 +499,8 @@ private:
     bool whiteColors;
 
     double symbolSizeFactor;
-
+    double filter_MinY,filter_MaxY,filter_MinX,filter_MaxX;
+    bool   ignorefirst_MinY,ignorefirst_MaxY,ignorefirst_MinX,ignorefirst_MaxX;
 };
 
 #endif

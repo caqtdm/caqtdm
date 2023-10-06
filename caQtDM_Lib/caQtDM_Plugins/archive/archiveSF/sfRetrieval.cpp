@@ -139,11 +139,11 @@ void sfRetrieval::cancelDownload()
     aborted = true;
 
     disconnect(manager);
-    if( reply != NULL ) {
+    if( reply != Q_NULLPTR ) {
         //qDebug() << QTime::currentTime().toString() << this << PV << "!!!!!!!!!!!!!!!!! abort networkreply for";
         reply->abort();
         reply->deleteLater();
-        reply = NULL;
+        reply = Q_NULLPTR;
     }
 
     downloadFinished();
@@ -218,7 +218,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
 
 #ifdef CSV
-    QStringList result = out.split("\n", QString::SkipEmptyParts);
+    QStringList result = out.split("\n", SKIP_EMPTY_PARTS);
     //printf("number of values received = %d\n",  result.count());
 
     if(result.count() < 2) {
@@ -233,7 +233,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 
     bool ok1, ok2;
     for(int i=1; i< result.count(); ++i) {
-        QStringList line = result[i].split(";", QString::SkipEmptyParts);
+        QStringList line = result[i].split(";", SKIP_EMPTY_PARTS);
         if(line.count() != expected) {
             errorString = tr("dataline has not the expected number of items %1: [%2]").arg(QString::number(line.count())).arg(expected);
             emit requestFinished();
@@ -264,7 +264,6 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
 #else
 
     totalCount = 0;
-    int stat;
     Backend = "";
 
     JSONValue *value = JSON::Parse(qasc(out));
@@ -272,7 +271,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     //printf("\n\nout: %s\n\n", qasc(out));
 
     // Did it go wrong?
-    if (value == NULL) {
+    if (value == Q_NULLPTR) {
         errorString = tr("could not parse json string left=%1 right=%2").arg(out.left(20)).arg(out.right(20));
         //qDebug() << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         emit requestFinished();

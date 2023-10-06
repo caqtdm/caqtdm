@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>567</width>
+    <height>390</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>551</width>
+      <height>381</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Loaded include</string>
+    </property>
+    <widget class="caCalc" name="cacalc_18">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>350</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true"/>
+     </property>
+     <property name="calc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">Global_Rescale.{&quot;caqtdm_monitor&quot;:{&quot;maxdisplayrate&quot;:150}}</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::TriggerZeroToOne</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_4">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>350</y>
+       <width>171</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">_Automin</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caCartesianPlot" name="cacartesianplot">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>441</width>
+       <height>281</height>
+      </rect>
+     </property>
+     <property name="channels_1" stdset="0">
+      <string>;simul</string>
+     </property>
+     <property name="symbol_1">
+      <enum>caCartesianPlot::Diamond</enum>
+     </property>
+     <property name="color_1">
+      <color>
+       <red>29</red>
+       <green>159</green>
+       <blue>20</blue>
+      </color>
+     </property>
+     <property name="LegendEnabled">
+      <bool>true</bool>
+     </property>
+     <property name="XaxisSyncGroup">
+      <number>1</number>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>350</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">scrollmin</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc_3">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>320</y>
+       <width>171</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="variable">
+      <string notr="true">_Automax</string>
+     </property>
+     <property name="initialValue">
+      <double>30.000000000000000</double>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+    <widget class="caCalc" name="cacalc">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>320</y>
+       <width>70</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="calc">
+      <string notr="true">A</string>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">scrollmax</string>
+     </property>
+     <property name="eventSignal">
+      <enum>caCalc::onAnyChange</enum>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QFrame</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cacalc</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>cacartesianplot</receiver>
+   <slot>setMaxXResize(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>328</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>53</x>
+     <y>273</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_2</sender>
+   <signal>emitSignal(double)</signal>
+   <receiver>cacartesianplot</receiver>
+   <slot>setMinXResize(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>82</x>
+     <y>358</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>32</x>
+     <y>294</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacartesianplot</sender>
+   <signal>getAutoScaleXMax(double)</signal>
+   <receiver>cacalc_3</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>338</x>
+     <y>325</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacartesianplot</sender>
+   <signal>getAutoScaleXMin(double)</signal>
+   <receiver>cacalc_4</receiver>
+   <slot>setValue(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>357</x>
+     <y>362</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cacalc_18</sender>
+   <signal>emitSignal(bool)</signal>
+   <receiver>cacartesianplot</receiver>
+   <slot>triggerXAutoScale()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>293</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

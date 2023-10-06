@@ -35,13 +35,13 @@ fileFunctions::fileFunctions()
 const QString fileFunctions::lastError()
 {
     if(errorString.length() > 0) return errorString;
-    else return QString::null;
+    else return Q_NULLPTR;
 }
 
 const QString fileFunctions::lastInfo()
 {
     if(infoString.length() > 0) return "Info: " + infoString;
-    else return QString::null;
+    else return Q_NULLPTR;
 }
 
 int fileFunctions::checkFileAndDownload(const QString &fileName, const QString &url)

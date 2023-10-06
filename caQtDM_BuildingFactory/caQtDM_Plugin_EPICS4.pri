@@ -115,6 +115,7 @@ epics4_plugin {
                 message("epics4_plugin configuration win32")
 		 epics7 {
                     message("epics4_plugin (with epics version 7) configuration win32")
+                    QMAKE_CXXFLAGS     += /Zc:twoPhase-
 		  }
  		
  

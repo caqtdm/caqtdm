@@ -94,7 +94,7 @@ public:
     void getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
                                     int& Precision, char* colMode, double& limitsMax, double& limitsMin);
     void createContextMenu(QMenu& menu);
-    QString getDragText(){ return "hello"; }
+    QString getDragText() { return getPV();}
     // caWidgetInterface implementation finish
 
     // other stuff

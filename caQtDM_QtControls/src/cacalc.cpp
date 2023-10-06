@@ -55,6 +55,8 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
     eventFired = false;
     checkSignal_value_bool=false;
     checkSignal_value_int=0;
+    checkSignal_value_double=0.0;
+    changeValue_value_double=0.0;
     checkSignal_value_QRect=QRect();
     for (int i=0;i<4;i++){
         value_QRect_const[i]=0;
@@ -86,6 +88,14 @@ void caCalc::setValue(double value)
         eventFired = true;
     } else if(thisEventSignal == onAnyChange) {
         emit emitSignal(value);
+
+        if (fabs(checkSignal_value_double-value)>std::numeric_limits<double>::epsilon()*10){
+            //qDebug()<<"reduced_emitSignal"<<checkSignal_value_double<<value<< this ;
+            checkSignal_value_double=value;
+            emit reduced_emitSignal(value);
+
+        }
+
         if ((!eventFired)||(checkSignal_value_int!=(int) value)){
             checkSignal_value_int = (int) value;
             emit emitSignal((int) value);
@@ -112,7 +122,11 @@ void caCalc::setValue(double value)
     //printf("%s emit change value %f\n", qasc(objectName()), value);
     // only in case of a change where no calculation takes places, will we update
     // the data container with the actual value
-    if(thisCalc.trimmed().size() == 0) emit changeValue(value);
+    if(thisCalc.trimmed().size() == 0)
+        if (fabs(changeValue_value_double-value)>std::numeric_limits<double>::epsilon()*10){
+            changeValue_value_double=value;
+            emit changeValue(value);
+        }
 }
 
 void caCalc::setValue(QString value)
@@ -167,8 +181,19 @@ void caCalc::setValue(QRect value)
 
 void caCalc::setValue(int value)
 {
+    Q_UNUSED(value)
+    double data=(int) value;
     QRect empty;
     setValue(empty);
+    setValue(data);
+}
+
+void caCalc::setValue(bool value)
+{
+    QRect empty;
+    setValue(empty);
+    int data=(int) value;
+    setValue((double) data);
 }
 
 

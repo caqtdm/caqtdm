@@ -59,7 +59,7 @@ int Epics3Plugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     QString msg=QString("Epics3Plugin: epics version: %1").arg(EPICS_VERSION_STRING);
     mutexknobdataP = data;
     messagewindowP = messageWindow;
-    if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
+    if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg,(char*) msg.toLatin1().constData());
     mutexknobdataP = data;
     mutexKnobdataPtr = data;
     messageWindowPtr = messageWindow;
@@ -90,13 +90,13 @@ int Epics3Plugin::pvClearMonitor(knobData *kData) {
 int Epics3Plugin::pvFreeAllocatedData(knobData *kData)
 {
     //qDebug() << "Epics3Plugin:pvFreeAllocatedData";
-    if (kData->edata.info != (void *) 0) {
+    if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
-        kData->edata.info = (void*) 0;
+        kData->edata.info = (void*) Q_NULLPTR;
     }
-    if(kData->edata.dataB != (void*) 0) {
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
         free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
 
     return true;

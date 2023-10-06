@@ -37,7 +37,9 @@
 #include <QPair>
 #include <QString>
 #include <QEventLoop>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
+#endif
 #include <QApplication>
 #include <QGroupBox>
 #include <QPainter>

@@ -31,15 +31,24 @@
 #include <QLabel>
 #include <QWidget>
 #include "splashscreen.h"
-#include <QStyleOptionProgressBarV2>
 #include <QDebug>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#include <QStyleOptionProgressBarV2>
 #include <QDesktopWidget>
+#else
+#include <QtGui>
+#include <QStyleOptionProgressBar>
+#endif
 #include <QApplication>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(0)
+#else
+SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(), m_progress(0)
+#endif
 
 {
-    Qt::WindowFlags flags = 0;
+    Qt::WindowFlags flags = (Qt::WindowFlags)0;
     flags |= Qt::WindowStaysOnTopHint | Qt::SplashScreen ;
     setWindowFlags(flags);
 
@@ -47,7 +56,7 @@ SplashScreen::SplashScreen(QWidget *parent) : QSplashScreen(parent), m_progress(
 
 #if defined(MOBILE_IOS)
     pixmapLoad.load(":caQtDM-logos.png");
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     if(size.height() < 500) {
        pixmap = pixmapLoad.scaled(pixmapLoad.size().width()/2, pixmapLoad.size().height()/2);
     } else {
@@ -100,11 +109,14 @@ void SplashScreen::drawContents(QPainter *painter)
       QSplashScreen::drawContents(painter);
 #if QT_VERSION < QT_VERSION_CHECK(5, 7, 0)
       QStyleOptionProgressBarV2 pbstyle;
-#else
-      QStyleOptionProgressBar pbstyle;
-#endif
       pbstyle.initFrom(this);
       pbstyle.state = QStyle::State_Enabled;
+#else
+      QStyleOptionProgressBar pbstyle;
+      pbstyle.initFrom(this);
+      pbstyle.state = QStyle::State_Enabled|QStyle::State_Horizontal;
+
+#endif
       pbstyle.textVisible = false;
       pbstyle.minimum = 0;
       pbstyle.maximum = m_maximum;
@@ -114,4 +126,5 @@ void SplashScreen::drawContents(QPainter *painter)
       pbstyle.textVisible = true;
       pbstyle.rect = QRect(0, pixmap.size().height()+50, pixmap.size().width()+200, 25);
       style()->drawControl(QStyle::CE_ProgressBar, &pbstyle, painter, this);
+
 }

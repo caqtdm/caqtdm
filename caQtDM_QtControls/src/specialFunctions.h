@@ -27,7 +27,9 @@
 #define specialFunctions_H
 
 #include <QtGui>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QDesktopWidget>
+#endif
 #include <QApplication>
 #include <qtcontrols_global.h>
 #ifdef MOBILE

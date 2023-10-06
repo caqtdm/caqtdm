@@ -67,6 +67,8 @@ public slots:
     }
 
     void setValue(double v);
+    void setValue(QString string);
+
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);

@@ -40,6 +40,7 @@
 #endif
 
 #include <qnumeric.h>
+#include <qwt_text.h>
 
 #if QWT_VERSION < 0x060100
 
@@ -117,7 +118,11 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
 #endif
 
+#if QWT_VERSION < 0x060200
     ScaleDraw->setPenWidth(1);
+#else
+    ScaleDraw->setPenWidthF(1);
+#endif
     setLineWidth(1);
     setFrameShadow(QwtDial::Sunken);
 
@@ -255,7 +260,7 @@ QString caMeter::setLabel(double value, const QString& units)
         strcat(asc, qasc(units));
     }
 
-    label = QString::fromAscii(asc);
+    label = QString::fromLatin1(asc);
 
     return label;
 }
@@ -284,7 +289,7 @@ QString caMeter::setScaleLabel(double value)
       snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
 
-    label = QString::fromAscii(asc);
+    label = QString::fromLatin1(asc);
 
     return label;
 }

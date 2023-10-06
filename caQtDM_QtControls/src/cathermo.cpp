@@ -498,7 +498,7 @@ void caThermo::paintValue(QPainter *painter, QRect valueRect) const
         painter->drawText( valueRect, Qt::AlignCenter, label );
     } else {
         QFontMetrics fm(font());
-        int w = fm.width(label);
+        int w = QMETRIC_QT456_FONT_WIDTH(fm,label);
         int h = fm.height();
         switch (this->scalePosition()) {
         case LeftScale:
@@ -574,8 +574,11 @@ QString caThermo::setScaleLabel(double value) const
     if(qIsNaN(value)){
       snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     label = QString::fromAscii(asc);
+#else
+    label = QString::fromLatin1(asc);
+#endif
 
     return label;
 }

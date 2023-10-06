@@ -97,7 +97,7 @@ void caImage::init(const QString& filename) {
     if(thisAngle != 0) OnFrameChanged(0);
 
     _layout->setSpacing(0);
-    _layout->setMargin(0);
+    SETMARGIN_QT456(_layout,0);
     _layout->addWidget(_container);
     setLayout(_layout);
 
@@ -188,6 +188,7 @@ void caImage::slotTiltAngle(double angle)
 
 void caImage::OnFrameChanged(int frame)
 {
+    Q_UNUSED(frame)
     if( _animation.isNull()) return;
     pixmap = pixmap.scaled(width(), height());
     pixmap = _animation->currentPixmap();
@@ -196,7 +197,13 @@ void caImage::OnFrameChanged(int frame)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QMatrix rm;
+#else
+    QTransform rm;
+#endif
+
+
     pix.scaled(width(), height());
     pix.fill(QColor::fromRgb(0, 0, 0, 0)); //pixmap transparent.
     QPainter* p = new QPainter(&pix);

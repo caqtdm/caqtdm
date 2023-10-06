@@ -25,6 +25,18 @@ contains(QT_VER_MAJ, 5) {
     DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
+contains(QT_VER_MAJ, 6) {
+    QT += widgets  uitools opengl
+    !ios:!android {
+       message("caQtDM_Lib -- printsupport added")
+       QT += printsupport
+    }
+    CONFIG += qt plugin thread
+    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+}
+
+FORMS += ../caQtDM_Viewer/src/main.ui
+
 CONFIG += warn_on
 
 TARGET = caQtDM_Lib

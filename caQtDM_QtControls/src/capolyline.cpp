@@ -246,14 +246,14 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 
     if(inDesigner) {
-        pairs = thisXYpairs.split(";", QString::SkipEmptyParts);
+        pairs = thisXYpairs.split(";", SKIP_EMPTY_PARTS);
     } else {
-        pairs = XYpairs.split(";", QString::SkipEmptyParts);
+        pairs = XYpairs.split(";", SKIP_EMPTY_PARTS);
     }
     QPolygon polygon(pairs.count());
 
     for(int i=0; i< pairs.count(); i++) {
-        QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
+        QStringList xy = pairs.at(i).split(",", SKIP_EMPTY_PARTS);
         if(xy.count() == 2) {
             polygon.putPoints(i, 1, atoi(qasc(xy.at(0))), atoi(qasc(xy.at(1))));
             lastPosition =  QPointF(atoi(qasc(xy.at(0))), atoi(qasc(xy.at(1))));
@@ -263,7 +263,7 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
 
     // when polygon, close the line
     if((thisPolyStyle == Polygon) && (nbPoints > 2)) {
-        QStringList xy = pairs.at(0).split(",", QString::SkipEmptyParts);
+        QStringList xy = pairs.at(0).split(",", SKIP_EMPTY_PARTS);
         if(xy.count() == 2) {
             polygon.putPoints(nbPoints, 1, atoi(qasc(xy.at(0))), atoi(qasc(xy.at(1))));
             nbPoints++;
@@ -316,13 +316,13 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
     double resizeX = (double) e->size().width() / (double) actualWidth;
     double resizeY = (double) e->size().height() / (double) actualHeight;
 
-    QStringList pairs = thisXYpairs.split(";", QString::SkipEmptyParts);
+    QStringList pairs = thisXYpairs.split(";", SKIP_EMPTY_PARTS);
 
     if(inDesigner) {
 
         thisXYpairs.clear();
         for(int i=0; i< pairs.count(); i++) {
-            QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
+            QStringList xy = pairs.at(i).split(",", SKIP_EMPTY_PARTS);
             if(xy.count() == 2) {
                 double x = atof(qasc(xy.at(0))) * resizeX;
                 double y = atof(qasc(xy.at(1))) * resizeY;
@@ -341,7 +341,7 @@ void caPolyLine::resizeEvent(QResizeEvent *e)
         // while we are not keeping the aspect ratio
         XYpairs.clear();
         for(int i=0; i< pairs.count(); i++) {
-            QStringList xy = pairs.at(i).split(",", QString::SkipEmptyParts);
+            QStringList xy = pairs.at(i).split(",",SKIP_EMPTY_PARTS);
             if(xy.count() == 2) {
                  double x = atof(qasc(xy.at(0))) * resizeX;
                  double y = atof(qasc(xy.at(1))) * resizeY;

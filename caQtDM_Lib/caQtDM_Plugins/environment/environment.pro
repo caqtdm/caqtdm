@@ -4,6 +4,10 @@ QT += core gui network
 contains(QT_VER_MAJ, 5) {
     QT     += widgets concurrent
 }
+contains(QT_VER_MAJ, 6) {
+    QT     += widgets concurrent
+}
+
 
 CONFIG += warn_on
 CONFIG += environment_Plugin

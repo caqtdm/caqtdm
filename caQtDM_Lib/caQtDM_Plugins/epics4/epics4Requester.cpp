@@ -31,21 +31,21 @@ void Epics4Requester::message(std::string const & message,epics::pvData::Message
 {
     char * mes = (char *)message.c_str();
     //do this, to prevent spurious messages when closing the application
-    if(strstr(mes,"DISCONNECTED") != (char*) 0) return;
-    if(strstr(mes,"DESTROYED") != (char*) 0) return;
+    if(strstr(mes,"DISCONNECTED") != (char*) Q_NULLPTR) return;
+    if(strstr(mes,"DESTROYED") != (char*) Q_NULLPTR) return;
 
     switch (messageType) {
     case epics::pvData::infoMessage:
-          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtDebugMsg, mes);
+          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtDebugMsg, mes);
           break;
     case epics::pvData::warningMessage:
-          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtWarningMsg, mes);
+          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtWarningMsg, mes);
           break;
     case epics::pvData::errorMessage:
-          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtCriticalMsg, mes);
+          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtCriticalMsg, mes);
           break;
     case epics::pvData::fatalErrorMessage:
-          if(messageWindow != (MessageWindow *) 0) messageWindow->postMsgEvent(QtCriticalMsg, mes);
+          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtCriticalMsg, mes);
           break;
     }
 }

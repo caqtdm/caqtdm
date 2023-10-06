@@ -40,25 +40,25 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     setWindowModality (Qt::WindowModal);
 
     QString text = StripPlot->getPVS();
-    vars = text.split(";", QString::SkipEmptyParts);
+    vars = text.split(";", SKIP_EMPTY_PARTS);
 
 #if defined(MOBILE_IOS)
     Specials special;
-    if(qApp->desktop()->size().height() < 500) {
+    if(qApp->primaryScreen()->size().height() < 500) {
         thisWidth=430;  // normal for iphone
         thisHeight=100 + vars.size() * 13;
     } else {
         thisHeight=100 + vars.size() * 20;
     }
-    special.setNewStyleSheet(this, qApp->desktop()->size());
+    special.setNewStyleSheet(this, qApp->primaryScreen()->size());
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->primaryScreen()->availableGeometry()));
 #elif defined(MOBILE_ANDROID)
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
     showMax = true;
@@ -155,7 +155,7 @@ void limitsStripplotDialog::applyClicked()
         if(pv.size() > 0) {
 
             knobData *ptr = monData->GetMutexKnobDataPtr(list.at(i+1).toInt());
-            if(ptr == (knobData *) 0) break;
+            if(ptr == (knobData *) Q_NULLPTR) break;
 
             int indx = minComboBox[i]->currentIndex();
             QString text = minLineEdit[i]->text();

@@ -12,6 +12,9 @@ contains(QT_VER_MAJ, 5) {
   QT       += widgets
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
+contains(QT_VER_MAJ, 6) {
+  QT       += widgets core
+}
 
 TEMPLATE = lib
 CONFIG	+= static

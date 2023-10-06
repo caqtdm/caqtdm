@@ -90,7 +90,7 @@ QSize SNumeric::sizeHint() const
         QFont f = font();
         f.setPointSize(4); /* provide a size hint calculated on a minimum font of 4 points */
         QFontMetrics fm(f);
-        int width = digits * fm.width("X") + fm.width("X"); /* in case there's the +/- sign */
+        int width = digits * QMETRIC_QT456_FONT_WIDTH(fm,"X") + QMETRIC_QT456_FONT_WIDTH(fm,"X"); /* in case there's the +/- sign */
         return QSize(width, fm.height());
     }
     return QWidget::sizeHint();
@@ -107,7 +107,12 @@ void SNumeric::setDigitsFontScaleEnabled(bool en)
     if(int1Label) {
         int1Label->setFontScaleMode(ESimpleLabel::None);
         d_fontScaleEnabled = en;
-        foreach(QLabel *l, findChildren<QLabel *>(QRegExp("layoutmember*"))) {
+        QString pattern="layoutmember*";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        foreach(QLabel *l, findChildren<QLabel *>(QRegExp(pattern))) {
+#else
+        foreach(QLabel *l, findChildren<QLabel *>(QRegularExpression(pattern))) {
+#endif
             l->setFont(int1Label->font());
         }
     } else {
@@ -121,17 +126,22 @@ void SNumeric::clearContainers()
 {
     if (box) {
         labels.clear();
-        foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp("layoutmember*"))) delete child;
+        QString pattern="layoutmember*";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        foreach(QWidget *child, this->findChildren<QWidget *>(QRegExp(pattern))) delete child;
+#else
+        foreach(QWidget *child, this->findChildren<QWidget *>(QRegularExpression(pattern))) delete child;
+#endif
         delete box;
-        box = NULL;
+        box = Q_NULLPTR;
     }
     if (bup) {
         delete bup;
-        bup = NULL;
+        bup = Q_NULLPTR;
     }
     if (bdown) {
         delete bdown;
-        bdown = NULL;
+        bdown = Q_NULLPTR;
     }
 }
 
@@ -141,8 +151,9 @@ void SNumeric::init()
     setFocusPolicy(Qt::StrongFocus);
 
     box = new QGridLayout(this);
-    box->setSpacing(0);
-    box->setMargin(1);
+    SETMARGIN_QT456(box,1);
+    SETSPACING_QT456(box,0);
+
     box->setRowStretch(0,1);
     //box->setRowStretch(1,1);
     //box->setRowStretch(2,1);
@@ -453,7 +464,11 @@ void SNumeric::resizeEvent(QResizeEvent *e)
     temp =  qobject_cast<QPushButton *>(list.front());
     if (temp) {
         QPixmap pix(temp->size() * 0.9);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         pix.fill(palette().color(QPalette::Background));
+#else
+        pix.fill(palette().color(QPalette::Window));
+#endif
         QPainter p(&pix);
         p.setRenderHint(QPainter::Antialiasing);
         hmargin = (int) (pix.width() * MARGIN);
@@ -468,7 +483,12 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         poly.setPoint(1, w - hmargin, h - vmargin);
         poly.setPoint(2, hmargin, h - vmargin);
         QPen	pen;
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         pen.setColor(palette().color(QPalette::Foreground));
+#else
+        pen.setColor(palette().color(QPalette::Text));
+#endif
         p.setPen(pen);
         QLinearGradient linearGradient(0, 0, w, h);
         linearGradient.setColorAt(0.0, palette().color(QPalette::Light));
@@ -497,7 +517,11 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         }
 
         i = 0;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QPixmap pix2 = pix.transformed(QMatrix().rotate(-180));
+#else
+        QPixmap pix2 = pix.transformed(QTransform().rotate(-180));
+#endif
         foreach (QAbstractButton* but, bdown->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
             if (temp) {
@@ -508,7 +532,7 @@ void SNumeric::resizeEvent(QResizeEvent *e)
         }
     }
 
-    if (text != NULL)  {
+    if (text != Q_NULLPTR)  {
         text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
     }
 

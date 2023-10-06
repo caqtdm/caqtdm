@@ -47,9 +47,16 @@ public:
     void remove(int index);
     void setCurrentIndex(int index);
     QWidget *widget(int index) const;
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+    bool canAddWidget() const;
+    bool canRemove(int index) const;
+#endif
 
 private:
     caDoubleTabWidget *myWidget;
+
+    // QDesignerContainerExtension interface
+
 };
 
 #endif

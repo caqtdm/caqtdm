@@ -44,18 +44,37 @@ class  QTCON_EXPORT caInclude : public QWidget
     Q_OBJECT
 
     Q_PROPERTY(QStringList macroList READ getMacroList WRITE setMacroList STORED false)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
     Q_PROPERTY(QString macro READ getMacroC WRITE setMacro  DESIGNABLE inactiveButVisible())
     Q_PROPERTY(QString xPositionsOrChannels READ getXpositions WRITE setXpositions DESIGNABLE inactiveButVisible() STORED false)
     Q_PROPERTY(QString yPositionsOrChannels READ getYpositions WRITE setYpositions DESIGNABLE inactiveButVisible() STORED false)
 
     Q_PROPERTY(double xCorrectionFactor READ getXcorrection WRITE setXcorrection  DESIGNABLE isPropertyVisible(xCorrectionFactor))
     Q_PROPERTY(double yCorrectionFactor READ getYcorrection WRITE setYcorrection  DESIGNABLE isPropertyVisible(yCorrectionFactor))
+#else
+    Q_PROPERTY(QString macro READ getMacroC WRITE setMacro  DESIGNABLE false)
+    Q_PROPERTY(QString xPositionsOrChannels READ getXpositions WRITE setXpositions DESIGNABLE false STORED false)
+    Q_PROPERTY(QString yPositionsOrChannels READ getYpositions WRITE setYpositions DESIGNABLE false STORED false)
+
+    Q_PROPERTY(double xCorrectionFactor READ getXcorrection WRITE setXcorrection  DESIGNABLE true)
+    Q_PROPERTY(double yCorrectionFactor READ getYcorrection WRITE setYcorrection  DESIGNABLE true)
+
+#endif
 
     Q_PROPERTY(QString filename READ getFileName WRITE setFileName)
     Q_PROPERTY(Stacking stacking READ getStacking WRITE setStacking)
     Q_PROPERTY(int numberOfItems READ getItemCount WRITE setItemCount)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+
     Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE isPropertyVisible(maximumLines))
     Q_PROPERTY(int maximumColumns READ getMaxColumns WRITE setMaxColumns DESIGNABLE isPropertyVisible(maximumColumns))
+#else
+    Q_PROPERTY(int maximumLines READ getMaxLines WRITE setMaxLines DESIGNABLE true)
+    Q_PROPERTY(int maximumColumns READ getMaxColumns WRITE setMaxColumns DESIGNABLE true)
+
+#endif
+
     Q_ENUMS(Stacking)
 
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
@@ -124,6 +143,10 @@ public:
     void setSpacingVertical(int spacing) {thisSpacingVertical = spacing; setAdjustSize(thisAdjust); prvSpacingVertical = thisSpacingVertical;}
     void setSpacingHorizontal(int spacing) {thisSpacingHorizontal = spacing; setAdjustSize(thisAdjust); prvSpacingHorizontal = thisSpacingHorizontal;}
 
+
+    QFrame* getIncludeFrame() {return frame;}
+    QHBoxLayout* getIncludeboxLayout(){return boxLayout;}
+    QGridLayout* getIncludegridLayout(){return gridLayout;}
     myShapes getFrameShape() const {return thisFrameShape;}
     void setFrameShape(myShapes shape) {thisFrameShape = shape; thisFrameUpdate = true; setFileName(newFileName);}
     QFrame::Shadow getFrameShadow() const {return thisFrameShadow;}
@@ -156,10 +179,18 @@ public:
     int getMargin();
 
     // keep childs
-    void appendChildToList(QWidget *child) {thisChildsList.append(child);}
+    void appendChildToList(QWidget *child)
+    {
+        thisChildsList.append(child);
+        //thisChildsList.append(child->findChildren<QWidget *>());
+    }
     void clearChildsList() {thisChildsList.clear();}
-    QList<QWidget*> getChildsList() {return thisChildsList;}
+    QList<QWidget*> getChildsList() {return thisChildsList;}//{return this->findChildren<QWidget *>();}
 
+    void childResizeCall(double factX, double factY);
+    void update_geometrysave();
+    QRect scanChildsneededArea();
+    void update_position(QWidget *w, int x, int y);
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -172,6 +203,9 @@ public slots:
 protected:
       void paintEvent( QPaintEvent *);
 
+
+private slots:
+      void caincludeNameChanged(const QString &objectName);
 private:
 
     bool designerVisible[10];
@@ -206,6 +240,8 @@ private:
     int maximumX, maximumY;
     double thisXfactor;
     double thisYfactor;
+    double thisXresizefactor;
+    double thisYresizefactor;
     QList<QWidget*> thisChildsList;
 
 #ifdef PRC

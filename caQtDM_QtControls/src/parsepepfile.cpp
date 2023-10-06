@@ -84,14 +84,22 @@ ParsePepFile::ParsePepFile(QString filename, bool willprint)
 
     // copy first header to our byte array
     QByteArray *array= new QByteArray();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(header);
-
+#else
+   array->append(header.toLatin1());
+#endif
     // fill array with the scanned data
     DisplayFile(nbRows, nbCols, array);
 
     // and finish with the footer
     footer = QString("</layout></item></layout></widget></widget></ui>");
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(footer);
+#else
+   array->append(footer.toLatin1());
+#endif
 
     // fill buffer with the byte array data
     buffer->open(QIODevice::ReadWrite);
@@ -148,7 +156,7 @@ void ParsePepFile::TreatFile(int &nbRows, int &nbCols, QColor &bgColor, QFile *f
         }
 
         // break the line down in their elements
-        QStringList elements= line.split(separator,  QString::SkipEmptyParts);
+        QStringList elements= line.split(separator,  SKIP_EMPTY_PARTS);
 /*
         printf("%d %s\n", elements.count(), qasc(line));
         for (int i=0; i< elements.count(); i++) {
@@ -551,7 +559,7 @@ void ParsePepFile::displayItem(int actualgridRow,int actualgridColumn, gridInfo 
 
     rgba[0] = 0; rgba[1] = 0; rgba[2] = 0; rgba[3] = 255;
 
-    QStringList pvElements= grid.widgetChannel.split(":",  QString::SkipEmptyParts);
+    QStringList pvElements= grid.widgetChannel.split(":", SKIP_EMPTY_PARTS);
     if(pvElements.count() > 0) partialpv = pvElements.at(0);
 
     if(grid.widgetType.contains("menubutton")) {
@@ -933,7 +941,7 @@ void ParsePepFile::writeWheelswitch(QString format, QString pv, QByteArray *arra
     bool ok;
     int totalDigits = 8, decimalDigits = 3;
     int integerDigits = totalDigits - decimalDigits -2;
-    QStringList elements= format.split(".",  QString::SkipEmptyParts);
+    QStringList elements= format.split(".",  SKIP_EMPTY_PARTS);
     if(elements.count() == 2) {
        totalDigits = elements[0].toInt(&ok);
        if(!ok) totalDigits = 8;
@@ -1090,7 +1098,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
             newFormat.replace("g", "");
             newFormat.replace("e", "");
             newFormat.replace("f", "");
-            QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+            QStringList elements= newFormat.split(".", SKIP_EMPTY_PARTS);
             if(elements.count() == 2) {
                 decimalDigits = elements[1].toInt(&ok);
                 if(ok) {
@@ -1105,7 +1113,7 @@ void ParsePepFile::writeLineEdit(QString format, QString pv, QString minwidth, Q
         } else if(newFormat.contains("o")) {
             writeSimpleProperty("formatType", "enum", "caLineEdit::octal", array);
         } else {
-            QStringList elements= newFormat.split(".",  QString::SkipEmptyParts);
+            QStringList elements= newFormat.split(".",  SKIP_EMPTY_PARTS);
             if(elements.count() == 2) {
                 decimalDigits = elements[1].toInt(&ok);
                 if(ok) {
@@ -1214,7 +1222,7 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 
     QFont font( "Lucida Sans Typewriter", pointsize.toInt());
     QFontMetrics metrics(font);
-    int width = metrics.width(text);
+    int width = QMETRIC_QT456_FONT_WIDTH(metrics,text);
     if( (minwidth.size() == 0) && (minheight.size() > 0) ) {
         writeOpenProperty("minimumSize", array);
         writeOpenTag("size", array);
@@ -1274,19 +1282,32 @@ void ParsePepFile::writeLabel(QString text, QString minwidth, QString minheight,
 void ParsePepFile::writeOpenProperty(QString property, QByteArray *array)
 {
     QString aux = QString("<property name=\"%1\">\n").arg( property);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
+
 }
 
 void ParsePepFile::writeCloseProperty(QByteArray *array)
 {
     QString aux = QString("</property>\n");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::writeTaggedString(QString tag, QString value, QByteArray *array)
 {
     QString aux = QString("<%1>%2</%3>\n").arg(tag).arg(value).arg(tag);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::setColor(QString property, int r, int g, int b, int alpha, QByteArray *array)
@@ -1329,20 +1350,32 @@ void ParsePepFile::writeItemRowCol(int &row, int &column,  int span, QByteArray 
 {
     QString Qrow, Qcolumn, Qspan;
     QString aux = QString("<item row=\"%1\" column=\"%2\" colspan=\"%3\">\n").arg(Qrow.setNum(row)).arg(Qcolumn.setNum(column)).arg(Qspan.setNum(span));
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
     column++;
 }
 
 void ParsePepFile::writeOpenTag(QString tag,  QByteArray *array)
 {
     QString aux = QString("<%1>\n").arg(tag);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::writeCloseTag(QString tag,  QByteArray *array)
 {
     QString aux = QString("</%1>\n").arg(tag);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     array->append(aux);
+#else
+   array->append(aux.toLatin1());
+#endif
 }
 
 void ParsePepFile::writeSimpleProperty(QString prop, QString tag, QString value, QByteArray *array)

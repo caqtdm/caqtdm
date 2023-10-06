@@ -42,20 +42,20 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     setWindowModality (Qt::WindowModal);
 
 #if defined(MOBILE_IOS)
-    if(qApp->desktop()->size().height() < 500) {
+    if(qApp->primaryScreen()->size().height() < 500) {
         thisWidth=430;  // normal for iphone
         thisHeight=150;
     }
     Specials special;
-    special.setNewStyleSheet(this, qApp->desktop()->size(), 16, 10);
+    special.setNewStyleSheet(this, qApp->primaryScreen()->size(), 16, 10);
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
-    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->desktop()->availableGeometry()));
+    setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(thisWidth,thisHeight), qApp->primaryScreen()->availableGeometry()));
 #elif defined(MOBILE_ANDROID)
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor(255,255,224,255));
+    palette.setBrush(QPalette::Window, QColor(255,255,224,255));
     setPalette(palette);
     setAutoFillBackground(true);
     showMax = true;
@@ -233,7 +233,7 @@ void limitsCartesianplotDialog::applyClicked()
         xLimits = xmin; xLimits.append(";"); xLimits.append(xmax);
     } else {
         xLimits = CartesianPlot->getXaxisLimits();
-        list = xLimits.split(";", QString::SkipEmptyParts);
+        list = xLimits.split(";", SKIP_EMPTY_PARTS);
         xminLineEdit->setText(list.at(0));
         xmaxLineEdit->setText(list.at(1));
     }
@@ -246,7 +246,7 @@ void limitsCartesianplotDialog::applyClicked()
         yLimits = ymin; yLimits.append(";"); yLimits.append(ymax);
     } else {
         yLimits = CartesianPlot->getYaxisLimits();
-        list = yLimits.split(";", QString::SkipEmptyParts);
+        list = yLimits.split(";", SKIP_EMPTY_PARTS);
         yminLineEdit->setText(list.at(0));
         ymaxLineEdit->setText(list.at(1));
     }
@@ -262,7 +262,7 @@ void limitsCartesianplotDialog::applyClicked()
         QStringList vars = pvs.split(";");
         if((vars.size()== 2) || (vars.at(0).trimmed().length() > 0)) {
             knobData *kPtr = monData->getMutexKnobDataPV(CartesianPlot, vars.at(0).trimmed());
-             if(kPtr != (knobData*) 0) {
+             if(kPtr != (knobData*) Q_NULLPTR) {
                 if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                     qDebug() << "set to channel limits" << kPtr->edata.lower_disp_limit << kPtr->edata.upper_disp_limit;
                     CartesianPlot->setScaleX(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);
@@ -289,7 +289,7 @@ void limitsCartesianplotDialog::applyClicked()
         QStringList vars = pvs.split(";");
         if((vars.size()== 2) || (vars.at(1).trimmed().length() > 0)) {
             knobData *kPtr = monData->getMutexKnobDataPV(CartesianPlot, vars.at(1).trimmed());
-             if(kPtr != (knobData*) 0) {
+             if(kPtr != (knobData*) Q_NULLPTR) {
                 if(kPtr->edata.lower_disp_limit != kPtr->edata.upper_disp_limit) {
                     //qDebug() << "set to channel limits" << kPtr->edata.lower_disp_limit << kPtr->edata.upper_disp_limit;
                     CartesianPlot->setScaleY(kPtr->edata.lower_disp_limit, kPtr->edata.upper_disp_limit);

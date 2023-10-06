@@ -5,7 +5,7 @@ TARGET_FILENAME = "caqtdm.exe"
 include($$CAQTDM_TOP/caQtDM_BuildingFactory/caQtDM_BuildControl_Version.pri)
 CONFIG += caQtDM_Viewer
 CONFIG += caQtDM_Installation
-CAQTDM_INSTALL_LIB = caQtDM
+CAQTDM_INSTALL_EXE = caQtDM
 include($$CAQTDM_TOP/caQtDM.pri)
 
 contains(QT_VER_MAJ, 4) {
@@ -35,6 +35,29 @@ unix:!macx:!ios:!android{
    CONFIG += qt warn_on thread widgets
    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
+
+contains(QT_VER_MAJ, 6) {
+    QT     += core gui svg uitools network opengl
+    CONFIG += qt warn_on thread widgets
+    modbus{
+       QT += serialbus
+       DEFINES += CAQTDM_MODBUS
+    }
+    gps{
+       QT += positioning
+       DEFINES += CAQTDM_GPS
+    }
+
+    unix:!macx:!ios:!android{
+        QT     += x11extras
+    }
+    !ios:!android {
+        QT     += printsupport
+     }
+
+}
+
+
 
 TARGET = caQtDM
 TEMPLATE = app

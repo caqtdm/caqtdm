@@ -99,7 +99,9 @@
 // 50 levels of includes should do it
 #define CAQTDM_MAX_INCLUDE_LEVEL 50
 
-
+enum macro_parser{
+    parse_simple,parse_withconst
+};
 
 namespace Ui {
 class CaQtDM_Lib;
@@ -177,7 +179,11 @@ public:
         printer->setOutputFileName(0);
         printer->setPrintProgram("lpr");
 #endif
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         printer->setOrientation(QPrinter::Landscape);
+#else
+        printer->setPageOrientation( QPageLayout::Landscape);
+#endif
         printer->setResolution(300);
         printer->setOutputFormat(QPrinter::NativeFormat);
         QPrintDialog *printDialog = new QPrintDialog(printer, this);
@@ -199,7 +205,11 @@ public:
     {
 #ifndef MOBILE
         QPrinter *printer = new QPrinter;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         printer->setOrientation(QPrinter::Portrait);
+#else
+        printer->setPageOrientation( QPageLayout::Portrait);
+#endif
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         printer->setOutputFormat(QPrinter::PostScriptFormat);
 #else
@@ -214,7 +224,27 @@ public:
 #endif
     }
 
-
+    void save_graphics(QString filename)
+    {
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+        QPixmap pm = this->grab();
+#else
+        QPixmap pm = QPixmap::grabWidget(this);
+#endif
+        QString text = QDate::currentDate().toString("yyyy-MM-dd");
+        text += " " + QTime::currentTime().toString("hh:mm:ss");
+        text += ", " + this->thisFileShort;
+        QPainter painter( &pm );
+        QFont qfont = painter.font();
+        qfont.setPointSizeF(8);
+        painter.setFont(qfont);
+        painter.drawText(QPoint(0, 10), text );
+        if (pm.save(filename,"PNG",-1)){
+            printf("caQtDM image file saved\n");
+        }else{
+            printf("caQtDM image file save failed\n");
+        }
+    }
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
@@ -253,15 +283,30 @@ private:
         QFontMetrics ft(thisFont);
 
         painter.save();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         double xscale = printer->pageRect().width()/double(this->width());
         double yscale = printer->pageRect().height()/double(this->height() + ft.lineSpacing());
         double scale = qMin(xscale, yscale);
         painter.translate(printer->paperRect().x() + printer->pageRect().width()/2,
                           printer->paperRect().y() + printer->pageRect().height()/2);
+#else
+        QRectF pageSize=printer->pageLayout().fullRect();
+        double xscale = pageSize.width()/double(this->width());
+        double yscale = pageSize.height()/double(this->height() + ft.lineSpacing());
+        double scale = qMin(xscale, yscale);
+        painter.translate(pageSize.x() + pageSize.width()/2,
+                          pageSize.y() + pageSize.height()/2);
+
+#endif
         painter.scale(scale, scale);
         painter.translate(-width()/2, -height()/2 + ft.lineSpacing());
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         QPixmap pm = QPixmap::grabWidget(this);
+#else
+        QPixmap pm = this->grab();
+#endif
+
         painter.drawPixmap(0, 0, pm);
 
         painter.restore();
@@ -297,6 +342,7 @@ private:
     bool parseForQRectConst(QString &input,double* valueArray);
     void getStatesToggleAndLed(QWidget *widget, const knobData &data, const QString &String, Qt::CheckState &state);
 
+    QRect widgetResize(QWidget *w, double factX, double factY);
     void resizeSpecials(QString className, QWidget *widget, QVariantList list, double factX, double factY);
     void shellCommand(QString command);
 
@@ -397,6 +443,9 @@ private:
 
     QString defaultPlugin;
 
+    QString handle_single_Macro(QString key, QString value, QString Text);
+    QString handle_Macro_withConst(QString key, QString value, QString Text);
+    QString handle_Macro_Scan(QString Text, QMap<QString, QString> map, macro_parser parse);
 private slots:
     void Callback_CaCalc(double value) ;
     void Callback_UndefinedMacrowindowExit();

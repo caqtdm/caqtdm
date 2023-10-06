@@ -40,7 +40,7 @@ public:
    fileFunctions();
    ~fileFunctions() {}
 
-   int checkFileAndDownload(const QString &file, const QString &url = QString::null );
+   int checkFileAndDownload(const QString &file, const QString &url = QString() );
    bool removeFilesInTree(const QString &dirName);
    const QString lastError();
    const QString lastInfo();

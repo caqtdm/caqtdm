@@ -54,7 +54,7 @@ void gpsPlugin::updateInterface()
     // go through our devices
     foreach(int index, listOfIndexes) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
-        if((kData != (knobData *) 0) && (kData->index != -1)) {
+        if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
             QString key = kData->pv;
 
             // find this pv in our internal double values list (assume for now we are only treating doubles)
@@ -85,7 +85,7 @@ void gpsPlugin::positionUpdated(const QGeoPositionInfo &info)
      if (info.isValid()){
          foreach(int index, listOfIndexes) {
              knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
-             if((kData != (knobData *) 0) && (kData->index != -1)) {
+             if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
                  QString key = kData->pv;
                  if (key.compare("altitude",Qt::CaseInsensitive)==0){
                      kData->edata.monitorCount++;
@@ -246,13 +246,13 @@ int gpsPlugin::pvFreeAllocatedData(knobData *kData)
 {
     QMutexLocker locker(&mutex);
     //qDebug() << "gpsPlugin:pvFreeAllocatedData";
-    if (kData->edata.info != (void *) 0) {
+    if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
-        kData->edata.info = (void*) 0;
+        kData->edata.info = (void*) Q_NULLPTR;
     }
-    if(kData->edata.dataB != (void*) 0) {
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
         free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
 
     return true;
@@ -260,10 +260,11 @@ int gpsPlugin::pvFreeAllocatedData(knobData *kData)
 
 // caQtDM_Lib will call this routine for setting data (see for more detail the epics3 plugin)
 int gpsPlugin::pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
-    Q_UNUSED(object);
-    Q_UNUSED(errmess);
-    Q_UNUSED(forceType);
-
+    Q_UNUSED(object)
+    Q_UNUSED(errmess)
+    Q_UNUSED(forceType)
+    Q_UNUSED(idata)
+    Q_UNUSED(sdata)
 
      QString key = pv;
      if (key.compare("setAltitude",Qt::CaseInsensitive)){

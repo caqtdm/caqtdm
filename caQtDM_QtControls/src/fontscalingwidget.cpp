@@ -72,7 +72,7 @@ void FontScalingWidget::setScaleMode(int mode)
 
 double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSize &size)
 {
-    QTextDocument *textDoc = (QTextDocument *) 0;
+    QTextDocument *textDoc = (QTextDocument *) Q_NULLPTR;
     QFontMetrics fmint = d_widget->fontMetrics();
     QFontMetricsF fm(fmint);
     QFont f = d_widget->font();
@@ -90,11 +90,17 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         QTextCursor* textCursor = new QTextCursor(textDoc);
         textDoc->setDocumentMargin(0);
         textCursor->insertHtml(text);
+        delete textCursor;
     }
 
     if(linecnt > 1) {
         QStringList lines = text.split("\n");
-        qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#else
+            std::sort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#endif
+
         qslisttoc(lines);
         longestLine = lines.first();
         txtHeight = fm.lineSpacing() * linecnt;
@@ -143,7 +149,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         // check if width does not go outside
         if(!richText) {
             QFontMetricsF tmpFm(f);
-            txtWidth = tmpFm.width(longestLine);
+            txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
         } else {
             textDoc->setDefaultFont(f);
             txtWidth = textDoc->idealWidth();
@@ -156,7 +162,7 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
             //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             if(!richText) {
                 QFontMetricsF tmpFm(f);
-                txtWidth = tmpFm.width(longestLine);
+                txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
             } else {
                 textDoc->setDefaultFont(f);
                 txtWidth = textDoc->idealWidth();
@@ -197,6 +203,9 @@ double FontScalingWidget::calculateFontPointSizeF(const QString& text, const QSi
         }
 
     }
+    if(richText) {
+        delete textDoc;
+    }
     return f.pointSizeF();
 }
 
@@ -212,7 +221,11 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
 
     if(linecnt > 1) {
         QStringList lines = text.split("\n");
-        qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            qSort(lines.begin(), lines.end(), FontScalingWidget::longerThan);
+#else
+            std::sort(lines.begin(), lines.end(), FontScalingWidget::longerThan );
+#endif
         qslisttoc(lines);
         longestLine = lines.first();
         txtHeight = fm.lineSpacing() * linecnt;
@@ -255,14 +268,14 @@ double FontScalingWidget::calculateVertFontPointSizeF(const QString& text, const
 
         // check if width does not go outside
         QFontMetricsF tmpFm(f);
-        txtWidth = tmpFm.width(longestLine);
+        txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
         while((txtWidth > borderH2) && f.pointSizeF() > MIN_FONT_SIZE) {
             if(f.pointSizeF() <= 0.0) f.setPointSizeF(1.0);
             f.setPointSizeF(f.pointSizeF() - 0.5);
             //printf(" \e[1;36m -- next DECREASING font size \"%s\" :text \"%s\" width %.1f height %.1f - point size %.2f - w: %.2f\e[0m\n",
             //         qasc(d_widget->objectName()), qasc(text),  txtWidth, txtHeight, f.pointSizeF(), borderW2);
             QFontMetricsF tmpFm(f);
-            txtWidth = tmpFm.width(longestLine);
+            txtWidth = QMETRIC_QT456_FONT_WIDTH(tmpFm,longestLine);
             //txtHeight = linecnt * tmpFm.lineSpacing();
         }
 

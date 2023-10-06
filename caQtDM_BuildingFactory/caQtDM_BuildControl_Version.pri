@@ -1,5 +1,4 @@
-
-CAQTDM_VERSION = V4.3.1
+CAQTDM_VERSION = V4.4.1
 
 
 exists($$CAQTDM_TOP/.git) {
@@ -37,7 +36,7 @@ message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
-TARGET_COPYRIGHT = "Copyright (C) 2020 Paul Scherrer Institut"
+TARGET_COPYRIGHT = "Copyright (C) 2022 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
 RETURN=$$escape_expand(\\n\\t)
@@ -52,6 +51,10 @@ unix {
     QMAKE_CXXFLAGS += "-g"
     QMAKE_CFLAGS_RELEASE += "-g"
 }
+
+
+# Set the overall Deployment Target for MACOSX
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 12.0
 
 # at psi the designer in 4.8.2 is patched in order to display tooltip description (not a nice test, but for now ok)
 # when the qt version is higher then 5.5.0 then we can also compile the plugins with description texts
@@ -122,11 +125,16 @@ unix:!macx:{
 # undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer
-
-CONFIG += epics7
-epics7 {
-   message( "Configuring build for epics4 plugin with epics7" )
-   CONFIG += epics4
+exists($(EPICSINCLUDE)/pv/pvAccess.h) {
+    #a special thing for PSI build
+    eval($$(EPICS_HOST_ARCH)=RHEL7-x86_64){
+        CONFIG += CAQTDM_PSI_SPECIAL_EPICS7_C11
+    }
+    CONFIG += epics7
+    epics7 {
+       message( "Configuring build for epics4 plugin with epics7" )
+       CONFIG += epics4
+    }
 }
 
 _CAQTDM_MODBUS = $$(CAQTDM_MODBUS)
@@ -134,7 +142,7 @@ isEmpty(_CAQTDM_MODBUS) {
 message("Modbus Plugin will not be build")
 }
 else {
-    contains(QT_VER_MAJ, 5) {
+    greaterThan(QT_VER_MAJ, 4) {
         unix:!macx:!ios:!android  {
             packagesExist(serialbus){
                 CONFIG += modbus
@@ -153,7 +161,7 @@ isEmpty(_CAQTDM_GPS) {
 message("GPS Plugin will not be build")
 }
 else {
-    contains(QT_VER_MAJ, 5) {
+    greaterThan(QT_VER_MAJ, 4) {
         unix:!macx:!ios:!android {
             packagesExist(positioning){
                 CONFIG += gps
@@ -296,7 +304,19 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
-# 4.3.1
+# 4.4.1
+# caQtDM can be compiled with Qt6
+# new signals for caCartesianplot
+# fix for caInclude with upscaling
+# fix for undefined macros to define a standard value in macro
+# fix for popup panels to get a panel without data monitors
+# fix for caLineEdit and caTextEntry to handle strings with Signal/Slot
+# fix for the start screen on some mobile iOS devices
+# cleanup of data plugin messages
+# fix for Qt6.4 compiler settings with EPICS4 header on Windows
+# fix the PV data selector in designer, missed environment
+
+# 4.4.0
 # fileopenwindow: options changes
 # fix for converted adl files
 # fix for higher python versions
@@ -308,6 +328,12 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # epics4plugin is now working with the epics 7 API and PVA can be used
 # filter feature for epics 7 is now available
 # caStripPlot: feature dynamic property "Legend" for rename the channel to a user defined
+# PV-Editor for Designer with network based auto completion
+# new commandline option [-savetoimage] to save screenshots as PNG files
+# added C entry points for python
+# new decoding functions for camera images (Mono8,Mono10p,Mono10packed,Mono12p,Mono12packed)
+# future use of compression for camera images (zLib+jpg)
+
 
 
 # 4.3.0

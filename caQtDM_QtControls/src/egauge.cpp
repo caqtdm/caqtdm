@@ -283,9 +283,12 @@ void EAbstractGauge::configure()
 #else
 		d_logarithmicScale ? representedValue  = exp10(val) : representedValue  = val;
 #endif
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         EngString engString(QString().sprintf(m_valueFormat.toLatin1(), representedValue), m_valueFormat, representedValue);
-// 		QString s = QString::number(representedValue);
+#else
+        EngString engString(QString().asprintf(m_valueFormat.toLatin1(), representedValue), m_valueFormat, representedValue);
+#endif
+        // 		QString s = QString::number(representedValue);
 		if ((longestLabelIndex == -1) || engString.length() > labels[longestLabelIndex].length())
 			longestLabelIndex = i;
 		labels << engString;

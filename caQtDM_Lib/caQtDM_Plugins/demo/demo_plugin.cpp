@@ -55,7 +55,7 @@ void DemoPlugin::updateInterface()
     // go through our devices
     foreach(int index, listOfIndexes) {
         knobData* kData = mutexknobdataP->GetMutexKnobDataPtr(index);
-        if((kData != (knobData *) 0) && (kData->index != -1)) {
+        if((kData != (knobData *) Q_NULLPTR) && (kData->index != -1)) {
             QString key = kData->pv;
 
             // find this pv in our internal double values list (assume for now we are only treating doubles)
@@ -157,13 +157,13 @@ int DemoPlugin::pvClearMonitor(knobData *kData) {
 int DemoPlugin::pvFreeAllocatedData(knobData *kData)
 {
     //qDebug() << "DemoPlugin:pvFreeAllocatedData";
-    if (kData->edata.info != (void *) 0) {
+    if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
-        kData->edata.info = (void*) 0;
+        kData->edata.info = (void*) Q_NULLPTR;
     }
-    if(kData->edata.dataB != (void*) 0) {
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
         free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
 
     return true;
