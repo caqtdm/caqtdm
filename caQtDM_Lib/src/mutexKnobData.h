@@ -124,5 +124,7 @@ private:
     bool blockProcess;
 
     UpdateType myUpdateType;
+
+    QMap<QString, QString> replaceUnitsMap;
 };
 #endif // MUTEXKNOBDATA_H

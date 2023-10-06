@@ -504,6 +504,13 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     this->ui.reloadAction->setEnabled(false);
     }
 
+    // Inform user about CAQTDM_REPLACE_UNITS replacements.
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+        QString replaceUnits = QString(qgetenv("CAQTDM_REPLACE_UNITS"));
+        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_REPLACE_UNITS\" is defined.")));
+        else messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_REPLACE_UNITS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_REPLACE_UNITS\" to replace characters within or whole units.")));
+    }
+
     // load the control plugins (must be done after setting the environment)
     loadPlugins loadplugins;
     if (!loadplugins.loadAll(interfaces, mutexKnobData, messageWindow, OptionList )) {
