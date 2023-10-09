@@ -125,6 +125,10 @@ private:
 
     UpdateType myUpdateType;
 
-    QMap<QString, QString> replaceUnitsMap;
+    bool doDefaultUnitReplacements;
+    QList<QPair<QString,QString>> createUnitReplacementPairList(QStringList replaceUnitsList);
+    QList<QPair<QString,QString>> defaultReplaceUnitsPairList;
+    QList<QPair<QString,QString>> replaceUnitsPairList;
+    QStringList createUnitReplacementList();
 };
 #endif // MUTEXKNOBDATA_H
