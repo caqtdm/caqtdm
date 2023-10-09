@@ -78,7 +78,7 @@ MutexKnobData::MutexKnobData()
     doDefaultUnitReplacements = true;
     if (qgetenv("CAQTDM_DEFAULT_UNIT_REPLACEMENTS").toLower().replace("\"","") == "false") doDefaultUnitReplacements = false;
 
-// Create unit replacement strings
+    // Create unit replacement strings
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QString defaultReplaceUnitString = QString( "muA=0x00b5,0x0041;"
                                                "uA=0x00b5,0x0041;"
