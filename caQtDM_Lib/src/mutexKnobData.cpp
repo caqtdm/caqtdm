@@ -87,9 +87,9 @@ MutexKnobData::MutexKnobData()
                                                "?J=0x00b5,0x004A;"
                                                "uJ=0x00b5,0x004A");
 #else
-    // Degree char coming from epics (0x00b0)    |||||    is replaced with two characters, one being an alternative degree charachter (0x00ba), the other being an Â (0x00c2).
-    // Without this Â char the degree character  ⌄⌄⌄⌄⌄  cannot be displayed correctly, the Â itself is not displayed.
-    QString defaultReplaceUnitString = QString( "0x00b0=0x00c2,0x00ba;"
+    // Degree char coming from epics (0x00b0)    |||||    is replaced with two characters, one being the degree charachter itself (0x00b0), the other being an Â (0x00c2).
+    // Without this Â char the degree character  ⌄⌄⌄⌄⌄  cannot be displayed correctly, the Â itself is not displayed. We don't know why though.
+    QString defaultReplaceUnitString = QString( "0x00b0=0x00c2,0x00b0;"
                                                 "0x00b5=0x00ce,0x00bc;"
                                                 "muA=0x00ce,0x00bc,0x0041;"
                                                 "uA=0x00ce,0x00bc,0x0041;"
