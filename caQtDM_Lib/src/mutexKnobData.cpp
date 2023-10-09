@@ -98,7 +98,7 @@ MutexKnobData::MutexKnobData()
                                                 "?J=0x00ce,0x00bc,0x004A;"
                                                 "uJ=0x00ce,0x00bc,0x004A");
 #endif
-    // Convert the values from CAQTDM_REPLACE_UNITS (from QString replaceUnits) in QStrings that can be inserted into a map to then easily replace all the strings.
+    // Convert the values from CAQTDM_CUSTOM_UNIT_REPLACEMENTS (from QString replaceUnits) in QStrings that can be inserted into a map to then easily replace all the strings.
     QStringList replaceUnitsList = createUnitReplacementList();
 
     // Initialize QMaps for default unit replacement and user defined unit replacement.
@@ -124,23 +124,22 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
     QList<QPair<QString, QString> > replaceUnitsPairList;
     if (replaceUnitsList.length() > 0) 
     {   
-	QStringList::iterator replaceUnitsListIterator;
-        for (replaceUnitsListIterator = replaceUnitsList.begin();replaceUnitsListIterator < replaceUnitsList.end(); replaceUnitsListIterator++){
+        QStringList::iterator replaceUnitsListIterator;
+        for (replaceUnitsListIterator = replaceUnitsList.begin(); replaceUnitsListIterator < replaceUnitsList.end(); ++replaceUnitsListIterator){
             QStringList unitHalfs = replaceUnitsListIterator->split("=");
-            if (unitHalfs.length()%2!=0){
-                continue;
-            }
+            if (unitHalfs.length()%2!=0) continue;
+
             QStringList unitKeyParts = unitHalfs[0].split(",");
             QStringList unitValueParts = unitHalfs[1].split(",");
             QString unitKey = "";
             QString unitValue = "";
-	    QStringList::iterator unitPartsIterator;
-	    for (unitPartsIterator = unitKeyParts.begin();unitPartsIterator < unitKeyParts.end();unitPartsIterator++) {
+            QStringList::iterator unitPartsIterator;
+            for (unitPartsIterator = unitKeyParts.begin(); unitPartsIterator < unitKeyParts.end(); ++unitPartsIterator) {
                 bool hexOk = true;
                 bool decOk = true;
                 quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
                 quint16 parsedValueDez = unitPartsIterator->toInt(&decOk, 10);
-                if (hexOk && unitPartsIterator->startsWith("0x")){
+                if (hexOk && unitPartsIterator->toLower().startsWith("0x")){
                     unitKey += QString(parsedValueHex);
                 } else if (decOk) {
                     unitKey += QString(parsedValueDez);
@@ -149,12 +148,12 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
                     unitKey += QString(*unitPartsIterator);
                 }
             }
-            for (unitPartsIterator = unitValueParts.begin();unitPartsIterator < unitValueParts.end();unitPartsIterator++) {
+            for (unitPartsIterator = unitValueParts.begin(); unitPartsIterator < unitValueParts.end(); ++unitPartsIterator) {
                 bool hexOk = true;
                 bool decOk = true;
                 quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
                 quint16 parsedValueDez = unitPartsIterator->toInt(&decOk, 10);
-                if (hexOk && unitPartsIterator->startsWith("0x")){
+                if (hexOk && unitPartsIterator->toLower().startsWith("0x")){
                     unitValue += QString(parsedValueHex);
                 } else if (decOk) {
                     unitValue += QString(parsedValueDez);
@@ -872,13 +871,13 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
         if (doDefaultUnitReplacements){
             // replace default QStrings
-            for (i = defaultReplaceUnitsPairList.begin(); i != defaultReplaceUnitsPairList.end(); ++i){
+            for (i = defaultReplaceUnitsPairList.begin(); i < defaultReplaceUnitsPairList.end(); ++i){
                 StringUnits.replace(i->first, i->second);
             }
         }
 
         // replace QStrings defined in CAQTDM_REPLACE_UNITS
-        for (i = replaceUnitsPairList.begin(); i != replaceUnitsPairList.end(); ++i){
+        for (i = replaceUnitsPairList.begin(); i < replaceUnitsPairList.end(); ++i){
             StringUnits.replace(i->first, i->second);
         }
 
@@ -887,7 +886,6 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
     // send data to main thread
     emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
 }
-//*********************************************************************************************************************
 void MutexKnobData::UpdateTextLine(char *message, char *name)
 {
     QString String = QString::fromLatin1(message);
