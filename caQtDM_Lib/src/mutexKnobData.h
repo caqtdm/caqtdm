@@ -41,6 +41,7 @@
 #include <QObject>
 #include <QVector>
 #include <QMap>
+#include <QPair>
 #include <QWaitCondition>
 #include "knobData.h"
 #include "mutexKnobDataWrapper.h"
@@ -126,9 +127,9 @@ private:
     UpdateType myUpdateType;
 
     bool doDefaultUnitReplacements;
-    QList<QPair<QString,QString>> createUnitReplacementPairList(QStringList replaceUnitsList);
-    QList<QPair<QString,QString>> defaultReplaceUnitsPairList;
-    QList<QPair<QString,QString>> replaceUnitsPairList;
+    QList<QPair<QString,QString> > createUnitReplacementPairList(QStringList replaceUnitsList);
+    QList<QPair<QString,QString> > defaultReplaceUnitsPairList;
+    QList<QPair<QString,QString> > replaceUnitsPairList;
     QStringList createUnitReplacementList();
 };
 #endif // MUTEXKNOBDATA_H

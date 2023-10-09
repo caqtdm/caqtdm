@@ -509,9 +509,9 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     bool doDefaultUnitReplacements = !(qgetenv("CAQTDM_DEFAULT_UNIT_REPLACEMENTS").toLower().replace("\"","") == "false");
         if (doDefaultUnitReplacements)  messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Default unit replacements are taking place, you can disable them by setting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" to false.")));
         else messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Default unit replacements are disabled by user, you can enable them by unsetting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" or setting it to true.")));
-        QString replaceUnits = QString(qgetenv("CAQTDM_REPLACE_UNITS"));
-        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_REPLACE_UNITS\" is defined.")));
-        else messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_REPLACE_UNITS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_REPLACE_UNITS\" to replace characters within or whole units.")));
+        QString replaceUnits = QString(qgetenv("CAQTDM_CUSTOM_UNIT_REPLACEMENTS"));
+        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is defined.")));
+        else messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" to replace characters within or whole units.")));
     }
 
     // load the control plugins (must be done after setting the environment)

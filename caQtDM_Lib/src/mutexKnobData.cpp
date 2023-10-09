@@ -32,6 +32,7 @@
 #include <QLineEdit>
 #include <QWidget>
 #include <QDebug>
+#include <QPair>
 #include "QtControls"
 
 /**
@@ -79,7 +80,7 @@ MutexKnobData::MutexKnobData()
 
 // Create unit replacement strings
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QString defaultReplaceUnitString =QString( "muA=0x00b5,0x0041;"
+    QString defaultReplaceUnitString = QString( "muA=0x00b5,0x0041;"
                                                "uA=0x00b5,0x0041;"
                                                "?A=0x00b5,0x0041;"
                                                "muJ=0x00b5,0x004A;"
@@ -112,18 +113,20 @@ MutexKnobData:: ~MutexKnobData()
 
 QStringList MutexKnobData::createUnitReplacementList()
 {
-    QString replaceUnits = (QString)  qgetenv("CAQTDM_REPLACE_UNITS");
+    QString replaceUnits = (QString)  qgetenv("CAQTDM_CUSTOM_UNIT_REPLACEMENTS");
     replaceUnits = replaceUnits.trimmed().remove("\"");
     QStringList replaceUnitsList = replaceUnits.split(";");
     return replaceUnitsList;
 }
 
-QList<QPair<QString, QString>> MutexKnobData::createUnitReplacementPairList(QStringList replaceUnitsList)
+QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QStringList replaceUnitsList)
 {
-    QList<QPair<QString, QString>> replaceUnitsPairList;
-    if (replaceUnitsList.length() > 0) {
-        for ( const QString& unit : replaceUnitsList ){
-            QStringList unitHalfs = unit.split("=");
+    QList<QPair<QString, QString> > replaceUnitsPairList;
+    if (replaceUnitsList.length() > 0) 
+    {   
+	QStringList::iterator replaceUnitsListIterator;
+        for (replaceUnitsListIterator = replaceUnitsList.begin();replaceUnitsListIterator < replaceUnitsList.end(); replaceUnitsListIterator++){
+            QStringList unitHalfs = replaceUnitsListIterator->split("=");
             if (unitHalfs.length()%2!=0){
                 continue;
             }
@@ -131,32 +134,33 @@ QList<QPair<QString, QString>> MutexKnobData::createUnitReplacementPairList(QStr
             QStringList unitValueParts = unitHalfs[1].split(",");
             QString unitKey = "";
             QString unitValue = "";
-            for (const auto& unitPart : unitKeyParts) {
+	    QStringList::iterator unitPartsIterator;
+	    for (unitPartsIterator = unitKeyParts.begin();unitPartsIterator < unitKeyParts.end();unitPartsIterator++) {
                 bool hexOk = true;
                 bool decOk = true;
-                const quint16 parsedValueHex = unitPart.toInt(&hexOk, 16);
-                const quint16 parsedValueDez = unitPart.toInt(&decOk, 10);
-                if (hexOk && unitPart.startsWith("0x")){
+                quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
+                quint16 parsedValueDez = unitPartsIterator->toInt(&decOk, 10);
+                if (hexOk && unitPartsIterator->startsWith("0x")){
                     unitKey += QString(parsedValueHex);
                 } else if (decOk) {
                     unitKey += QString(parsedValueDez);
                 } else {
-                    qDebug() << "Argument from CAQTDM_REPLACE_UNITS cannot be converted to UTF-8 Code, will be treated as string: " << QString(unitPart);
-                    unitKey += QString(unitPart);
+                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string: " << QString(*unitPartsIterator);
+                    unitKey += QString(*unitPartsIterator);
                 }
             }
-            for (const auto& unitPart : unitValueParts) {
+            for (unitPartsIterator = unitValueParts.begin();unitPartsIterator < unitValueParts.end();unitPartsIterator++) {
                 bool hexOk = true;
                 bool decOk = true;
-                const quint16 parsedValueHex = unitPart.toInt(&hexOk, 16);
-                const quint16 parsedValueDez = unitPart.toInt(&decOk, 10);
-                if (hexOk && unitPart.startsWith("0x")){
+                quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
+                quint16 parsedValueDez = unitPartsIterator->toInt(&decOk, 10);
+                if (hexOk && unitPartsIterator->startsWith("0x")){
                     unitValue += QString(parsedValueHex);
                 } else if (decOk) {
                     unitValue += QString(parsedValueDez);
                 } else {
-                    qDebug() << "Argument from CAQTDM_REPLACE_UNITS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(unitPart);
-                    unitValue += QString(unitPart);
+                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(*unitPartsIterator);
+                    unitValue += QString(*unitPartsIterator);
                 }
             }
             replaceUnitsPairList.append(QPair<QString, QString>(unitKey, unitValue));
@@ -864,7 +868,7 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
     QString StringUnits = QString::fromLatin1(units);
     if(StringUnits.size() > 0) {
         // iterator for both loops
-        QList<QPair<QString, QString>>::iterator i;
+        QList<QPair<QString, QString> >::iterator i;
 
         if (doDefaultUnitReplacements){
             // replace default QStrings
