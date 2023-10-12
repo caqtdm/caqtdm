@@ -1719,7 +1719,8 @@ bool FileOpenWindow::event(QEvent *e)
 {
     if (e->type() == QEvent::Show) {
         qDebug()<<"QEvent::Show!";
-        if (!debugWindow) this->showMinimized();
+        // Qt 6.5.2 ShowMinimized=crash in QWidget::event better solution = setVisible(false)
+        if (!debugWindow) this->setVisible(false);
     }
     return QWidget::event(e);
 }
