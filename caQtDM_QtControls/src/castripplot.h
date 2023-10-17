@@ -548,5 +548,7 @@ private:
     int thisXticks;
     float ResizeFactorX, ResizeFactorY;
     float oldResizeFactorX, oldResizeFactorY;
+
+    int YAxisIndex;
 };
 #endif

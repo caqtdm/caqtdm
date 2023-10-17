@@ -5690,11 +5690,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     stripplotWidget->setYaxisLimitsMin(actPlot, 0.0);
                     stripplotWidget->setYaxisLimitsMax(actPlot, 10.0);
                 }
-                if(actPlot == 0) {
-                    stripplotWidget->setYscale(stripplotWidget->getYaxisLimitsMin(0), stripplotWidget->getYaxisLimitsMax(0));
-                }
                 // do this for redisplaying legend with correct limits
-
                 stripplotWidget->resize(stripplotWidget->geometry().width()+1, stripplotWidget->geometry().height());
                 stripplotWidget->resize(stripplotWidget->geometry().width()-1, stripplotWidget->geometry().height());
             }

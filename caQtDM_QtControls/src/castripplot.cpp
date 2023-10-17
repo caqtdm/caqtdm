@@ -168,6 +168,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     ResizeFactorX = ResizeFactorY = 1.0;
     oldResizeFactorX = oldResizeFactorY = 1.0;
     thisYaxisType = linear;
+    YAxisIndex = 0;
 
 #ifdef QWT_USE_OPENGL
     printf("caStripplot uses opengl ?\n");
@@ -638,7 +639,6 @@ void caStripPlot::TimeOutThread()
 
     // shift data back
     if(dataCount > 1) {
-
         // shift data and our timebase for the fixed scale
         if(thisXaxisType == ValueScale) {
             for (c = 0; c < NumberOfCurves; c++ ) {
@@ -967,13 +967,16 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
 
     // in case of fixed scales, remap the data to the first curve
     if(thisYaxisScaling == fixedScale) {
-        double y0min = thisYaxisLimitsMin[0];
-        double y0max = thisYaxisLimitsMax[0];
+        double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
+        double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
         double ymin =  thisYaxisLimitsMin[curvIndex];
         double ymax =  thisYaxisLimitsMax[curvIndex];
         actVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin) + y0min;
         minVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin) + y0min;
         maxVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin) + y0min;
+
+        setYscale(getYaxisLimitsMin(YAxisIndex),getYaxisLimitsMax(YAxisIndex));
+
         // otherwise keep the data
     } else {
         actVal[curvIndex] = realVal[curvIndex];
@@ -1184,15 +1187,61 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
         int nButton = ((QMouseEvent*) event)->button();
+        if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1) {
+            int oldYAxisIndex = YAxisIndex;
+            YAxisIndex += 1;
+            if (YAxisIndex > (NumberOfCurves-1)) YAxisIndex = 0;
+            if (getYaxisLimitsMin(YAxisIndex) == getYaxisLimitsMin(oldYAxisIndex) && getYaxisLimitsMax(YAxisIndex) == getYaxisLimitsMax(oldYAxisIndex)) return true;
+            setYscale(getYaxisLimitsMin(YAxisIndex), getYaxisLimitsMax(YAxisIndex));
+            for (quint16 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++) {
+                mutex.lock();
+                qDebug() << "new curve: " << curvIndex;
+                double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
+                double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
+                double ymin =  thisYaxisLimitsMin[curvIndex];
+                double ymax =  thisYaxisLimitsMax[curvIndex];
+                actVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin)) + y0min;
+                minVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin)) + y0min;
+                maxVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin)) + y0min;
+                for (quint16 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].value != 0; j++){
+                    double arg1 = rangeData[curvIndex][j].interval.minValue();
+                    double arg2 = rangeData[curvIndex][j].interval.maxValue();
+                    double arg3 = fillData[curvIndex][j].y();
+                    qDebug() << "time: " << rangeData[curvIndex][j].value;
+                    qDebug() << "curve: " << curvIndex << ", j: " << j << " , before : " << rangeData[curvIndex][j].interval;
+                    if (YAxisIndex-1 >= 0){
+                        rangeData[curvIndex][j].interval.setInterval(((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg1 - thisYaxisLimitsMin[int(YAxisIndex-1)]) / (thisYaxisLimitsMax[int(YAxisIndex-1)] - thisYaxisLimitsMin[int(YAxisIndex-1)])) + thisYaxisLimitsMin[int(YAxisIndex)], ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg2 - thisYaxisLimitsMin[int(YAxisIndex-1)]) / (thisYaxisLimitsMax[int(YAxisIndex-1)] - thisYaxisLimitsMin[int(YAxisIndex-1)])) + thisYaxisLimitsMin[int(YAxisIndex)]);
+                        if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg3 - thisYaxisLimitsMin[int(YAxisIndex-1)]) / (thisYaxisLimitsMax[int(YAxisIndex-1)] - thisYaxisLimitsMin[int(YAxisIndex-1)])) + thisYaxisLimitsMin[int(YAxisIndex)]);
+                    }
+                    else {
+                        rangeData[curvIndex][j].interval.setInterval(((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg1 - thisYaxisLimitsMin[int(NumberOfCurves-1)]) / (thisYaxisLimitsMax[int(NumberOfCurves-1)] - thisYaxisLimitsMin[int(NumberOfCurves-1)])) + thisYaxisLimitsMin[int(YAxisIndex)], ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg2 - thisYaxisLimitsMin[int(NumberOfCurves-1)]) / (thisYaxisLimitsMax[int(NumberOfCurves-1)] - thisYaxisLimitsMin[int(NumberOfCurves-1)])) + thisYaxisLimitsMin[int(YAxisIndex)]);
+                        if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg3 - thisYaxisLimitsMin[int(NumberOfCurves-1)]) / (thisYaxisLimitsMax[int(NumberOfCurves-1)] - thisYaxisLimitsMin[int(NumberOfCurves-1)])) + thisYaxisLimitsMin[int(YAxisIndex)]);
+                    }
+                    qDebug() << "after: " << rangeData[curvIndex][j].interval;
+                }
+                // set the data to the curves
+                if(thisStyle[curvIndex] == FillUnder) {
+                    fillcurve[curvIndex]->setSamplesList(fillData[curvIndex]);
+                    fillcurve[curvIndex]->setSamples(fillData[curvIndex]);
+                }
+                errorcurve[curvIndex]->setSamplesList(rangeData[curvIndex]);
+                errorcurve[curvIndex]->setSamples(rangeData[curvIndex]);
+
+                mutex.unlock();
+            }
+            replot();
+            return true;
+        }
         if(nButton==2) {
             //printf("emit from %s\n", qasc(this->objectName()));
             QPoint p;
             emit ShowContextMenu(p);
+            return true;
         }
     } else if(event->type() == QEvent::Show) {
+        //hoi
     }
     return QObject::eventFilter(obj, event);
 }
 
 #include "moc_castripplot.cpp"
-
