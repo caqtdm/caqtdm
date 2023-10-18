@@ -465,6 +465,7 @@ signals:
 private slots:
      void TimeOut();
      void TimeOutThread();
+     void onSelected(const QPointF& point);
 
 private:
     int HISTORY;
@@ -483,6 +484,7 @@ private:
     void RescaleCurves(int width, units unit, double period);
     void RescaleAxis();
     void TimersStart();
+    void selectYAxis(quint16 newYAxisIndex);
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];
@@ -535,7 +537,7 @@ private:
     double realVal[MAXCURVES], realMax[MAXCURVES], realMin[MAXCURVES];
     struct timeb realTim[MAXCURVES];
 
-    QStringList savedTitres;
+    QStringList savedTitles;
     QString legendText(int i);
 
     stripplotthread *timerThread;
@@ -549,6 +551,8 @@ private:
     float ResizeFactorX, ResizeFactorY;
     float oldResizeFactorX, oldResizeFactorY;
 
-    int YAxisIndex;
+    quint8 YAxisIndex;
+    float xAxisToleranceFactor;
+    bool propertyConversionOk;
 };
 #endif
