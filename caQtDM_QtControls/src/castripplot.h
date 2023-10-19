@@ -484,7 +484,7 @@ private:
     void RescaleCurves(int width, units unit, double period);
     void RescaleAxis();
     void TimersStart();
-    void selectYAxis(quint16 newYAxisIndex);
+    void selectYAxis(quint8 newYAxisIndex);
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];

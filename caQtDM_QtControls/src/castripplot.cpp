@@ -273,27 +273,26 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     QwtPlotPicker* plotPicker = new QwtPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
     QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
     plotPicker->setStateMachine(pickerMachine);
+    plotPicker->setTrackerMode(QwtPicker::AlwaysOff);
     connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 }
 
 void caStripPlot::onSelected(const QPointF& point)
 {
     const double scaledTolerance = (thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)]) * 0.01;
-    double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
+    const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
-    int lIndex = -1;
+    qint8 lIndex = -1;
 
     // get nearest curve point by iterating over plot items, filtering for curves and calculating minimum distance
-    qDebug() << "point: " << point;
     for(int curvIndex=0; curvIndex < NumberOfCurves; curvIndex++) {
         if(curve[curvIndex]->isVisible() == false){
-            qDebug() << "continuing";
             continue;
         }
         double lCurveDist = 100000000000;
         double lTmpDist;
         // loop over all samples, could be more clever by only looking at sample at x position
-        for (quint16 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++) {
+        for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++) {
             if (rangeData[curvIndex][j].value > (point.x() + xAxisTolerance) || rangeData[curvIndex][j].value < (point.x() - xAxisTolerance)) {
                 continue;
             }
@@ -307,42 +306,46 @@ void caStripPlot::onSelected(const QPointF& point)
             lIndex = curvIndex;
         }
     }
-    qDebug() << "lDist:" << lDist;
-    qDebug() << "lIndex" << lIndex;
     // check if mouse position is within tolerance
     if ( lDist > scaledTolerance || lIndex == -1) return;
-    qDebug() << "calling func" << lIndex;
     selectYAxis(lIndex);
 }
 
 /*  Select the Y-axis which is to be used for the whole Plot. Argument is given by the index of the curve whose axis is to be used.
  *  This Function converts all existing values for the new scale and sets YAxisIndex so new Values will be recalculated accordingly.
  * */
-void caStripPlot::selectYAxis(quint16 newYAxisIndex){
+void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     // If values are identical, nothing has to be done
-    quint8 oldYAxisIndex = YAxisIndex;
     YAxisIndex = newYAxisIndex;
     if (YAxisIndex > (NumberOfCurves-1)) YAxisIndex = 0;
-    if (getYaxisLimitsMin(YAxisIndex) == getYaxisLimitsMin(oldYAxisIndex) && getYaxisLimitsMax(YAxisIndex) == getYaxisLimitsMax(oldYAxisIndex)) return;
 
+    mutex.lock();
+    const double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
+    const double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
+    if (getYaxisLimitsMin(YAxisIndex) == oldYAxisMin && getYaxisLimitsMax(YAxisIndex) == oldYAxisMax){
+        mutex.unlock();
+        return;
+    }
     setYscale(getYaxisLimitsMin(YAxisIndex), getYaxisLimitsMax(YAxisIndex));
-    for (quint16 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++) {
-        double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
-        double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
-        double ymin =  thisYaxisLimitsMin[curvIndex];
-        double ymax =  thisYaxisLimitsMax[curvIndex];
+    mutex.unlock();
+
+    for (quint8 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++) {
+        const double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
+        const double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
+        const double ymin =  thisYaxisLimitsMin[curvIndex];
+        const double ymax =  thisYaxisLimitsMax[curvIndex];
         actVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin)) + y0min;
         minVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin)) + y0min;
         maxVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin)) + y0min;
 
         // Update all values that are plotted right now
         mutex.lock();
-        for (quint16 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
-            double arg1 = rangeData[curvIndex][j].interval.minValue();
-            double arg2 = rangeData[curvIndex][j].interval.maxValue();
-            double arg3 = fillData[curvIndex][j].y();
-            rangeData[curvIndex][j].interval.setInterval(((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg1 - thisYaxisLimitsMin[int(oldYAxisIndex)]) / (thisYaxisLimitsMax[int(oldYAxisIndex)] - thisYaxisLimitsMin[int(oldYAxisIndex)])) + thisYaxisLimitsMin[int(YAxisIndex)], ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg2 - thisYaxisLimitsMin[int(oldYAxisIndex)]) / (thisYaxisLimitsMax[int(oldYAxisIndex)] - thisYaxisLimitsMin[int(oldYAxisIndex)])) + thisYaxisLimitsMin[int(YAxisIndex)]);
-            if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg3 - thisYaxisLimitsMin[int(oldYAxisIndex)]) / (thisYaxisLimitsMax[int(oldYAxisIndex)] - thisYaxisLimitsMin[int(oldYAxisIndex)])) + thisYaxisLimitsMin[int(YAxisIndex)]);
+        for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
+            const double arg1 = rangeData[curvIndex][j].interval.minValue();
+            const double arg2 = rangeData[curvIndex][j].interval.maxValue();
+            const double arg3 = fillData[curvIndex][j].y();
+            rangeData[curvIndex][j].interval.setInterval(((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg1 - oldYAxisMin) / (oldYAxisMax - oldYAxisMin)) + thisYaxisLimitsMin[int(YAxisIndex)], ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg2 - oldYAxisMin) / (oldYAxisMax - oldYAxisMin)) + thisYaxisLimitsMin[int(YAxisIndex)]);
+            if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg3 - oldYAxisMin) / (oldYAxisMax - oldYAxisMin)) + thisYaxisLimitsMin[int(YAxisIndex)]);
         }
         mutex.unlock();
 
@@ -1283,13 +1286,13 @@ void caStripPlot::ReplaceTrailingZerosByBlancs(char *asc)
 bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
-        int nButton = ((QMouseEvent*) event)->button();
+        const quint8 nButton = ((QMouseEvent*) event)->button();
         if (nButton == 1 && thisYaxisScaling == fixedScale && thisYaxisType == linear && NumberOfCurves > 1) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate an event for the castripplot.
             // Canvas events are ignored, because clicks on there are handled by the qwt plotpicker to select the clicked curve --> They are not for just iterating.
             if (obj->objectName() == "QwtPlotCanvas") return true;
-            selectYAxis(YAxisIndex+1);
-
+            const quint8 newYAxisIndex = YAxisIndex+1;
+            selectYAxis(newYAxisIndex);
             return true;
         }
         if(nButton==2) {
