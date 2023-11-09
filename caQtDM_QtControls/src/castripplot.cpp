@@ -235,6 +235,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     oldResizeFactorX = oldResizeFactorY = 1.0;
     thisYaxisType = linear;
     YAxisIndex = 0;
+    plotIsPaused = false;
 
     setProperty("xAxisToleranceFactor", 0.01);
 
@@ -341,6 +342,60 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 }
 
+
+/* Slot to stop the plot in its current state, e.g by a Button or Checkbox.
+ * Can be used to analyze the curves.
+ * */
+void caStripPlot::stopPlot(){
+    plotIsPaused = true;
+}
+
+/* Slot to restart  the plot, e.g by a Button or Checkbox.
+ * Can be used to restart the plot e.g after having it stopped.
+ * */
+void caStripPlot::restartPlot()
+{
+    plotIsPaused = false;
+    for(int i=0; i < MAXCURVES; i++) {
+        // reset interval data for error and fill curves
+        rangeData[i].clear();
+        rangeData[i].reserve(MAXIMUMSIZE+5);
+        fillData[i].clear();
+        fillData[i].reserve(MAXIMUMSIZE+5);
+        if(i==0)  {
+            base.clear();
+            base.reserve(MAXIMUMSIZE+5);
+        }
+        for ( int j = 0; j <  MAXIMUMSIZE; j++ ) {
+            rangeData[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
+            fillData[i].append(QPointF(NAN,NAN));
+            if(i==0) base.append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
+        }
+    }
+    // set the data to the curves
+    for(int i=0; i < NumberOfCurves; i++) {
+        if(thisStyle[i] == FillUnder) {
+            fillcurve[i]->setSamplesList(fillData[i]);
+            fillcurve[i]->setSamples(fillData[i]);
+        }
+        errorcurve[i]->setSamplesList(rangeData[i]);
+        errorcurve[i]->setSamples(rangeData[i]);
+    }
+    replot();
+}
+
+/* Slot to pause or resume the plot, e.g by a Button or Checkbox.
+ * Can be used to pause the plot in its current state or resume it with the data of the past Interval
+ * The difference to stopping and restarting the plot is that the plot is not cleared after resuming, but drawn past record-time.
+ * */
+void caStripPlot::pausePlot(bool pausePlot)
+{
+    pausePlot ? plotIsPaused = true : plotIsPaused = false;
+}
+
+/* Slot to handle clicks within the curve-canvas.
+ * Is used to decide wether a specific curve was clicked and changes the displayed Y-axis accordingly to show the corresponding axis.
+ * */
 void caStripPlot::onSelected(const QPointF& point)
 {
     if (thisYaxisScaling != fixedScale) return;
@@ -885,6 +940,8 @@ void caStripPlot::TimeOutThread()
 // display the curves
 void caStripPlot::TimeOut()
 {
+    if (plotIsPaused) return;
+
     int nbTicks;
     double elapsedTime = 0.0;
 

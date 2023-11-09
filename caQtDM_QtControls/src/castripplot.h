@@ -456,6 +456,12 @@ public slots:
 #include "hideobjectcode.h"
     }
 
+    void stopPlot();
+
+    void restartPlot();
+
+    void pausePlot(bool pausePlot);
+
 protected:
     void resizeEvent ( QResizeEvent * event);
 
@@ -479,6 +485,7 @@ private:
     struct timeb  timeStart;
     struct timeb plotStart;
     bool RestartPlot1, RestartPlot2;
+    bool plotIsPaused;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void setXaxis(double interval, double period);
