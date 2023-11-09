@@ -210,6 +210,8 @@ public:
     void setXticks( int nb ) {thisXticks = nb; defineXaxis(thisUnits, thisPeriod);}
     int getXticks() {return thisXticks;}
 
+    bool setDataFirstCall = true;
+
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
 

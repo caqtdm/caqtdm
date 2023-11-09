@@ -142,6 +142,70 @@ private:
     int nbTicks;
 };
 
+/* Class for creating a ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
+ * have the correct spacing after the conversion odne by the (Unit)ScaleDraw.
+ * */
+class QwtUnitScaleEngine: public QwtLinearScaleEngine {
+
+public:
+    QwtUnitScaleEngine(double ConversionFactor = 1.0) : QwtLinearScaleEngine(10), _ConversionFactor(ConversionFactor) {
+    }
+
+    QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
+        x1 *= _ConversionFactor;
+        x2 *= _ConversionFactor;
+        stepSize *= _ConversionFactor;
+
+        QwtScaleDiv Div = QwtLinearScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
+
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+
+        Ticks[QwtScaleDiv::MajorTick] = Div.ticks(QwtScaleDiv::MajorTick);
+        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MajorTick].count(); i++) {
+            Ticks[QwtScaleDiv::MajorTick][i] /= _ConversionFactor;
+        }
+        Ticks[QwtScaleDiv::MediumTick] = Div.ticks(QwtScaleDiv::MediumTick);
+        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MediumTick].count(); i++) {
+            Ticks[QwtScaleDiv::MediumTick][i] /= _ConversionFactor;
+        }
+        Ticks[QwtScaleDiv::MinorTick] = Div.ticks(QwtScaleDiv::MinorTick);
+        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MinorTick].count(); i++) {
+            Ticks[QwtScaleDiv::MinorTick][i] /= _ConversionFactor;
+        }
+        return QwtScaleDiv(QwtInterval(x1 / _ConversionFactor, x2 / _ConversionFactor), Ticks);
+    }
+protected:
+    double _ConversionFactor;
+};
+
+/* Class for creating a ScaleDraw that modifies the value by a given factor and offset,
+ * to show different Scales, than the one currently drawn. Doesn't modify the actuals curves.
+ * */
+class QwtUnitScaleDraw: public QwtScaleDraw
+{
+public:
+
+    QwtUnitScaleDraw(double ConversionFactor = 1, double ConversionOffset = 0): QwtScaleDraw(), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset)
+    {
+    }
+
+    void setConversion(double ConversionFactor = 1, double ConversionOffset = 0)
+    {
+        _ConversionFactor = ConversionFactor;
+        _ConversionOffset = ConversionOffset;
+    }
+
+    virtual QwtText label(double v) const
+    {
+        double newLabel = (v * _ConversionFactor)+_ConversionOffset;
+        return QwtScaleDraw::label(newLabel);
+    }
+
+private:
+    double _ConversionFactor;
+    double _ConversionOffset;
+};
+
 caStripPlot::~caStripPlot() {
 
     emit timerThreadStop();
@@ -279,6 +343,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 
 void caStripPlot::onSelected(const QPointF& point)
 {
+    if (thisYaxisScaling != fixedScale) return;
     const double scaledTolerance = (thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)]) * 0.01;
     const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
@@ -309,56 +374,27 @@ void caStripPlot::onSelected(const QPointF& point)
     // check if mouse position is within tolerance
     if ( lDist > scaledTolerance || lIndex == -1) return;
     selectYAxis(lIndex);
+    return;
 }
 
 /*  Select the Y-axis which is to be used for the whole Plot. Argument is given by the index of the curve whose axis is to be used.
  *  This Function converts all existing values for the new scale and sets YAxisIndex so new Values will be recalculated accordingly.
  * */
 void caStripPlot::selectYAxis(quint8 newYAxisIndex){
-    // If values are identical, nothing has to be done
+
     YAxisIndex = newYAxisIndex;
     if (YAxisIndex > (NumberOfCurves-1)) YAxisIndex = 0;
 
-    mutex.lock();
     const double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
     const double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
-    if (getYaxisLimitsMin(YAxisIndex) == oldYAxisMin && getYaxisLimitsMax(YAxisIndex) == oldYAxisMax){
-        mutex.unlock();
-        return;
-    }
-    setYscale(getYaxisLimitsMin(YAxisIndex), getYaxisLimitsMax(YAxisIndex));
-    mutex.unlock();
 
-    for (quint8 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++) {
-        const double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
-        const double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
-        const double ymin =  thisYaxisLimitsMin[curvIndex];
-        const double ymax =  thisYaxisLimitsMax[curvIndex];
-        actVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin)) + y0min;
-        minVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin)) + y0min;
-        maxVal[curvIndex] = ((y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin)) + y0min;
+    const double conversionFactor = -((thisYaxisLimitsMax[YAxisIndex] - thisYaxisLimitsMin[YAxisIndex])/(oldYAxisMin - oldYAxisMax));
+    const double conversionOffset = (thisYaxisLimitsMin[YAxisIndex] * oldYAxisMax - thisYaxisLimitsMax[YAxisIndex] * oldYAxisMin) / (oldYAxisMax - oldYAxisMin);
 
-        // Update all values that are plotted right now
-        mutex.lock();
-        for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
-            const double arg1 = rangeData[curvIndex][j].interval.minValue();
-            const double arg2 = rangeData[curvIndex][j].interval.maxValue();
-            const double arg3 = fillData[curvIndex][j].y();
-            rangeData[curvIndex][j].interval.setInterval(((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg1 - oldYAxisMin) / (oldYAxisMax - oldYAxisMin)) + thisYaxisLimitsMin[int(YAxisIndex)], ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg2 - oldYAxisMin) / (oldYAxisMax - oldYAxisMin)) + thisYaxisLimitsMin[int(YAxisIndex)]);
-            if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), ((thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)])*(arg3 - oldYAxisMin) / (oldYAxisMax - oldYAxisMin)) + thisYaxisLimitsMin[int(YAxisIndex)]);
-        }
-        mutex.unlock();
+    static_cast<QwtUnitScaleDraw*>(axisScaleDraw(yLeft))->setConversion(conversionFactor, conversionOffset);
+    setAxisScaleEngine(yLeft, new QwtUnitScaleEngine(conversionFactor));
 
-        // Set the data to the curves
-        if(thisStyle[curvIndex] == FillUnder) {
-            fillcurve[curvIndex]->setSamplesList(fillData[curvIndex]);
-            fillcurve[curvIndex]->setSamples(fillData[curvIndex]);
-        }
-        errorcurve[curvIndex]->setSamplesList(rangeData[curvIndex]);
-        errorcurve[curvIndex]->setSamples(rangeData[curvIndex]);
-    }
     replot();
-    return;
 }
 
 void caStripPlot::defineXaxis(units unit, double period)
@@ -424,7 +460,8 @@ void caStripPlot::setYaxisType(yAxisType s)
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
 #endif
     } else {
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+        setAxisScaleDraw(QwtPlot::yLeft, new QwtUnitScaleDraw());
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtUnitScaleEngine());
     }
 
     replot();
@@ -653,7 +690,6 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
 
     // Set xAxisToleranceFactor, because object is now fully constructed.
     xAxisToleranceFactor = this->property("xAxisToleranceFactor").toFloat(&propertyConversionOk);
-    qDebug() << xAxisToleranceFactor;
     if (!propertyConversionOk || 0 <! xAxisToleranceFactor || xAxisToleranceFactor <=! 1){
         qDebug().nospace() << "The Dynamic Property xAxisToleranceFactor is either not set or set incorrectly (not between 0 and 1) and will be replaced by default value 0.01 for Object: " << this->objectName();
         xAxisToleranceFactor = 0.01;
@@ -878,6 +914,10 @@ void caStripPlot::TimeOut()
             }
             setAxisScaleDraw (QwtPlot::xBottom, new TimeScaleDraw (timeNow));
         }
+        if(thisYaxisType == linear){
+            setAxisScaleEngine(yLeft, new QwtUnitScaleEngine());
+            setAxisScaleDraw(yLeft, new QwtUnitScaleDraw());
+        }
     }
 
     // get actual time
@@ -1067,15 +1107,22 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
 
     // in case of fixed scales, remap the data to the first curve
     if(thisYaxisScaling == fixedScale) {
-        double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
-        double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
+        double y0min = thisYaxisLimitsMin[0];
+        double y0max = thisYaxisLimitsMax[0];
+        //double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
+        //double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
         double ymin =  thisYaxisLimitsMin[curvIndex];
         double ymax =  thisYaxisLimitsMax[curvIndex];
         actVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin) + y0min;
         minVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin) + y0min;
         maxVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin) + y0min;
 
-        setYscale(getYaxisLimitsMin(YAxisIndex),getYaxisLimitsMax(YAxisIndex));
+        //setYscale(getYaxisLimitsMin(YAxisIndex),getYaxisLimitsMax(YAxisIndex));
+
+        if (setDataFirstCall){
+            setYscale(getYaxisLimitsMin(0),getYaxisLimitsMax(0));
+            setDataFirstCall = false;
+        }
 
         // otherwise keep the data
     } else {
