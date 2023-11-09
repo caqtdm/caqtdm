@@ -125,7 +125,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
     if (replaceUnitsList.length() > 0) 
     {   
         QStringList::iterator replaceUnitsListIterator;
-        for (replaceUnitsListIterator = replaceUnitsList.begin(); replaceUnitsListIterator < replaceUnitsList.end(); ++replaceUnitsListIterator){
+        for (replaceUnitsListIterator = replaceUnitsList.begin(); replaceUnitsListIterator != replaceUnitsList.end(); ++replaceUnitsListIterator){
             QStringList unitHalfs = replaceUnitsListIterator->split("=");
             if (unitHalfs.length()%2!=0) continue;
 
@@ -134,7 +134,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
             QString unitKey = "";
             QString unitValue = "";
             QStringList::iterator unitPartsIterator;
-            for (unitPartsIterator = unitKeyParts.begin(); unitPartsIterator < unitKeyParts.end(); ++unitPartsIterator) {
+            for (unitPartsIterator = unitKeyParts.begin(); unitPartsIterator != unitKeyParts.end(); ++unitPartsIterator) {
                 bool hexOk = true;
                 bool decOk = true;
                 quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
@@ -148,7 +148,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
                     unitKey += QString(*unitPartsIterator);
                 }
             }
-            for (unitPartsIterator = unitValueParts.begin(); unitPartsIterator < unitValueParts.end(); ++unitPartsIterator) {
+            for (unitPartsIterator = unitValueParts.begin(); unitPartsIterator != unitValueParts.end(); ++unitPartsIterator) {
                 bool hexOk = true;
                 bool decOk = true;
                 quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
@@ -871,13 +871,13 @@ void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, 
 
         if (doDefaultUnitReplacements){
             // replace default QStrings
-            for (i = defaultReplaceUnitsPairList.begin(); i < defaultReplaceUnitsPairList.end(); ++i){
+            for (i = defaultReplaceUnitsPairList.begin(); i != defaultReplaceUnitsPairList.end(); ++i){
                 StringUnits.replace(i->first, i->second);
             }
         }
 
         // replace QStrings defined in CAQTDM_REPLACE_UNITS
-        for (i = replaceUnitsPairList.begin(); i < replaceUnitsPairList.end(); ++i){
+        for (i = replaceUnitsPairList.begin(); i != replaceUnitsPairList.end(); ++i){
             StringUnits.replace(i->first, i->second);
         }
 
