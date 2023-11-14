@@ -148,34 +148,37 @@ private:
 class QwtUnitScaleEngine: public QwtLinearScaleEngine {
 
 public:
-    QwtUnitScaleEngine(double ConversionFactor = 1.0) : QwtLinearScaleEngine(10), _ConversionFactor(ConversionFactor) {
+    QwtUnitScaleEngine(double ConversionFactor = 1.0, double ConversionOffset = 0) : QwtLinearScaleEngine(10), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset) {
     }
 
     QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
-        x1 *= _ConversionFactor;
-        x2 *= _ConversionFactor;
+        x1 = (x1*_ConversionFactor)+_ConversionOffset;
+        x2 = (x2*_ConversionFactor)+_ConversionOffset;
+
         stepSize *= _ConversionFactor;
 
         QwtScaleDiv Div = QwtLinearScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
+        QwtScaleDiv test = QwtLinearScaleEngine::divideScale(-100, 500, numMajorSteps, numMinorSteps, stepSize);
 
         QList<double> Ticks[QwtScaleDiv::NTickTypes];
 
         Ticks[QwtScaleDiv::MajorTick] = Div.ticks(QwtScaleDiv::MajorTick);
         for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MajorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MajorTick][i] /= _ConversionFactor;
+            Ticks[QwtScaleDiv::MajorTick][i] = (Ticks[QwtScaleDiv::MajorTick][i] - _ConversionOffset) / _ConversionFactor;
         }
         Ticks[QwtScaleDiv::MediumTick] = Div.ticks(QwtScaleDiv::MediumTick);
         for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MediumTick].count(); i++) {
-            Ticks[QwtScaleDiv::MediumTick][i] /= _ConversionFactor;
+            Ticks[QwtScaleDiv::MediumTick][i] = (Ticks[QwtScaleDiv::MediumTick][i] - _ConversionOffset) / _ConversionFactor;
         }
         Ticks[QwtScaleDiv::MinorTick] = Div.ticks(QwtScaleDiv::MinorTick);
         for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MinorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MinorTick][i] /= _ConversionFactor;
+            Ticks[QwtScaleDiv::MinorTick][i] = (Ticks[QwtScaleDiv::MinorTick][i] - _ConversionOffset) / _ConversionFactor;
         }
-        return QwtScaleDiv(QwtInterval(x1 / _ConversionFactor, x2 / _ConversionFactor), Ticks);
+        return QwtScaleDiv(QwtInterval((x1 - _ConversionOffset) / _ConversionFactor, (x2 - _ConversionOffset) / _ConversionFactor), Ticks);
     }
 protected:
     double _ConversionFactor;
+    double _ConversionOffset;
 };
 
 /* Class for creating a ScaleDraw that modifies the value by a given factor and offset,
@@ -398,7 +401,7 @@ void caStripPlot::pausePlot(bool pausePlot)
  * */
 void caStripPlot::onSelected(const QPointF& point)
 {
-    if (thisYaxisScaling != fixedScale) return;
+    if (thisYaxisScaling != fixedScale || thisYaxisType != linear || NumberOfCurves == 1) return;
     const double scaledTolerance = (thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)]) * 0.01;
     const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
@@ -447,7 +450,7 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     const double conversionOffset = (thisYaxisLimitsMin[YAxisIndex] * oldYAxisMax - thisYaxisLimitsMax[YAxisIndex] * oldYAxisMin) / (oldYAxisMax - oldYAxisMin);
 
     static_cast<QwtUnitScaleDraw*>(axisScaleDraw(yLeft))->setConversion(conversionFactor, conversionOffset);
-    setAxisScaleEngine(yLeft, new QwtUnitScaleEngine(conversionFactor));
+    setAxisScaleEngine(yLeft, new QwtUnitScaleEngine(conversionFactor, conversionOffset));
 
     replot();
 }
@@ -513,6 +516,7 @@ void caStripPlot::setYaxisType(yAxisType s)
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
 #else
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
+        setAxisScaleDraw(QwtPlot::yLeft, new QwtScaleDraw);
 #endif
     } else {
         setAxisScaleDraw(QwtPlot::yLeft, new QwtUnitScaleDraw());
