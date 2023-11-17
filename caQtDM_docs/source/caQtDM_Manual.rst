@@ -2,8 +2,8 @@
 caQtDM Manual
 =============
 
-| **Anton Mezger**
-| **February 2014**
+| **Anton Mezger/Helge Brands**
+| **November 2023**
 | Paul Scherrer Institute
 | CH-5232 Villigen
 | Switzerland
@@ -11,13 +11,12 @@ caQtDM Manual
 About this manual
 -----------------
 
-This manual has been written in HTML and after conversion introduced in
-the Qt assistant in order to get help for the caQtDM system. It has to
+This manual has been written in Sphinx Ret. It has to
 be noted that caQtDM is though as a replacement of the very known EPICS [#]_
 Display Manager MEDM [#]_, therefore this manual is of course also inspired
 of the existing MEDM manual.
 
-The HTML was converted to restructured text using pandoc, then hand-edited.
+The HTML was converted to restructured text using spinx.
 
 .. [#] EPICS: https://epics.anl.gov
 .. [#] MEDM: https://epics.anl.gov/extensions/medm
@@ -99,10 +98,10 @@ necessary directories and files. In the upper directory you will find
 the necessary procedures to build the package, run it locally without
 installing, and also an installation procedure.
 
-#. you will have to install Qt-4.8 and qwt-6 when they are not already
-   installed. On modern systems Qt4 should already be installed, but the
-   qt4-designer not necessarily and you should install it (eventually
-   with sudo apt-get install qt4-designer). qwt is normally not
+#. you will have to install Qt and qwt when they are not already
+   installed. On modern systems Qt should already be installed, but the
+   qt-designer not necessarily and you should install it (eventually
+   with sudo apt-get install qt*-designer). qwt is normally not
    installed and you should install this too.
 #. you will have to install EPICS (base)
 #. all the environment variables used for the installation will be
@@ -124,7 +123,7 @@ installing, and also an installation procedure.
    pointing to them.
 #. running ``caQtDM``: when the package has been successfully build into the
    directory ``./caQtDM_Binaries``, you can start ``caQtDM`` by using the script
-   ``startDM_Local`` and the qt4-designer by the script ``qtdesigner`` (all
+   ``startDM_Local`` and the qt-designer by the script ``qtdesigner`` (all
    located in the main directory where you expanded the tar file). These
    scripts will set some important environment variables in order to set
    the path, the plugin_path and to point to the test directory provided
@@ -134,18 +133,28 @@ installing, and also an installation procedure.
    the display some EPICS channels have to be defined. This can be done
    by running a softIoc shell called with run-epics also provided in
    the test directory.
-#. in case you have qwt 6.1 you will have to use in
+#. in case you have qwt 6.1 or greater you will have to use in
    caQtDM_QtControls/src the files qwt_thermo_marker_61. 
    (*instead of qwt_thermo_marker*)
-#. in case you already use Qt5.1 with qwt6.1 the building should also be
+#. in case you already use Qt5 or Qt6 with qwt6.2 the building should also be
    straight forward.
-#. Instructions for compiling caQtDM on Windows Requirements:
+#. Instructions for compiling caQtDM on Windows/Linux/Mac Requirements:
 
-   -  Qt 4.8.2
+Min:
+   -  Qt 4.8.5
    -  Qwt 6.0.1
-   -  EPICS 3.12.2
+   -  EPICS 3.14.12
    -  MS Visual Studio 2010
-   -  Wix 3.0.5419.0
+   -  Wix 3.0
+
+Max:
+   -  Qt 6.5.2
+   -  Qwt 6.2.0
+   -  EPICS 7.0.7
+   -  MS Visual Studio 2019
+   -  Wix 3.11
+
+
 
    With ``caQtDM_Env.bat`` you can configure your system. All settings which
    are needed will be taken from here.
@@ -157,6 +166,215 @@ installing, and also an installation procedure.
    ``caQtDM_Binaries``.
 
    To clean the Folder you should use ``caQtDM_CleanAll.bat``.
+
+Example build settings for Debian 12
+------------------------------------
+
+.. sourcecode:: none 
+   :caption: installation
+
+    apt install git
+    apt install qtcreator
+    apt install gcc
+    apt install g++
+    apt install qwt
+    apt install qwt-qt6
+    apt install qwt-qt5
+    apt install libqwt
+    apt install libqwt-qt5-dev
+    apt install qmake
+    apt install qt5-dev
+    apt install qt6
+    apt install qt5-qmake
+    apt install qt5-default
+    apt install qtbase5-dev
+    apt install qt5designer
+    apt install qt5-designer
+    apt install qttools5-dev-tools
+    apt install qtsvg5-examples
+    apt install qttools5-dev
+    apt install qtsystems5-dev
+    apt install libqt5svg5-dev
+    apt install libzip-dev
+    apt install python3-dev
+    apt install libqt5x11extras5-dev
+
+
+.. code-block::
+   :caption: configuration
+
+	  #!/bin/bash
+	  if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
+	  fi
+	  if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
+	  fi
+	  if [ -z "$QWTINCLUDE" ];            then export   QWTINCLUDE=/usr/include/qwt;
+	  fi
+	  if [ -z "$QWTLIB" ];                then export   QWTLIB=/usr/lib;
+	  fi
+	  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
+	  fi
+	  # on unix library can be libqwt or libqwt-qt5 or ...
+	  if [ -z "$QWTLIBNAME" ];            then export   QWTLIBNAME=qwt-qt5;
+	  fi
+	  if [ -z "$EPICS_BASE" ];            then export   EPICS_BASE=/home/helge/epics-base;
+	  fi
+	  if [ -z "$EPICSINCLUDE" ];          then export   EPICSINCLUDE=${EPICS_BASE}/include;
+	  fi
+	  if [ -z "$EPICSLIB" ];              then  export  EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$EPICS4LOCATION" ];         then  export  EPICS4LOCATION=/home/mezger/EPICS-CPP-4.6.0/
+	  fi
+	  if [ -z "$EPICSEXTENSIONS" ];     then  export  EPICSEXTENSIONS=/usr/local/epics/extensions;
+	  fi
+	  if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_COLLECT" ];       then export  CAQTDM_COLLECT=`pwd`/caQtDM_Binaries;
+	  fi
+	  export  QTBASE=${QTCONTROLS_LIBS};
+
+	  if [ -z "$CAQTDM_CA_ARCHIVELIBS" ];       then export  CAQTDM_CA_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_LOGGING_ARCHIVELIBS" ];       then export  CAQTDM_LOGGING_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+
+	  if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
+	  fi
+
+	  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=3.11;
+	  fi
+	  if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
+	  fi
+	  if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
+	  fi 
+
+	  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local;
+	  fi 
+	  if [ -z "$ZMQINC" ];   then  export  ZMQINC=$ZMQ/include;
+	  fi 
+	  if [ -z "$ZMQLIB" ];   then  export  ZMQLIB=$ZMQ/lib;
+	  fi 
+
+
+
+	  if [ -z "$TROLLTECH" ]; then
+	    echo
+	    echo ====== do not use psi trolltech directories
+	    echo
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
+	    fi
+	  else
+	    echo
+	    echo ====== use psi trolltech directories
+	    echo 
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt;
+	    fi 
+	  fi
+
+	 if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
+	 fi
+
+
+Example build settings for Rocky Linux 9
+-----------------------------------------
+
+.. sourcecode:: none 
+   :caption: installation
+
+       dnf -y install epel-release
+       dnf install qt-creator
+       dnf install readline-devel
+       dnf install perl
+       dnf install qwt-qt5-devel
+       dnf install qt5-qttools-devel
+       dnf install qt5-qtx11extras
+       dnf install qt5-qttools-static
+       dnf install libzip-devel
+       dnf install zlib-devel
+       dnf install python3-devel
+       dnf install libXext-devel
+
+Please change the qmake call in ./caQtDM_BuildAll to qmake-qt5
+.. code-block::
+   :caption: configuration
+
+	  #!/bin/bash
+	  if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
+	  fi
+	  if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
+	  fi
+	  if [ -z "$QWTINCLUDE" ];            then export   QWTINCLUDE=/usr/include/qt5/qwt;
+	  fi
+	  if [ -z "$QWTLIB" ];                then export   QWTLIB=${QWTHOME}/lib;
+	  fi
+	  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
+	  fi
+	  # on unix library can be libqwt or libqwt-qt5 or ...
+	  if [ -z "$QWTLIBNAME" ];            then export   QWTLIBNAME=qwt-qt5;
+	  fi
+	  if [ -z "$EPICS_HOST_ARCH" ];       then export   EPICS_HOST_ARCH=linux-x86_64;
+	  fi
+	  if [ -z "$EPICS_BASE" ];            then export   EPICS_BASE=/home/helge/base-7.0.7;
+	  fi
+	  if [ -z "$EPICSINCLUDE" ];          then export   EPICSINCLUDE=${EPICS_BASE}/include;
+	  fi
+	  if [ -z "$EPICSLIB" ];              then  export  EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$EPICS4LOCATION" ];         then  export  EPICS4LOCATION=/home/mezger/EPICS-CPP-4.6.0/
+	  fi
+	  if [ -z "$EPICSEXTENSIONS" ];     then  export  EPICSEXTENSIONS=/usr/local/epics/extensions;
+	  fi
+	  if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_COLLECT" ];       then export  CAQTDM_COLLECT=`pwd`/caQtDM_Binaries;
+	  fi
+	  export  QTBASE=${QTCONTROLS_LIBS};
+
+	  if [ -z "$CAQTDM_CA_ARCHIVELIBS" ];       then export  CAQTDM_CA_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_LOGGING_ARCHIVELIBS" ];       then export  CAQTDM_LOGGING_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+
+	  if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
+	  fi
+
+	  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=3.9;
+	  fi
+	  if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
+	  fi
+	  if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
+	  fi
+
+	  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local;
+	  fi
+	  if [ -z "$ZMQINC" ];   then  export  ZMQINC=$ZMQ/include;
+	  fi
+	  if [ -z "$ZMQLIB" ];   then  export  ZMQLIB=$ZMQ/lib;
+	  fi
+
+
+
+	  if [ -z "$TROLLTECH" ]; then
+	    echo
+	    echo ====== do not use psi trolltech directories
+	    echo
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
+	    fi
+	  else
+	    echo
+	    echo ====== use psi trolltech directories
+	    echo
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt;
+	    fi
+	  fi
+
+	 if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
+	 fi
+
 
 Development history
 -----------------------
