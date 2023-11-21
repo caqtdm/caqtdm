@@ -298,6 +298,7 @@ Example build settings for Rocky Linux 9
 
 Please change the qmake call in ./caQtDM_BuildAll to qmake-qt5
 .. code-block::
+   
    :caption: configuration
 
 	  #!/bin/bash
@@ -655,7 +656,7 @@ the used version has been solved.
    4.0.2
    
 -  new options on command line available for caQtDM: -cs for specifiying default plugin to be used, -options for passing options (key, value pairs) to plugins
--  use now the QStringlList editor in Designer for semicolumn separated strings
+-  use now the QStringlList editor in Designer for semicolon separated strings
 -  mobile handling of config files slightly modified
 -  adjustment of fonts for android modified / apply button of caapplynumeric is now resizable
 -  resizing was perturbed by a resize forced by incoming channel data.
@@ -694,7 +695,7 @@ the used version has been solved.
 -  edl2ui enhanced (by Lucas Carvalho)
 -  several warnings (mainly on mac osx) solved
 -  capolyline was not resizing correctly, this has been now corrected
--  a string containing a semicolumn was only displayed up to the semicolumn, this is corrected now.
+-  a string containing a semicolon was only displayed up to the semicolumn, this is corrected now.
 -  cacamera and cascan2d got display of selected values and readback values with different representations and may therefore write values to the CS
 -  soft variable bug corrected (was not always found when writing)
 -  catextentry got input dialogs (filedialog in case of strings, otherwise simple dialog)
@@ -1260,8 +1261,8 @@ is the equivalent of the Text Update in MEDM.
 
 .. _caThermo:
 
-caThermo
-~~~~~~~~
+``caThermo``
+~~~~~~~~~~~~
 
 is the equivalent of the Bar Monitor in MEDM.
 
@@ -1318,8 +1319,8 @@ is the equivalent of the Bar Monitor in MEDM.
 
 .. _caLed:
 
-caLed
-~~~~~
+``caLed``
+~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1348,8 +1349,8 @@ has no equivalent in MEDM.
 
 .. _caLinearGauge:
 
-caLinearGauge
-~~~~~~~~~~~~~
+``caLinearGauge``
+~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Bar Monitor in MEDM.
 
@@ -1360,8 +1361,8 @@ is the equivalent of the Bar Monitor in MEDM.
 
 .. _caCircularGauge:
 
-caCircularGauge
-~~~~~~~~~~~~~~~
+``caCircularGauge``
+~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Meter Monitor in MEDM.
 
@@ -1372,8 +1373,8 @@ is the equivalent of the Meter Monitor in MEDM.
 
 .. _caCartesianPlot:
 
-caCartesianPlot
-~~~~~~~~~~~~~~~
+``caCartesianPlot``
+~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Cartesian plot in MEDM and will plot up to 6
 curves
@@ -1390,9 +1391,9 @@ curves
    **channels_1, channels_2, channels_3, channels_4, channels_5, channels_6**
       QString: these strings represents the control system process
       variables; each channelpair is composed of two channels separated
-      by a semicolumn.
+      by a semicolon.
       When specifying only one channel, you will have to put a
-      semicolumn in fron or at the end of the string in order to specify
+      semicolon in fron or at the end of the string in order to specify
       x or y, you will find in the table below how the cartesian plot
       behaves in case of array or scalars or when only one channel is
       specified.
@@ -1501,10 +1502,10 @@ curves
       bool: specifies if a grid should be drawn
    **XaxisLimits:**
       QString: minimum value used in case of limitsMode=User; the values
-      must be separated by a semicolumn
+      must be separated by a semicolon
    **YaxisLimits:**
       QString: minimum value used in case of limitsMode=User; the values
-      must be separated by a semicolumn
+      must be separated by a semicolon
 
    .. container::
 
@@ -1527,7 +1528,7 @@ curves
       which to get the y values. These process variables can be array
       process variables, such as Waveforms, or they can be scalar
       process variables with only a single value. The variables have to
-      be separated by a semicolumn (see above).
+      be separated by a semicolon (see above).
       There are eight possible kinds of traces as seen in the following
       table. The traces for a given plot do not all have to be of the
       same kind - they can be mixed. (In the table Nx is the number of
@@ -1599,8 +1600,8 @@ curves
 
 .. _caStripPlot:
 
-caStripPlot
-~~~~~~~~~~~
+``caStripPlot``
+~~~~~~~~~~~~~~~
 
 is the equivalent of the StripChart Monitor in MEDM.
 
@@ -1615,7 +1616,7 @@ is the equivalent of the StripChart Monitor in MEDM.
       QString: Title of the Y-axis
    **channels**
       QString: this string represents the control system process
-      variables; the channels have to be separated by a semicolumn.
+      variables; the channels have to be separated by a semicolon.
    **units**
       =========== ======================================
       Millisecond The update period is in milli-seconds.
@@ -1659,7 +1660,7 @@ is the equivalent of the StripChart Monitor in MEDM.
       QString: minimum/maximum value used in case of limitsMode=User
    **YaxisLimits:**
       QString: minimum value used in case of limitsMode=User; the values
-      must be separated by a semicolumn
+      must be separated by a semicolon
    **background:**
       QColor: color used for the background
    **foreground:**
@@ -1679,8 +1680,8 @@ is the equivalent of the StripChart Monitor in MEDM.
 
 .. _caByte:
 
-caByte
-~~~~~~
+``caByte``
+~~~~~~~~~~
 
 is the equivalent of the Byte Monitor in MEDM.
 
@@ -1691,20 +1692,134 @@ is the equivalent of the Byte Monitor in MEDM.
 
 .. _caCamera:
 
-caCamera
-~~~~~~~~
+``caCamera``
+~~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
-   :ref:`geometry` is used for any object
-   **Description:**
+   | :ref:`geometry` is used for any object 
+   | **Description:** 
+    
+   **channelData**
+      Image data channel. Typically a waveform with the data in different formats comming directly from the hardware. 
+   **channelWidth**
+      channel with the horizontal resolution in pixel
+   **channelHeight**
+      channel with the vertical resolution in pixel
+   **simpleZoomedView**
+      boolean to reduce the complexity of the widget to get an image only view
+   **Zoom**
+      enables/disables the zoom bar on the right site of the widget 
+   **automaticLevels**
+      enables the scan over the image data to define the min and the max value. These values are needed to 
+   **minLevel**
+      define in the widget a static min level. This can be changed during runtime.
+   **maxLevel**
+      define in the widget a static max level. This can be changed during runtime.
+   **colorMode**
+	Enum: how the data should be interpreted
+	    =============  ==========  ========================================================================================== 
+            Enum value     datatype    simple description
+            -------------  ----------  ------------------------------------------------------------------------------------------
+	    Mono           EPICS       data of the waveform used to generate the image from data defined in the EPICS data type   
+	    Mono12p        Binary      12 bit packed mono format 
+	    Mono10p        Binary      10 bit packed mono format (5 Byte)
+	    Mono10Packed   Binary      10 bit packed mono format (3 Byte)
+	    Mono8          Binary      8 bit mono data
+	    RGB1_CA        EPICS       3 Layer RGB data pixel by pixel
+	    RGB2_CA        EPICS       3 Layer RGB data line by line
+	    RGB3_CA        EPICS       3 Layer RGB data image by image
+	    BayerRG_8      Binary      8 bit Bayerpatternformat RGB 
+	    BayerGB_8      Binary      8 bit Bayerpatternformat GBR
+	    BayerGR_8      Binary      8 bit Bayerpatternformat GRB
+	    BayerBG_8      Binary      8 bit Bayerpatternformat BGR
+	    BayerRG_12     Binary      12 bit Bayerpatternformat RGB
+	    BayerGB_12     Binary      12 bit Bayerpatternformat GBR
+	    BayerGR_12     Binary      12 bit Bayerpatternformat GRB
+	    BayerBG_12     Binary      12 bit Bayerpatternformat BGR
+	    RGB_8          Binary      8 bit RGB data
+	    BGR_8          Binary      8 bit BGR data
+	    RGBA_8         Binary      8 bit RGBA data
+	    BGRA_8         Binary      8 bit BGRA data
+	    YUV444         Binary      converted data from the colorshift data model to RGB (bit representation see packMode too) 
+	    YUV422         Binary      converted data from the colorshift data model to RGB (bit representation see packMode too) 
+	    YUV411         Binary      converted data from the colorshift data model to RGB (bit representation see packMode too) 
+	    YUV421         -           not yet supported image format
+	    =============  ==========  ========================================================================================== 
+    
+   **colorModeOverwriteChannel**
+      MISSING
+   **packMode**
+      MISSING
+   **packingModeOverwriteChannel**
+      MISSING
+   **showComboBoxes**
+      enable/disable the visibility for changing the data interpretation from the user side
+   
+   **ColorMap**
+       color map used to display experimental data to the 8Bit RGB world of a monitor
+         =================== ==============================================
+         Maps                rough description
+         color_to_mono       grayscale images
+         mono_to_wavelength  different colors optimal for detector testing
+         mono_to_hot         red and yellow colloring            
+         mono_to_heat        thermal representation
+         mono_to_jet         optimal for flow data  
+         mono_to_custom      user defined color mapping
+         =================== ==============================================
+         
+   **customColorMap**
+      QString: list of color values (value,r,g,b), seperated by a semicolon
+   **discreteCustomColorMap**
+      MISSING
+   **ROI_readChannelsList**
+      edit list of 4 channels seperated by a semicolon to draw rectangle into the image
+   **ROI_readChannels**
+      see the actual ROI_readChannelsList
+   **ROI_readmarkerType**
+      define the cursor marker for the selection
+             =================== ==============================================
+             cursor              selection type
+             box                 simple box
+             box_crosshairs      box with extra lines
+             line                line connection       
+             arrow               arrow connection
+             =================== ==============================================
+
+   **ROI_readType**
+      how the data from the channels are interpreted
+             ===================== ================================================
+             type                  description
+             none                  data is ignored
+             xy_only               only the first 2 channels are used for a center
+             xy1_xy2               box with 2 coordinates       
+             xyUpleft_xyLowright   box with a upper left and lower right version
+             xycenter_width_height box with center coordinats and a size 
+             ===================== ================================================
+  
+   **ROI_writeChannelsList**
+      edit list of 4 channels seperated by a semicolon to write rectangle data into channels
+   
+   **ROI_writeChannels**
+      see the actual ROI_writeChannelsList
+   **ROI_writemarkerType**
+      MISSING
+   **ROI_writeType**
+      MISSING
+   **channelXaverage**
+      waveform channel to display a pixel wise plot into an image for the x-axis
+   **channelYaverage**
+      waveform channel to display a pixel wise plot into an image for the y-axis
+   
+   
+   
 
 --------------
 
 .. _caCalc:
 
-caCalc
-~~~~~~
+``caCalc``
+~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1715,8 +1830,8 @@ has no equivalent in MEDM.
 
 .. _caWaterfallPlot:
 
-caWaterfallPlot
-~~~~~~~~~~~~~~~
+``caWaterfallPlot``
+~~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1727,8 +1842,8 @@ has no equivalent in MEDM.
 
 .. _caBitNames:
 
-caBitNames
-~~~~~~~~~~
+``caBitNames``
+~~~~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1739,8 +1854,8 @@ has no equivalent in MEDM.
 
 .. _caTable:
 
-caTable
-~~~~~~~
+``caTable``
+~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1754,8 +1869,8 @@ all graphical objects
 
 .. _caLabel:
 
-caLabel
-~~~~~~~
+``caLabel``
+~~~~~~~~~~~
 
 is the equivalent of Text in MEDM.
 
@@ -1766,8 +1881,8 @@ is the equivalent of Text in MEDM.
 
 .. _caGraphics:
 
-caGraphics
-~~~~~~~~~~
+``caGraphics``
+~~~~~~~~~~~~~~
 
 is the equivalent of all primary graphical objects (like circles, lines,
 arcs, triangles, arrows, ...) in MEDM.
@@ -1779,8 +1894,8 @@ arcs, triangles, arrows, ...) in MEDM.
 
 .. _caFrame:
 
-caFrame
-~~~~~~~
+``caFrame``
+~~~~~~~~~~~
 
 has no equivalent of Text in MEDM.
 
@@ -1791,8 +1906,8 @@ has no equivalent of Text in MEDM.
 
 .. _caImage:
 
-caImage
-~~~~~~~
+``caImage``
+~~~~~~~~~~~
 
 is the equivalent of image in MEDM.
 
@@ -1841,8 +1956,8 @@ is the equivalent of image in MEDM.
 
 .. _caPolyLine:
 
-caPolyLine
-~~~~~~~~~~
+``caPolyLine``
+~~~~~~~~~~~~~~
 
 is the equivalent of Polyline and Polygone in MEDM.
 
@@ -1853,8 +1968,8 @@ is the equivalent of Polyline and Polygone in MEDM.
 
 .. _caInclude:
 
-caInclude
-~~~~~~~~~
+``caInclude``
+~~~~~~~~~~~~~
 
 is the equivalent of the Composite in MEDM
 
@@ -1871,8 +1986,8 @@ is the equivalent of the Composite in MEDM
 
 .. _caDoubleTabWidget:
 
-caDoubleTabWidget
-~~~~~~~~~~~~~~~~~
+``caDoubleTabWidget``
+~~~~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM and is not a controls object
 
@@ -1884,8 +1999,8 @@ all controller objects
 
 .. _caNumeric:
 
-caNumeric
-~~~~~~~~~
+``caNumeric``
+~~~~~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
@@ -1908,8 +2023,8 @@ is the equivalent of the Wheelswitch in MEDM
 
 .. _caApplyNumeric:
 
-caApplyNumeric
-~~~~~~~~~~~~~~
+``caApplyNumeric``
+~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
@@ -1922,8 +2037,8 @@ is the equivalent of the Wheelswitch in MEDM
 
 .. _caSlider:
 
-caSlider
-~~~~~~~~
+``caSlider``
+~~~~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
@@ -1934,8 +2049,8 @@ is the equivalent of the Wheelswitch in MEDM
 
 .. _caShellCommand:
 
-caShellCommand
-~~~~~~~~~~~~~~
+``caShellCommand``
+~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Shell command in MEDM
 
@@ -1946,8 +2061,8 @@ is the equivalent of the Shell command in MEDM
 
 .. _caMenu:
 
-caMenu
-~~~~~~
+``caMenu``
+~~~~~~~~~~
 
 is the equivalent of the Menu in MEDM
 
@@ -1958,8 +2073,8 @@ is the equivalent of the Menu in MEDM
 
 .. _caChoice:
 
-caChoice
-~~~~~~~~
+``caChoice``
+~~~~~~~~~~~~
 
 is the equivalent of the Choice Button in MEDM
 
@@ -1983,8 +2098,8 @@ is the equivalent of the Choice Button in MEDM
 
 .. _caRelatedDisplay:
 
-caRelatedDisplay
-~~~~~~~~~~~~~~~~
+``caRelatedDisplay``
+~~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Related Display in MEDM
 
@@ -2018,8 +2133,8 @@ is the equivalent of the Related Display in MEDM
 
 .. _caTextEntry:
 
-caTextEntry
-~~~~~~~~~~~
+``caTextEntry``
+~~~~~~~~~~~~~~~
 
 is the equivalent of the Text Entry in MEDM
 
@@ -2030,8 +2145,8 @@ is the equivalent of the Text Entry in MEDM
 
 .. _caMessageButton:
 
-caMessageButton
-~~~~~~~~~~~~~~~
+``caMessageButton``
+~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Message Button in MEDM
 
@@ -2042,8 +2157,8 @@ is the equivalent of the Message Button in MEDM
 
 .. _caToggleButton:
 
-caToggleButton
-~~~~~~~~~~~~~~
+``caToggleButton``
+~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
@@ -2054,8 +2169,8 @@ has no equivalent in MEDM
 
 .. _caScriptButton:
 
-caScriptButton
-~~~~~~~~~~~~~~
+``caScriptButton``
+~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
@@ -2066,8 +2181,8 @@ has no equivalent in MEDM
 
 .. _caSpinBox:
 
-caSpinBox
-~~~~~~~~~
+``caSpinBox``
+~~~~~~~~~~~~~
 
 represents a simplified Wheelswitch
 
