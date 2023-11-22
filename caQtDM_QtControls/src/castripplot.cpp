@@ -142,13 +142,13 @@ private:
     int nbTicks;
 };
 
-/* Class for creating a ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
+/* Class for creating a linear ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
  * have the correct spacing after the conversion odne by the (Unit)ScaleDraw.
  * */
-class QwtUnitScaleEngine: public QwtLinearScaleEngine {
+class QwtUnitLinearScaleEngine: public QwtLinearScaleEngine {
 
 public:
-    QwtUnitScaleEngine(double ConversionFactor = 1.0, double ConversionOffset = 0) : QwtLinearScaleEngine(10), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset) {
+    QwtUnitLinearScaleEngine(double ConversionFactor = 1.0, double ConversionOffset = 0) : QwtLinearScaleEngine(10), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset) {
     }
 
     QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
@@ -181,14 +181,42 @@ protected:
     double _ConversionOffset;
 };
 
-/* Class for creating a ScaleDraw that modifies the value by a given factor and offset,
+/* Class for creating a linear ScaleDraw that modifies the value by a given factor and offset,
  * to show different Scales, than the one currently drawn. Doesn't modify the actuals curves.
  * */
-class QwtUnitScaleDraw: public QwtScaleDraw
+class QwtUnitLinearScaleDraw: public QwtScaleDraw
 {
 public:
 
-    QwtUnitScaleDraw(double ConversionFactor = 1, double ConversionOffset = 0): QwtScaleDraw(), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset)
+    QwtUnitLinearScaleDraw(double ConversionFactor = 1, double ConversionOffset = 0): QwtScaleDraw(), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset)
+    {
+    }
+
+    void setConversion(double ConversionFactor = 1, double ConversionOffset = 0)
+    {
+        _ConversionFactor = ConversionFactor;
+        _ConversionOffset = ConversionOffset;
+    }
+
+    virtual QwtText label(double v) const
+    {
+        double newLabel = (v * _ConversionFactor)+_ConversionOffset;
+        return QwtScaleDraw::label(newLabel);
+    }
+
+private:
+    double _ConversionFactor;
+    double _ConversionOffset;
+};
+
+/* Class for creating a linear ScaleDraw that modifies the value by a given factor and offset,
+ * to show different Scales, than the one currently drawn. Doesn't modify the actuals curves.
+ * */
+class QwtUnitLogScaleDraw: public QwtScaleDraw
+{
+public:
+
+    QwtUnitLogScaleDraw(double ConversionFactor = 1, double ConversionOffset = 0): QwtScaleDraw(), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset)
     {
     }
 
@@ -296,6 +324,8 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 
         thisYaxisLimitsMax[i] = 100;
         thisYaxisLimitsMin[i] = 0;
+
+        sAutoScaleCurves[i] = true;
     }
 
     // default colors and styles
@@ -396,6 +426,19 @@ void caStripPlot::pausePlot(bool pausePlot)
     pausePlot ? plotIsPaused = true : plotIsPaused = false;
 }
 
+/* Slot to select a curve whose Y Axis is to be displayed.
+ * If used while autoscale is on, it will switch to fixed scaling.
+ * */
+void caStripPlot::selectFixedYAxis(int newYAxisIndex){
+    if (newYAxisIndex >= NumberOfCurves) return;
+    setYaxisScaling(fixedScale);
+    UpdateScaling();
+    RescaleAxis();
+    setYscale(thisYaxisLimitsMin[0], thisYaxisLimitsMax[0]);
+    selectYAxis(newYAxisIndex);
+
+}
+
 /* Slot to handle clicks within the curve-canvas.
  * Is used to decide wether a specific curve was clicked and changes the displayed Y-axis accordingly to show the corresponding axis.
  * */
@@ -446,11 +489,11 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     const double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
     const double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
 
-    const double conversionFactor = -((thisYaxisLimitsMax[YAxisIndex] - thisYaxisLimitsMin[YAxisIndex])/(oldYAxisMin - oldYAxisMax));
+    const double conversionFactor = ((thisYaxisLimitsMax[YAxisIndex] - thisYaxisLimitsMin[YAxisIndex])/(oldYAxisMax - oldYAxisMin));
     const double conversionOffset = (thisYaxisLimitsMin[YAxisIndex] * oldYAxisMax - thisYaxisLimitsMax[YAxisIndex] * oldYAxisMin) / (oldYAxisMax - oldYAxisMin);
 
-    static_cast<QwtUnitScaleDraw*>(axisScaleDraw(yLeft))->setConversion(conversionFactor, conversionOffset);
-    setAxisScaleEngine(yLeft, new QwtUnitScaleEngine(conversionFactor, conversionOffset));
+    static_cast<QwtUnitLinearScaleDraw*>(axisScaleDraw(yLeft))->setConversion(conversionFactor, conversionOffset);
+    setAxisScaleEngine(yLeft, new QwtUnitLinearScaleEngine(conversionFactor, conversionOffset));
 
     replot();
 }
@@ -519,9 +562,43 @@ void caStripPlot::setYaxisType(yAxisType s)
         setAxisScaleDraw(QwtPlot::yLeft, new QwtScaleDraw);
 #endif
     } else {
-        setAxisScaleDraw(QwtPlot::yLeft, new QwtUnitScaleDraw());
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtUnitScaleEngine());
+        setAxisScaleDraw(QwtPlot::yLeft, new QwtUnitLinearScaleDraw());
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtUnitLinearScaleEngine());
     }
+
+    replot();
+}
+
+/* Function to remap the curves from previous Min/Max to a new Min/Max.
+ * Is used to correct data when autoscale is enabled while previous data is still on the plot,
+ * or to do the vice versa.
+ * */
+void caStripPlot::remapCurves(double oldMin, double oldMax, double newMin, double newMax, quint8 curvIndex)
+{
+
+    const double conversionFactor = ((newMax - newMin)/(oldMax - oldMin));
+    const double conversionOffset = (newMin * oldMax - newMax * oldMin) / (oldMax - oldMin);
+
+    // Update all values that are plotted right now
+    mutex.lock();
+    for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
+
+        const double arg1 = rangeData[curvIndex][j].interval.minValue();
+        const double arg2 = rangeData[curvIndex][j].interval.maxValue();
+        const double arg3 = fillData[curvIndex][j].y();
+
+        rangeData[curvIndex][j].interval.setInterval((arg1 * conversionFactor) + conversionOffset, (arg2 * conversionFactor) + conversionOffset);
+        if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), (arg3 * conversionFactor) + conversionOffset);
+    }
+    mutex.unlock();
+
+    // Set the data to the curves
+    if(thisStyle[curvIndex] == FillUnder) {
+        fillcurve[curvIndex]->setSamplesList(fillData[curvIndex]);
+        fillcurve[curvIndex]->setSamples(fillData[curvIndex]);
+    }
+    errorcurve[curvIndex]->setSamplesList(rangeData[curvIndex]);
+    errorcurve[curvIndex]->setSamples(rangeData[curvIndex]);
 
     replot();
 }
@@ -648,10 +725,24 @@ void caStripPlot::resizeEvent ( QResizeEvent * event )
     if(timerID) RescaleAxis();
 }
 
-void caStripPlot:: UpdateScaling()
+void caStripPlot::UpdateScaling()
 {
-    initCurves = true;
     RescaleCurves(canvas()->size().width(), thisUnits, thisPeriod);
+    if ((thisYaxisScaling == autoScale || thisYaxisScaling == selectiveAutoScale) && !YScalingMappedAutoScale) {
+        YScalingMappedAutoScale = true;
+        qDebug() << "remapping for autoscale";
+        for (quint8 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++)
+        {
+           remapCurves(thisYaxisLimitsMin[0], thisYaxisLimitsMax[0], thisYaxisLimitsMin[curvIndex], thisYaxisLimitsMax[curvIndex], curvIndex);
+        }
+    } else if (thisYaxisScaling == fixedScale && YScalingMappedAutoScale) {
+        qDebug() << "remapping for fixedscale";
+        YScalingMappedAutoScale = false;
+        for (quint8 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++) {
+           remapCurves(thisYaxisLimitsMin[curvIndex], thisYaxisLimitsMax[curvIndex], thisYaxisLimitsMin[0], thisYaxisLimitsMax[0], curvIndex);
+        }
+        selectYAxis(YAxisIndex);
+    }
     replot();
     if(timerID) RescaleAxis();
 }
@@ -938,6 +1029,35 @@ void caStripPlot::TimeOutThread()
         }
     }
 
+    if(thisYaxisScaling == selectiveAutoScale) {
+        qDebug() << "selectiveAutoScale";
+        AutoscaleMaxY = -INFINITY;
+        AutoscaleMinY = INFINITY;
+
+        for (c = 0; c < NumberOfCurves; c++ ) {
+            if (!sAutoScaleCurves[c]) continue;
+            for (int counter = 0; counter < dataCount; counter++) {
+                QwtIntervalSample P = rangeData[c].at(counter);
+                if(!qIsNaN(P.interval.maxValue()) && P.interval.maxValue() > AutoscaleMaxY) AutoscaleMaxY = P.interval.maxValue();
+                if(!qIsNaN(P.interval.minValue()) && P.interval.minValue() < AutoscaleMinY) AutoscaleMinY = P.interval.minValue();
+            }
+        }
+
+        if(AutoscaleMaxY == AutoscaleMinY) {
+            AutoscaleMaxY += 0.5;
+            AutoscaleMinY -= 0.5;
+        } else {
+            if(qAbs(AutoscaleMaxY) > 1.e-9) AutoscaleMaxY += (AutoscaleMaxY - AutoscaleMinY)/20.0;
+            if(qAbs(AutoscaleMinY) > 1.e-9 && thisYaxisType != log10) AutoscaleMinY -= (AutoscaleMaxY - AutoscaleMinY)/20.0;
+        }
+
+        if(thisYaxisType == log10) {
+            for (c = 0; c < NumberOfCurves; c++ ) {
+                if(AutoscaleMinY < thisYaxisLimitsMin[c]) AutoscaleMinY = thisYaxisLimitsMin[c];
+            }
+        }
+    }
+
     mutex.unlock();
 }
 
@@ -976,8 +1096,8 @@ void caStripPlot::TimeOut()
             setAxisScaleDraw (QwtPlot::xBottom, new TimeScaleDraw (timeNow));
         }
         if(thisYaxisType == linear){
-            setAxisScaleEngine(yLeft, new QwtUnitScaleEngine());
-            setAxisScaleDraw(yLeft, new QwtUnitScaleDraw());
+            setAxisScaleEngine(yLeft, new QwtUnitLinearScaleEngine());
+            setAxisScaleDraw(yLeft, new QwtUnitLinearScaleDraw());
         }
     }
 
@@ -1014,7 +1134,7 @@ void caStripPlot::TimeOut()
     }
 
     // in case of autoscale adjust the vertical scale
-    if(thisYaxisScaling == autoScale) {
+    if(thisYaxisScaling == autoScale || thisYaxisScaling == selectiveAutoScale) {
         if(!qIsInf(AutoscaleMinY) && !qIsInf(AutoscaleMaxY)) setAxisScale(QwtPlot::yLeft, AutoscaleMinY, AutoscaleMaxY);
     }
 
@@ -1395,8 +1515,16 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
         const quint8 nButton = ((QMouseEvent*) event)->button();
+        if (nButton == 1){
+            for (quint8 curvIndex = 0; curvIndex < 5; curvIndex++) {
+                for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
+
+                }
+                qDebug() <<rangeData[curvIndex][0].value-rangeData[curvIndex][50].value<<rangeData[curvIndex][50].interval;
+            }
+        }
         if (nButton == 1 && thisYaxisScaling == fixedScale && thisYaxisType == linear && NumberOfCurves > 1) {
-            // Ignore events on the canvas itself and stop them from being processed further, because it would generate an event for the castripplot.
+            // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.
             // Canvas events are ignored, because clicks on there are handled by the qwt plotpicker to select the clicked curve --> They are not for just iterating.
             if (obj->objectName() == "QwtPlotCanvas") return true;
             const quint8 newYAxisIndex = YAxisIndex+1;

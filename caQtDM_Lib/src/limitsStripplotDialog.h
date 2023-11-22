@@ -28,6 +28,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QLineEdit>
 #include <QGridLayout>
 #include <QDialogButtonBox>
@@ -81,6 +82,7 @@
      QComboBox *maxComboBox[caStripPlot::MAXCURVES];
      QLineEdit *minLineEdit[caStripPlot::MAXCURVES];
      QLineEdit *maxLineEdit[caStripPlot::MAXCURVES];
+     QCheckBox *sAutoScaleSelected[caStripPlot::MAXCURVES];
      QComboBox *YaxisType;
      QComboBox *YaxisScaling;
      QStringList vars;

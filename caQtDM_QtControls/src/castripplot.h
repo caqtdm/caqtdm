@@ -195,11 +195,11 @@ public:
     enum cpuUsage {Low, Medium, High};
 
     enum axisScaling {Channel, User};
-    enum  curvStyle {Lines = 1, FillUnder = 5};
+    enum curvStyle {Lines = 1, FillUnder = 5};
     enum units { Millisecond = 0, Second, Minute};
     enum xAxisType {ValueScale, TimeScale, TimeScaleFix};
     enum yAxisType {linear=0, log10};
-    enum yAxisScaling {fixedScale=0, autoScale};
+    enum yAxisScaling {fixedScale=0, autoScale=1, selectiveAutoScale=2};
 
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
@@ -438,6 +438,9 @@ public:
     void setYscalingMin(int i, axisScaling s) {if(i>= MAXCURVES) return; else setYscalingMin(s, i); }
     void setYscalingMax(int i, axisScaling s) {if(i>= MAXCURVES) return; else setYscalingMax(s, i); }
 
+    bool getSeleticeAutoScaleCurves(int i) {if(i>= MAXCURVES) return false; else return sAutoScaleCurves[i];}
+    void setSelectiveAutoScaleCurves(int i, bool enable = true) {if(i>= MAXCURVES) return; else sAutoScaleCurves[i] = enable;}
+
     void showCurve(int number, bool on);
     void addText(double x, double y, char* text, QColor c, int fontsize);
     void startPlot();
@@ -461,6 +464,8 @@ public slots:
     void restartPlot();
 
     void pausePlot(bool pausePlot);
+
+    void selectFixedYAxis(int newYAxisIndex);
 
 protected:
     void resizeEvent ( QResizeEvent * event);
@@ -486,6 +491,7 @@ private:
     struct timeb plotStart;
     bool RestartPlot1, RestartPlot2;
     bool plotIsPaused;
+    bool YScalingMappedAutoScale = false;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void setXaxis(double interval, double period);
@@ -494,6 +500,7 @@ private:
     void RescaleAxis();
     void TimersStart();
     void selectYAxis(quint8 newYAxisIndex);
+    void remapCurves(double oldMin, double oldMax, double newMin, double newMax, quint8 curvIndex);
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];
@@ -527,6 +534,7 @@ private:
     QColor thisLineColor[MAXCURVES], thisGridColor;
     double AutoscaleMaxY;
     double AutoscaleMinY;
+    bool sAutoScaleCurves[MAXCURVES];
 
     axisScaling thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
 
