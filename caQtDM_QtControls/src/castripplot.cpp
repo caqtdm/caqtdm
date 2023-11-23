@@ -267,7 +267,6 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     thisYaxisType = linear;
     YAxisIndex = 0;
     plotIsPaused = false;
-
     setProperty("xAxisToleranceFactor", 0.01);
 
 #ifdef QWT_USE_OPENGL
@@ -371,7 +370,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     QwtPlotPicker* plotPicker = new QwtPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
     QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
     plotPicker->setStateMachine(pickerMachine);
-    plotPicker->setTrackerMode(QwtPicker::AlwaysOff);
+    //plotPicker->setTrackerMode(QwtPicker::AlwaysOff);
     connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 }
 
@@ -485,6 +484,17 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
 
     YAxisIndex = newYAxisIndex;
     if (YAxisIndex > (NumberOfCurves-1)) YAxisIndex = 0;
+
+    savedTitles = originalTitles;
+    savedTitles.insert(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
+    for(quint8 i=0; i < NumberOfCurves; i++) {
+        curve[i]->setTitle(legendText(i));
+    }
+
+    QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
+    QPalette palette = scaleY->palette();
+    palette.setColor( QPalette::WindowText, thisLineColor[YAxisIndex].rgba());
+    scaleY->setPalette (palette);
 
     const double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
     const double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
@@ -728,6 +738,26 @@ void caStripPlot::resizeEvent ( QResizeEvent * event )
 void caStripPlot::UpdateScaling()
 {
     RescaleCurves(canvas()->size().width(), thisUnits, thisPeriod);
+    if (thisYaxisScaling == fixedScale){
+        QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
+        QPalette palette = scaleY->palette();
+        palette.setColor( QPalette::WindowText, thisLineColor[YAxisIndex].rgba());
+        scaleY->setPalette (palette);
+
+        savedTitles.insert(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
+        curve[YAxisIndex]->setTitle(legendText(YAxisIndex));
+    } else {
+        QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
+        QPalette palette = scaleY->palette();
+        palette.setColor( QPalette::WindowText, getScaleColor());
+        scaleY->setPalette (palette);
+
+        savedTitles = originalTitles;
+        for(quint8 i=0; i < NumberOfCurves; i++) {
+            curve[i]->setTitle(legendText(i));
+        }
+    }
+
     if ((thisYaxisScaling == autoScale || thisYaxisScaling == selectiveAutoScale) && !YScalingMappedAutoScale) {
         YScalingMappedAutoScale = true;
         qDebug() << "remapping for autoscale";
@@ -773,12 +803,14 @@ QString caStripPlot::legendText(int i)
     return title;
 }
 
-void caStripPlot::defineCurves(QStringList titres, units unit, double period, int width, int nbCurves)
+void caStripPlot::defineCurves(QStringList titles, units unit, double period, int width, int nbCurves)
 {
     int min, max;
     NumberOfCurves = nbCurves;
     scaleWidget->getBorderDistHint(min, max);
-    savedTitles = titres;
+    originalTitles = savedTitles = titles;
+
+    savedTitles.insert(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
 
     defineXaxis(unit, period);
 
@@ -832,7 +864,6 @@ void caStripPlot::defineCurves(QStringList titres, units unit, double period, in
     if(thisLegendshow) {
         QwtLegend *lgd = new QwtLegend;
         insertLegend(lgd, QwtPlot::BottomLegend);
-
         // set color on legend texts
         setLegendAttribute(thisScaleColor, QFont("arial",9), COLOR);
     }
@@ -967,9 +998,16 @@ void caStripPlot::TimeOutThread()
         double valueMin = minVal[c];
         double valueMax = maxVal[c];
 
-        if(thisYaxisType == log10) {
-            if(valueMin < 1.e-20) valueMin=1.e-20;
-            if(valueMax < 1.e-20) valueMax=1.e-20;
+        if(thisYaxisScaling == selectiveAutoScale) {
+            if(thisYaxisType == log10 && sAutoScaleCurves[c]) {
+                if(valueMin < 1.e-20) valueMin=1.e-20;
+                if(valueMax < 1.e-20) valueMax=1.e-19;
+            }
+        } else {
+            if(thisYaxisType == log10) {
+                if(valueMin < 1.e-20) valueMin=1.e-20;
+                if(valueMax < 1.e-20) valueMax=1.e-19;
+            }
         }
 
         QwtInterval tmpr;
@@ -1022,15 +1060,14 @@ void caStripPlot::TimeOutThread()
             if(qAbs(AutoscaleMinY) > 1.e-9 && thisYaxisType != log10) AutoscaleMinY -= (AutoscaleMaxY - AutoscaleMinY)/20.0;
         }
 
-        if(thisYaxisType == log10) {
+        /*if(thisYaxisType == log10) {
             for (c = 0; c < NumberOfCurves; c++ ) {
                 if(AutoscaleMinY < thisYaxisLimitsMin[c]) AutoscaleMinY = thisYaxisLimitsMin[c];
             }
-        }
+        }*/
     }
 
     if(thisYaxisScaling == selectiveAutoScale) {
-        qDebug() << "selectiveAutoScale";
         AutoscaleMaxY = -INFINITY;
         AutoscaleMinY = INFINITY;
 
@@ -1051,11 +1088,18 @@ void caStripPlot::TimeOutThread()
             if(qAbs(AutoscaleMinY) > 1.e-9 && thisYaxisType != log10) AutoscaleMinY -= (AutoscaleMaxY - AutoscaleMinY)/20.0;
         }
 
-        if(thisYaxisType == log10) {
+        /*if(thisYaxisType == log10) {
             for (c = 0; c < NumberOfCurves; c++ ) {
+                if (!sAutoScaleCurves[c]) continue;
                 if(AutoscaleMinY < thisYaxisLimitsMin[c]) AutoscaleMinY = thisYaxisLimitsMin[c];
             }
-        }
+        }*/
+    }
+
+    if(thisYaxisScaling != fixedScale && thisYaxisType == log10){
+        if (AutoscaleMinY != manualAutoscaleMinY && autoscaleMinYOverride) {
+            AutoscaleMinY = manualAutoscaleMinY;
+        } else manualAutoscaleMinY = AutoscaleMinY;
     }
 
     mutex.unlock();
@@ -1516,12 +1560,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         const quint8 nButton = ((QMouseEvent*) event)->button();
         if (nButton == 1){
-            for (quint8 curvIndex = 0; curvIndex < 5; curvIndex++) {
-                for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
-
-                }
-                qDebug() <<rangeData[curvIndex][0].value-rangeData[curvIndex][50].value<<rangeData[curvIndex][50].interval;
-            }
+            // apply testing conditions, like enabling certain features or more --> EMPTY IN PROD!
         }
         if (nButton == 1 && thisYaxisScaling == fixedScale && thisYaxisType == linear && NumberOfCurves > 1) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.

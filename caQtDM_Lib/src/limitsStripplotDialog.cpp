@@ -25,6 +25,7 @@
 
 #include <QtGui>
 #include "limitsStripplotDialog.h"
+#include "qspinbox.h"
 
 limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
@@ -34,7 +35,7 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     StripPlot = w;
     monData = data;
 
-    QGridLayout *Layout = new QGridLayout;
+    Layout = new QGridLayout;
     Qt::WindowFlags flags = Qt::Dialog;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
@@ -118,7 +119,6 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
             maxLineEdit[i] = new QLineEdit(text);
 
             sAutoScaleSelected[i] = new QCheckBox;
-            sAutoScaleSelected[i]->setMinimumWidth(200);
             StripPlot->getSeleticeAutoScaleCurves(i) ? sAutoScaleSelected[i]->setChecked(true) : sAutoScaleSelected[i]->setChecked(false);
 
             Layout->addWidget(channelLabel,    i+1, 0);
@@ -126,7 +126,7 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
             Layout->addWidget(minLineEdit[i],  i+1, 2);
             Layout->addWidget(maxComboBox[i],  i+1, 3);
             Layout->addWidget(maxLineEdit[i],  i+1, 4);
-            Layout->addWidget(sAutoScaleSelected[i], i+1, 5);
+            Layout->addWidget(sAutoScaleSelected[i], i+1, 5, Qt::AlignCenter);
         }
     }
 
@@ -143,6 +143,30 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
         YaxisScaling->setCurrentIndex(1);
     }
 
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    Layout->addWidget(line, vars.size()+1, 0, 1, 6);
+
+    overRideAutoScale = new QLabel("Override Log10 Autoscaled Minimum: ");
+    overRideAutoScaleActive = new QCheckBox;
+    StripPlot->getAutoscaleMinYOverride() ? overRideAutoScaleActive->setChecked(true) : overRideAutoScaleActive->setChecked(false) ;
+    overRideAutoScaleValue = new QLabel("Value: ");
+    autoscaleMinY = StripPlot->getAutoscaleMinY();
+    text.setNum(autoscaleMinY);
+    minLineEditAutoScale = new QLineEdit(text);
+    Layout->addWidget(overRideAutoScaleActive, vars.size()+2, 0);
+    Layout->addWidget(minLineEditAutoScale, vars.size()+2, 1);
+    Layout->addWidget(overRideAutoScale, vars.size()+2, 2);
+    Layout->addWidget(overRideAutoScaleValue, vars.size()+2, 3);
+
+    if (!(StripPlot->getYaxisType() == caStripPlot::log10 && StripPlot->getYaxisScaling() != caStripPlot::fixedScale)) {
+        overRideAutoScale->setVisible(false);
+        minLineEditAutoScale->setVisible(false);
+        overRideAutoScaleActive->setVisible(false);
+        overRideAutoScaleValue->setVisible(false);
+    }
+
     QLabel *YaxisTypeLabel = new QLabel("Y axis :");
     YaxisType = new QComboBox;
     YaxisType->addItem("linear");
@@ -150,11 +174,11 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     if(StripPlot->getYaxisType() == caStripPlot::log10) YaxisType->setCurrentIndex(1);
     else YaxisType->setCurrentIndex(0);
 
-    Layout->addWidget(YaxisScalingLabel,  vars.size()+1, 1);
-    Layout->addWidget(YaxisScaling,  vars.size()+1, 2);
+    Layout->addWidget(YaxisScalingLabel,  vars.size()+3, 1);
+    Layout->addWidget(YaxisScaling,  vars.size()+3, 2);
 
-    Layout->addWidget(YaxisTypeLabel,  vars.size()+1, 3);
-    Layout->addWidget(YaxisType,  vars.size()+1, 4);
+    Layout->addWidget(YaxisTypeLabel,  vars.size()+3, 3);
+    Layout->addWidget(YaxisType,  vars.size()+3, 4);
 
     buttonBox = new QDialogButtonBox( Qt::Horizontal );
     QPushButton *button = new QPushButton( "Return" );
@@ -164,8 +188,7 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     button = new QPushButton( "Apply" );
     connect( button, SIGNAL(clicked()), this, SLOT(applyClicked()) );
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
-
-    Layout->addWidget(buttonBox, vars.size()+1, 0);
+    Layout->addWidget(buttonBox, vars.size()+3, 0);
 
     setLayout(Layout);
     setWindowTitle(title);
@@ -256,6 +279,32 @@ void limitsStripplotDialog::applyClicked()
     else if(indx == 2) StripPlot->setYaxisScaling(caStripPlot::selectiveAutoScale);
 
     StripPlot->UpdateScaling();
+    if (StripPlot->getYaxisType() == caStripPlot::log10 && StripPlot->getYaxisScaling() != caStripPlot::fixedScale) {
+        overRideAutoScale->setVisible(true);
+        minLineEditAutoScale->setVisible(true);
+        overRideAutoScale->setVisible(true);
+        overRideAutoScaleActive->setVisible(true);
+    } else {
+        overRideAutoScale->setVisible(false);
+        minLineEditAutoScale->setVisible(false);
+        overRideAutoScale->setVisible(false);
+        overRideAutoScaleActive->setVisible(false);
+    }
+
+    double convertedAutoscaleMinY = minLineEditAutoScale->text().toDouble(&ok);
+    QString text;
+    if(ok && autoscaleMinY != qMin(1.0, qMax(1e-20, convertedAutoscaleMinY))) {
+        StripPlot->setAutoscaleMinY(qMin(1.0, qMax(1e-20, convertedAutoscaleMinY)));
+        autoscaleMinY = StripPlot->getAutoscaleMinY();
+        text.setNum(autoscaleMinY);
+        minLineEditAutoScale->setText(text);
+    } else {
+        autoscaleMinY = StripPlot->getAutoscaleMinY();
+        text.setNum(autoscaleMinY);
+        minLineEditAutoScale->setText(text);
+    }
+
+    StripPlot->setAutoscaleMinYOverride(overRideAutoScaleActive);
 }
 
 void limitsStripplotDialog::exec()

@@ -78,6 +78,14 @@
      virtual void paintEvent(QPaintEvent *e);
 
  private:
+     QGridLayout *Layout;
+
+     QLabel *overRideAutoScale;
+     QCheckBox *overRideAutoScaleActive;
+     QLabel *overRideAutoScaleValue;
+     QLineEdit *minLineEditAutoScale;
+     double autoscaleMinY;
+
      QComboBox *minComboBox[caStripPlot::MAXCURVES];
      QComboBox *maxComboBox[caStripPlot::MAXCURVES];
      QLineEdit *minLineEdit[caStripPlot::MAXCURVES];
@@ -85,6 +93,7 @@
      QCheckBox *sAutoScaleSelected[caStripPlot::MAXCURVES];
      QComboBox *YaxisType;
      QComboBox *YaxisScaling;
+
      QStringList vars;
      caStripPlot *StripPlot;
      MutexKnobData *monData;

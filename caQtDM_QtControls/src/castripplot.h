@@ -201,7 +201,6 @@ public:
     enum yAxisType {linear=0, log10};
     enum yAxisScaling {fixedScale=0, autoScale=1, selectiveAutoScale=2};
 
-
     enum LegendAtttribute { COLOR, FONT, TEXT};
 
     void setXaxisSyncGroup( int group ) {thisXaxisSyncGroup = group;}
@@ -215,7 +214,7 @@ public:
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
 
-    void defineCurves(QStringList titres, units unit, double period, int width, int nb);
+    void defineCurves(QStringList titles, units unit, double period, int width, int nb);
     void setData(struct timeb now, double Y, int curvIndex);
 
     bool getXaxisEnabled() const { return thisXshow; }
@@ -224,6 +223,12 @@ public:
     void setYaxisEnabled(bool thisYshow);
     bool getLegendEnabled() const { return thisLegendshow; }
     void setLegendEnabled(bool thisLegendshow);
+
+    bool getAutoscaleMinYOverride() const {return autoscaleMinYOverride;}
+    void setAutoscaleMinYOverride(bool const newAutoscaleMinYOverride) {autoscaleMinYOverride = newAutoscaleMinYOverride;}
+
+    double getAutoscaleMinY() const {return manualAutoscaleMinY;}
+    void setAutoscaleMinY(double const newAutoscaleMinY) {manualAutoscaleMinY = newAutoscaleMinY;}
 
     QString getTitlePlot() const {return thisTitle;}
     void setTitlePlot(QString const &title);
@@ -534,7 +539,9 @@ private:
     QColor thisLineColor[MAXCURVES], thisGridColor;
     double AutoscaleMaxY;
     double AutoscaleMinY;
+    double manualAutoscaleMinY;
     bool sAutoScaleCurves[MAXCURVES];
+    bool autoscaleMinYOverride = false;
 
     axisScaling thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
 
@@ -554,6 +561,7 @@ private:
     double realVal[MAXCURVES], realMax[MAXCURVES], realMin[MAXCURVES];
     struct timeb realTim[MAXCURVES];
 
+    QStringList originalTitles;
     QStringList savedTitles;
     QString legendText(int i);
 
