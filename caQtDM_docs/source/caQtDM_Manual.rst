@@ -1085,6 +1085,8 @@ the used version has been solved.
 -  keeping the medm command line parameters.
 -  caQtDM runs in native mode on linux as well as on microsoft windows.
 
+
+
 caQtDM Custom Widgets
 -------------------------
 
@@ -2319,11 +2321,24 @@ option                                    meaning
 ``-x``                                    has no effect (MEDM's execute-only mode)
 ``-attach``                               attach to a running caQtDM
 ``-noMsg``                                iconize the main window
-``-noStyles``                             no stylesheet will be loaded, works only when not attaching
-``-print``                                print file and exit
+``-stylefile filename``                   will replace the default stylesheet with the specified file (works only when not attaching)
 ``-noResize``                             prevent resizing, works only when not attaching
 ``-macro "xxx=aaa,yyy=bbb, ..."``         apply :ref:`macro substitution <macro-substitution>` to replace occurrences of ``$(xxx)`` with value ``aaa``.
+``-macrodefs filename``                   will load macro definitions from file
+
 ``-dg [xpos[xypos]][+xoffset[+yoffsets]`` specifies the geometry (location and size) of the synoptic display
+``-httpconfig``
+``-print``                                print file and exit
+``-savetoimage``                          will save image file and exit
+``-cs defaultcontrolsystempluginname``    will override the default epics3 datasource
+``-option "xxx=aaa,yyy=bbb, ..."``        e.g. -option "updatetype=direct" will set the updatetype to Direct
+                                          options for bsread:
+                                          * bsmodulo,bsoffset,
+                                          * bsinconsistency(drop|keep-as-is|adjust-individual|adjust-global),
+                                          * bsmapping(provide-as-is|drop|fill-null)
+                                          * bsstrategy(complete-all|complete-latest)
+``-url url``                              will look for files on the specified url and download them to a local directory
+``-emptycache``                           will empty the local cache used for downloading
 ========================================= ===================================
 
 Parameters in square brackets [] are optional.
@@ -2657,36 +2672,36 @@ The main window of caQTDM present messages, a menu bar and a status
 bar.
 The menu bar has the following items:
 
-+------------+-----------+-------------------------------------------+
-| Menu       | Open File | calls a dialog box for opening a ``.ui``  |
-|            |           | or ``.prc`` file (``.prc`` files          |
-|            |           | represent PSI special ASCII files for     |
-|            |           | rapid prototyping)                        |
-+------------+-----------+-------------------------------------------+
-|            | Reload    | will close and reload all displays; very  |
-|            |           | handy during editing                      |
-+------------+-----------+-------------------------------------------+
-|            | Exit      | will exit caQTDM                          |
-+------------+-----------+-------------------------------------------+
-|            | About     | gives some information about the build    |
-|            |           | and author                                |
-+------------+-----------+-------------------------------------------+
-| PV         |           | will display a list of unconnected PV's   |
-+------------+-----------+-------------------------------------------+
-| UpdataType | Direct    | When caQtDM is in this mode, all the      |
-|            |           | monitors will be displayed as soon as     |
-|            |           | they come                                 |
-+------------+-----------+-------------------------------------------+
-|            | Timed     | When caQtDM is in this mode, all the      |
-|            |           | monitors will be displayed will be        |
-|            |           | displayed with a highest rate of 5Hz,     |
-|            |           | however this rate can be set on a         |
-|            |           | individual base by a JSON string after    |
-|            |           | the channel (in designer) with the        |
-|            |           | following syntax                          |
-|            |           | channel{"monitor":{"maxdisplayrate":20}}, |
-|            |           | where you can choose your display rate.   |
-+------------+-----------+-------------------------------------------+
++------------+-----------+--------------------------------------------------+
+| Menu       | Open File | calls a dialog box for opening a ``.ui``         |
+|            |           | or ``.prc`` file (``.prc`` files                 |
+|            |           | represent PSI special ASCII files for            |
+|            |           | rapid prototyping)                               |
++------------+-----------+--------------------------------------------------+
+|            | Reload    | will close and reload all displays; very         |
+|            |           | handy during editing                             |
++------------+-----------+--------------------------------------------------+
+|            | Exit      | will exit caQTDM                                 |
++------------+-----------+--------------------------------------------------+
+|            | About     | gives some information about the build           |
+|            |           | and author                                       |
++------------+-----------+--------------------------------------------------+
+| PV         |           | will display a list of unconnected PV's          |
++------------+-----------+--------------------------------------------------+
+| UpdataType | Direct    | When caQtDM is in this mode, all the             |
+|            |           | monitors will be displayed as soon as            |
+|            |           | they come                                        |
++------------+-----------+--------------------------------------------------+
+|            | Timed     | When caQtDM is in this mode, all the             |
+|            |           | monitors will be displayed will be               |
+|            |           | displayed with a highest rate of 5Hz,            |
+|            |           | however this rate can be set on a                |
+|            |           | individual base by a JSON string after           |
+|            |           | the channel (in designer) with the               |
+|            |           | following syntax                                 |
+|            |           | channel{"caqtdm_monitor":{"maxdisplayrate":20}}, |
+|            |           | where you can choose your display rate.          |
++------------+-----------+--------------------------------------------------+
 
 
 The Status bar will display the following information: memory used by
@@ -2770,17 +2785,71 @@ should get a print dialog.
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
 
-MEDM uses the following environment variables:
+caQtDM uses the following environment variables:
 
-+---------------------+-----------------------------------------------+
-| CAQTDM_DISPLAY_PATH | A colon-separated (semi-colon-separated on    |
-|                     | Mircosoft Windows) list of directories in     |
-|                     | which to look for display files. Only looks   |
-|                     | in the current working directory if not       |
-|                     | specified. Related Displays have to be in     |
-|                     | your current directory or in this path        |
-+---------------------+-----------------------------------------------+
-| CAQTDM_EXEC_LIST    | A list of commands for the Context Menu . See |
-|                     | the :ref:`context.menu.customization` for     |
-|                     | the format.                                   |
-+---------------------+-----------------------------------------------+
+**form QT and EPICS Library:**
+
++------------------------------+-----------------------------------------------+
+| ``QT_PLUGIN_PATH``           | to find the plugins of qt and others          |
++------------------------------+-----------------------------------------------+
+| ``EPICS_CA_ADDR_LIST``       | see EPICS Documentation                       |
++------------------------------+-----------------------------------------------+
+| ``EPICS_CA_MAX_ARRAY_BYTES`` | see EPICS Documentation                       |
++------------------------------+-----------------------------------------------+
+
+**from caQtDM:**
+
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_DISPLAY_PATH``              | A colon-separated (semi-colon-separated on    |
+|                                      | Mircosoft Windows) list of directories in     |
+|                                      | which to look for display files. Only looks   |
+|                                      | in the current working directory if not       |
+|                                      | specified. Related Displays have to be in     |
+|                                      | your current directory or in this path        |
+|                                      |                                               |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_URL_DISPLAY_PATH``          | paths to look for ui and stylesheet files     | 
+|                                      | to download via http                          |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_EXEC_LIST``                 | A list of commands for the Context Menu . See |
+|                                      | the :ref:`context.menu.customization` for     |
+|                                      | the format.                                   |
++--------------------------------------+-----------------------------------------------+
+| ``MEDM_EXEC_LIST``                   | for backwards......                           |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_LAUNCHFILE``                | Enviroment file for Mobile devices            |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_TIMEOUT_HOURS``             | to exit caQtDM after some amount of time      |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_DIRECT``         | override all other find record settings       |
+|                                      | (direct json http download)                   |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_SRV``            | for autocompletion, the request URL           |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_FACILITY``       | search limitation for a facility              |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_LIMIT``          | search limit max number of entries            |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_DEFAULT_UNIT_REPLACEMENTS`` | if set to "false", default unit replacements  |
+|                                      | are disabled.                                 |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_CUSTOM_UNIT_REPLACEMENTS``  | define custom unit replacements. They are     |
+|                                      | replaced after default replacements took      |
+|                                      | place, if enabled.You can use unicode         |
+|                                      | characters or hexadecimal / decimal utf-8     |
+|                                      | character codes, seperated by (,) , (=)       |
+|                                      | and (;).                                      |
++--------------------------------------+-----------------------------------------------+
+
+**from plugins:**
+
++----------------------------------+-----------------------------------------------------------+
+| ``BSREAD_DISPATCHER``            | point the bsread plugin to the dispatcher                 |
++----------------------------------+-----------------------------------------------------------+
+| ``BSREAD_ZMQ_CONNECTION_TYPE``   | control the connection type of the bsread plugin          |
++----------------------------------+-----------------------------------------------------------+
+| ``BSREAD_ZMQ_ADDR_LIST``         | point the bsread plugin static sources                    |
++----------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVERSF_URL``        | point the archiver plugin to a different archiver backend |
++----------------------------------+-----------------------------------------------------------+
+
