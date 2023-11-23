@@ -1695,11 +1695,24 @@ is the equivalent of the Byte Monitor in MEDM.
 ``caCamera``
 ~~~~~~~~~~~~
 
-has no equivalent in MEDM.
-
-   | :ref:`geometry` is used for any object 
    | **Description:** 
-    
+        The main idea of the camera widget is to display 2D data in a widget. This can be any data that has the one format that the widget 
+        can decode. The widget uses EPICS data types, but can use the data as a memory bob and decodes the data in various ways that are common 
+        for image encoding. Be aware that we can't implement every way. We tested against two different vendors/color cameras (Basler acA4600-10uc/acA1300-30gc and Prosilica GC1660C)
+        to cover most needed conversions.
+        Be aware that the conversion matrixes between YUV and RGB are based on the used color room. We are using these functions:
+
+	.. math::
+	       
+	       \begin{aligned}
+	       YUV2R(y,cb,cr) &= \frac{298.082*y}{256} & &+ \frac{408.583 * cr }{256} &- 222.291 \\
+	       YUV2G(y,cb,cr) &= \frac{298.082*y}{256} &- \frac{100.291 * cb }{256} &- \frac{208.120 * cr  }{256} &+ 135.576 \\
+	       YUV2B(y,cb,cr) &= \frac{298.082*y}{256} &+ \frac{561.412 * cb }{256} & &- 276.836
+	       \end{aligned}
+	       
+	       
+	       
+
    **channelData**
       Image data channel. Typically a waveform with the data in different formats comming directly from the hardware. 
    **channelWidth**
@@ -1748,11 +1761,18 @@ has no equivalent in MEDM.
 	    =============  ==========  ========================================================================================== 
     
    **colorModeOverwriteChannel**
-      MISSING
+      channel to select one of the color modes. The value of the channel has to be a string to let the widget seatch inside it enum list.
+      This should be supported by the hardware IOC because this is hardware depended setting. If this is not available enable the combo boxes to do it manual
    **packMode**
-      MISSING
+         =================== ================================================
+         packNo              no modification of the bit representation
+         MSB12Bit            for 12 bit color modes set most significant bit 
+         LSB12Bit            for 12 bit color modes set least significant bit
+         Reversed            for YUV to reverse the decoding to VUY
+         =================== ================================================
    **packingModeOverwriteChannel**
-      MISSING
+      channel to select one of the packing modes. The value of the channel has to be a string to let the widget seatch inside it enum list. 
+      This should be supported by the hardware IOC because this is hardware depended setting. If this is not available enable the combo boxes to do it manual
    **showComboBoxes**
       enable/disable the visibility for changing the data interpretation from the user side
    
@@ -1771,7 +1791,7 @@ has no equivalent in MEDM.
    **customColorMap**
       QString: list of color values (value,r,g,b), seperated by a semicolon
    **discreteCustomColorMap**
-      MISSING
+      QString: list of color values (value,r,g,b), seperated by a semicolon. This map is not smoothed over the value area.      
    **ROI_readChannelsList**
       edit list of 4 channels seperated by a semicolon to draw rectangle into the image
    **ROI_readChannels**
@@ -1803,9 +1823,25 @@ has no equivalent in MEDM.
    **ROI_writeChannels**
       see the actual ROI_writeChannelsList
    **ROI_writemarkerType**
-      MISSING
+      define the cursor marker for the selection
+             =================== ==============================================
+             cursor              selection type
+             ------------------- ----------------------------------------------
+             box                 simple box
+             box_crosshairs      box with extra lines
+             line                line connection       
+             arrow               arrow connection
+             =================== ==============================================
    **ROI_writeType**
-      MISSING
+     how the data is written to the channels 
+             ===================== ================================================
+             type                  description
+             none                  data is ignored
+             xy_only               only the first 2 channels are used for a center
+             xy1_xy2               box with 2 coordinates       
+             xyUpleft_xyLowright   box with a upper left and lower right version
+             xycenter_width_height box with center coordinats and a size 
+             ===================== ================================================
    **channelXaverage**
       waveform channel to display a pixel wise plot into an image for the x-axis
    **channelYaverage**
@@ -1820,11 +1856,62 @@ has no equivalent in MEDM.
 
 ``caCalc``
 ~~~~~~~~~~
-
-has no equivalent in MEDM.
-
-   :ref:`geometry` is used for any object
+   
    **Description:**
+      The idea of caCalc is to have a posibility to do calculations for supporting and optimizing the graphical interface. Thinks like complex visibility and specific data handling/distributions. It is *NOT* meant for a simple replacement for a real IOC.
+      The advantage of caCalc is to open a connection between channel data and data transportation and modification of Qt. This Signal/Slot mechanisem helps to access deeper graphical functionalities, like moving widgets aaround or get control over the main window e.g. remote displays.
+   **variable**
+      this string generates a process wide variable (softPV) inside caQtDM. This contains the value of the calculation. If this string is empty there will be an automatic name generated, everytime the panels is opened. To guarantee that this name is unique caQtDM is using the UUID generator. 
+   **variableType**
+      this defines the output type of the softPV. The only decission you can made is sclar or vector.
+       ====== ====================
+       scalar a single double
+       vector an array of doubles
+       ====== ====================
+       
+   **foreground**
+      defines the foreground color of the widget
+   **background**
+      defines the background color of the widget
+   **channels**
+      if variableType is vector you can add a number of single channels to a list. caCalc is generating a softPV that can be used for plotting  
+   **channelList**
+      visualisation of all channels 
+   **calc**
+      this string represents the calculation that is executed when one of the 4 channels got a monitor. The calculation is exactly the same mechanisem like in the calc or the calcout record in EPICS. There are additional way to use caCalc.
+
+      #. EPICS calc string
+      #. %/regexp/ : to use Regular Expressions
+      #. %QRect : to use Siganl/Slot mechanisem to control positions and size. For this you need to add all 4 channel properties a data source
+      #. %P/ : to use Python for calculations (extra support is needed during build time, typically only Linux support)
+      
+      inside the calculation macros can be used.
+      
+   **channel**
+      data source for **A** can be a channel that gets the data over a plugin or a softPV. The reason for the not name this property not **channelA** is the naming in the origin of EPICS records.
+   **channelB**
+      datas source for the value **B** 
+   **channelC**
+      datas source for the value **C**
+   **channelD**
+      datas source for the value **D**
+   **initialValue**
+      this property initialize the widget with this value enterd here
+   **precision**
+      the precision gives the accuarcy of the graphical display part of this widget
+   **eventsignal**
+       if you are using the Signal/Slot mechanissen you must change this property. Otherwise there will be no signals emitted.   
+       ================= ====================
+       Never             there will never a signal generated
+       onFirstChange     there will be one signal emitted at the first change
+       onAnyChange       on every change ther will be signal emitted, this frequency can be sometimes a problem.
+       TriggerZeroToOne  there will be only signals when the value before was rounded 0 and now the rounded value is 1
+       TriggerOneToZero  there will be only a signal when the value was rounded 1 and is now rounded 0
+       ================= ====================
+     
+   **buddy**
+      Qt specific property because of the object characteristic of the caCalc widget 
+      
 
 --------------
 

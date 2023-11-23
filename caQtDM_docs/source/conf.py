@@ -22,6 +22,7 @@ extensions = """
     sphinx.ext.githubpages
     sphinx.ext.todo
     sphinx.ext.viewcode
+    sphinx.ext.imgmath
 """.split()
 
 templates_path = ["_templates"]
