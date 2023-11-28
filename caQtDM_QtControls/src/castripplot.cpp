@@ -36,6 +36,7 @@
 #include <qpainter.h>
 #include <QMetaProperty>
 #include "castripplot.h"
+#include <cmath>
 
 #include <qwt_picker_machine.h>
 
@@ -143,98 +144,123 @@ private:
 };
 
 /* Class for creating a linear ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
- * have the correct spacing after the conversion odne by the (Unit)ScaleDraw.
+ * have the correct spacing.
  * */
-class QwtUnitLinearScaleEngine: public QwtLinearScaleEngine {
-
+class StripplotLinearScaleEngine: public QwtLinearScaleEngine {
 public:
-    QwtUnitLinearScaleEngine(double ConversionFactor = 1.0, double ConversionOffset = 0) : QwtLinearScaleEngine(10), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset) {
+    StripplotLinearScaleEngine(double MinOld = 10, double MaxOld = 100, double MinNew = 10, double MaxNew = 100) : QwtLinearScaleEngine(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew)
+    {
     }
 
     QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
-        x1 = (x1*_ConversionFactor)+_ConversionOffset;
-        x2 = (x2*_ConversionFactor)+_ConversionOffset;
+        x1 = ((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(x1-_MinOld)+_MinNew;
+        x2 = ((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(x2-_MinOld)+_MinNew;
 
-        stepSize *= _ConversionFactor;
+        stepSize *= ((_MaxNew - _MinNew) / (_MaxOld - _MinOld));
 
         QwtScaleDiv Div = QwtLinearScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
-        QwtScaleDiv test = QwtLinearScaleEngine::divideScale(-100, 500, numMajorSteps, numMinorSteps, stepSize);
 
         QList<double> Ticks[QwtScaleDiv::NTickTypes];
 
         Ticks[QwtScaleDiv::MajorTick] = Div.ticks(QwtScaleDiv::MajorTick);
         for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MajorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MajorTick][i] = (Ticks[QwtScaleDiv::MajorTick][i] - _ConversionOffset) / _ConversionFactor;
+            Ticks[QwtScaleDiv::MajorTick][i] = ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(Ticks[QwtScaleDiv::MajorTick][i]-_MinNew)+_MinOld;
         }
         Ticks[QwtScaleDiv::MediumTick] = Div.ticks(QwtScaleDiv::MediumTick);
         for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MediumTick].count(); i++) {
-            Ticks[QwtScaleDiv::MediumTick][i] = (Ticks[QwtScaleDiv::MediumTick][i] - _ConversionOffset) / _ConversionFactor;
+            Ticks[QwtScaleDiv::MediumTick][i] = ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(Ticks[QwtScaleDiv::MediumTick][i]-_MinNew)+_MinOld;
         }
         Ticks[QwtScaleDiv::MinorTick] = Div.ticks(QwtScaleDiv::MinorTick);
         for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MinorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MinorTick][i] = (Ticks[QwtScaleDiv::MinorTick][i] - _ConversionOffset) / _ConversionFactor;
+            Ticks[QwtScaleDiv::MinorTick][i] = ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(Ticks[QwtScaleDiv::MinorTick][i]-_MinNew)+_MinOld;
         }
-        return QwtScaleDiv(QwtInterval((x1 - _ConversionOffset) / _ConversionFactor, (x2 - _ConversionOffset) / _ConversionFactor), Ticks);
+        return QwtScaleDiv(QwtInterval(((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(x1-_MinNew)+_MinOld, ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(x2-_MinNew)+_MinOld), Ticks);
     }
 protected:
-    double _ConversionFactor;
-    double _ConversionOffset;
+    double _MinOld;
+    double _MaxOld;
+    double _MinNew;
+    double _MaxNew;
 };
 
-/* Class for creating a linear ScaleDraw that modifies the value by a given factor and offset,
- * to show different Scales, than the one currently drawn. Doesn't modify the actuals curves.
+/* Class for creating a logarithmic ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
+ * have the correct spacing.
  * */
-class QwtUnitLinearScaleDraw: public QwtScaleDraw
+class StripplotLog10ScaleEngine: public QwtLogScaleEngine {
+public:
+    StripplotLog10ScaleEngine(double MinOld = 10, double MaxOld = 100, double MinNew = 10, double MaxNew = 100) : QwtLogScaleEngine(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew)
+    {
+    }
+
+    QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
+        x1 = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(x1/_MinOld)/std::log10(_MaxOld/_MinOld))));
+        x2 = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(x2/_MinOld)/std::log10(_MaxOld/_MinOld))));
+
+        stepSize *= std::log10(_MaxNew/_MinNew) / std::log10(_MaxOld/_MinOld);
+
+        QwtScaleDiv Div = QwtLogScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
+
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+
+        Ticks[QwtScaleDiv::MajorTick] = Div.ticks(QwtScaleDiv::MajorTick);
+        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MajorTick].count(); i++) {
+            Ticks[QwtScaleDiv::MajorTick][i] = _MinOld*(pow((_MaxOld/_MinOld),(std::log10(Ticks[QwtScaleDiv::MajorTick][i]/_MinNew)/std::log10(_MaxNew/_MinNew))));
+        }
+        Ticks[QwtScaleDiv::MediumTick] = Div.ticks(QwtScaleDiv::MediumTick);
+        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MediumTick].count(); i++) {
+            Ticks[QwtScaleDiv::MediumTick][i] = _MinOld*(pow((_MaxOld/_MinOld),(std::log10(Ticks[QwtScaleDiv::MediumTick][i]/_MinNew)/std::log10(_MaxNew/_MinNew))));
+        }
+        Ticks[QwtScaleDiv::MinorTick] = Div.ticks(QwtScaleDiv::MinorTick);
+        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MinorTick].count(); i++) {
+            Ticks[QwtScaleDiv::MinorTick][i] = _MinOld*(pow((_MaxOld/_MinOld),(std::log10(Ticks[QwtScaleDiv::MinorTick][i]/_MinNew)/std::log10(_MaxNew/_MinNew))));
+        }
+        return QwtScaleDiv(QwtInterval(_MinOld*(pow((_MaxOld/_MinOld),(std::log10(x1/_MinNew)/std::log10(_MaxNew/_MinNew)))), _MinOld*(pow((_MaxOld/_MinOld),(std::log10(x2/_MinNew)/std::log10(_MaxNew/_MinNew))))), Ticks);
+    }
+protected:
+    double _MinOld;
+    double _MaxOld;
+    double _MinNew;
+    double _MaxNew;
+};
+
+/* Class for creating a  ScaleDraw that modifies the value to show different Scales
+ * than the one currently drawn. Doesn't modify the actuals curves.
+ * Depending on the axistype (linear, log10) the values will be modified accordingly.
+ * */
+class StripplotScaleDraw: public QwtScaleDraw
 {
 public:
 
-    QwtUnitLinearScaleDraw(double ConversionFactor = 1, double ConversionOffset = 0): QwtScaleDraw(), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset)
+    StripplotScaleDraw(double MinOld = 10, double MaxOld = 100, double MinNew = 10, double MaxNew = 100, bool IsLinear = true): QwtScaleDraw(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew), _IsLinear(IsLinear)
     {
     }
 
-    void setConversion(double ConversionFactor = 1, double ConversionOffset = 0)
+    void setConversion(double MinOld, double MaxOld, double MinNew, double MaxNew, bool IsLinear)
     {
-        _ConversionFactor = ConversionFactor;
-        _ConversionOffset = ConversionOffset;
+        _MinOld = MinOld;
+        _MaxOld = MaxOld;
+        _MinNew = MinNew;
+        _MaxNew = MaxNew;
+        _IsLinear = IsLinear;
     }
 
-    virtual QwtText label(double v) const
+    QwtText label(double v) const
     {
-        double newLabel = (v * _ConversionFactor)+_ConversionOffset;
+        double newLabel;
+        if (_IsLinear) {
+            newLabel = ((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(v-_MinOld)+_MinNew;
+        } else {
+            newLabel = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(v/_MinOld)/std::log10(_MaxOld/_MinOld))));
+        }
         return QwtScaleDraw::label(newLabel);
     }
 
 private:
-    double _ConversionFactor;
-    double _ConversionOffset;
-};
-
-/* Class for creating a linear ScaleDraw that modifies the value by a given factor and offset,
- * to show different Scales, than the one currently drawn. Doesn't modify the actuals curves.
- * */
-class QwtUnitLogScaleDraw: public QwtScaleDraw
-{
-public:
-
-    QwtUnitLogScaleDraw(double ConversionFactor = 1, double ConversionOffset = 0): QwtScaleDraw(), _ConversionFactor(ConversionFactor), _ConversionOffset(ConversionOffset)
-    {
-    }
-
-    void setConversion(double ConversionFactor = 1, double ConversionOffset = 0)
-    {
-        _ConversionFactor = ConversionFactor;
-        _ConversionOffset = ConversionOffset;
-    }
-
-    virtual QwtText label(double v) const
-    {
-        double newLabel = (v * _ConversionFactor)+_ConversionOffset;
-        return QwtScaleDraw::label(newLabel);
-    }
-
-private:
-    double _ConversionFactor;
-    double _ConversionOffset;
+    double _MinOld;
+    double _MaxOld;
+    double _MinNew;
+    double _MaxNew;
+    bool _IsLinear;
 };
 
 caStripPlot::~caStripPlot() {
@@ -443,7 +469,7 @@ void caStripPlot::selectFixedYAxis(int newYAxisIndex){
  * */
 void caStripPlot::onSelected(const QPointF& point)
 {
-    if (thisYaxisScaling != fixedScale || thisYaxisType != linear || NumberOfCurves == 1) return;
+    if (thisYaxisScaling != fixedScale || NumberOfCurves == 1) return;
     const double scaledTolerance = (thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)]) * 0.01;
     const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
@@ -486,7 +512,7 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     if (YAxisIndex > (NumberOfCurves-1)) YAxisIndex = 0;
 
     savedTitles = originalTitles;
-    savedTitles.insert(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
+    savedTitles.replace(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
     for(quint8 i=0; i < NumberOfCurves; i++) {
         curve[i]->setTitle(legendText(i));
     }
@@ -498,12 +524,18 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
 
     const double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
     const double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
+    const double newYAxisMin = thisYaxisLimitsMin[YAxisIndex];
+    const double newYAxisMax = thisYaxisLimitsMax[YAxisIndex];
+    qDebug() << "going from" << oldYAxisMin << "-" <<oldYAxisMax << "to" << newYAxisMin << "-" << newYAxisMax;
 
-    const double conversionFactor = ((thisYaxisLimitsMax[YAxisIndex] - thisYaxisLimitsMin[YAxisIndex])/(oldYAxisMax - oldYAxisMin));
-    const double conversionOffset = (thisYaxisLimitsMin[YAxisIndex] * oldYAxisMax - thisYaxisLimitsMax[YAxisIndex] * oldYAxisMin) / (oldYAxisMax - oldYAxisMin);
+    bool isLinear = (thisYaxisType == linear);
+    static_cast<StripplotScaleDraw*>(axisScaleDraw(yLeft))->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
+    if (isLinear) {
+        setAxisScaleEngine(yLeft, new StripplotLinearScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
+    } else {
+        setAxisScaleEngine(yLeft, new StripplotLog10ScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
+    }
 
-    static_cast<QwtUnitLinearScaleDraw*>(axisScaleDraw(yLeft))->setConversion(conversionFactor, conversionOffset);
-    setAxisScaleEngine(yLeft, new QwtUnitLinearScaleEngine(conversionFactor, conversionOffset));
 
     replot();
 }
@@ -567,13 +599,15 @@ void caStripPlot::setYaxisType(yAxisType s)
     if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+        setAxisScaleDraw(QwtPlot::yLeft, new StripplotScaleDraw());
 #else
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
-        setAxisScaleDraw(QwtPlot::yLeft, new QwtScaleDraw);
+        // Leaves default parameter IsLinear = true, doesn't matter though because we don't want any conversion so far.
+        setAxisScaleDraw(QwtPlot::yLeft, new StripplotScaleDraw());
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine());
 #endif
     } else {
-        setAxisScaleDraw(QwtPlot::yLeft, new QwtUnitLinearScaleDraw());
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtUnitLinearScaleEngine());
+        setAxisScaleDraw(QwtPlot::yLeft, new StripplotScaleDraw());
+        setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
     }
 
     replot();
@@ -744,7 +778,7 @@ void caStripPlot::UpdateScaling()
         palette.setColor( QPalette::WindowText, thisLineColor[YAxisIndex].rgba());
         scaleY->setPalette (palette);
 
-        savedTitles.insert(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
+        savedTitles.replace(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
         curve[YAxisIndex]->setTitle(legendText(YAxisIndex));
     } else {
         QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
@@ -810,7 +844,7 @@ void caStripPlot::defineCurves(QStringList titles, units unit, double period, in
     scaleWidget->getBorderDistHint(min, max);
     originalTitles = savedTitles = titles;
 
-    savedTitles.insert(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
+    savedTitles.replace(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
 
     defineXaxis(unit, period);
 
@@ -1001,12 +1035,12 @@ void caStripPlot::TimeOutThread()
         if(thisYaxisScaling == selectiveAutoScale) {
             if(thisYaxisType == log10 && sAutoScaleCurves[c]) {
                 if(valueMin < 1.e-20) valueMin=1.e-20;
-                if(valueMax < 1.e-20) valueMax=1.e-19;
+                if(valueMax < 1.e-19) valueMax=1.e-19;
             }
         } else {
             if(thisYaxisType == log10) {
                 if(valueMin < 1.e-20) valueMin=1.e-20;
-                if(valueMax < 1.e-20) valueMax=1.e-19;
+                if(valueMax < 1.e-19) valueMax=1.e-19;
             }
         }
 
@@ -1140,8 +1174,8 @@ void caStripPlot::TimeOut()
             setAxisScaleDraw (QwtPlot::xBottom, new TimeScaleDraw (timeNow));
         }
         if(thisYaxisType == linear){
-            setAxisScaleEngine(yLeft, new QwtUnitLinearScaleEngine());
-            setAxisScaleDraw(yLeft, new QwtUnitLinearScaleDraw());
+            setAxisScaleEngine(yLeft, new StripplotLinearScaleEngine());
+            setAxisScaleDraw(yLeft, new StripplotScaleDraw);
         }
     }
 
@@ -1332,23 +1366,28 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
 
     // in case of fixed scales, remap the data to the first curve
     if(thisYaxisScaling == fixedScale) {
-        double y0min = thisYaxisLimitsMin[0];
-        double y0max = thisYaxisLimitsMax[0];
-        //double y0min = thisYaxisLimitsMin[int(YAxisIndex)];
-        //double y0max = thisYaxisLimitsMax[int(YAxisIndex)];
-        double ymin =  thisYaxisLimitsMin[curvIndex];
-        double ymax =  thisYaxisLimitsMax[curvIndex];
-        actVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin) + y0min;
-        minVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin) + y0min;
-        maxVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin) + y0min;
+        // We need a different Algorithm for remapping linear vs logarithmic data
+        if (thisYaxisType == linear) {
+            double y0min = thisYaxisLimitsMin[0];
+            double y0max = thisYaxisLimitsMax[0];
+            double ymin =  thisYaxisLimitsMin[curvIndex];
+            double ymax =  thisYaxisLimitsMax[curvIndex];
+            actVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realVal[curvIndex] - ymin) + y0min;
+            minVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMin[curvIndex] - ymin) + y0min;
+            maxVal[curvIndex] = (y0max - y0min) / (ymax -ymin) * (realMax[curvIndex] - ymin) + y0min;
+        } else {
+            double ymin =  thisYaxisLimitsMin[curvIndex];
+            double ymax =  thisYaxisLimitsMax[curvIndex];
+            if (ymin < 1e-20) setYaxisLimitsMin(curvIndex, 1e-20);
+            if (ymax < 1e-19) setYaxisLimitsMax(curvIndex, 1e-19);
+            double y0min = thisYaxisLimitsMin[0];
+            double y0max = thisYaxisLimitsMax[0];
 
-        //setYscale(getYaxisLimitsMin(YAxisIndex),getYaxisLimitsMax(YAxisIndex));
-
-        if (setDataFirstCall){
-            setYscale(getYaxisLimitsMin(0),getYaxisLimitsMax(0));
-            setDataFirstCall = false;
+            actVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realVal[curvIndex]/ymin)/std::log10(ymax/ymin))));
+            minVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realMin[curvIndex]/ymin)/std::log10(ymax/ymin))));
+            maxVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realMax[curvIndex]/ymin)/std::log10(ymax/ymin))));
         }
-
+        setYscale(getYaxisLimitsMin(0),getYaxisLimitsMax(0));
         // otherwise keep the data
     } else {
         actVal[curvIndex] = realVal[curvIndex];
@@ -1562,7 +1601,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
         if (nButton == 1){
             // apply testing conditions, like enabling certain features or more --> EMPTY IN PROD!
         }
-        if (nButton == 1 && thisYaxisScaling == fixedScale && thisYaxisType == linear && NumberOfCurves > 1) {
+        if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.
             // Canvas events are ignored, because clicks on there are handled by the qwt plotpicker to select the clicked curve --> They are not for just iterating.
             if (obj->objectName() == "QwtPlotCanvas") return true;

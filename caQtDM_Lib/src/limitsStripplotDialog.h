@@ -82,7 +82,7 @@
 
      QLabel *overRideAutoScale;
      QCheckBox *overRideAutoScaleActive;
-     QLabel *overRideAutoScaleValue;
+     QLabel *overRideAutoScaleValueLabel;
      QLineEdit *minLineEditAutoScale;
      double autoscaleMinY;
 

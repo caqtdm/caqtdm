@@ -148,23 +148,23 @@ limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data
     line->setFrameShadow(QFrame::Sunken);
     Layout->addWidget(line, vars.size()+1, 0, 1, 6);
 
-    overRideAutoScale = new QLabel("Override Log10 Autoscaled Minimum: ");
+    overRideAutoScale = new QLabel("Override Log10 autoscaled minimum: ");
     overRideAutoScaleActive = new QCheckBox;
     StripPlot->getAutoscaleMinYOverride() ? overRideAutoScaleActive->setChecked(true) : overRideAutoScaleActive->setChecked(false) ;
-    overRideAutoScaleValue = new QLabel("Value: ");
+    overRideAutoScaleValueLabel = new QLabel("New minimum Value: ");
     autoscaleMinY = StripPlot->getAutoscaleMinY();
     text.setNum(autoscaleMinY);
     minLineEditAutoScale = new QLineEdit(text);
-    Layout->addWidget(overRideAutoScaleActive, vars.size()+2, 0);
-    Layout->addWidget(minLineEditAutoScale, vars.size()+2, 1);
-    Layout->addWidget(overRideAutoScale, vars.size()+2, 2);
-    Layout->addWidget(overRideAutoScaleValue, vars.size()+2, 3);
+    Layout->addWidget(overRideAutoScale, vars.size()+2, 0);
+    Layout->addWidget(overRideAutoScaleActive, vars.size()+2, 1);
+    Layout->addWidget(overRideAutoScaleValueLabel, vars.size()+2, 2);
+    Layout->addWidget(minLineEditAutoScale, vars.size()+2, 3);
 
     if (!(StripPlot->getYaxisType() == caStripPlot::log10 && StripPlot->getYaxisScaling() != caStripPlot::fixedScale)) {
         overRideAutoScale->setVisible(false);
         minLineEditAutoScale->setVisible(false);
         overRideAutoScaleActive->setVisible(false);
-        overRideAutoScaleValue->setVisible(false);
+        overRideAutoScaleValueLabel->setVisible(false);
     }
 
     QLabel *YaxisTypeLabel = new QLabel("Y axis :");
@@ -282,12 +282,12 @@ void limitsStripplotDialog::applyClicked()
     if (StripPlot->getYaxisType() == caStripPlot::log10 && StripPlot->getYaxisScaling() != caStripPlot::fixedScale) {
         overRideAutoScale->setVisible(true);
         minLineEditAutoScale->setVisible(true);
-        overRideAutoScale->setVisible(true);
+        overRideAutoScaleValueLabel->setVisible(true);
         overRideAutoScaleActive->setVisible(true);
     } else {
         overRideAutoScale->setVisible(false);
         minLineEditAutoScale->setVisible(false);
-        overRideAutoScale->setVisible(false);
+        overRideAutoScaleValueLabel->setVisible(false);
         overRideAutoScaleActive->setVisible(false);
     }
 
