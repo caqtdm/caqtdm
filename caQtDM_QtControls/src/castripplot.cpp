@@ -230,7 +230,7 @@ class StripplotScaleDraw: public QwtScaleDraw
 {
 public:
 
-    StripplotScaleDraw(double MinOld = 10, double MaxOld = 100, double MinNew = 10, double MaxNew = 100, bool IsLinear = true): QwtScaleDraw(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew), _IsLinear(IsLinear)
+    StripplotScaleDraw(double MinOld = 1e-20, double MaxOld = 100.0, double MinNew = 1e-20, double MaxNew = 100.0, bool IsLinear = true): QwtScaleDraw(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew), _IsLinear(IsLinear)
     {
     }
 
