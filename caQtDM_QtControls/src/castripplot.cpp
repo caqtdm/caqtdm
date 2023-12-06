@@ -229,7 +229,8 @@ protected:
 class StripplotScaleDraw: public QwtScaleDraw
 {
 public:
-
+    // Default Limits are the same for new and old ones to not have any convertion of values.
+    // Default minimum is 1e-20 to ensure proper precision.
     StripplotScaleDraw(double MinOld = 1e-20, double MaxOld = 100.0, double MinNew = 1e-20, double MaxNew = 100.0, bool IsLinear = true): QwtScaleDraw(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew), _IsLinear(IsLinear)
     {
     }
@@ -260,6 +261,59 @@ private:
     double _MinNew;
     double _MaxNew;
     bool _IsLinear;
+};
+
+class StripplotPlotPicker : public QwtPlotPicker
+{
+public:
+    StripplotPlotPicker(QwtAxisId xAxisId, QwtAxisId yAxisId, RubberBand rubberBand, DisplayMode trackerMode, QWidget * widget) : QwtPlotPicker( xAxisId,  yAxisId,  rubberBand,  trackerMode, widget)
+    {
+    }
+
+    void setConversion(double MinOld, double MaxOld, double MinNew, double MaxNew, bool IsLinear)
+    {
+        _MinOld = MinOld;
+        _MaxOld = MaxOld;
+        _MinNew = MinNew;
+        _MaxNew = MaxNew;
+        _IsLinear = IsLinear;
+        qDebug() << "set IsLinear to:" << _IsLinear;
+    }
+
+    void setStartTime(long long startTime, double period)
+    {
+        _StartTime = QDateTime::fromSecsSinceEpoch(startTime);
+        _Period = period;
+    }
+
+protected:
+    QwtText trackerText( const QPoint& pos ) const
+    {
+        if ( plot() == NULL ) {
+            return QwtText();
+        }
+
+        QPointF coordinates = invTransform(pos);
+        QDateTime timeOnHover = _StartTime.addMSecs((coordinates.x() - _Period)*1000);
+        qDebug() << timeOnHover << _Period;
+        if (_IsLinear) {
+            coordinates.setY(((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(coordinates.y()-_MinOld)+_MinNew);
+        } else {
+            qDebug() << coordinates.y();
+            coordinates.setY(_MinNew*(pow((_MaxNew/_MinNew),(std::log10(coordinates.y()/_MinOld)/std::log10(_MaxOld/_MinOld)))));
+            qDebug() << coordinates.y();
+        }
+
+        return trackerTextF(coordinates);
+    }
+private:
+    double _MinOld = 1e-20;
+    double _MaxOld = 100;
+    double _MinNew = 1e-20;
+    double _MaxNew = 100;
+    bool _IsLinear = true;
+    QDateTime _StartTime;
+    double _Period;
 };
 
 caStripPlot::~caStripPlot() {
@@ -392,10 +446,9 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     connect(this, SIGNAL(timerThreadStop()), timerThread, SLOT(runStop()));
     connect(timerThread, SIGNAL(update()), this, SLOT(TimeOutThread()),  Qt::DirectConnection);
 
-    QwtPlotPicker* plotPicker = new QwtPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
+    plotPicker = new StripplotPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
     QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
     plotPicker->setStateMachine(pickerMachine);
-    //plotPicker->setTrackerMode(QwtPicker::AlwaysOff);
     connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 }
 
@@ -547,6 +600,7 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
 
     bool isLinear = (thisYaxisType == linear);
     static_cast<StripplotScaleDraw*>(axisScaleDraw(yLeft))->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
+    static_cast<StripplotPlotPicker*>(plotPicker)->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
     if (isLinear) {
         setAxisScaleEngine(yLeft, new StripplotLinearScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
     } else {
@@ -888,6 +942,7 @@ void caStripPlot::UpdateScaling()
             remapCurve(thisYaxisLimitsMin[curvIndex], thisYaxisLimitsMax[curvIndex], curvIndex, thisYaxisType == log10);
         }
     }
+    selectYAxis(YAxisIndex);
 
     replot();
     if(timerID) RescaleAxis();
@@ -1034,6 +1089,7 @@ void caStripPlot::TimeOutThread()
     // we need an exact time scale
     if(RestartPlot1) {
         ftime(&timeStart);
+        static_cast<StripplotPlotPicker*>(plotPicker)->setStartTime(timeStart.time, thisPeriod);
         RestartPlot1 = false;
         RestartPlot2 = true;
     }

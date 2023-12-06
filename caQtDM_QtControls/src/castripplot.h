@@ -523,6 +523,8 @@ private:
     QVector<QwtIntervalSample> rangeDataRaw[MAXCURVES];
     QVector<QPointF> fillDataRaw[MAXCURVES];
 
+    QwtPlotPicker * plotPicker;
+
     double timeData;
     int dataCount;
 
