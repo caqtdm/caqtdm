@@ -506,7 +506,7 @@ private:
     void RescaleAxis();
     void TimersStart();
     void selectYAxis(quint8 newYAxisIndex);
-    void remapCurves(double newMin, double newMax, quint8 curvIndex, bool isNewLog);
+    void remapCurve(double newMin, double newMax, quint8 curvIndex, bool isNewLog);
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];
