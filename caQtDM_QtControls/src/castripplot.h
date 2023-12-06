@@ -496,7 +496,8 @@ private:
     struct timeb plotStart;
     bool RestartPlot1, RestartPlot2;
     bool plotIsPaused;
-    bool YScalingMappedAutoScale = false;
+    enum YScalingMapping {notMapped = 0, fixedScaleMapped, autoScaleMapped};
+    YScalingMapping yScalingMapping = notMapped;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void setXaxis(double interval, double period);
@@ -505,7 +506,7 @@ private:
     void RescaleAxis();
     void TimersStart();
     void selectYAxis(quint8 newYAxisIndex);
-    void remapCurves(double oldMin, double oldMax, double newMin, double newMax, quint8 curvIndex);
+    void remapCurves(double newMin, double newMax, quint8 curvIndex, bool isNewLog);
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];
@@ -517,6 +518,10 @@ private:
     QVector<QwtIntervalSample> base;
     QVector<QwtIntervalSample> rangeData[MAXCURVES];
     QVector<QPointF> fillData[MAXCURVES];
+
+    // original, raw y data for conversions
+    QVector<QwtIntervalSample> rangeDataRaw[MAXCURVES];
+    QVector<QPointF> fillDataRaw[MAXCURVES];
 
     double timeData;
     int dataCount;

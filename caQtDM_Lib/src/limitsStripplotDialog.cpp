@@ -208,7 +208,6 @@ void limitsStripplotDialog::applyClicked()
     QVariant var=StripPlot->property("MonitorList");
     QVariantList list = var.toList();
     int nbMonitors = list.at(0).toInt();
-
     for(int i=0; i< qMin(vars.size(), nbMonitors); i++) {
         QString pv = vars.at(i).trimmed();
         if(pv.size() > 0) {
@@ -255,29 +254,17 @@ void limitsStripplotDialog::applyClicked()
             sAutoScaleSelected[i]->isChecked() ? StripPlot->setSelectiveAutoScaleCurves(i, true) : StripPlot->setSelectiveAutoScaleCurves(i, false);
         }
     }
-
     int indx = YaxisType->currentIndex();
     if(indx == 0) {
         StripPlot->setYaxisType(caStripPlot::linear);
     } else if(indx == 1) {
-            // TEMPORARY ERROR CORRECTION:
-            // 2 Cases:
-            // - Plot goes from linear and autoscale to log10
-            // - Plot goes from linear and fixedscale to log10 and autoscale
-        if (( StripPlot->getYaxisType() == caStripPlot::linear && StripPlot->getYaxisScaling() == caStripPlot::autoScale ) || ( StripPlot->getYaxisType() == caStripPlot::linear && StripPlot->getYaxisScaling() == caStripPlot::fixedScale && YaxisScaling->currentIndex() > 0 ) ) {
-            StripPlot->setYaxisType(caStripPlot::log10);
-            //UNCOMMENT BELOW IF NOT FIXED
-            StripPlot->restartPlot();
-        } else {
-            StripPlot->setYaxisType(caStripPlot::log10);
-        }
+        StripPlot->setYaxisType(caStripPlot::log10);
     }
 
     indx = YaxisScaling->currentIndex();
     if(indx == 0) StripPlot->setYaxisScaling(caStripPlot::fixedScale);
     else if(indx == 1) StripPlot->setYaxisScaling(caStripPlot::autoScale);
     else if(indx == 2) StripPlot->setYaxisScaling(caStripPlot::selectiveAutoScale);
-
     StripPlot->UpdateScaling();
     if (StripPlot->getYaxisType() == caStripPlot::log10 && StripPlot->getYaxisScaling() != caStripPlot::fixedScale) {
         overRideAutoScale->setVisible(true);

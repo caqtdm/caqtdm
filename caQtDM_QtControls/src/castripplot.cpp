@@ -195,7 +195,6 @@ public:
     QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
         x1 = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(x1/_MinOld)/std::log10(_MaxOld/_MinOld))));
         x2 = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(x2/_MinOld)/std::log10(_MaxOld/_MinOld))));
-
         stepSize *= std::log10(_MaxNew/_MinNew) / std::log10(_MaxOld/_MinOld);
 
         QwtScaleDiv Div = QwtLogScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
@@ -420,6 +419,13 @@ void caStripPlot::restartPlot()
         rangeData[i].reserve(MAXIMUMSIZE+5);
         fillData[i].clear();
         fillData[i].reserve(MAXIMUMSIZE+5);
+
+        //reset interval data for raw data curves
+        rangeDataRaw[i].clear();
+        rangeDataRaw[i].reserve(MAXIMUMSIZE+5);
+        fillDataRaw[i].clear();
+        fillDataRaw[i].reserve(MAXIMUMSIZE+5);
+
         if(i==0)  {
             base.clear();
             base.reserve(MAXIMUMSIZE+5);
@@ -428,6 +434,9 @@ void caStripPlot::restartPlot()
             rangeData[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
             fillData[i].append(QPointF(NAN,NAN));
             if(i==0) base.append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
+
+            rangeDataRaw[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
+            fillDataRaw[i].append(QPointF(NAN,NAN));
         }
     }
     // set the data to the curves
@@ -522,10 +531,18 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     palette.setColor( QPalette::WindowText, thisLineColor[YAxisIndex].rgba());
     scaleY->setPalette (palette);
 
-    const double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
-    const double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
-    const double newYAxisMin = thisYaxisLimitsMin[YAxisIndex];
-    const double newYAxisMax = thisYaxisLimitsMax[YAxisIndex];
+    double oldYAxisMin = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
+    double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
+    double newYAxisMin = thisYaxisLimitsMin[YAxisIndex];
+    double newYAxisMax = thisYaxisLimitsMax[YAxisIndex];
+
+    if (thisYaxisType == log10){
+        oldYAxisMin = qMax(oldYAxisMin, 1e-20);
+        oldYAxisMax = qMax(oldYAxisMax, 1e-19);
+        newYAxisMin = qMax(newYAxisMin, 1e-20);
+        newYAxisMax = qMax(newYAxisMax, 1e-19);
+    }
+
     qDebug() << "going from" << oldYAxisMin << "-" <<oldYAxisMax << "to" << newYAxisMin << "-" << newYAxisMax;
 
     bool isLinear = (thisYaxisType == linear);
@@ -617,24 +634,88 @@ void caStripPlot::setYaxisType(yAxisType s)
  * Is used to correct data when autoscale is enabled while previous data is still on the plot,
  * or to do the vice versa.
  * */
-void caStripPlot::remapCurves(double oldMin, double oldMax, double newMin, double newMax, quint8 curvIndex)
+void caStripPlot::remapCurves(double newMin, double newMax,  quint8 curvIndex, bool isNewLog = false)
 {
+    // Variables
+    // Because the values are calculated from the raw data, old min and old max are always given.
+    double oldMin = thisYaxisLimitsMin[curvIndex];
+    double oldMax = thisYaxisLimitsMax[curvIndex];
 
-    const double conversionFactor = ((newMax - newMin)/(oldMax - oldMin));
-    const double conversionOffset = (newMin * oldMax - newMax * oldMin) / (oldMax - oldMin);
-
-    // Update all values that are plotted right now
-    mutex.lock();
-    for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
-
-        const double arg1 = rangeData[curvIndex][j].interval.minValue();
-        const double arg2 = rangeData[curvIndex][j].interval.maxValue();
-        const double arg3 = fillData[curvIndex][j].y();
-
-        rangeData[curvIndex][j].interval.setInterval((arg1 * conversionFactor) + conversionOffset, (arg2 * conversionFactor) + conversionOffset);
-        if (thisStyle[curvIndex] == FillUnder) fillData[curvIndex][j] = QPointF(fillData[curvIndex][j].x(), (arg3 * conversionFactor) + conversionOffset);
+    // Make sure no bad values are used for logarithmic conversions.
+    if (isNewLog) {
+        newMin = qMax(newMin, 1e-20);
+        newMax = qMax(newMax, 1e-19);
+        oldMin = qMax(oldMin, 1e-20);
+        oldMax = qMax(oldMax, 1e-19);
     }
-    mutex.unlock();
+
+    double percentMin;
+    double percentMax;
+    double percentFillY;
+
+    double oldMaxMinDiff = oldMax - oldMin;
+    double oldLogMaxMinDiv = std::log10(oldMax/oldMin);
+    double newLogMaxMinDiv = std::log10(newMax/newMin);
+    double newMaxMinDiff = newMax - newMin;
+    double log10NewMin = std::log10(newMin);
+    double log10OldMin = std::log10(oldMin);
+
+    // efficiently do default conversion to original values
+    if (oldMin == newMin && oldMax == newMax) {
+        if (isNewLog){ // treat incorrect values
+           mutex.lock();
+           for (quint32 j = 0; rangeDataRaw[curvIndex][j].value > (rangeDataRaw[curvIndex][0].value - thisPeriod) && rangeDataRaw[curvIndex][j].interval.isValid() && rangeDataRaw[curvIndex][j].value != 0; j++){
+                if (rangeDataRaw[curvIndex][j].interval.minValue() <= 1e-20){
+                    rangeData[curvIndex][j].interval.setMinValue(1e-20);
+                } else {
+                    rangeData[curvIndex][j].interval.setMinValue(rangeDataRaw[curvIndex][j].interval.minValue());
+                }
+                if (rangeDataRaw[curvIndex][j].interval.maxValue() <= 1e-20){
+                    rangeData[curvIndex][j].interval.setMaxValue(1e-20);
+                } else {
+                    rangeData[curvIndex][j].interval.setMaxValue(rangeDataRaw[curvIndex][j].interval.maxValue());
+                }
+                if (fillDataRaw[curvIndex][j].y() <= 1e-20){
+                    fillData[curvIndex][j].setY(1e-20);
+                } else {
+                    fillData[curvIndex][j].setY(fillDataRaw[curvIndex][j].y());
+                }
+           }
+           mutex.unlock();
+        } else {
+           mutex.lock();
+           rangeData[curvIndex] = rangeDataRaw[curvIndex];
+           fillData[curvIndex] = fillDataRaw[curvIndex];
+           mutex.unlock();
+        }
+    } else { // remap the curves for any arbitrary conversion
+        // Different equations are used because the logarithmic conversion is most performant the way it is (least amount of log10() calls)
+        // but the linear conversion needs to be different due to division by zero errors which can't happen on a log scale (are prevented by setting minimum values to 1e-20).
+        if (isNewLog) {
+           mutex.lock();
+           qDebug() << "start";
+           for (quint32 j = 0; rangeDataRaw[curvIndex][j].value > (rangeDataRaw[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
+                percentMin = (std::log10(rangeDataRaw[curvIndex][j].interval.minValue()) - log10OldMin)/oldLogMaxMinDiv;
+                percentMax = (std::log10(rangeDataRaw[curvIndex][j].interval.maxValue()) - log10OldMin)/oldLogMaxMinDiv;
+                percentFillY = (std::log10(fillDataRaw[curvIndex][j].y()) - log10OldMin)/oldLogMaxMinDiv;
+                rangeData[curvIndex][j].interval.setMinValue(pow(10, ((percentMin * newLogMaxMinDiv) + log10NewMin)));
+                rangeData[curvIndex][j].interval.setMaxValue(pow(10, ((percentMax * newLogMaxMinDiv) + log10NewMin)));
+                fillData[curvIndex][j].setY(pow(10, ((percentFillY * newLogMaxMinDiv) + log10NewMin)));
+           }
+           mutex.unlock();
+        } else {
+           mutex.lock();
+           for (quint32 j = 0; rangeDataRaw[curvIndex][j].value > (rangeDataRaw[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++){
+                percentMin = (rangeDataRaw[curvIndex][j].interval.minValue() - oldMin)/(oldMaxMinDiff);
+                percentMax = (rangeDataRaw[curvIndex][j].interval.maxValue() - oldMin)/(oldMaxMinDiff);
+                percentFillY = (fillDataRaw[curvIndex][j].y() - oldMin)/(oldMaxMinDiff);
+                rangeData[curvIndex][j].interval.setMinValue((percentMin * newMaxMinDiff) + newMin);
+                rangeData[curvIndex][j].interval.setMaxValue((percentMax * newMaxMinDiff) + newMin);
+                fillData[curvIndex][j].setY((percentFillY * newMaxMinDiff) + newMin);
+           }
+           mutex.unlock();
+        }
+    }
 
     // Set the data to the curves
     if(thisStyle[curvIndex] == FillUnder) {
@@ -696,6 +777,12 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
         rangeData[i].reserve(MAXIMUMSIZE+5);
         fillData[i].clear();
         fillData[i].reserve(MAXIMUMSIZE+5);
+
+        //reset interval data for raw data curves
+        rangeDataRaw[i].clear();
+        rangeDataRaw[i].reserve(MAXIMUMSIZE+5);
+        fillDataRaw[i].clear();
+        fillDataRaw[i].reserve(MAXIMUMSIZE+5);
         if(i==0)  {
             base.clear();
             base.reserve(MAXIMUMSIZE+5);
@@ -703,6 +790,8 @@ void caStripPlot::RescaleCurves(int width, units unit, double period)
         for ( int j = 0; j <  MAXIMUMSIZE; j++ ) {
             rangeData[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
             fillData[i].append(QPointF(NAN,NAN));
+            rangeDataRaw[i].append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
+            fillDataRaw[i].append(QPointF(NAN,NAN));
             if(i==0) base.append(QwtIntervalSample(0, QwtInterval(NAN, NAN)));
         }
     }
@@ -791,19 +880,18 @@ void caStripPlot::UpdateScaling()
             curve[i]->setTitle(legendText(i));
         }
     }
-
-    if ((thisYaxisScaling == autoScale || thisYaxisScaling == selectiveAutoScale) && !YScalingMappedAutoScale) {
-        YScalingMappedAutoScale = true;
+    if ((thisYaxisScaling == autoScale || thisYaxisScaling == selectiveAutoScale) && !(yScalingMapping == autoScaleMapped)) {
+        yScalingMapping = autoScaleMapped;
         qDebug() << "remapping for autoscale";
         for (quint8 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++)
         {
-           remapCurves(thisYaxisLimitsMin[0], thisYaxisLimitsMax[0], thisYaxisLimitsMin[curvIndex], thisYaxisLimitsMax[curvIndex], curvIndex);
+            remapCurves(thisYaxisLimitsMin[curvIndex], thisYaxisLimitsMax[curvIndex], curvIndex, thisYaxisType == log10);
         }
-    } else if (thisYaxisScaling == fixedScale && YScalingMappedAutoScale) {
+    } else if (thisYaxisScaling == fixedScale && !(yScalingMapping == fixedScaleMapped)) {
         qDebug() << "remapping for fixedscale";
-        YScalingMappedAutoScale = false;
+        yScalingMapping = fixedScaleMapped;
         for (quint8 curvIndex = 0 ; curvIndex < NumberOfCurves ; curvIndex++) {
-           remapCurves(thisYaxisLimitsMin[curvIndex], thisYaxisLimitsMax[curvIndex], thisYaxisLimitsMin[0], thisYaxisLimitsMax[0], curvIndex);
+           remapCurves(thisYaxisLimitsMin[0], thisYaxisLimitsMax[0], curvIndex, thisYaxisType == log10);
         }
         selectYAxis(YAxisIndex);
     }
@@ -998,9 +1086,13 @@ void caStripPlot::TimeOutThread()
                 // shift left and cur last
                 rangeData[c].prepend(tmp);
                 rangeData[c].erase(rangeData[c].end() - 1);
+                rangeDataRaw[c].prepend(tmp);
+                rangeDataRaw[c].erase(rangeDataRaw[c].end() - 1);
                 if(thisStyle[c] == FillUnder) {
                     fillData[c].prepend(tmpP);
                     fillData[c].erase(fillData[c].end() - 1);
+                    fillDataRaw[c].prepend(tmpP);
+                    fillDataRaw[c].erase(fillDataRaw[c].end() - 1);
                 }
             }
 
@@ -1012,6 +1104,8 @@ void caStripPlot::TimeOutThread()
                 for (c = 0; c < NumberOfCurves; c++ ) {
                     rangeData[c][i].value = value;
                     fillData[c][i].setX(value);
+                    rangeDataRaw[c][i].value = value;
+                    fillDataRaw[c][i].setX(value);
                 }
             }
 
@@ -1019,9 +1113,17 @@ void caStripPlot::TimeOutThread()
         } else {
             for (c = 0; c < NumberOfCurves; c++ ) {
                 rangeData[c].prepend(tmp);
-                if(thisStyle[c] == FillUnder) fillData[c].prepend(tmpP);
+                rangeDataRaw[c].prepend(tmp);
+                if(thisStyle[c] == FillUnder) {
+                    fillData[c].prepend(tmpP);
+                    fillDataRaw[c].prepend(tmpP);
+                }
                 rangeData[c].erase(rangeData[c].end() - 1);
-                if(thisStyle[c] == FillUnder) fillData[c].erase(fillData[c].end() - 1);
+                rangeDataRaw[c].erase(rangeDataRaw[c].end() - 1);
+                if(thisStyle[c] == FillUnder) {
+                    fillData[c].erase(fillData[c].end() - 1);
+                    fillDataRaw[c].erase(fillDataRaw[c].end() - 1);
+                }
             }
         }
 
@@ -1031,6 +1133,8 @@ void caStripPlot::TimeOutThread()
     for (c = 0; c < NumberOfCurves; c++ ) {
         double valueMin = minVal[c];
         double valueMax = maxVal[c];
+        double valueMinRaw = realMin[c];
+        double valueMaxRaw = realMax[c];
 
         if(thisYaxisScaling == selectiveAutoScale) {
             if(thisYaxisType == log10 && sAutoScaleCurves[c]) {
@@ -1048,12 +1152,18 @@ void caStripPlot::TimeOutThread()
         tmpr.setMaxValue( valueMax);
         tmpr.setMinValue( valueMin);
 
+        QwtInterval tmprRaw;
+        tmprRaw.setMaxValue(valueMaxRaw);
+        tmprRaw.setMinValue(valueMinRaw);
+
         rangeData[c][0] = QwtIntervalSample( timeData, tmpr);
+        rangeDataRaw[c][0] = QwtIntervalSample( timeData, tmprRaw);
         if(thisXaxisType == ValueScale) {
             base[0] = QwtIntervalSample(timeData, tmpr);
         }
         if(thisStyle[c] == FillUnder) {
             fillData[c][0] = QPointF(timeData, (valueMax+valueMin)/2);
+            fillDataRaw[c][0] = QPointF(timeData, (valueMaxRaw+valueMinRaw)/2);
         }
     }
 
@@ -1359,6 +1469,9 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
 
     mutex.lock();
 
+    static std::vector<double> bmvec;
+    static std::vector<double> bmvece;
+
     realVal[curvIndex] = Y;
     realTim[curvIndex] = now;
     if(Y> realMax[curvIndex]) realMax[curvIndex]  = Y;
@@ -1382,10 +1495,28 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
             if (ymax < 1e-19) setYaxisLimitsMax(curvIndex, 1e-19);
             double y0min = thisYaxisLimitsMin[0];
             double y0max = thisYaxisLimitsMax[0];
+            if (y0min < 1e-20) setYaxisLimitsMin(0, 1e-20);
+            if (y0max < 1e-19) setYaxisLimitsMax(0, 1e-19);
 
             actVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realVal[curvIndex]/ymin)/std::log10(ymax/ymin))));
             minVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realMin[curvIndex]/ymin)/std::log10(ymax/ymin))));
             maxVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realMax[curvIndex]/ymin)/std::log10(ymax/ymin))));
+            /*qDebug() << "start";
+            QElapsedTimer timer;
+            timer.start();
+            double timer1result = y0min*(pow((y0max/y0min),(std::log10(realVal[curvIndex]/ymin)/std::log10(ymax/ymin))));
+            qDebug() << timer.nsecsElapsed() << timer1result;
+            bmvec.insert(bmvec.end(), timer.nsecsElapsed());
+            timer.invalidate();
+            QElapsedTimer timer2;
+            timer2.start();
+            double timer2result = y0min*(pow((y0max/y0min),(log(realVal[curvIndex]/ymin)/log(ymax/ymin))));
+            qDebug() << timer2.nsecsElapsed() << timer2result;
+            bmvece.insert(bmvece.end(), timer2.nsecsElapsed());
+            timer2.invalidate();
+            qDebug() << "avg log10: " << std::reduce(bmvec.begin(), bmvec.end()) / bmvec.size();
+            qDebug() << "avg loge: " << std::reduce(bmvece.begin(), bmvece.end()) / bmvece.size();
+            qDebug() << "stop";*/
         }
         setYscale(getYaxisLimitsMin(0),getYaxisLimitsMax(0));
         // otherwise keep the data
@@ -1599,7 +1730,8 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         const quint8 nButton = ((QMouseEvent*) event)->button();
         if (nButton == 1){
-            // apply testing conditions, like enabling certain features or more --> EMPTY IN PROD!
+            // apply testing code, like enabling certain features or showing features --> EMPTY IN PROD!
+            qDebug() << QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
         }
         if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.
