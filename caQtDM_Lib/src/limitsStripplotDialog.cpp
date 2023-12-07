@@ -25,7 +25,6 @@
 
 #include <QtGui>
 #include "limitsStripplotDialog.h"
-#include "qspinbox.h"
 
 limitsStripplotDialog::limitsStripplotDialog(caStripPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {

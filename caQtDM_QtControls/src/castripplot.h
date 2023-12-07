@@ -209,8 +209,6 @@ public:
     void setXticks( int nb ) {thisXticks = nb; defineXaxis(thisUnits, thisPeriod);}
     int getXticks() {return thisXticks;}
 
-    bool setDataFirstCall = true;
-
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
 
@@ -496,8 +494,6 @@ private:
     struct timeb plotStart;
     bool RestartPlot1, RestartPlot2;
     bool plotIsPaused;
-    enum YScalingMapping {notMapped = 0, fixedScaleMapped, autoScaleMapped};
-    YScalingMapping yScalingMapping = notMapped;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void setXaxis(double interval, double period);
@@ -585,6 +581,5 @@ private:
 
     quint8 YAxisIndex;
     float xAxisToleranceFactor;
-    bool propertyConversionOk;
 };
 #endif

@@ -277,7 +277,6 @@ public:
         _MinNew = MinNew;
         _MaxNew = MaxNew;
         _IsLinear = IsLinear;
-        qDebug() << "set IsLinear to:" << _IsLinear;
     }
 
     void setStartTime(long long startTime, double period)
@@ -307,7 +306,7 @@ protected:
             coordinates.setY(_MinNew*(pow((_MaxNew/_MinNew),(std::log10(coordinates.y()/_MinOld)/std::log10(_MaxOld/_MinOld)))));
         }
 
-        // create new QwtText --> Did not use QString.number() because then fixed precision would destroy log values
+        // create new QwtText --> Did not use QString.setNum() because then fixed precision would destroy logarithmic values
         QwtText newText = (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
         newText.setBackgroundBrush(Qt::white);
         newText.setBorderRadius(1);
@@ -1045,9 +1044,10 @@ void caStripPlot::defineCurves(QStringList titles, units unit, double period, in
     RescaleCurves(width, unit, period);
 
     // Set xAxisToleranceFactor, because object is now fully constructed.
+    bool propertyConversionOk;
     xAxisToleranceFactor = this->property("xAxisToleranceFactor").toFloat(&propertyConversionOk);
-    if (!propertyConversionOk || 0 <! xAxisToleranceFactor || xAxisToleranceFactor <=! 1){
-        qDebug().nospace() << "The Dynamic Property xAxisToleranceFactor is either not set or set incorrectly (not between 0 and 1) and will be replaced by default value 0.01 for Object: " << this->objectName();
+    if (!propertyConversionOk || xAxisToleranceFactor <= 0 || xAxisToleranceFactor >= 1){
+        qDebug() << "The Dynamic Property xAxisToleranceFactor is either not set or set incorrectly (not between 0 and 1) and will be replaced by default value 0.01 for Object:" << this->objectName();
         xAxisToleranceFactor = 0.01;
     }
 }
