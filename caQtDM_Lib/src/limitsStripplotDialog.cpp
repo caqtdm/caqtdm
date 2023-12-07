@@ -290,7 +290,7 @@ void limitsStripplotDialog::applyClicked()
         minLineEditAutoScale->setText(text);
     }
 
-    StripPlot->setAutoscaleMinYOverride(overRideAutoScaleActive);
+    StripPlot->setAutoscaleMinYOverride(overRideAutoScaleActive->isChecked());
 }
 
 void limitsStripplotDialog::exec()

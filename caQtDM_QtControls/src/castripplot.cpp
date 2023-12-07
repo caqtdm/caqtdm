@@ -591,7 +591,6 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     double oldYAxisMax = QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().maxValue();
     double newYAxisMin = thisYaxisLimitsMin[YAxisIndex];
     double newYAxisMax = thisYaxisLimitsMax[YAxisIndex];
-
     if (thisYaxisType == log10){
         oldYAxisMin = qMax(oldYAxisMin, 1e-20);
         oldYAxisMax = qMax(oldYAxisMax, 1e-19);
@@ -1190,16 +1189,9 @@ void caStripPlot::TimeOutThread()
         double valueMinRaw = realMin[c];
         double valueMaxRaw = realMax[c];
 
-        if(thisYaxisScaling == selectiveAutoScale) {
-            if(thisYaxisType == log10 && sAutoScaleCurves[c]) {
-                if(valueMin < 1.e-20) valueMin=1.e-20;
-                if(valueMax < 1.e-19) valueMax=1.e-19;
-            }
-        } else {
-            if(thisYaxisType == log10) {
-                if(valueMin < 1.e-20) valueMin=1.e-20;
-                if(valueMax < 1.e-19) valueMax=1.e-19;
-            }
+        if(thisYaxisType == log10) {
+            if(valueMin < 1e-20) valueMin=1e-20;
+            if(valueMax < 1e-20) valueMax=1e-20;
         }
 
         QwtInterval tmpr;
@@ -1295,9 +1287,10 @@ void caStripPlot::TimeOutThread()
     }
 
     if(thisYaxisScaling != fixedScale && thisYaxisType == log10){
-        if (AutoscaleMinY != manualAutoscaleMinY && autoscaleMinYOverride) {
+        if (autoscaleMinYOverride) {
             AutoscaleMinY = manualAutoscaleMinY;
         } else manualAutoscaleMinY = AutoscaleMinY;
+        qDebug() << manualAutoscaleMinY;
     }
 
     mutex.unlock();
@@ -1555,7 +1548,6 @@ void caStripPlot::setData(struct timeb now, double Y, int curvIndex)
             double realValPositive = qMax(realVal[curvIndex], 1e-20);
             double realMinPositive = qMax(realMin[curvIndex], 1e-20);
             double realMaxPositive = qMax(realMax[curvIndex], 1e-20);
-
             actVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realValPositive/ymin)/std::log10(ymax/ymin))));
             minVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realMinPositive/ymin)/std::log10(ymax/ymin))));
             maxVal[curvIndex] = y0min*(pow((y0max/y0min),(std::log10(realMaxPositive/ymin)/std::log10(ymax/ymin))));
