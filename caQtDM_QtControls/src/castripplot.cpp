@@ -307,8 +307,12 @@ protected:
             coordinates.setY(_MinNew*(pow((_MaxNew/_MinNew),(std::log10(coordinates.y()/_MinOld)/std::log10(_MaxOld/_MinOld)))));
         }
 
-        // return new String --> Did not use QString.number() because then fixed precision would destroy log values.
-        return (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
+        // create new QwtText --> Did not use QString.number() because then fixed precision would destroy log values
+        QwtText newText = (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
+        newText.setBackgroundBrush(Qt::white);
+        newText.setBorderRadius(1);
+
+        return newText;
     }
 private:
     double _MinOld = 1e-20;
