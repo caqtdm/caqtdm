@@ -289,22 +289,26 @@ public:
 protected:
     QwtText trackerText( const QPoint& pos ) const
     {
+        // default exemption handling by QwtPlotPicker
         if ( plot() == NULL ) {
             return QwtText();
         }
 
+        // get values from pixels
         QPointF coordinates = invTransform(pos);
+
+        // get time in the plot where mouse is
         QDateTime timeOnHover = _StartTime.addMSecs((coordinates.x() - _Period)*1000);
-        qDebug() << timeOnHover << _Period;
+
+        // convert value to match the current limits
         if (_IsLinear) {
             coordinates.setY(((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(coordinates.y()-_MinOld)+_MinNew);
         } else {
-            qDebug() << coordinates.y();
             coordinates.setY(_MinNew*(pow((_MaxNew/_MinNew),(std::log10(coordinates.y()/_MinOld)/std::log10(_MaxOld/_MinOld)))));
-            qDebug() << coordinates.y();
         }
 
-        return trackerTextF(coordinates);
+        // return new String --> Did not use QString.number() because then fixed precision would destroy log values.
+        return (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
     }
 private:
     double _MinOld = 1e-20;
@@ -519,11 +523,7 @@ void caStripPlot::pausePlot(bool pausePlot)
 void caStripPlot::selectFixedYAxis(int newYAxisIndex){
     if (newYAxisIndex >= NumberOfCurves) return;
     setYaxisScaling(fixedScale);
-    UpdateScaling();
-    RescaleAxis();
-    setYscale(thisYaxisLimitsMin[0], thisYaxisLimitsMax[0]);
     selectYAxis(newYAxisIndex);
-
 }
 
 /* Slot to handle clicks within the curve-canvas.
@@ -1785,7 +1785,6 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
         const quint8 nButton = ((QMouseEvent*) event)->button();
         if (nButton == 1){
             // apply testing code, like enabling certain features or showing features --> EMPTY IN PROD!
-            qDebug() << QwtPlot::axisScaleDiv(QwtPlot::yLeft).interval().minValue();
         }
         if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.
