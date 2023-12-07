@@ -453,7 +453,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     connect(this, SIGNAL(timerThreadStop()), timerThread, SLOT(runStop()));
     connect(timerThread, SIGNAL(update()), this, SLOT(TimeOutThread()),  Qt::DirectConnection);
 
-    plotPicker = new StripplotPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
+    plotPicker = new StripplotPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
     QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
     plotPicker->setStateMachine(pickerMachine);
     connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
@@ -529,12 +529,24 @@ void caStripPlot::selectFixedYAxis(int newYAxisIndex){
     selectYAxis(newYAxisIndex);
 }
 
+/* Slot to set the plotPicker Mode.
+ * Can enable or disable the plotPicker Tooltip. 0 = off | 1 = on.
+ * */
+void caStripPlot::setPlotPickerMode(int mode)
+{
+    if (mode == 0) {
+        plotPicker->setTrackerMode(QwtPicker::AlwaysOff);
+    } else {
+        plotPicker->setTrackerMode(QwtPicker::AlwaysOn);
+    }
+}
+
 /* Slot to handle clicks within the curve-canvas.
  * Is used to decide wether a specific curve was clicked and changes the displayed Y-axis accordingly to show the corresponding axis.
  * */
 void caStripPlot::onSelected(const QPointF& point)
 {
-    if (thisYaxisScaling != fixedScale || NumberOfCurves == 1) return;
+    if (thisYaxisScaling != fixedScale || NumberOfCurves == 1 || !thisSelectableCurves) return;
     const double scaledTolerance = (thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)]) * 0.01;
     const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
@@ -1047,8 +1059,10 @@ void caStripPlot::defineCurves(QStringList titles, units unit, double period, in
     xAxisToleranceFactor = this->property("xAxisToleranceFactor").toFloat(&propertyConversionOk);
     if (!propertyConversionOk || xAxisToleranceFactor <= 0 || xAxisToleranceFactor >= 1){
         qDebug() << "The Dynamic Property xAxisToleranceFactor is either not set or set incorrectly (not between 0 and 1) and will be replaced by default value 0.01 for Object:" << this->objectName();
-        xAxisToleranceFactor = 0.01;
+        xAxisToleranceFactor = 0.01f;
     }
+    // set plotpicker, same reason as xAxisToleranceFactor;
+    if (thisPlotPicker == on) plotPicker->setTrackerMode(QwtPicker::AlwaysOn);
 }
 
 void caStripPlot::startPlot()
@@ -1290,7 +1304,6 @@ void caStripPlot::TimeOutThread()
         if (autoscaleMinYOverride) {
             AutoscaleMinY = manualAutoscaleMinY;
         } else manualAutoscaleMinY = AutoscaleMinY;
-        qDebug() << manualAutoscaleMinY;
     }
 
     mutex.unlock();
@@ -1780,9 +1793,9 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         const quint8 nButton = ((QMouseEvent*) event)->button();
         if (nButton == 1){
-            // apply testing code, like enabling certain features or showing features --> EMPTY IN PROD!
+            // apply testing code, like enabling certain features or showing values --> EMPTY IN PROD!
         }
-        if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1) {
+        if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1 && thisIterableCurves) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.
             // Canvas events are ignored, because clicks on there are handled by the qwt plotpicker to select the clicked curve --> They are not for just iterating.
             if (obj->objectName() == "QwtPlotCanvas") return true;

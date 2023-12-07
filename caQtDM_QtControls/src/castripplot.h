@@ -92,6 +92,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_ENUMS(yAxisType)
     Q_ENUMS(yAxisScaling)
     Q_ENUMS(cpuUsage)
+    Q_ENUMS(PlotPicker)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -108,6 +109,9 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY( int numberOfXticks READ getXticks WRITE setXticks)
     Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
     Q_PROPERTY(yAxisScaling YAxisScaling READ getYaxisScaling WRITE setYaxisScaling)
+    Q_PROPERTY(PlotPicker plotpicker READ getPlotPicker WRITE setPlotPicker)
+    Q_PROPERTY(bool CurvesIterableInLegend READ getIterableCurves WRITE setIterableCurves)
+    Q_PROPERTY(bool CurvesSelectableInPlot READ getSelectableCurves WRITE setSelectableCurves)
 
     // would have been nice to define all this with a define statement, however moc does not support that
 
@@ -196,10 +200,11 @@ public:
 
     enum axisScaling {Channel, User};
     enum curvStyle {Lines = 1, FillUnder = 5};
-    enum units { Millisecond = 0, Second, Minute};
+    enum units {Millisecond = 0, Second, Minute};
     enum xAxisType {ValueScale, TimeScale, TimeScaleFix};
     enum yAxisType {linear=0, log10};
     enum yAxisScaling {fixedScale=0, autoScale=1, selectiveAutoScale=2};
+    enum PlotPicker {off = 0, on = 1};
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
 
@@ -208,6 +213,16 @@ public:
 
     void setXticks( int nb ) {thisXticks = nb; defineXaxis(thisUnits, thisPeriod);}
     int getXticks() {return thisXticks;}
+
+
+    void setPlotPicker(PlotPicker p) {thisPlotPicker = p;}
+    PlotPicker getPlotPicker() {return thisPlotPicker;}
+
+    bool getIterableCurves() const {return thisIterableCurves;}
+    // setter defined as public slot
+
+    bool getSelectableCurves() const {return thisSelectableCurves;}
+    // setter defined as public slot
 
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
@@ -463,12 +478,15 @@ public slots:
     }
 
     void stopPlot();
-
     void restartPlot();
-
     void pausePlot(bool pausePlot);
 
     void selectFixedYAxis(int newYAxisIndex);
+
+    void setPlotPickerMode(int mode);
+
+    void setIterableCurves(bool itCurvs) {thisIterableCurves = itCurvs; qDebug() << "signal it Called with bool:" << itCurvs;};
+    void setSelectableCurves(bool selectCurvs) {thisSelectableCurves = selectCurvs; qDebug() << "signal sel Called with bool:" << selectCurvs;};
 
 protected:
     void resizeEvent ( QResizeEvent * event);
@@ -527,9 +545,11 @@ private:
     cpuUsage  thisUsageCPU;
 
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;
+    bool thisIterableCurves, thisSelectableCurves = false;
     xAxisType thisXaxisType;
     yAxisType thisYaxisType;
     yAxisScaling thisYaxisScaling;
+    PlotPicker thisPlotPicker = off;
 
     QString thisTitle, thisTitleX, thisTitleY;
     units thisUnits;
