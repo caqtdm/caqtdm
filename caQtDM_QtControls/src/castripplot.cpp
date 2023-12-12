@@ -39,6 +39,7 @@
 #include <cmath>
 
 #include <qwt_picker_machine.h>
+#include <qelapsedtimer.h>
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 12, 0)
 #if !defined(NAN)
@@ -266,8 +267,14 @@ private:
 class StripplotPlotPicker : public QwtPlotPicker
 {
 public:
-    StripplotPlotPicker(QwtAxisId xAxisId, QwtAxisId yAxisId, RubberBand rubberBand, DisplayMode trackerMode, QWidget * widget) : QwtPlotPicker( xAxisId,  yAxisId,  rubberBand,  trackerMode, widget)
+    StripplotPlotPicker(QwtPlot::Axis xAxisId, QwtPlot::Axis yAxisId, QwtPicker::RubberBand  rubberBand, QwtPicker::DisplayMode trackerMode, QWidget * widget) : QwtPlotPicker( xAxisId,  yAxisId,  rubberBand,  trackerMode, widget)
     {
+	_MinOld = 1e-20;
+	_MaxOld = 100;
+	_MinNew = 1e-20;
+	_MaxNew = 100;
+	_IsLinear = true;
+
     }
 
     void setConversion(double MinOld, double MaxOld, double MinNew, double MaxNew, bool IsLinear)
@@ -281,7 +288,7 @@ public:
 
     void setStartTime(long long startTime, double period)
     {
-        _StartTime = QDateTime::fromSecsSinceEpoch(startTime);
+        _StartTime = QDateTime::fromMSecsSinceEpoch(startTime*1000);
         _Period = period;
     }
 
@@ -314,11 +321,11 @@ protected:
         return newText;
     }
 private:
-    double _MinOld = 1e-20;
-    double _MaxOld = 100;
-    double _MinNew = 1e-20;
-    double _MaxNew = 100;
-    bool _IsLinear = true;
+    double _MinOld;
+    double _MaxOld;
+    double _MinNew;
+    double _MaxNew;
+    bool _IsLinear;
     QDateTime _StartTime;
     double _Period;
 };
@@ -354,6 +361,9 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     YAxisIndex = 0;
     plotIsPaused = false;
     setProperty("xAxisToleranceFactor", 0.01);
+    thisIterableCurves = thisSelectableCurves = false;
+    thisPlotPicker = off;
+    autoscaleMinYOverride = false;
 
 #ifdef QWT_USE_OPENGL
     printf("caStripplot uses opengl ?\n");

@@ -545,11 +545,11 @@ private:
     cpuUsage  thisUsageCPU;
 
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;
-    bool thisIterableCurves, thisSelectableCurves = false;
+    bool thisIterableCurves, thisSelectableCurves;
     xAxisType thisXaxisType;
     yAxisType thisYaxisType;
     yAxisScaling thisYaxisScaling;
-    PlotPicker thisPlotPicker = off;
+    PlotPicker thisPlotPicker;
 
     QString thisTitle, thisTitleX, thisTitleY;
     units thisUnits;
@@ -564,7 +564,7 @@ private:
     double AutoscaleMinY;
     double manualAutoscaleMinY;
     bool sAutoScaleCurves[MAXCURVES];
-    bool autoscaleMinYOverride = false;
+    bool autoscaleMinYOverride;
 
     axisScaling thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
 
