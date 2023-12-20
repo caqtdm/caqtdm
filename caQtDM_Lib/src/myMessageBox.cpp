@@ -28,7 +28,7 @@
 myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 {
     bool showMax = false;
-    Qt::WindowFlags flags = Qt::Dialog;
+    Qt::WindowFlags flags = Qt::Dialog| Qt::Popup;
     setWindowFlags(flags);
     setWindowModality (Qt::WindowModal);
 
@@ -39,15 +39,15 @@ myMessageBox::myMessageBox(QWidget *parent) : QWidget(parent)
 
 #if defined(MOBILE_IOS)
     Specials special;
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     if(size.height() < 500) {
-        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(250,250), qApp->desktop()->availableGeometry()));
+        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(250,250), qApp->primaryScreen()->availableGeometry()));
         setMinimumSize(250,250);
     } else {
-        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->desktop()->availableGeometry()));
+        setGeometry(QStyle::alignedRect(Qt::LeftToRight,Qt::AlignCenter, QSize(350,500), qApp->primaryScreen()->availableGeometry()));
         setMinimumSize(350,500);
     }
-    special.setNewStyleSheet(thisText, qApp->desktop()->size(), 16, 10);
+    special.setNewStyleSheet(thisText, qApp->primaryScreen()->size(), 16, 10);
 #elif defined(MOBILE_ANDROID)
     showMax = true;
 #else

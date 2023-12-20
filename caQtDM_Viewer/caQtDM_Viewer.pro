@@ -33,6 +33,29 @@ unix:!macx:!ios:!android{
    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 
+contains(QT_VER_MAJ, 6) {
+    QT     += core gui svg uitools network opengl
+    CONFIG += qt warn_on thread widgets
+    modbus{
+       QT += serialbus
+       DEFINES += CAQTDM_MODBUS
+    }
+    gps{
+       QT += positioning
+       DEFINES += CAQTDM_GPS
+    }
+
+    unix:!macx:!ios:!android{
+        QT     += x11extras
+    }
+    !ios:!android {
+        QT     += printsupport
+     }
+
+}
+
+
+
 TARGET = caQtDM
 TEMPLATE = app
 
@@ -43,7 +66,7 @@ VPATH += ./src
 INCLUDEPATH += ./src
 UI_DIR += ./src
 
-INCLUDEPATH += $(QWTINCLUDE)
+INCLUDEPATH += $$(QWTINCLUDE)
 INCLUDEPATH += ../caQtDM_QtControls/src
 INCLUDEPATH += ../caQtDM_Lib/src
 INCLUDEPATH += ../caQtDM_Lib/caQtDM_Plugins

@@ -49,17 +49,17 @@ caScan2D::caScan2D(QWidget *parent) : QWidget(parent)
     savedHeight = 0;
     selectionInProgress = false;
 
-    savedData = (float*) 0;
+    savedData = (float*) Q_NULLPTR;
 
     initWidgets();
 
     Xpos = Ypos = 0;
 
-    scrollArea = (QScrollArea *) 0;
+    scrollArea = (QScrollArea *) Q_NULLPTR;
 
     mainLayout = new QGridLayout(this);
-    mainLayout->setMargin(0);
-    mainLayout->setSpacing(0);
+    SETMARGIN_QT456(mainLayout,0);
+    SETSPACING_QT456(mainLayout,0);
     setLayout(mainLayout);
     setup();
 
@@ -100,56 +100,56 @@ void caScan2D::setPropertyVisible(Properties property, bool visible)
 
 void caScan2D::deleteWidgets()
 {
-    if(image != (QImage *) 0)                    delete image;
+    if(image != (QImage *) Q_NULLPTR)                    delete image;
 
-    if(valuesLayout != (QHBoxLayout *) 0)        delete valuesLayout;
-    if(labelMaxText != (caLabel *) 0)            delete labelMaxText;
-    if(labelMinText != (caLabel *) 0)            delete labelMinText;
-    if(labelMin != (caLineEdit *) 0)             delete labelMin;
-    if(labelMax != (caLineEdit *) 0)             delete labelMax;
-    if(checkAutoText != (caLabel *) 0)           delete checkAutoText;
-    if(autoW != (QCheckBox *) 0)                 delete autoW;
-    if(intensity != (caLabel *) 0)               delete intensity;
-    if(intensityText != (caLabel *) 0)           delete intensityText;
-    if(nbUpdatesText != (caLabel *) 0)           delete nbUpdatesText;
+    if(valuesLayout != (QHBoxLayout *) Q_NULLPTR)        delete valuesLayout;
+    if(labelMaxText != (caLabel *) Q_NULLPTR)            delete labelMaxText;
+    if(labelMinText != (caLabel *) Q_NULLPTR)            delete labelMinText;
+    if(labelMin != (caLineEdit *) Q_NULLPTR)             delete labelMin;
+    if(labelMax != (caLineEdit *) Q_NULLPTR)             delete labelMax;
+    if(checkAutoText != (caLabel *) Q_NULLPTR)           delete checkAutoText;
+    if(autoW != (QCheckBox *) Q_NULLPTR)                 delete autoW;
+    if(intensity != (caLabel *) Q_NULLPTR)               delete intensity;
+    if(intensityText != (caLabel *) Q_NULLPTR)           delete intensityText;
+    if(nbUpdatesText != (caLabel *) Q_NULLPTR)           delete nbUpdatesText;
 
-    if(zoomSliderLayout != ( QGridLayout *) 0)   delete zoomSliderLayout;
-    if(zoomSlider != (QSlider *) 0)              delete zoomSlider;
-    if(zoomValue != (caLabel *) 0)               delete zoomValue;
-    if(zoomInIcon != (QToolButton *) 0)          delete zoomInIcon;
-    if(zoomOutIcon != (QToolButton *) 0)         delete zoomOutIcon;
+    if(zoomSliderLayout != ( QGridLayout *) Q_NULLPTR)   delete zoomSliderLayout;
+    if(zoomSlider != (QSlider *) Q_NULLPTR)              delete zoomSlider;
+    if(zoomValue != (caLabel *) Q_NULLPTR)               delete zoomValue;
+    if(zoomInIcon != (QToolButton *) Q_NULLPTR)          delete zoomInIcon;
+    if(zoomOutIcon != (QToolButton *) Q_NULLPTR)         delete zoomOutIcon;
 
-    if(imageW != (ImageWidget *) 0)              delete imageW;
-    if(valuesWidget != (QWidget *) 0)            delete valuesWidget;
-    if(scrollArea != (QScrollArea *) 0)          delete scrollArea;
-    if(colormapWidget != (QwtScaleWidget *) 0)   delete colormapWidget;
-    if(zoomWidget != (QWidget *) 0)              delete zoomWidget;
+    if(imageW != (ImageWidget *) Q_NULLPTR)              delete imageW;
+    if(valuesWidget != (QWidget *) Q_NULLPTR)            delete valuesWidget;
+    if(scrollArea != (QScrollArea *) Q_NULLPTR)          delete scrollArea;
+    if(colormapWidget != (QwtScaleWidget *) Q_NULLPTR)   delete colormapWidget;
+    if(zoomWidget != (QWidget *) Q_NULLPTR)              delete zoomWidget;
 }
 
 void caScan2D::initWidgets()
 {
-    image = (QImage *) 0;
-    labelMin = (caLineEdit *) 0;
-    labelMax = (caLineEdit *) 0;
-    intensity = (caLabel *) 0;
-    imageW = (ImageWidget *) 0;
-    autoW = (QCheckBox *) 0;
-    labelMaxText = (caLabel *) 0;
-    labelMinText = (caLabel *) 0;
-    intensityText = (caLabel *) 0;
-    checkAutoText = (caLabel *) 0;
-    nbUpdatesText = (caLabel *) 0;
-    scrollArea = (QScrollArea *) 0;
-    valuesWidget = (QWidget *) 0;
-    zoomWidget = (QWidget *) 0;
-    zoomSlider = (QSlider *) 0;
-    zoomValue = (caLabel *) 0;
-    zoomInIcon = (QToolButton *) 0;
-    zoomOutIcon = (QToolButton *) 0;
+    image = (QImage *) Q_NULLPTR;
+    labelMin = (caLineEdit *) Q_NULLPTR;
+    labelMax = (caLineEdit *) Q_NULLPTR;
+    intensity = (caLabel *) Q_NULLPTR;
+    imageW = (ImageWidget *) Q_NULLPTR;
+    autoW = (QCheckBox *) Q_NULLPTR;
+    labelMaxText = (caLabel *) Q_NULLPTR;
+    labelMinText = (caLabel *) Q_NULLPTR;
+    intensityText = (caLabel *) Q_NULLPTR;
+    checkAutoText = (caLabel *) Q_NULLPTR;
+    nbUpdatesText = (caLabel *) Q_NULLPTR;
+    scrollArea = (QScrollArea *) Q_NULLPTR;
+    valuesWidget = (QWidget *) Q_NULLPTR;
+    zoomWidget = (QWidget *) Q_NULLPTR;
+    zoomSlider = (QSlider *) Q_NULLPTR;
+    zoomValue = (caLabel *) Q_NULLPTR;
+    zoomInIcon = (QToolButton *) Q_NULLPTR;
+    zoomOutIcon = (QToolButton *) Q_NULLPTR;
 
-    valuesLayout = (QHBoxLayout *) 0;
-    zoomSliderLayout = ( QGridLayout *) 0;
-    colormapWidget = (QwtScaleWidget *) 0;
+    valuesLayout = (QHBoxLayout *) Q_NULLPTR;
+    zoomSliderLayout = ( QGridLayout *) Q_NULLPTR;
+    colormapWidget = (QwtScaleWidget *) Q_NULLPTR;
 }
 
 caScan2D::~caScan2D()
@@ -277,7 +277,7 @@ bool caScan2D::eventFilter(QObject *obj, QEvent *event)
     
     if(buttonPressed) imageW->updateSelectionBox(selectionPoints, selectionInProgress);
 
-    if(buttonPressed && (savedData != (float*) 0)) {
+    if(buttonPressed && (savedData != (float*) Q_NULLPTR)) {
         double Xnew, Ynew, Xmax, Ymax;
         validIntensity = true;
 
@@ -360,8 +360,8 @@ void caScan2D::setup()
 
         // add everything to layout
         valuesLayout = new QHBoxLayout();
-        valuesLayout->setMargin(0);
         valuesLayout->setSpacing(2);
+        SETMARGIN_QT456(valuesLayout,0);
         valuesLayout->addWidget(labelMinText, Qt::AlignLeft);
         valuesLayout->addWidget(labelMin, Qt::AlignLeft);
         valuesLayout->addWidget(labelMaxText, Qt::AlignLeft);
@@ -489,14 +489,14 @@ void caScan2D::setFitToSize(zoom const &z)
 bool caScan2D::getInitialAutomatic()
 {
     if(thisSimpleView) return thisInitialAutomatic;
-    if(autoW == (QCheckBox *) 0) return false;
+    if(autoW == (QCheckBox *) Q_NULLPTR) return false;
     return autoW->isChecked();
 }
 
 void caScan2D::setInitialAutomatic(bool automatic)
 {
     if(thisSimpleView) thisInitialAutomatic = automatic;
-    if(autoW == (QCheckBox *) 0) return;
+    if(autoW == (QCheckBox *) Q_NULLPTR) return;
     autoW->setChecked(automatic);
 }
 
@@ -576,7 +576,7 @@ void caScan2D::setColormap(colormap const &map)
         break;
     }
     // force resize
-    if(zoomWidget != (QWidget*) 0) zoomWidget->adjustSize();
+    if(zoomWidget != (QWidget*) Q_NULLPTR) zoomWidget->adjustSize();
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
 }
@@ -687,7 +687,7 @@ void caScan2D::resizeEvent(QResizeEvent *e)
         if(!thisFitToSize) {
             imageW->setMinimumSize((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
             showImage((int) (m_width * scaleFactor), (int) (m_height * scaleFactor));
-        } else if((zoomWidget != (QWidget*) 0) && (valuesWidget != (QWidget*) 0)) {
+        } else if((zoomWidget != (QWidget*) Q_NULLPTR) && (valuesWidget != (QWidget*) Q_NULLPTR)) {
             double Xcorr = (double) (e->size().width() - zoomWidget->width()-4) / (double) savedWidth;
             double Ycorr = (double) (e->size().height()- valuesWidget->height()-4) / (double) savedHeight;
             double scale = qMin(Xcorr, Ycorr); // aspect ratio
@@ -702,7 +702,7 @@ void caScan2D::resizeEvent(QResizeEvent *e)
             showImage(m_width, m_height);
         }
     }
-    if(image != (QImage *) 0)  imageW->rescaleSelectionBox(scaleFactor);
+    if(image != (QImage *) Q_NULLPTR)  imageW->rescaleSelectionBox(scaleFactor);
 }
 
 void caScan2D::refreshImage()
@@ -739,25 +739,25 @@ bool caScan2D::getAutomateChecked()
     if(thisSimpleView) {
         return thisInitialAutomatic;
     }
-    if(autoW == (QCheckBox *) 0) return false;
+    if(autoW == (QCheckBox *) Q_NULLPTR) return false;
     return autoW->isChecked();
 }
 
 void caScan2D::updateMax(int max)
 {
-    if(labelMax == (caLineEdit*) 0) return;
+    if(labelMax == (caLineEdit*) Q_NULLPTR) return;
     labelMax->setText(QString::number(max));
 }
 
 void caScan2D::updateMin(int min)
 {
-    if(labelMin == (caLineEdit*) 0) return;
+    if(labelMin == (caLineEdit*) Q_NULLPTR) return;
     labelMin->setText(QString::number(min));
 }
 
 void caScan2D::updateIntensity(QString strng)
 {
-    if(intensity == (caLabel*) 0) return;
+    if(intensity == (caLabel*) Q_NULLPTR) return;
     intensity->setText(strng);
 }
 
@@ -765,14 +765,14 @@ int caScan2D::getMin()
 {
     bool ok;
     if(thisSimpleView) return  thisMinLevel.toInt(&ok);
-    if(labelMin == (caLineEdit*) 0) return 0;
+    if(labelMin == (caLineEdit*) Q_NULLPTR) return 0;
     return labelMin->text().toInt();
 }
 int caScan2D::getMax()
 {
     bool ok;
     if(thisSimpleView) return  thisMaxLevel.toInt(&ok);
-    if(labelMax == (caLineEdit*) 0) return 65535;
+    if(labelMax == (caLineEdit*) Q_NULLPTR) return 65535;
     return labelMax->text().toInt();
 }
 
@@ -828,7 +828,7 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
         savedSize = numDataValues;
         savedWidth = m_width;
         savedHeight = m_height;
-        if(image != (QImage *) 0) delete image;
+        if(image != (QImage *) Q_NULLPTR) delete image;
         image = new QImage(resultSize, QImage::Format_RGB32);
         m_init = false;
         minvalue = 0;
@@ -879,7 +879,7 @@ void caScan2D::showImage(int numXDataValues, int numYDataValues)
         }
     }
 
-    if(image != (QImage *) 0)  updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
+    if(image != (QImage *) Q_NULLPTR)  updateImage(*image, readvaluesPresent, readvalues, scaleFactor);
 }
 
 void caScan2D::setAccessW(bool access)

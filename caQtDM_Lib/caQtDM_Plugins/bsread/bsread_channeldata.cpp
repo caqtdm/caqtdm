@@ -23,6 +23,7 @@
  *    helge.brands@psi.ch
  */
 #include "bsread_channeldata.h"
+#include "bsread_Plugin.h"
 
 bsread_channeldata::bsread_channeldata(QObject *parent) : QObject(parent)
 {
@@ -32,7 +33,7 @@ bsread_channeldata::bsread_channeldata(QObject *parent) : QObject(parent)
     offset=0;
     modulo=1;
     endianess=bs_little;
-    bsdata.wf_data=NULL;
+    bsdata.wf_data=Q_NULLPTR;
     bsdata.wf_data_size=0;
     precision=4;
     units="";

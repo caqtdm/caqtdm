@@ -30,6 +30,7 @@
 #endif
 
 #include "caclock.h"
+#include <qwt_dial_needle.h>
 
 #if defined(_MSC_VER)
 #define fmax max
@@ -49,7 +50,13 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     const QColor knobColor = thisBaseColor.lighter(130);
     setPalette( colorTheme( thisBaseColor.darker( 150 ) ) );
 
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     scaleDraw()->setPenWidth(3);
+#else
+    scaleDraw()->setPenWidthF(3);
+#endif
+
     setLineWidth(3);
     setFrameShadow(QwtDial::Sunken);
 

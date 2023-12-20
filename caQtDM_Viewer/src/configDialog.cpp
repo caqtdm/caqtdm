@@ -54,21 +54,26 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #ifdef MOBILE
   #ifdef MOBILE_IOS
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
-    if(qApp->desktop()->heightMM() > 100) { // probably an ipad
-        windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25),
-                                         qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
+    if(qApp->primaryScreen()->physicalSize().rheight() > 100) { // probably an ipad
+        windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.20),
+                                         qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.20));
     } else { // probably an iphone
         windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.1), qRound(desktopSize.height() * 0.05),
                                          qRound(desktopSize.width() * 0.1), qRound(desktopSize.height() * 0.07));
     }
-  #else
+
+#else
     setGeometry(0,0, desktopSize.width(), desktopSize.height());
     windowlayout->setContentsMargins(qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.15),
                                      qRound(desktopSize.width() * 0.15), qRound(desktopSize.height() * 0.25));
   #endif
 #else
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QDesktopWidget * Desktop = QApplication::desktop();
     QRect defscreengeo = Desktop->availableGeometry(-1);
+#else
+    QRect defscreengeo =  QGuiApplication::primaryScreen()->availableGeometry();
+#endif
     setGeometry(0,0, defscreengeo.width(), defscreengeo.height());
     desktopSize=defscreengeo.size();
     windowlayout->setContentsMargins(qRound(defscreengeo.width() * 0.2), qRound(defscreengeo.height() * 0.2),
@@ -87,7 +92,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #endif
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, bg);
+    palette.setBrush(QPalette::Window, bg);
     setPalette(palette);
 
     ClearConfigButtonClicked = false;
@@ -100,6 +105,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     frame->setAutoFillBackground(true);
     frame->setObjectName("topFrame");
     frame->setStyleSheet("QFrame#topFrame {border:0px solid gray; border-radius: 15px; background: rgba(255,255,255,150);}");
+    frame->adjustSize();
 
     windowlayout->addWidget(frame); // add frame to layout
 
@@ -111,12 +117,14 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     // title
     QLabel *title = new QLabel("Start settings");
     specials.setNewStyleSheet(title, desktopSize, 22, 15, "background-color : #aaffff; color : black; ", 4);
-
+    title->adjustSize();
     title->setAlignment(Qt::AlignCenter);
     frameLayout->addWidget(title, 0, Qt::AlignCenter);
+    // title->setMaximumWidth(title->fontMetrics().boundingRect(title->text()).width());
+    // title->setMaximumHeight(title->fontMetrics().boundingRect(title->text()).height());
 
     // first layout for first group
-    QGridLayout *clearLayout = new QGridLayout;
+    QHBoxLayout *clearLayout = new QHBoxLayout;
     clearLayout->setSpacing(2);
     clearLayout->setContentsMargins(3, 3, 3, 3);
 
@@ -128,15 +136,23 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     QString str= QString::number((int) NumberOfFiles());
     QLabel *label = new QLabel("Number:");
     fileCountLabel = new QLabel(str);
-    clearLayout->addWidget(label, 0, 0);
-    clearLayout->addWidget(fileCountLabel, 0, 1);
+
+    height = fileCountLabel->minimumSizeHint().height();
+    fileCountLabel->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
+
+    height = label->minimumSizeHint().height();
+    label->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
+
+
+    clearLayout->addWidget(label, 0);
+    clearLayout->addWidget(fileCountLabel, 1);
 
     // first group, clear config button
     QPushButton* clearConfigButton = new QPushButton("Reset configuration");
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearConfigButton, desktopSize, 22, 15, buttonStyle, 2);
 #endif
-    clearLayout->addWidget(clearConfigButton, 0, 2);
+    clearLayout->addWidget(clearConfigButton, 2);
     connect(clearConfigButton, SIGNAL(clicked()), this, SLOT(clearConfigClicked()) );
 
     // adjust height
@@ -148,7 +164,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #ifdef MOBILE_ANDROID
     specials.setNewStyleSheet(clearUiButton, desktopSize, 22, 15, buttonStyle, 2);
 #endif
-    clearLayout->addWidget(clearUiButton, 0, 3);
+    clearLayout->addWidget(clearUiButton, 3);
     connect(clearUiButton, SIGNAL(clicked()), this, SLOT(clearUiClicked()) );
 
     // adjust height
@@ -157,7 +173,10 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // first group, messages label
     QLabel *debugLabel = new QLabel(" Messages:");
-    clearLayout->addWidget(debugLabel, 0, 4);
+    height = debugLabel->minimumSizeHint().height();
+    debugLabel->setMinimumHeight(qRound(height*COMBOHEIGHTFACTOR));
+
+    clearLayout->addWidget(debugLabel, 4);
 
     // first group, combo yes/no
     debugComboBox = new QComboBox();
@@ -165,7 +184,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     debugComboBox->addItem("No");
     debugComboBox->addItem("Yes");
     debugComboBox->setCurrentIndex(0);
-    clearLayout->addWidget(debugComboBox, 0, 5);
+    clearLayout->addWidget(debugComboBox, 5);
 
     // adjust height
     height = debugComboBox->minimumSizeHint().height();
@@ -268,6 +287,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     #endif
     QLabel *version = new QLabel(message);
     version->setAlignment(Qt::AlignRight);
+    version->adjustSize();
     specials.setNewStyleSheet(version, desktopSize, 22, 13, "background-color: transparent;", -4);
 
     // add it

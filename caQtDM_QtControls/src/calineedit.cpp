@@ -91,6 +91,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     Alarm = 0;
 
+    thisDatatype = caDOUBLE;
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
     defSelectColor = Qt::red; // this does not appear in the palette
 
@@ -120,6 +121,13 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 void caLineEdit::setFromTextEntry()
 {
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(rescaleFont(const QString&)));
+}
+
+void caLineEdit::triggertextChange(bool send)
+{
+    if (send){
+        emit textChanged(text());
+    }
 }
 
 void caLineEdit::setValueType(bool isvalue)
@@ -630,8 +638,8 @@ QSize caLineEdit::sizeHint() const
     QFont f = font();
     f.setPointSize(10);
     QFontMetrics fm(f);
-    int w = fm.width(text());
-    int h = fm.height();
+    int w = QMETRIC_QT456_FONT_WIDTH(fm,text());
+    int h = QMETRIC_QT456_FONT_HEIGHT(fm,text());
     QSize size(w, h);
     //printf("ESimpleLabel \e[1;33msizeHint\e[0m \"%s\" returning size w %d h %d\n", objectName(), size.width(), size.height());
     return size;

@@ -258,7 +258,46 @@ void caSlider::setMinValue(double const &minim){
 
 void caSlider::setSliderValue(double const &value){
     thisValue = value;
+    //qDebug() <<"setSliderValue"<<value<< this;
     setValue(value);
+
+}
+
+void caSlider::set_Max_Value(int max)
+{
+    set_Max_Value(double(max));
+}
+
+void caSlider::set_Max_Value(double max)
+{
+    if (fabs(thisMaximum-max)>std::numeric_limits<double>::epsilon()*10){
+        //qDebug()<< "Max:"<< max;
+        thisMaximum=max;
+#if QWT_VERSION < 0x060100
+        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
+#else
+        setScale(thisMinimum, thisMaximum);
+#endif
+    }
+
+
+}
+
+void caSlider::set_Min_Value(int min)
+{
+    set_Min_Value(double(min));
+}
+
+void caSlider::set_Min_Value(double min)
+{
+    if (fabs(thisMinimum-min)>std::numeric_limits<double>::epsilon()*10){
+        thisMinimum=min;
+#if QWT_VERSION < 0x060100
+        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
+#else
+        setScale(thisMinimum, thisMaximum);
+#endif
+    }
 }
 
 void caSlider::setIncrementValue(double const &value){
@@ -517,8 +556,12 @@ void caSlider::wheelEvent(QWheelEvent *e)
         e->ignore();
         return;
     }
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     int delta = e->delta();
+#else
+    int delta = e->pixelDelta().manhattanLength();
+#endif
+
 
     if(thisDirection == Right || thisDirection == Up) {
         if ( delta > 0 ) direction = 1;
@@ -908,7 +951,7 @@ QString caSlider::setScaleLabel(double value) const
       snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
 
-    label = QString::fromAscii(asc);
+    label = QString::fromLatin1(asc);
 
     return label;
 }

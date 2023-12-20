@@ -30,6 +30,12 @@
 #include "catable.h"
 #include "alarmdefs.h"
 
+#if defined(_MSC_VER)
+    #ifndef snprintf
+     #define snprintf _snprintf
+    #endif
+#endif
+
 caTable::caTable(QWidget *parent) : QTableWidget(parent)
 
 {
@@ -40,7 +46,7 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     setMaxValue(1.0);
     for(int i=0; i< MaxRows; i++) {
         setFormat(i, 1);
-        for(int j=0; j< MaxCols; j++) tableItem[i][j] = (QTableWidgetItem*) 0;
+        for(int j=0; j< MaxCols; j++) tableItem[i][j] = (QTableWidgetItem*) Q_NULLPTR;
     }
 
     thisItemFont = this->font();
@@ -50,10 +56,14 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     setEditTriggers(QTableWidget::NoEditTriggers);
     verticalHeader()->setDefaultSectionSize(20);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-
     defaultForeColor = palette().foreground().color();
+#else
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    defaultForeColor = palette().windowText().color();
 
+#endif
     createActions();
     addAction(copyAct);
 
@@ -70,7 +80,7 @@ void caTable::cellclicked(int row, int col)
 void caTable::celldoubleclicked(int row, int col)
 {
      if(col==1) emit TableDoubleClickedSignal(this->item(row, 0)->text());
-     if(tableItem[row][col] != (QTableWidgetItem*) 0)  this->item(row,col)->setSelected(false);
+     if(tableItem[row][col] != (QTableWidgetItem*) Q_NULLPTR)  this->item(row,col)->setSelected(false);
 }
 
 void caTable::createActions() {
@@ -83,7 +93,11 @@ void caTable::createActions() {
 void caTable::setColumnSizes(QString const &newSizes)
 {
     if(newSizes.size() > 0) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+#else
+        horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+#endif
         thisColumnSizes = newSizes.split(";");
         for(int i=0; i< thisColumnSizes.count(); i++) {
             int colsize=thisColumnSizes.at(i).toInt();
@@ -92,7 +106,12 @@ void caTable::setColumnSizes(QString const &newSizes)
             }
         }
     } else {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+#else
+        horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+#endif
+
     }
 }
 
@@ -159,7 +178,7 @@ void caTable::displayText(int row, int col, short status, QString const &text)
 
     if(row >= rowCount() || col >= columnCount()) return;
 
-    if(tableItem[row][col] != (QTableWidgetItem*) 0) {
+    if(tableItem[row][col] != (QTableWidgetItem*) Q_NULLPTR) {
         tableItem[row][col]->setText(text);
     } else {
         tableItem[row][col] = new QTableWidgetItem(text);
@@ -219,7 +238,8 @@ void caTable::setValue(int row, int col, short status, double value, QString con
             Alarm = NO_ALARM;
         }
     }
-    sprintf(text, thisFormat[row], value);
+    //sprintf(text, thisFormat[row], value);
+    snprintf(text, 40, thisFormat[row], value);
     displayText(row, col, Alarm, text);
     displayText(row, col+1, Alarm, unit);
 }

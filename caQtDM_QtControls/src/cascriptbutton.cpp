@@ -30,7 +30,7 @@ caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
 {
 
     QGridLayout *l = new QGridLayout;
-    l->setMargin(0);
+    SETMARGIN_QT456(l,0);
     displayScript = new QCheckBox();
     displayScript->setText("");
     displayScript->setGeometry(0,0,15,15);

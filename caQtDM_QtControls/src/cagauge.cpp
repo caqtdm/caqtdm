@@ -97,7 +97,9 @@ void caLinearGauge::paintEvent(QPaintEvent *)
 
     if (m_scaleEnabled) {
         h = fm.height()+2;
-        w = fm.width(labels[longestLabelIndex])+2;
+        //w = fm.width(labels[longestLabelIndex])+2;
+        w = QMETRIC_QT456_FONT_WIDTH(fm,labels[longestLabelIndex]) + 2;
+
     } else {
         h=w=10;
     }
@@ -131,7 +133,7 @@ void caLinearGauge::paintEvent(QPaintEvent *)
 
     if (!isEnabled())
     {
-        QColor c = palette().color(QPalette::Background);
+        QColor c = palette().color(QPalette::Window);
         c.setAlpha(200);
         painter.fillRect(painter.window(), c);
     }
@@ -209,7 +211,12 @@ void caLinearGauge::drawColorBar(QPainter *p)
         v1 = (m_value-m_minValue)/(m_maxValue-m_minValue);
 
         p->setPen(Qt::black);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         p->setBrush(palette().background());
+#else
+        p->setBrush(palette().window());
+#endif
+
         if (m_fillMode == FROM_MIN)
         {
             max = v1;
@@ -349,7 +356,8 @@ void caLinearGauge::drawLabels(QPainter *p)
     QFont f = p->font();
     QFontMetrics fm(f);
     h = fm.height();
-    w = fm.width(labels[longestLabelIndex]);
+    //w = fm.width(labels[longestLabelIndex]);
+    w = QMETRIC_QT456_FONT_WIDTH(fm,labels[longestLabelIndex]);
 
     if (m_orientation == Qt::Horizontal)
     {
@@ -357,7 +365,7 @@ void caLinearGauge::drawLabels(QPainter *p)
         h = labelsSize;
         while (check && f.pointSize() > 2)
         {
-            if ((p->fontMetrics().width(labels[longestLabelIndex]) > (p->window().width()/m_numMajorTicks)))
+           if ((QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),labels[longestLabelIndex]) > (p->window().width()/m_numMajorTicks)))
             {
                 f.setPointSize(f.pointSize()-1);
                 p->setFont(f);
@@ -394,7 +402,7 @@ void caLinearGauge::drawLabels(QPainter *p)
         w = labelsSize;
         while (check && f.pointSize() > 2)
         {
-            if (((p->fontMetrics().height()>(p->window().height()/m_numMajorTicks))||p->fontMetrics().width(labels[longestLabelIndex])>labelsSize))
+            if (((p->fontMetrics().height()>(p->window().height()/m_numMajorTicks))||QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),labels[longestLabelIndex]) >labelsSize))
             {
                 f.setPointSize(f.pointSize()-1);
                 p->setFont(f);
@@ -489,7 +497,7 @@ void caCircularGauge::paintEvent(QPaintEvent *)
 
     if (!isEnabled())
     {
-        QColor c = palette().color(QPalette::Background);
+        QColor c = palette().color(QPalette::Window);
         c.setAlpha(200);
         painter.fillRect(painter.window(), c);
     }
@@ -524,7 +532,11 @@ void caCircularGauge::drawColorBar(QPainter *p)
         p->setBrush(v_c[0]);
         p->drawPie(-m_outerRadius,-m_outerRadius,m_outerRadius*2,m_outerRadius*2, (int)(m_startAngle*16), (int)-(m_arcLength*16));
     }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     p->setBrush(palette().background());
+#else
+    p->setBrush(palette().window());
+#endif
     p->drawEllipse(-m_innerRadius,-m_innerRadius,m_innerRadius*2,m_innerRadius*2);
 }
 
@@ -653,7 +665,12 @@ void caCircularGauge::drawValue(QPainter *p)
     QString s;
     if (isEnabled())
     {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         EngString engString(QString().sprintf(m_valueFormat.toLatin1(), d_naturalValue), m_valueFormat, d_naturalValue);
+#else
+        EngString engString(QString().asprintf(m_valueFormat.toLatin1(), d_naturalValue), m_valueFormat, d_naturalValue);
+#endif
+
         s = engString;
     }
     else
@@ -673,7 +690,7 @@ void caCircularGauge::drawValue(QPainter *p)
     bool check = true;
     while (check)
     {
-        if ((p->fontMetrics().width(s) > (w-2)))
+        if ((QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),s) > (w-2)))
         {
             qreal fontSize = f.pointSizeF()-.5;
             if(fontSize < MIN_FONT_SIZE) fontSize = MIN_FONT_SIZE;
@@ -697,7 +714,7 @@ void caCircularGauge::drawValue(QPainter *p)
     check = true;
     while (check)
     {
-        if ((p->fontMetrics().width(m_label) > (38)))
+        if ((QMETRIC_QT456_FONT_WIDTH(p->fontMetrics(),m_label) > (38)))
         {
             f.setPointSizeF(f.pointSizeF()-.5);
             p->setFont(f);

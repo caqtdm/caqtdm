@@ -86,16 +86,29 @@ class QTCON_EXPORT caScan2D : public QWidget
     Q_PROPERTY(QString maxLevel READ getMaxLevel WRITE setMaxLevel)
 
     Q_PROPERTY(colormap ColorMap READ getColormap WRITE setColormap)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QString customColorMap READ getCustomMap WRITE setCustomMap  DESIGNABLE isPropertyVisible(customcolormap))
     Q_PROPERTY(bool discreteCustomColorMap READ getDiscreteCustomMap WRITE setDiscreteCustomMap DESIGNABLE isPropertyVisible(discretecolormap))
+#else
+#endif
 
     Q_PROPERTY(QStringList ROI_readChannelsList READ getROIChannelsReadList WRITE setROIChannelsReadList STORED false)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE inactiveButVisible())
+#else
+    Q_PROPERTY(QString ROI_readChannels READ getROIChannelsRead WRITE setROIChannelsRead DESIGNABLE false)
+#endif
+
     Q_PROPERTY(ROI_markertype ROI_readmarkerType READ getROIreadmarkerType WRITE setROIreadmarkerType)
     Q_PROPERTY(ROI_type ROI_readType READ getROIreadType WRITE setROIreadType)
 
     Q_PROPERTY(QStringList ROI_writeChannelsList READ getROIChannelsWriteList WRITE setROIChannelsWriteList STORED false)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE inactiveButVisible())
+#else
+    Q_PROPERTY(QString ROI_writeChannels READ getROIChannelsWrite WRITE setROIChannelsWrite DESIGNABLE false)
+#endif
+
     Q_PROPERTY(ROI_markertype ROI_writemarkerType READ getROIwritemarkerType WRITE setROIwritemarkerType)
     Q_PROPERTY(ROI_type ROI_writeType READ getROIwriteType WRITE setROIwriteType)
 

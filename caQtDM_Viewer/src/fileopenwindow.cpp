@@ -84,7 +84,7 @@ int setenv(const char *name, const char *value, int overwrite)
     int errcode = 0;
     if(!overwrite) {
         size_t envsize = 0;
-        errcode = getenv_s(&envsize, NULL, 0, name);
+        errcode = getenv_s(&envsize, Q_NULLPTR, 0, name);
         if(errcode || envsize) return errcode;
     }
     return _putenv_s(name, value);
@@ -113,13 +113,13 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              qDebug() << "application state changed to inactive";
 
              pendio = false;
-             if (mutexKnobData != (MutexKnobData *) 0) {
+             if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                  for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                      knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                      if(kPtr->index != -1)  {
                        //qDebug() << "should disconnect" << kPtr->pv;
                        ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                       if(plugininterface != (ControlsInterface *) 0) plugininterface->pvDisconnect(kPtr);
+                       if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvDisconnect(kPtr);
                        mutexKnobData->SetMutexKnobData(i, *kPtr);
                        pendio = true;
                      }
@@ -131,12 +131,12 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
          case Qt::ApplicationActive:
              qDebug() << "application state changed to active";
              pendio = false;
-              if (mutexKnobData != (MutexKnobData *) 0) {
+              if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
                       knobData *kPtr = mutexKnobData->GetMutexKnobDataPtr(i);
                       if(kPtr->index != -1) {
                         ControlsInterface * plugininterface = (ControlsInterface *) kPtr->pluginInterface;
-                        if(plugininterface != (ControlsInterface *) 0) plugininterface->pvReconnect(kPtr);
+                        if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvReconnect(kPtr);
                         pendio = true;
                       }
                   }
@@ -161,7 +161,7 @@ void FileOpenWindow::FlushAllInterfaces()
         while (i.hasNext()) {
             i.next();
             ControlsInterface *plugininterface = i.value();
-            if(plugininterface != (ControlsInterface *) 0) plugininterface->FlushIO();
+            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->FlushIO();
         }
     }
 }
@@ -174,7 +174,7 @@ void FileOpenWindow::TerminateAllInterfaces()
         while (i.hasNext()) {
             i.next();
             ControlsInterface *plugininterface = i.value();
-            if(plugininterface != (ControlsInterface *) 0) plugininterface->TerminateIO();
+            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->TerminateIO();
         }
     }
 }
@@ -189,7 +189,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // definitions for last opened file
     debugWindow = true;
     fromIOS = false;
-    lastWindow = (QMainWindow*) 0;
+    lastWindow = (QMainWindow*) Q_NULLPTR;
     lastMacro ="";
     lastFile = "";
     if(resizing) lastResizing="true";
@@ -205,9 +205,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     OptionList = options;
 
     caQtDM_TimeOutEnabled = false;
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qDebug() <<  "caQtDM -- desktop size:" << qApp->desktop()->size();
-
+#else
+     qDebug() <<  "caQtDM -- desktop size:" <<  QGuiApplication::primaryScreen()->size();
+#endif
     // Set Window Title without the whole path
     QString title("caQtDM ");
     title.append(BUILDVERSION);
@@ -291,7 +293,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     OptionList.remove("updatetype");
 
 #ifdef MOBILE
-    specials.setNewStyleSheet(messageWindow, qApp->desktop()->size(), 16, 10);
+    specials.setNewStyleSheet(messageWindow, qApp->primaryScreen()->size(), 16, 10);
 #endif
     messageWindow->setAllowedAreas(Qt::TopDockWidgetArea);
     QGridLayout *gridLayoutCentral = new QGridLayout(this->ui.centralwidget);
@@ -399,14 +401,21 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // start a timer
     startTimer(1000);
 
-    pvWindow = (QMainWindow*) 0;
-    pvTable = (QTableWidget*) 0;
+    pvWindow = (QMainWindow*) Q_NULLPTR;
+    pvTable = (QTableWidget*) Q_NULLPTR;
 
 //************************************************************************************************************************************************
     if(HTTPCONFIGURATOR) {
     // test reading a local configuration file in order to start caQtDM for ios (read caQTDM_IOS_Config.xml, display its data, choose configuration,
     // then get from the choosen website and choosen config file the epics configuration and ui file to launch
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QSize desktopSize = qApp->desktop()->size();
+#else
+    QSize desktopSize = QGuiApplication::primaryScreen()->size();
+#endif
+
+
     //qDebug() <<  "desktop size in millimer" << qApp->desktop()->widthMM() << qApp->desktop()->heightMM();
  again:
     QList<QString> urls;
@@ -472,7 +481,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     setenv("CAQTDM_DISPLAY_PATH", qasc(specials.getStdPath()), 1);
     int success = filefunction.checkFileAndDownload(file, url);
     if(!success) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not download file %1 from %2").arg(file).arg(url));
         exit(0);
     }
 
@@ -576,7 +585,7 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 
     /* can not open file */
     if (!file->open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
         exit(0);
     }
 
@@ -591,14 +600,14 @@ void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &ur
 
         /* If token is StartElement, we'll see if we can read it.*/
         if(token == QXmlStreamReader::StartElement) {
-            if(xml.name() == "configuration") continue;
+            if(xml.name() == QString("configuration")) continue;
 
-            if(xml.name() == "url") {
+            if(xml.name() == QString("url")) {
                 QXmlStreamAttributes attributes = xml.attributes();
                 if(attributes.hasAttribute("value")) urls.append(attributes.value("value").toString());
             }
 
-            if(xml.name() == "config") {
+            if(xml.name() == QString("config")) {
                 QXmlStreamAttributes attributes = xml.attributes();
                 if(attributes.hasAttribute("value")) files.append(attributes.value("value").toString());
             }
@@ -620,7 +629,7 @@ void FileOpenWindow::saveConfigFile(const QString &filename, QList<QString> &url
 
     /* can not open file */
     if (!file->open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(0, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
+        QMessageBox::critical(Q_NULLPTR, tr("caQtDM"), tr("could not open configuration file: %1").arg(filename));
         exit(0);
     }
 
@@ -659,7 +668,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
     EnvFile.append(fileName);
     QFile file(EnvFile);
     if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "open file error setAllEnviromentVariables", file.errorString());
+        QMessageBox::information(Q_NULLPTR, "open file error setAllEnviromentVariables", file.errorString());
         return;
     }
 
@@ -740,7 +749,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #endif
 
     // any non connected pv's to display ?
-    if (mutexKnobData != (MutexKnobData *) 0) {
+    if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
         char msg[MAX_STRING_LENGTH];
         msg[0] = '\0';
 
@@ -775,7 +784,7 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         }
         statusBar()->showMessage(msg);
     }
-
+    QString filename_save=qgetenv("CAQTDM_SCREENSHOT_NAME");
     // we wanted a print, do it when acquired, then exit
     if(printandexit) {
         if(countPV > 0 && countNotConnected == 0) {
@@ -800,6 +809,41 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
             exit(1);
         }
     }
+    QVariant var = this->property("savetoimage");
+    if(!var.isNull()) {
+        bool savetoimage = var.toBool();
+        if (savetoimage){
+            QString name="caQtDM";
+            if (!filename_save.isEmpty()){
+                name=filename_save;
+            }
+            name=name.append(".png");
+            if(countPV > 0 && countNotConnected == 0) {
+                if(this->findChildren<CaQtDM_Lib *>().count() == 1) {
+                    CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                    if(countDisplayed > 0 && countDisplayed == countPV) {
+                        printIt++;
+                        if(printIt > 2) {
+
+                            widget->save_graphics(name);
+                            qDebug() << "caQtDM -- file has been printed to "<< name;
+                            qApp->exit(1);
+                            exit(1);
+                        }
+                    }
+                }
+            }
+            if(timeout++ > 4) {    // seems we did not get everything
+                CaQtDM_Lib * widget = this->findChild<CaQtDM_Lib *>();
+                widget->save_graphics(name);
+                qDebug() << "caQtDM -- file has been printed to " << name << ", probably with errors";
+                qApp->exit(1);
+                exit(1);
+            }
+
+        }
+    }
+
 
     // reload windows that were closed to be reloaded (had to be deferrred, due to memory problems)
     if(!reloadList.isEmpty()) {
@@ -835,7 +879,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 {
     char *asc;
     bool willprint = printexit;
-    CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, 0, OptionList);
+    CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, Q_NULLPTR, OptionList);
 
     // prc files are not allowed to be resized, or when resizing is prohibited by the command line
     if (fileS.contains("prc")) {
@@ -885,8 +929,12 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     // center the window if requested (only for windows)
 #if defined(WIN32) && !defined(__GNUC__)
      if(centerwindow)  {
+        #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QDesktopWidget * Desktop = QApplication::desktop();
-            QRect defscreengeo = Desktop->availableGeometry(-1);//Defaultscreen=-1
+            QRect defscreengeo = Desktop->availableGeometry(-1);
+        #else
+            QRect defscreengeo =  QGuiApplication::primaryScreen()->availableGeometry();
+        #endif
             int mainw_width = mainWindow->width();
             int mainw_height = mainWindow->height();
             int movx = (defscreengeo.width() / 2) - (mainw_width / 2);
@@ -928,7 +976,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 #ifdef MOBILE_IOS
     // this is needed for the status bar
     mainWindow->setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea,false);
-    QRect availscreengeo = QApplication::desktop()->availableGeometry(-1);
+    QRect availscreengeo = qApp->primaryScreen()->availableGeometry();
     //QRect screengeo = QApplication::desktop()->geometry();
     //qDebug() << "IOS screen" << screengeo<< availscreengeo;
     QSize winsize=mainWindow->size();
@@ -1046,7 +1094,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
         while (counter<extensions){
             FileName=inputFile;
             // remove any extension
-            FileName=FileName.split(".",QString::SkipEmptyParts).at(0);
+            FileName=FileName.split(".",SKIP_EMPTY_PARTS).at(0);
 
             FileName=FileName.append(valid_extensions[counter]);
             //qDebug() << "check " << FileName << valid_extensions[counter] ;
@@ -1137,6 +1185,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 // all these past commands will only give you a notification in the taskbar
 // in case of x windows, we will pop the window really up
 #ifdef CAQTDM_X11
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        if (qApp->platformName()== QLatin1String("xcb")){
+        #endif
+
                 static Atom  NET_ACTIVE_WINDOW = 0;
                 XClientMessageEvent xev;
                 if (NET_ACTIVE_WINDOW == 0) {
@@ -1153,6 +1205,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
                 xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
                 xev.data.l[1] = xev.data.l[2] = xev.data.l[3] = xev.data.l[4] = 0;
                 XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
+        #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
+        }
+        #endif
+
 #endif //CAQTDM_X11
 
                 return;
@@ -1172,10 +1228,10 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     if(fileNameFound.isNull()) {
         QString message = QString(FileName);
         message.append(" does not exist");
-        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog, true);
+        QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
         m->show();
     } else {
-        qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
+        //qDebug() << "file" << fileNameFound << "will be loaded" << "macro=" << macroString;
         QPoint position(0,0);
         QMainWindow *mainWindow = loadMainWindow(position, fileNameFound, macroString, resizeString, printandexit, false, (geometry == ""));//if geometry is empty center window (for windows)
         if(geometry != "") {
@@ -1192,7 +1248,7 @@ void FileOpenWindow::Callback_ActionAbout()
 {
     QString message = QString("Qt-based Epics Display Manager Version %1 using Qt %2 and %3 with data from %4 developed at Paul Scherrer Institut, by Anton Mezger\nPlatform support is supported by H.Brands\n");
     message = message.arg(BUILDVERSION, QT_VERSION_STR, BUILDARCH, SUPPORT);
-    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog, true);
+    QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Information, "About", message, ":/caQtDM-logospsi.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
     m->show();
 }
 
@@ -1401,7 +1457,7 @@ void FileOpenWindow::Callback_ActionUnconnected()
     int countNotConnected=0;
     int countDisplayed = 0;
 
-    if(pvWindow != (QMainWindow*) 0) {
+    if(pvWindow != (QMainWindow*) Q_NULLPTR) {
         pvWindow->show();
         return;
     }
@@ -1445,7 +1501,7 @@ void FileOpenWindow::Callback_PVwindowExit()
 void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &countDisplayed)
 {
     int count = 0;
-    if(pvTable != (QTableWidget*) 0) {
+    if(pvTable != (QTableWidget*) Q_NULLPTR) {
         pvTable->clear();
         pvTable->setColumnCount(4);
         pvTable->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -1465,7 +1521,7 @@ void FileOpenWindow::fillPVtable(int &countPV, int &countNotConnected, int &coun
         }
     }
 
-    if(pvTable != (QTableWidget*) 0) {
+    if(pvTable != (QTableWidget*) Q_NULLPTR) {
         pvTable->setRowCount(countNotConnected);
         count = 0;
         for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
@@ -1617,14 +1673,23 @@ void FileOpenWindow::parse_and_set_Geometry(QMainWindow *widget, QString parsest
     h = qMax(h,minSize.height());
 
     if ((m & XNegative)) {
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         x = qApp->desktop()->width()  + x - w;
+#else
+        x = QGuiApplication::primaryScreen()->availableGeometry().width()  + x - w;
+#endif
         x -= (widget->frameGeometry().width() - widget->width()) / 2;
     } else {
         x += (widget->geometry().x() - widget->x());
     }
 
     if ((m & YNegative)) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         y = qApp->desktop()->height() + y - h;
+#else
+        y = QGuiApplication::primaryScreen()->availableGeometry().height() + y - h;
+#endif
     } else {
         y += (widget->geometry().y() - widget->y());
     }
@@ -1649,6 +1714,17 @@ void FileOpenWindow::closeEvent(QCloseEvent* ce)
     Callback_ActionExit();
     ce->ignore();
 }
+#ifdef MOBILE
+bool FileOpenWindow::event(QEvent *e)
+{
+    if (e->type() == QEvent::Show) {
+        qDebug()<<"QEvent::Show!";
+        // Qt 6.5.2 ShowMinimized=crash in QWidget::event better solution = setVisible(false)
+        if (!debugWindow) this->setVisible(false);
+    }
+    return QWidget::event(e);
+}
+#endif
 
 bool FileOpenWindow::eventFilter(QObject *obj, QEvent *event)
 {

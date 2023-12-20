@@ -79,7 +79,7 @@ static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, 
             strng3 = strng3.arg(propertyname[i]).arg(propertytext[i]);
             strng1.append(strng3);
 #endif
-            if(strstr(propertytype[i], "multiline") != (char*) 0) {
+            if(strstr(propertytype[i], "multiline") != (char*) Q_NULLPTR) {
                 strng2 = " <stringpropertyspecification name=\"%1\" notr=\"true\" type=\"%2\"/>";
                 strng2 = strng2.arg(propertyname[i]).arg(propertytype[i]);
             }
@@ -107,10 +107,21 @@ CustomWidgetInterface_Monitors::CustomWidgetInterface_Monitors(QObject *parent):
 {
 }
 
-void CustomWidgetInterface_Monitors::initialize(QDesignerFormEditorInterface *)
+void CustomWidgetInterface_Monitors::initialize(QDesignerFormEditorInterface *formEditor)
 {
     if (d_isInitialized) return;
     d_isInitialized = true;
+
+#ifndef MOBILE
+        // for edition of channel/pv
+        QExtensionManager *manager = formEditor->extensionManager();
+        Q_ASSERT(manager != 0);
+        manager->registerExtensions(new PVTaskMenuFactory(manager),
+                                    Q_TYPEID(QDesignerTaskMenuExtension));
+#else
+    Q_UNUSED(formEditor);
+#endif
+
 }
 
 caBitnamesInterface::caBitnamesInterface(QObject *parent): CustomWidgetInterface_Monitors(parent)

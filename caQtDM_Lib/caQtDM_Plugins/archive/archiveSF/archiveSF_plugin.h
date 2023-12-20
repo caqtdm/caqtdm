@@ -144,7 +144,7 @@ public slots:
             }
 
         } else {
-            if(messageWindow != (MessageWindow *) 0) {
+            if(messageWindow != (MessageWindow *) Q_NULLPTR) {
                 QString mess("ArchiveSF plugin -- lastError: ");
                 mess.append(fromArchive->lastError());
                 mess.append(" for pv: ");
@@ -193,10 +193,10 @@ public:
     }
 
     sfRetrieval *getArchive() {
-        if(pworker != (WorkerSF *) 0) {
+        if(pworker != (WorkerSF *) Q_NULLPTR) {
             return pworker->getArchive();
         } else {
-            return (sfRetrieval *) 0;
+            return (sfRetrieval *) Q_NULLPTR;
         }
     }
 

@@ -4,6 +4,10 @@ contains(QT_VER_MAJ, 5) {
     QT     += widgets concurrent
     QT += serialbus
 }
+contains(QT_VER_MAJ, 6) {
+    QT     += widgets concurrent
+    QT += serialbus
+}
 
 CONFIG += warn_on
 CONFIG += environment_Plugin

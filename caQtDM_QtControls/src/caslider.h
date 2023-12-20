@@ -30,7 +30,8 @@
  #define QWT_DLL
 #endif
 
-
+#include <QtCore>
+#include <limits>
 
 #include <qtcontrols_global.h>
 #include <qwt_slider.h>
@@ -185,6 +186,10 @@ public slots:
 
 public slots:
     void setSliderValue(double const &value);
+    void set_Max_Value(int max);
+    void set_Max_Value(double max);
+    void set_Min_Value(int min);
+    void set_Min_Value(double min);
 
 private slots:
     void repeater();

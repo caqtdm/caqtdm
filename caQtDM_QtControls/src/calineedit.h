@@ -162,6 +162,7 @@ public slots:
     void hideObject(bool hideit) {
 #include "hideobjectcode.h"
     }
+    void triggertextChange(bool send);
 
 private slots:
     void rescaleFont(const QString& newText);

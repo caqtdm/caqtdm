@@ -3,6 +3,10 @@ QT += core gui
 contains(QT_VER_MAJ, 5) {
     QT     += widgets
 }
+contains(QT_VER_MAJ, 6) {
+    QT     += widgets
+}
+
 CONFIG += warn_on
 CONFIG += epics3_plugin
 include(../../../caQtDM.pri)

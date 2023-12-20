@@ -69,8 +69,8 @@ QSize EPushButton:: sizeHint() const
 	QFont f = font();
     f.setPointSize(10);
 	QFontMetrics fm(f);
-	int width = fm.width(text());
-        width += 8; /* add some extra space */
+    int width = QMETRIC_QT456_FONT_WIDTH(fm,text());
+    width += 8; /* add some extra space */
     return QSize(width, fm.height() + 4);
   }
   return QPushButton::sizeHint();

@@ -25,7 +25,7 @@
 #ifndef _JSONVALUE_H_
 #define _JSONVALUE_H_
 
-#include "caQtDM_Lib_global.h"
+#include "qtcontrols_global.h"
 #include <vector>
 #include <string>
 
@@ -35,7 +35,7 @@ class JSON;
 
 enum JSONType { JSONType_Null, JSONType_String, JSONType_Bool, JSONType_Number, JSONType_Array, JSONType_Object };
 
-class CAQTDM_LIBSHARED_EXPORT JSONValue
+class QTCON_EXPORT JSONValue
 {
 	friend class JSON;
 	
@@ -45,8 +45,10 @@ class CAQTDM_LIBSHARED_EXPORT JSONValue
 		JSONValue(const std::wstring &m_string_value);
 		JSONValue(bool m_bool_value);
 		JSONValue(double m_number_value);
+        JSONValue(int m_integer_value);
 		JSONValue(const JSONArray &m_array_value);
 		JSONValue(const JSONObject &m_object_value);
+        JSONValue(const JSONValue &m_source);
 		~JSONValue();
 
 		bool IsNull() const;
@@ -69,19 +71,26 @@ class CAQTDM_LIBSHARED_EXPORT JSONValue
 		JSONValue *Child(const wchar_t* name);
 
 		std::wstring Stringify() const;
+        std::vector<std::wstring> ObjectKeys() const;
 
 	protected:
 		static JSONValue *Parse(const wchar_t **data);
 
 	private:
-		static std::wstring StringifyString(const std::wstring &str);
-	
-		JSONType type;
-		std::wstring string_value;
-		bool bool_value;
-		double number_value;
-		JSONArray array_value;
-		JSONObject object_value;
+        static std::wstring StringifyString(const std::wstring &str);
+        std::wstring StringifyImpl(size_t const indentDepth) const;
+        static std::wstring Indent(size_t depth);
+
+        JSONType type;
+
+        union
+        {
+            bool bool_value;
+            double number_value;
+            std::wstring *string_value;
+            JSONArray *array_value;
+            JSONObject *object_value;
+        };
 };
 
 #endif

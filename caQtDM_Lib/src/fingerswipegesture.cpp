@@ -32,7 +32,7 @@
 #include <QEvent>
 #include <QTouchEvent>
 #include <QtDebug>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QApplication>
 
 #include <QtControls>
@@ -263,28 +263,28 @@ FingerSwipeGesture::~FingerSwipeGesture()
 
 bool FingerSwipeGesture::isLeftToRight() const
 {
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     int movelength = size.width() / 3;
     //printf("horiz movelenght=%d\n", movelength);
     return m_startPos.x()+movelength < m_currentPos.x();
 }
 bool FingerSwipeGesture::isRightToLeft() const
 {
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     int movelength = size.width() / 3;
     //printf("horiz movelenght=%d\n", movelength);
     return m_startPos.x() > m_currentPos.x()+movelength;
 }
 bool FingerSwipeGesture::isBottomToTop() const
 {
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     int movelength = size.height() / 2;
     //printf("vert movelenght=%d\n", movelength);
     return m_startPos.y()+movelength < m_currentPos.y();
 }
 bool FingerSwipeGesture::isTopToBottom() const
 {
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     int movelength = size.height() / 2;
     //printf("vert movelenght=%d\n", movelength);
     return m_startPos.y() > m_currentPos.y()+movelength;
@@ -292,7 +292,7 @@ bool FingerSwipeGesture::isTopToBottom() const
 
 bool FingerSwipeGesture::isVertical() const
 {
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     int movelength = size.height() / 20;
     //printf("vert movelenght=%d\n", movelength);
     return m_startPos.y() > m_currentPos.y()+qAbs(movelength);
@@ -301,7 +301,7 @@ bool FingerSwipeGesture::isVertical() const
 
 bool FingerSwipeGesture::isHorizontal() const
 {
-    QSize size = qApp->desktop()->size();
+    QSize size = qApp->primaryScreen()->size();
     int movelength = size.width() / 20;
     //printf("horiz movelenght=%d\n", movelength);
     return m_startPos.x() > m_currentPos.x()+qAbs(movelength);

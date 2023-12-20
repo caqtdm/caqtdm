@@ -49,6 +49,7 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     thisFormatC[0] = '\0';
     thisFormat[0] = '\0';
     thisUnsigned = false;
+    thisColorMode = Static;
 
     setPrecisionMode(Channel);
     setFormatType(decimal);
@@ -64,8 +65,12 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     verticalHeader()->setDefaultSectionSize(20);
     verticalHeader()->setSortIndicatorShown(false);
-    horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+           horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+#else
+           horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+#endif
     setColumnSize(80);
     setAttribute(Qt::WA_Hover);
 
@@ -81,7 +86,11 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
     createActions();
     addAction(copyAct);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     defaultForeColor = palette().foreground().color();
+#else
+    defaultForeColor = this->palette().brush(QPalette::Text).color();
+#endif
 
     blockIndex = -1;
 
@@ -132,7 +141,7 @@ void caWaveTable::setupItems(int nbRows, int nbCols)
     for(int i=0; i<rowCount(); i++) {
         for(int j=0; j<columnCount(); j++) {
             QTableWidgetItem *Item = item(i,j);
-            if(Item != (QTableWidgetItem *) 0) {
+            if(Item != (QTableWidgetItem *) Q_NULLPTR) {
                 delete Item;
             }
         }
@@ -202,7 +211,7 @@ void caWaveTable::dataInput(int row, int col)
         clearSelection();
 
         // set the value back (dataInput is now blocked again
-        if(item(row,col) != (QTableWidgetItem*) 0) {
+        if(item(row,col) != (QTableWidgetItem*) Q_NULLPTR) {
             item(row,col)->setText(keepText[index]);
         }
 
@@ -213,8 +222,8 @@ void caWaveTable::dataInput(int row, int col)
 
 void caWaveTable::cellClicked(int row, int col)
 {
-    Q_UNUSED(row);
-    Q_UNUSED(col);
+    Q_UNUSED(row)
+    Q_UNUSED(col)
     disableEdit(item(row, col));
     QTimer::singleShot(2000, this, SLOT(clearSelection()));
 }
@@ -360,7 +369,16 @@ QString caWaveTable::setValue(double value, DataType dataType)
                 snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
             }
         } else {
-            snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
+            switch (thisFormatType) {
+             case hexadecimal:
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int64_t)value);
+                break;
+            case octal:
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int64_t)value);
+                break;
+            default:
+                snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
+            }
         }
     } else if(dataType == longs) {
         if(thisUnsigned) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (uint) value);

@@ -36,9 +36,9 @@ class CAQTDM_LIBSHARED_EXPORT myQProcess : public QObject
     Q_OBJECT
 public:
 
-    explicit myQProcess(QObject *parent = 0);
+    explicit myQProcess(QObject *parent = Q_NULLPTR);
     ~myQProcess() {
-     if (process != (QProcess *) 0)
+     if (process != (QProcess *) Q_NULLPTR)
         if (started && process->state() != QProcess::NotRunning)
             process->kill();
     }

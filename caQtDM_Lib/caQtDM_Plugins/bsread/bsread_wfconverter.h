@@ -96,7 +96,7 @@ public:
             QMutex *datamutex;
             datamutex = (QMutex*) kDataP->mutex;
             datamutex->lock();
-            if (kDataP->edata.dataB==NULL){
+            if (kDataP->edata.dataB==Q_NULLPTR){
                 qDebug() << "Realloc"<< bsreadPVP->name << bsreadPVP->bsdata.wf_data_size<< sizeof(T_CAQTDM);
                 free(kDataP->edata.dataB);
             }
@@ -141,9 +141,14 @@ public:
                 QFutureSynchronizer<void> Sectors;
                 for (int sector=0;sector<threadcounter;sector++){
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                    Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
+#else
+                    Sectors.addFuture(QtConcurrent::run(&bsread_wfConverter::ConProcess,this,sector,threadcounter,ptr,elementcount,target));
+#endif
 
 
-                  Sectors.addFuture(QtConcurrent::run(this,&bsread_wfConverter::ConProcess,sector,threadcounter,ptr,elementcount,target));
+
                 }
                 Sectors.waitForFinished();
                 //printf("Image timer : %d milliseconds \n",timer.elapsed());

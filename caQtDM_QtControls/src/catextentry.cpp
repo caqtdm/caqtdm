@@ -50,6 +50,11 @@ void caTextEntry::setValue(double v)
     setText(QString::number(v));
     emit TextEntryChanged(QString::number(v));
 }
+void caTextEntry::setValue(QString string)
+{
+    setText(string);
+    emit TextEntryChanged(string);
+}
 
 // routine not used any more
 void caTextEntry::dataInput()

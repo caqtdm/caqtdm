@@ -401,7 +401,7 @@ QSize caMultiLineString::sizeHint() const
     QFont f = font();
     f.setPointSize(10);
     QFontMetrics fm(f);
-    int w = fm.width(text());
+    int w = QMETRIC_QT456_FONT_WIDTH(fm,text());
     int h = fm.height();
     QSize size(w, h);
     //printf("ESimpleLabel \e[1;33msizeHint\e[0m \"%s\" returning size w %d h %d\n", objectName(), size.width(), size.height());

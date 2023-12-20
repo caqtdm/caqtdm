@@ -18,9 +18,9 @@ For building and installing caqtdm following requirements have to met:
 
 or
 
-1. Qt 5.1
-2. Qwt 6.1.0
-3. EPICS 3.12.2
+1. Qt 6.4
+2. Qwt 6.2.0
+3. EPICS 7.0.6
 4. Designer
 
 The latest version of caQtDM has build and installation procedure working for several linux platforms. First you will have to unpack the tar archive, which will create the necessary directories and files. In the upper directory you will find the necessary procedures to build the package, run it locally without installing and also an installation procedure.
@@ -40,7 +40,7 @@ and the qt4-designer by the script qtdesigner (all located in the main directory
 
 In case you have qwt 6.1 you will have to use in caQtDM_QtControls/src the files qwt_thermo_marker_61.* instead of qwt_thermo_marker.*
 
-In case you already use Qt5.1 with qwt6.1 the building should also be straight forward.
+In case you already use Qt5.15 with qwt6.1.5 the building should also be straight forward.
 
 good luck and enjoy
 
@@ -49,10 +49,10 @@ In case of problems, please contact Anton Mezger at PSI.
 ## Windows
 To compile and run caQtDM on Windows following requirements have to be met:
 
-1. Qt 4.8.2 - Qt 5.12.0
-2. Qwt 6.0.1 - Qwt 6.1.3
-3. EPICS 3.14.12
-4. MS Visual Studio 2013 and MS Visual Studio 2017 
+1. Qt 4.8.2 - Qt 6.4.0
+2. Qwt 6.0.1 - Qwt 6.2.0
+3. EPICS 7.0.6
+4. MS Visual Studio 2013 and MS Visual Studio 2019 
 5. Wix 3.0.5419.0
 
 With caQtDM_Env.bat you can configure your system. All setting which are needed will be taken from here.
@@ -85,4 +85,11 @@ Following environment variables can be used to configure caqtdm:
 - __BSREAD_ZMQ_CONNECTION_TYPE__ - control the connection type of the bsread plugin 
 - __BSREAD_ZMQ_ADDR_LIST__ - point the bsread plugin static sources 
 
-- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend |
+- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend 
+
+- __CAQTDM_FINDRECORD_SRV__ - for autocompletion, the request URL
+- __CAQTDM_FINDRECORD_FACILITY__ - search limitation for a facility  
+- __CAQTDM_FINDRECORD_LIMIT__ - search limit max number of entries
+
+- __CAQTDM_FINDRECORD_DIRECT__ - override all other find record settings (direct json http download)
+|

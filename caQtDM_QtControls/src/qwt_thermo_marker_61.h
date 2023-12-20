@@ -37,6 +37,10 @@
 
 #include <QTimer>
 #include <QTime>
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+#include <QElapsedTimer>
+#endif
+
 #include <qtcontrols_global.h>
 #include "qwt_global.h"
 #include "qwt_abstract_scale.h"
@@ -261,7 +265,11 @@ private:
     PrivateData *d_data;
     DisplayType thisType;
     QTimer *redrawTimer;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QTime peakLevelChanged;
+#else
+    QElapsedTimer peakLevelChanged;
+#endif
     double prvValue;
     bool thisDecayOption;
     double thisDecayTime;

@@ -39,6 +39,9 @@
 
 #include "caQtDM_Lib_global.h"
 
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+#define Q_PID qint64
+#endif
 
 class CAQTDM_LIBSHARED_EXPORT processWindow : public QMainWindow
 {

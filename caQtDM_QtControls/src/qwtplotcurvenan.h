@@ -41,7 +41,7 @@ class QTCON_EXPORT  QwtPlotCurveNaN : public QwtPlotCurve
 
 public:
 
-    QwtPlotCurveNaN(const QString &title = QString::null );
+    QwtPlotCurveNaN(const QString &title = Q_NULLPTR );
     void setSamplesList(const QVector<QPointF>& Samples);
     void getLimits(double &ymin, double &ymax);
     void setInterval(curvType type, double interval);
@@ -63,7 +63,7 @@ class QTCON_EXPORT  QwtPlotIntervalCurveNaN : public QwtPlotIntervalCurve
 
 public:
 
-    QwtPlotIntervalCurveNaN(const QString &title = QString::null );
+    QwtPlotIntervalCurveNaN(const QString &title = Q_NULLPTR );
     void setSamplesList(const QVector<QwtIntervalSample>& Samples);
     void getLimits(double &ymin, double &ymax);
     void setInterval(curvType type, double interval);

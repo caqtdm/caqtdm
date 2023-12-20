@@ -28,6 +28,10 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QMouseEvent>
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+#include <QSignalMapper>
+#endif
+
 #include <math.h>
 
 caChoice::caChoice(QWidget *parent) : QWidget(parent)
@@ -62,7 +66,7 @@ caChoice::caChoice(QWidget *parent) : QWidget(parent)
 
     //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     grid = new QGridLayout(this);
-    grid->setMargin(0);
+    SETMARGIN_QT456(grid,0);
     grid->setSpacing(2);
 
     thisStacking = Row;
@@ -187,9 +191,13 @@ void caChoice::arrangeCells(QStringList list, int indx)
     // when buttons available connect them
     if(count > 0) {
        lastValue = indx;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
        connect(signalMapper, SIGNAL(mapped(QString)),this, SIGNAL(clicked(QString)));
        connect(signalMapperInt, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
-
+#else
+        connect(signalMapper, SIGNAL(mappedString(QString)),this, SIGNAL(clicked(QString)));
+        connect(signalMapperInt, SIGNAL(mappedInt(int)),this, SIGNAL(clicked(int)));
+#endif
        // when no buttons, make at least one
     } else {
         QString s = "";

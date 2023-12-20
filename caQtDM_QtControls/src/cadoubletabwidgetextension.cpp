@@ -67,3 +67,12 @@ QWidget* caDoubleTabWidgetExtension::widget(int index) const
 {
     return myWidget->widget(index);
 }
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+bool caDoubleTabWidgetExtension::canAddWidget() const{
+    return true;
+
+}
+bool caDoubleTabWidgetExtension::canRemove(int index) const{
+    return true;
+}
+#endif

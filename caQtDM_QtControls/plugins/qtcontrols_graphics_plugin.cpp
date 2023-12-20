@@ -53,7 +53,7 @@ static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, 
     QString strng1 = "";
     QString strng2 = "";
 
-    if(strstr(name, "cadoubletabwidget") != (char*) 0) {
+    if(strstr(name, "cadoubletabwidget") != (char*) Q_NULLPTR) {
         mess = "<ui language=\"c++\"><widget class=\"%1\" name=\"%2\">\
                 <property name=\"geometry\">\
                 <rect>\
@@ -102,7 +102,7 @@ static QString XmlFunc(const char *clss, const char *name, int x, int y, int w, 
                 strng3 = strng3.arg(propertyname[i]).arg(propertytext[i]);
                 strng1.append(strng3);
 #endif
-                if(strstr(propertytype[i], "multiline") != (char*) 0) {
+                if(strstr(propertytype[i], "multiline") != (char*) Q_NULLPTR) {
                     strng2 = " <stringpropertyspecification name=\"%1\" notr=\"true\" type=\"%2\"/>";
                     strng2 = strng2.arg(propertyname[i]).arg(propertytype[i]);
                 }

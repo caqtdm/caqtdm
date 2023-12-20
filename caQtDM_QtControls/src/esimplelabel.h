@@ -56,8 +56,18 @@ class QTCON_EXPORT ESimpleLabel : public QLabel, public FontScalingWidget
 {
   /* scalable fonts */
   Q_PROPERTY(bool fontScaleEnabled READ fontScaleEnabled DESIGNABLE false)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   Q_PROPERTY(double botTopBorderWidth READ botTopBorderWidth WRITE setBotTopBorderWidth DESIGNABLE fontScaleEnabled)
   Q_PROPERTY(double lateralBorderWidth READ lateralBorderWidth WRITE setLateralBorderWidth DESIGNABLE fontScaleEnabled)
+#else
+    Q_PROPERTY(double botTopBorderWidth READ botTopBorderWidth WRITE setBotTopBorderWidth DESIGNABLE true)
+    Q_PROPERTY(double lateralBorderWidth READ lateralBorderWidth WRITE setLateralBorderWidth DESIGNABLE true)
+
+#endif
+
+
+
+
   Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor  DESIGNABLE false)
   Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
   

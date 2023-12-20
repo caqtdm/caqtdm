@@ -50,28 +50,23 @@
 #include <pv/nt.h>
 #include <pv/convert.h>
 
-
 #include <QObject>
 #include "controlsinterface.h"
 #include "epics4_callbackThread.h"
 #include "epics4Requester.h"
 
 
-
 namespace epics { namespace caqtdm { namespace epics4 {
 
-
-
 class PVAChannel;
+
 typedef std::tr1::shared_ptr<PVAChannel> PVAChannelPtr;
 typedef std::tr1::weak_ptr<PVAChannel> PVAChannelWPtr;
-
+typedef std::tr1::shared_ptr<epics::pvAccess::ChannelProvider> PVAChannelProviderPtr;
 
 }}}
 
-
-class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, 
-     public std::tr1::enable_shared_from_this<Epics4Plugin>
+class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, public std::tr1::enable_shared_from_this<Epics4Plugin>
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
@@ -99,20 +94,13 @@ public:
         Q_UNUSED(nelm); Q_UNUSED(object); Q_UNUSED(errmess);
         return false;
     }
-    int pvGetTimeStamp(char *pv, char *timestamp)
-    {
-        Q_UNUSED(pv); Q_UNUSED(timestamp);
-        return false;
-    }
-    int pvGetDescription(char *pv, char *description)
-    {
-        Q_UNUSED(pv); Q_UNUSED(description);
-        return false;
-    }
+
+    int pvGetTimeStamp(char *pv, char *timestamp);
+    int pvGetDescription(char *pv, char *description);
     bool pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
     bool pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-    bool pvGetTimeStamp(knobData *kData, char *timestamp);
-    bool pvGetDescription(knobData *kData, char *description);
+    bool pvGetTimeStampN(knobData *kData, char *timestamp);
+    bool pvGetDescriptionN(knobData *kData, char *description);
     int pvClearEvent(void * ptr);
     int pvAddEvent(void * ptr);
     int pvReconnect(knobData *kData);
@@ -122,13 +110,20 @@ public:
     static void setDebug(bool value) {debug = value;}
     static bool getDebug() {return debug;}
 
-
   private:
     static bool debug;
     std::map<std::string,epics::caqtdm::epics4::PVAChannelWPtr> pvaChannelMap;
+    std::map<std::string, int > pvMap;
     epics::caqtdm::epics4::Epics4RequesterPtr requester;
     epics::pvData::CallbackThreadPtr epics4_callbackThread;
     MutexKnobData * mutexKnobData;
+    epics::caqtdm::epics4::PVAChannelProviderPtr providerN;
+signals:
+    void closeSignal();
+
+private slots:
+    void closeEvent();
+
 };
 
 #endif

@@ -40,7 +40,7 @@ caByteController::caByteController(QWidget *parent) : QWidget(parent)
     setAccessW(true);
 
     grid = new QGridLayout(this);
-    grid->setMargin(0);
+    SETMARGIN_QT456(grid,0);
     grid->setSpacing(0);
     prvStartBit = thisStartBit = 0;
     prvEndBit = thisEndBit = 31;
@@ -66,7 +66,11 @@ caByteController::caByteController(QWidget *parent) : QWidget(parent)
         prvTextcolor[i] = Qt::white;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     connect(signalMapper, SIGNAL(mapped(int)),this, SIGNAL(clicked(int)));
+#else
+    connect(signalMapper, SIGNAL(mappedInt(int)),this, SIGNAL(clicked(int)));
+#endif
 
     arrangeCells();
 

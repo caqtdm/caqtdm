@@ -17,7 +17,13 @@ contains(QT_VER_MAJ, 5) {
           QT += designer
       }
 }
-
+contains(QT_VER_MAJ, 6) {
+      CONFIG += plugin qt thread warn_on
+      QT += widgets uitools opengl
+      !MOBILE {
+        QT += designer
+      }
+}
 TEMPLATE = lib
 
 ios | android {
@@ -67,7 +73,7 @@ unix:!ios {
 
    unix:!macx {
       LIBS += -L$(QWTLIB) -Wl,-rpath,$(QWTLIB) -l$$(QWTLIBNAME)
-      LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
+      LIBS += -L$(CAQTDM_COLLECT) -Wl,-rpath,$(QTDM_RPATH) -lqtcontrols
    }
 
    macx: {
@@ -76,7 +82,7 @@ unix:!ios {
       QMAKE_LFLAGS_PLUGIN += -bundle
       LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
       LIBS += -L $(CAQTDM_COLLECT) -lqtcontrols
-      QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
+
    }
 }
 

@@ -99,7 +99,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 
     // for compatibility either one can be used, both will be updated
     Q_PROPERTY(QStringList channelsList READ getPVSList WRITE setPVSList STORED false)
-    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE inactiveButVisible())
+    Q_PROPERTY(QString channels READ getPVS WRITE setPVS DESIGNABLE false)
 
     Q_PROPERTY(units units READ getUnits WRITE setUnits)
     Q_PROPERTY(double period READ getPeriod WRITE setPeriod)

@@ -26,7 +26,13 @@
 #include "eng_notation.h"
 #include <stdio.h>
 #include <math.h>
-#include <QRegExp>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <QRegExp>
+#else
+    #include <QRegularExpression>
+#endif
+
+
 #include <QStringList>
 
 #define qstoc(x) ""
@@ -75,18 +81,39 @@ EngString::EngString(QString s , const QString& format, const QVariant &value) :
 // 	  printf("looking for suffix at pos %d (value to double %f)\n", (expof10 - d_prefixStart)/3, d);
 	  if(/*numeric || */(expof10 < d_prefixStart) ||
                     (expof10 > d_prefixEnd))
-        sprintf("%.*fe%d", digits - 1, absVal, expof10);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+         sprintf("%.*fe%d", digits - 1, absVal, expof10);
       else
-        sprintf("%.*f %s", digits - 1, absVal, qstoc(suffixes[(expof10 - d_prefixStart)/3]));
+         sprintf("%.*f %s", digits - 1, absVal, qstoc(suffixes[(expof10 - d_prefixStart)/3]));
+#else
+      s=QString("%1e%2").arg(absVal,digits - 1,'f').arg(expof10);
+      else
+      s=QString("%1 %2").arg(absVal,digits - 1,'f').arg(qstoc(suffixes[(expof10 - d_prefixStart)/3]));
+#endif
+
 	  if(d < 0.0)
 		prepend("-");
 	}
 	else if(ok && d == 0)
 	{
-	  QString format;
-	  digits > 0 ? format = QString("%.%1f").arg(digits - 1) : format = "%.1f";
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+      QString format;
+      digits > 0 ? format = QString("%.%1f").arg(digits - 1) : format = "%.1f";
       sprintf(format.toStdString().c_str(), 0.0);
-	}
+#else
+      if (digits > 0){
+          s=QString("%1").arg(0.0,digits - 1,'f');
+      }else{
+          s=QString("%1").arg(0.0,1,'f');
+      }
+#endif
+
+
+
+
+
+    }
   }
   else if(format.isEmpty())
   {
@@ -112,12 +139,22 @@ int EngString::extractSignificantDigits(const QString &fmt)
   {
 	/* not escaped pattern %(\d+)(?:.{0,1}\d*)eng */
     QString pattern = QString("%(\\d+)(?:.{0,1}\\d*)%1").arg(ENGFMT);
-	QRegExp re(pattern);
-	int pos = re.indexIn(fmt);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QRegExp re(pattern);
+    int pos = re.indexIn(fmt);
     //printf("looking for pattern \"%s\" in \"%s\" : pos %d\n", qstoc(pattern), qstoc(fmt), pos);
-	if(pos > -1)
-	{
-	  QStringList captures = re.capturedTexts();
+    if(pos > -1)
+    {
+      QStringList captures = re.capturedTexts();
+
+#else
+    QRegularExpression re(pattern);
+    QRegularExpressionMatch match = re.match(fmt);
+    if(match.hasMatch())
+    {
+      QStringList captures = match.capturedTexts();
+
+#endif
 	  if(captures.size() > 1)
 		sigDigits = captures.at(1).toInt();
 	}

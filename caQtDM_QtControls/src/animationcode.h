@@ -26,7 +26,7 @@ if(q != qold) {
         }
 
         QWidget *contents = (QWidget*) parent();
-        if(contents != (QWidget *) 0) {
+        if(contents != (QWidget *) Q_NULLPTR) {
             QSize sizew = contents->minimumSize();
             if(maxX > sizew.width() || maxY > sizew.height()) {
                 contents->setMinimumSize(maxX, maxY);

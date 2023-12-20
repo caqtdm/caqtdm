@@ -47,12 +47,23 @@ class  QTCON_EXPORT caGraphics : public QWidget
 
     Q_PROPERTY(Form form READ getForm WRITE setForm)
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Q_PROPERTY( int arrowSize READ getArrowSize WRITE setArrowSize DESIGNABLE isPropertyVisible(arrowsize))
     Q_PROPERTY( ArrowMode arrowMode READ getArrowMode WRITE setArrowMode DESIGNABLE isPropertyVisible(arrowmode))
 
     Q_PROPERTY( int tiltAngle READ getTiltAngle WRITE setTiltAngle DESIGNABLE isPropertyVisible(tiltangle))
     Q_PROPERTY( int startAngle READ getStartAngle WRITE setStartAngle DESIGNABLE isPropertyVisible(startangle))
     Q_PROPERTY( int spanAngle READ getSpanAngle WRITE setSpanAngle DESIGNABLE isPropertyVisible(spanangle))
+#else
+    Q_PROPERTY( int arrowSize READ getArrowSize WRITE setArrowSize DESIGNABLE true)
+    Q_PROPERTY( ArrowMode arrowMode READ getArrowMode WRITE setArrowMode DESIGNABLE true)
+
+    Q_PROPERTY( int tiltAngle READ getTiltAngle WRITE setTiltAngle DESIGNABLE true)
+    Q_PROPERTY( int startAngle READ getStartAngle WRITE setStartAngle DESIGNABLE true)
+    Q_PROPERTY( int spanAngle READ getSpanAngle WRITE setSpanAngle DESIGNABLE true)
+#endif
+
+
 
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)

@@ -24,7 +24,11 @@
  */
 
 #include "dec_int_from_format.h"
-#include <QRegExp>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <QRegExp>
+#else
+    #include <QRegularExpression>
+#endif
 #include <QStringList>
 #include <stdio.h>
 
@@ -43,6 +47,8 @@ DecIntFromFormat::DecIntFromFormat(QString f)
 bool DecIntFromFormat::decode()
 {
 	int pos = - 1;
+    int posV2 = - 1;
+    int posV3 = - 1;
 	QStringList captures;
 // 	printf("\e[1;36mdecode() format %s\e[0m\n", qstoc(d_format));
 	if(d_format == "%d")
@@ -52,26 +58,59 @@ bool DecIntFromFormat::decode()
 		return true;
 	}
         /* add ' in [0-9] to recognize "%'d" */
-        QRegExp intRe("%[0-9]*\\.*[0-9']*d\\b");
-	pos = intRe.indexIn(d_format);
+
+        QString pattern = QString("%[0-9]*\\.*[0-9']*d\\b");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp intRe(pattern);
+        pos = intRe.indexIn(d_format);
+#else
+        QRegularExpression intRe(pattern);
+        QRegularExpressionMatch match = intRe.match(d_format);
+        pos=match.capturedStart();
+
+#endif
+
+
 	if(pos >= 0) /* integer */
 	{
 		d_decDefaults = false;
-                d_decDigits = 0;
-                QRegExp capRe("%\\.[']?([0-9]*)d\\b");
-                QRegExp capReV2("%[']?([0-9]*)d\\b");
-		pos = capRe.indexIn(d_format);
-		if(pos >= 0 && capRe.capturedTexts().size() > 1)
+        d_decDigits = 0;
+
+        QString pattern = QString("%\\.[']?([0-9]*)d\\b");
+        QString patternV2 = QString("%[']?([0-9]*)d\\b");
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp capRe(pattern);
+        QRegExp capReV2(patternV2);
+        pos = capRe.indexIn(d_format);
+        posV2 = capReV2.indexIn(d_format);
+        QStringList capRe_Text=capRe.capturedTexts();
+        QStringList capReV2_Text=capReV2.capturedTexts();
+
+#else
+        QRegularExpression capRe(pattern);
+        QRegularExpression capReV2(patternV2);
+
+        QRegularExpressionMatch match = intRe.match(d_format);
+        QRegularExpressionMatch matchV2 = intRe.match(d_format);
+        pos=match.capturedStart();
+        posV2=matchV2.capturedStart();
+        QStringList capRe_Text=match.capturedTexts();
+        QStringList capReV2_Text=matchV2.capturedTexts();
+#endif
+
+
+        if(pos >= 0 && capRe_Text.size() > 1)
 		{
-			d_intDigits = capRe.capturedTexts().at(1).toInt();
+            d_intDigits = capRe_Text.at(1).toInt();
 			d_intDefaults = false;
 		}
 		else
 		{
-			pos = capReV2.indexIn(d_format);
-			if(pos >= 0  && capReV2.capturedTexts().size() > 1)
+
+            if(posV2 >= 0  && capReV2_Text.size() > 1)
 			{
-				d_intDigits = capReV2.capturedTexts().at(1).toInt();
+                d_intDigits = capReV2_Text.at(1).toInt();
 				d_intDefaults = false;
                     printf("warning: format \"%s\" is not correct, anyway accepting it and setting %d decimals\n",
 					qstoc(d_format),  d_intDigits);
@@ -83,27 +122,53 @@ bool DecIntFromFormat::decode()
 	{
 		if(d_format == "%f")
 			return true;
-		QRegExp floatRe("%[0-9]*\\.{1,1}[0-9]+f\\b");
-		pos = floatRe.indexIn(d_format);
+
+        QString pattern = QString("%[0-9]*\\.{1,1}[0-9]+f\\b");
+
+        QString patternV2 = QString("%\\.{1,1}([0-9]+)f\\b");
+
+        QString patternV3 = QString("%([0-9]*)\\.{1,1}([0-9]+)f\\b");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp floatRe(pattern);
+        QRegExp flRe1(patternV2);
+        QRegExp flRe2(patternV3);
+        pos = floatRe.indexIn(d_format);
+        posV2 = flRe1.indexIn(d_format);
+        posV3 = flRe2.indexIn(d_format);
+        QStringList floatRe_Text=floatRe.capturedTexts();
+        QStringList flRe1_Text=flRe1.capturedTexts();
+        QStringList flRe2_Text=flRe2.capturedTexts();
+#else
+        QRegularExpression floatRe(pattern);
+        QRegularExpression flRe1(patternV2);
+        QRegularExpression flRe2(patternV3);
+
+        QRegularExpressionMatch match = floatRe.match(d_format);
+        QRegularExpressionMatch matchV2 = flRe1.match(d_format);
+        QRegularExpressionMatch matchV3 = flRe2.match(d_format);
+        pos=match.capturedStart();
+        posV2=matchV2.capturedStart();
+        posV3=matchV3.capturedStart();
+        QStringList floatRe_Text=match.capturedTexts();
+        QStringList flRe1_Text=matchV2.capturedTexts();
+        QStringList flRe2_Text=matchV3.capturedTexts();
+#endif
+
 		if(pos >= 0)
 		{
-			/* type %.3f  decimal digits only */
-			QRegExp flRe1("%\\.{1,1}([0-9]+)f\\b");
-			/* type %2.3f integer and decimal digits */
-			QRegExp flRe2("%([0-9]*)\\.{1,1}([0-9]+)f\\b");
-			pos = flRe1.indexIn(d_format);
-			if(pos >= 0 && flRe1.capturedTexts().size() > 1)
+            pos = posV2;
+            if(pos >= 0 && flRe1_Text.size() > 1)
 			{
-				d_decDigits = flRe1.capturedTexts().at(1).toInt();
+                d_decDigits = flRe1_Text.at(1).toInt();
 				d_decDefaults = false;
 			}
 			else 
 			{
-				pos = flRe2.indexIn(d_format);
-				if(pos >= 0 && flRe2.capturedTexts().size() > 2)
+                pos = posV3;
+                if(pos >= 0 && flRe2_Text.size() > 2)
 				{
-					d_intDigits = flRe2.capturedTexts().at(1).toInt();
-					d_decDigits = flRe2.capturedTexts().at(2).toInt();
+                    d_intDigits = flRe2_Text.at(1).toInt();
+                    d_decDigits = flRe2_Text.at(2).toInt();
                     printf("captured %d int %d dec\n", d_intDigits, d_decDigits);
 					d_decDefaults = false;
 					d_intDefaults =  false;

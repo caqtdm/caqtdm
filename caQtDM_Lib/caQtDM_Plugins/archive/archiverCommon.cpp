@@ -142,7 +142,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             if(!ok) index.secondsPast = 3600;
         } else {
             QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget " + QString(kData->dispName) + ", default to 1 hour back");
-            if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+            if(messagewindowP != (MessageWindow *) Q_NULLPTR && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
             index.secondsPast = 3600;
         }
 
@@ -159,7 +159,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
         } else{
             QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget " + QString(kData->dispName) + ", default to 60 seconds update");
-            if(messagewindowP != (MessageWindow *) 0 && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+            if(messagewindowP != (MessageWindow *) Q_NULLPTR && !QString(kData->pv).contains(".Y")) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
             index.updateSeconds = SECONDSTIMEOUT;
         }
         if(index.updateSeconds < 10) index.updateSeconds = 10;
@@ -191,7 +191,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 else if(kData->specData[2] == caCartesianPlot::CH_Y) indexNew.indexY = kData->index;
                 //qDebug() << "indexes x and y" << indexNew.indexX << indexNew.indexY;
 
-                if (kData->edata.info != (void *) 0) free(kData->edata.info);
+                if (kData->edata.info != (void *) Q_NULLPTR) free(kData->edata.info);
                 kData->edata.info = (char *) malloc(sizeof (asc));
                 memcpy(kData->edata.info, qasc(key), sizeof(asc));
                 indexNew.lastUpdateTime.time = 0;
@@ -203,7 +203,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     } else {
         QString mess("archivedata can only be used in a cartesianplot");
-        if(messagewindowP != (MessageWindow *) 0) messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
     }
 
     return true;
@@ -247,7 +247,7 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
         strcpy(kData.edata.fec, qasc(backend));
 
         if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
-            if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+            if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
             kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
             kData.edata.dataSize = nbVal * sizeof(double);
         }
@@ -266,7 +266,7 @@ void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double
         strcpy(kData.edata.fec, qasc(backend));
 
         if((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
-            if(kData.edata.dataB != (void*) 0) free(kData.edata.dataB);
+            if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
             kData.edata.dataB = (void*) malloc(nbVal * sizeof(double));
             kData.edata.dataSize = nbVal * sizeof(double);
         }
@@ -326,13 +326,13 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
 int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
 {
-    if (kData->edata.info != (void *) 0) {
+    if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
-        kData->edata.info = (void*) 0;
+        kData->edata.info = (void*) Q_NULLPTR;
     }
-    if(kData->edata.dataB != (void*) 0) {
+    if(kData->edata.dataB != (void*) Q_NULLPTR) {
         free(kData->edata.dataB);
-        kData->edata.dataB = (void*) 0;
+        kData->edata.dataB = (void*) Q_NULLPTR;
     }
     return true;
 }

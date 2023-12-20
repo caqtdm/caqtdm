@@ -226,6 +226,7 @@ int modbusPlugin::pvClearMonitor(knobData *kData) {
 }
 int modbusPlugin::pvFreeAllocatedData(knobData *kData)
 {
+    Q_UNUSED(kData)
     //qDebug() << "DemoPlugin:pvFreeAllocatedData";
     //if (kData->edata.info != (void *) Q_NULLPTR) {
         //free(kData->edata.info);

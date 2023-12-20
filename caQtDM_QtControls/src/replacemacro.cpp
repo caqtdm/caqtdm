@@ -66,7 +66,7 @@ replaceMacro::replaceMacro(QWidget *parent) : QWidget(parent)
     connect(macroValueListCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(reloadIt(int)));
 
     mainLayout = new QVBoxLayout(this);
-    mainLayout->setMargin(0);
+    SETMARGIN_QT456(mainLayout,0);
     mainLayout->setSpacing(0);
     setLayout(mainLayout);
 

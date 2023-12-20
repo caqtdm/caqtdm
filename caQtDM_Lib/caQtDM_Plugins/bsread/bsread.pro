@@ -3,6 +3,9 @@ QT += core gui network
 contains(QT_VER_MAJ, 5) {
     QT     += widgets concurrent
 }
+contains(QT_VER_MAJ, 6) {
+    QT     += widgets concurrent
+}
 
 CONFIG += warn_on
 CONFIG += bsread_Plugin
@@ -13,6 +16,7 @@ CONFIG         += plugin
 INCLUDEPATH    += .
 INCLUDEPATH    += ../
 INCLUDEPATH    += ../../src
+INCLUDEPATH    += ../../../caQtDM_QtControls/src
 HEADERS         = bsread_Plugin.h ../controlsinterface.h \
     bsread_decode.h \
     bsread_channeldata.h \

@@ -42,7 +42,7 @@ extern "C" char filePrefix[128];
 
 // pointer used by external C
 extern "C" {
-    myParserEDM* myParserPtr;
+    myParserEDM* myParserEDMPtr;
 }
 
 // constructor
@@ -114,7 +114,13 @@ void myParserEDM::closeFile()
         myvector.append(zorder[i]);
     }
     // sort according to the static elements
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qStableSort(myvector.begin(), myvector.end(), compareFunc);
+#else
+    std::stable_sort(myvector.begin(), myvector.end(), compareFunc);
+#endif
+
     for (it=myvector.begin(); it!=myvector.end(); ++it) {
         //qDebug() << "sorted" << it->indx << it->vis << it->z;
         xw->writeTaggedString("zorder", it->z);
@@ -164,7 +170,7 @@ void myParserEDM::writeCloseTag(const QString& type)
 
 void myParserEDM::Init(myParserEDM* edlParser)
 {
-    myParserPtr = edlParser;
+    myParserEDMPtr = edlParser;
 }
 
 void myParserEDM::writeMessage(char *mess) {
