@@ -13,7 +13,7 @@ About this manual
 
 This manual has been written in HTML and after conversion introduced in
 the Qt assistant in order to get help for the caQtDM system. It has to
-be noted that caQtDM is thought as a replacement for the well known EPICS [#]_
+be noted that caQtDM is thought of as a replacement for the well-known EPICS [#]_
 Display Manager MEDM [#]_, therefore this manual is of course also inspired
 by the existing MEDM manual.
 
@@ -26,7 +26,7 @@ Introduction
 ----------------
 
 caQtDM is a package based on Qt developed at PSI as a successor of
-MEDM, a well known package used in the EPICS community for building
+MEDM, a well-known package used in the EPICS community for building
 synoptic displays. The caQtDM package uses the standard Qt GUI (Qt
 designer) for designing synoptic displays, containing all the
 graphical control elements necessary to visualize and control a facility. Qt
@@ -57,19 +57,19 @@ when building it, but only a few tests could be done while not many
 process variables could be tested so far.
 
 .. [#] *epics3* refers to Channel Access protocol
-.. [#] *epics4* refers to PV Access protocol, introduced in EPIS release 7
+.. [#] *epics4* refers to PV Access protocol, introduced in EPICS release 7
 
 Part of the package is also a converter (``adl2ui``) that can convert MEDM
 ``.adl`` files into ``.ui`` files used by the caQtDM package. In most cases
 this converter gives good results. Besides the already mentioned ``.ui``
 files, the viewer can also use in-house developed ``.prc`` files. These
 last files represent ASCII files to be edited with any text editor
-using our in house syntax.
+using our in-house syntax.
 
 The Qt system is widely used on many platforms today and is therefore
 an ideal system to develop new applications. The advantage of Qt is
 therefore that an application using this architecture will run on many
-platforms, so caQtDM will run on linux as well as on windows systems.
+platforms, so caQtDM will run on Linux as well as on Windows systems.
 
 Qt Designer: editor
 -------------------
@@ -91,7 +91,7 @@ Install
 .. todo:: Update for Qt & qwt supported now
 
 Since version 3.1.4 of caQtDM a new build and installation procedure
-working for several linux platforms is available.
+working for several Linux platforms is available.
 
 First you will have to unpack the tar archive, which will create the
 necessary directories and files. In the upper directory you will find
@@ -894,10 +894,10 @@ that for many widgets their stylesheet will be overwritten in order to
 get the representation that is requested when specifying for example
 background, foreground, border colors or other properties. The
 stylesheet can be influenced in some cases by specifying a stylesheet
-for the mainwindow or in ``stylesheet.qss``, a stylesheet found in the
+for the main window or in ``stylesheet.qss``, a stylesheet found in the
 caQtDM path. The ``adl2ui`` converter normally uses this stylesheet to
 integrate these defaults into the generated ``.ui`` file. You may delete
-this stylesheet or change it to your convenience. However as mentioned
+this stylesheet or change it to your convenience. However, as mentioned
 before, many styles will be overwritten.
 
 .. csv-table:: Overview of the caQtDM Custom Widgets
@@ -949,7 +949,7 @@ is the equivalent of the Text Update in MEDM.
       +---------------+-----------------------------------------------------+
       | Alarm_Default | Show the object in alarm colors based on the        |
       |               | severity of the associated process variable.        |
-      |               | (green, yellow, red, white or gray). The foregound  |
+      |               | (green, yellow, red, white or gray). The foreground |
       |               | or the background is given by the stylesheets       |
       |               | depending on if alarmHandling specified that the    |
       |               | alarm handling is done on the foreground or on the  |
@@ -1013,11 +1013,11 @@ is the equivalent of the Text Update in MEDM.
       |                                  | will switch to e format          |
       +----------------------------------+----------------------------------+
       | exponential, engr_notation       | value encoded in e format using  |
-      |                                  | absolaute precision from user or |
+      |                                  | absolute precision from user or |
       |                                  | channel                          |
       +----------------------------------+----------------------------------+
       | compact                          | value encode in e or f format    |
-      |                                  | using absolaute precision from   |
+      |                                  | using absolute precision from   |
       |                                  | user or channel, format will     |
       |                                  | switch to e format for values    |
       |                                  | <1.0e-4                          |
@@ -1380,10 +1380,33 @@ curves
 caStripPlot
 ~~~~~~~~~~~
 
-is the equivalent of the StripChart Monitor in MEDM.
+This serves as the replacement for the StripChart Monitor in MEDM.
 
    | :ref:`geometry` is used for any object
    | **Description:**
+   
+   The caStripPlot widget can display up to 7 simultaneous curves on a plot. Every curve gets it's data by an EPICS pv.
+   The data comes in the form of doubles, indicating the y values. The x values are automatically calculated by either taking
+   the time a value was received or by setting a static value based on XaxisType. The caStripPlot can either display the values
+   on a logarithmic scale to the base 10 or on a linear scale. There are also 3 different ways the caStripPlot is scaled.
+   It can have fixed limits (minimum and maximum) using the fixedScale feature. 
+   You can have multiple curves, even with different limits; therefore the y-axis can only display the limits of one curve at a time. 
+   By default, the limits of the first curve are displayed. The other curves still have their original limits
+   and their points are drawn like the y-axis had the corresponding limits. Only the y-axis doesn't look like it.
+   Because of that, you can cycle through the curves whose limits are displayed on the y-axis, either with the Property CurvesIterableInLegend
+   or with CurvesSelectableInPlot or by using one of the slots described below. Due to backwards compatibility, any features that select a different curve
+   to dispay it's limits are disabled by default.
+   The caStripPlot can also dynamically calculate the limits itself by using the autoScale or selectiveAutoScale feature. With autoScale, the caStripPlot analyzes all
+   currently drawn points on all curves and adjusts the limits to fit all curves in the plot entirely. Because this might cause the plot to be unreadable if
+   one curve has extremely high or low spikes, selectiveAutoScale can be used instead to be able to deselect single curves from being taken into consideration
+   when calculating the new limits. Curves can be deselected in the "change axis" menu accessible through the context menu by right-clicking the plot.
+   In this menu, the scaling can also be selected, just as the y-axis type (linear or log10) and the limits for all curves.
+   Additionally, because negative values on one curve can completely distort a logarithmic scale on autoScale, there is an extra option for this specific problem.
+   If the scale is both autoScale and logarithmic, a field will appear in the "change axis" menu, where a custom minimum value can be defined for the plot.
+   One important thing to consider is that even though the y-axis limits only display for one curve at a time with fixedScale, in autoScale the y-axis limits are
+   correctly displayed for all curves, as then they all have the same, automatically computed limits. This is also why you cant change the y-axis to be displayed
+   with autoScale or selectiveAutoScale, because there is only one.
+   You can also freeze the image currently drawn by the plot by pausing or resuming it using the provided public slots.
 
    **Title**
       QString: Titel of the plot
@@ -1391,7 +1414,7 @@ is the equivalent of the StripChart Monitor in MEDM.
       QString: Title of the X-axis
    **TitleY**
       QString: Title of the Y-axis
-   **channels**
+   **channelsList**
       QString: this string represents the control system process
       variables; the channels have to be separated by a semicolon.
    **units**
@@ -1401,30 +1424,69 @@ is the equivalent of the StripChart Monitor in MEDM.
       minute      The update period is in minutes.
       =========== ======================================
 
-   **Period**
+   **period**
       Integer: the timespan of the plot for the specified units
+   **refreshRate**
+      sets the refresh rate for the plot
+      ======= ======================================
+      low     The refresh rate is set to 2.5 Hz.
+      medium  The refresh rate is set to 5 Hz.
+      high    The refresh rate is set to 10 Hz.
+      ======= ====================================== 
    **XaxisType**
-      +------------+--------------------------------------------------------+
-      | TimeScale  | The scale of the x-axis is given in the format         |
-      |            | hours:minutes:seconds                                  |
-      +------------+--------------------------------------------------------+
-      | ValueScale | The scale of the x-axis is given with the values based |
-      |            | on the period value                                    |
-      +------------+--------------------------------------------------------+
+      +--------------+--------------------------------------------------------+
+      | ValueScale   | The scale of the x-axis is given with the values based |
+      |              | on the period value                                    |
+      +--------------+--------------------------------------------------------+
+      | TimeScale    | The scale of the x-axis is given in the format         |
+      |              | hours:minutes:seconds                                  |
+      +--------------+--------------------------------------------------------+
+      | TimeScaleFix |                                                        |
+      |              |                                                        |
+      +--------------+--------------------------------------------------------+
 
-   **YaxisType:**
+   **numberOfXticks**
+      Integer: the number of ticks on the x-axis and therefore the number of horizontal grid lines.
+   **YAxisType:**
       ====== =================
-      linear Use a linear axis
-      log10  Use a log axis
+      linear Use a linear y-axis
+      log10  Use a logarithmic y-axis to the base 10
       ====== =================
-
-   **XaxisScalingMax_1 .....7/YaxisScalingMin_1, .....7:**
+      
+   **YAxisScaling**
+      +--------------------+--------------------------------------------------------+
+      | fixedScale         | The y-axis has fixed minimum and maximum values that   |
+      |                    | are dependent on YaxisScaling{Max}_1 .....7            |
+      +--------------------+--------------------------------------------------------+
+      | autoScale          | The y-axis minimum and maximum values are dynamically  |
+      |                    | selected to fit every curve with some margin           |
+      +--------------------+--------------------------------------------------------+
+      | selectiveAutoScale | Does the same as autoScale, but single curves can be   |
+      |                    | deselected in the context menu so the plot only fits   |
+      |                    | selected curves. Can be used to prevent spikes in one  |
+      |                    | curve from distorting the min/max values for the plot  |
+      +--------------------+--------------------------------------------------------+
+   
+   **plotpicker:**
+      ========= ================================================================================
+      off       PlotPicker utility is disabled
+      on        PlotPicker window with plot information will display when hovering over the plot
+      ========= ================================================================================
+   **CurvesIterableInLegend:**
+      bool: when activated, left-clicking the legend will cycle through the different axis limits to display on the y-axis
+      	    Important: This feature only works with YAxisScaling=fixedScale
+   **CurvesSelectableInPlot:**
+      bool: when activated, left-clicking on a curve in the plot will select its limits to display on the y-axis
+      	    Important: This feature only works with YAxisScaling=fixedScale
+   **YaxisLimitsMax_1 .....7/YaxisLimitsMin_1 .....7:**
+      QString: minimum/maximum value used in case of YaxisScaling{Min/Max}_1 .....7=User
+   **YaxisScalingMax_1 .....7/YaxisScalingMin_1, .....7:**
       +---------+-------------------------------------------------------------------+
       | Channel | Get the axis range from the process variable                      |
       +---------+-------------------------------------------------------------------+
       | User    | Specify custom minimum and maximum values for the axis.           |
       +---------+-------------------------------------------------------------------+
-
+   
    **Style_1 ....7:**
       ========= ====================================
       Lines     normal curve, like a line
@@ -1433,25 +1495,122 @@ is the equivalent of the StripChart Monitor in MEDM.
 
    **color_1 ....7:**
       QColor: color used for the curve
-   **XaxisLimitsMax_1 .....7/YaxisLimitsMin_1, .....7:**
-      QString: minimum/maximum value used in case of limitsMode=User
-   **YaxisLimits:**
-      QString: minimum value used in case of limitsMode=User; the values
-      must be separated by a semicolon
-   **background:**
-      QColor: color used for the background
    **foreground:**
       QColor: color used for the foreground
+   **background:**
+      QColor: color used for the background
    **scaleColor:**
       QColor: color used for the scale if scales are specified
+   **grid:**
+      bool: specifies if the grid should be drawn
    **gridColor:**
       QColor: color used for the grid if grid is specified
    **XaxisEnabled:**
-      bool: specifies if the x axis should be drawn
+      bool: specifies if the x-axis should be drawn
    **YaxisEnabled:**
-      bool: specifies if the y axis should be drawn
+      bool: specifies if the y-axis should be drawn
    **LegendEnabled:**
       bool: specifies if the legend should be drawn
+   
+   | **Dynamic Properties:**
+   .. container::
+      caStripPlot also has dynamic properties. For panel designers, they can be treated the same as regular QProperties.
+      
+      **xAxisToleranceFactor:**
+      double: value between (not equal to) 0 - 1 defining the tolerance factor for selecting curves in the plot when
+      CurvesSelectableInPlot is set to true. When the plot is clicked, the period in seconds is multiplied by the xAxisToleranceFactor.
+      This new Value is used as the tolerance to determine if a click in the plot landed on a curve or not. Only clicks that have a point
+      with an x-value deviating no more than this tolerance from the mouse click are registered. The curve it selects is the one with a point that is both within
+      the x-axis tolerance and is the closest on the y-axis from all the points within the x-axis tolerance.
+      In short: this property sets the accuracy of mouse clicks when selecting a curve by clicking in the plot, the default value is 0.01, creating a 1% tolerance.
+      This property only has an effect if CurvesSelectableInPlot is set to true, otherwise no clicks in the plot are registered.
+   
+   | **Public Slots:**   
+   .. container::
+      There are a few public slots available for the caStripPlot Widgets.
+      Those slots provide an API for calling certain functions directly with triggers connected
+      from the QtDesigner. To make use of a slot, you first have to have a trigger widget. This can
+      be something like a caToggleButton or caCalc. Then, you need to open the signals and slot editor
+      in the QtDesigner and connect the signal from the trigger widget to the slot you want.
+      
+      For more information about the signal and slots editor, please turn to the documentation for QtDesigner.
+      
+      Slots are meant to give panel designers more creative freedom and ways to dynamically interact with caQtDM widgets.
+      
+   **animation(QRect p):**
+      Input: QRect: X = new X Coordinate, Y = new Y Coordinate
+ 
+      Slot to change the position of the plot. The X and Y Coordinates of the QRect are used to set the new coordinates of the plot. This can be used
+      for example by creating a cacalc to output a QRect (with %QRect in "calc", two channels in "channel" and "channelB" and onAnyChange in "eventSignal")
+      and then use the output signal as input for animation(QRect). In this example, every time one of the input channels changes, the caStripPlot is relocated to
+      the new position.
+   **void hideObject(bool hideit):**
+      Input: bool: false to show, true to hide
+ 
+      Slot to hide the whole caStripPlot widget. It still works in the background and registers new points, so don't use this to load a lot of different variations
+      of a plot, as they will all consume power and affect performance.
+   **stopPlot():**
+      Input: nothing
+ 
+      Slot to stop the plot. This does the same as pausing it with the slot pausePlot, just that it only stops it, to resume it you have to use another slot.
+   **resumePlot():**
+      Input: nothing
+ 
+      Slot to resume the plot when it is stopped. This does the same as resuming it with the slot pausePlot, just that it only resumes it if stopped by another slot.
+   **restartPlot():**
+      Input: nothing
+ 
+      Slot to restart the plot. It clears the plot so the canvas empty and then starts tracing the curves again as they come in.
+      Can be used to get rid of graphical errors on the plot or just to get an empty plot again.
+   **pausePlot(bool pausePlot):**
+      Input: bool: true to pause the plot, false to resume it
+ 
+      Slot to pause and resume the plot with just one plot. Will freeze the plot, manipulations like displaying another y-axis are still
+      possible to analyze the plot data. Disclaimer: This is meant for short pauses, it is recommended to resume the plot shortly after stopping.
+      If the "apply" button is clicked in the "change axis" menu (reachable through context menu) the image might start to fade away, this action
+      is possible but not supported as it overwrites the memory holding the paused plot data.
+   **selectFixedYAxis(int newYAxisIndex):**
+      Input: integer: any value from 0 through 6 and no more than the index of the last curve in the plot, indicating a curve index
+ 
+      Slot to select a curve by index whose limits are displayed on the y-axis. So if the plot has 3 channels connected to curves 1, 2 and 3
+      then their index is 0, 1 and 2. By calling this slot with the integer 1, the limits of the second curve will be displayed in the y-axis.
+      If this slot is called and the property YAxisScaling is not set to fixedScale, it will be set to fixedScale.
+      The actions of this slot cannot be configured using a default property. The y-axis will by default display the limits of the first curve.
+   **setPlotPickerMode(int mode):**
+      Input: integer: either 0 for off or 1 for on
+      
+      Slot to disable or enable the plotpicker utility
+      Does the same as setting the plotpicker property but can be dynamically called.
+   **setIterableCurves(bool itCurvs):**
+      Input: bool: true to activate, false to deactivate
+ 
+      Slot to select whether the curve whose limits are displayed can be iterated over by clicking the plot legend.
+      Does the same as setting the CurvesIterableInLegend property but can be dynamically called.
+   **setSelectableCurves(bool selectCurvs):**
+      Input: bool: true to activate, false to deactivate
+ 
+      Slot to select whether the limits displayed on the y-axis can be selected by clicking a curve with the new limits in the plot.
+      Does the same as setting the CurvesSelectableInPlot property but can be dynamically called.
+      
+      
+          void animation(QRect p) {
+      #include "animationcode.h"
+          }
+      
+          void hideObject(bool hideit) {
+      #include "hideobjectcode.h"
+          }
+      
+          void stopPlot();
+          void restartPlot();
+          void pausePlot(bool pausePlot);
+      
+          void selectFixedYAxis(int newYAxisIndex);
+      
+          void setPlotPickerMode(int mode);
+      
+          void setIterableCurves(bool itCurvs) {thisIterableCurves = itCurvs; qDebug() << "signal it Called with bool:" << itCurvs;};
+    void setSelectableCurves(bool selectCurvs) {thisSelectableCurves = selectCurvs; qDebug() << "signal sel Called with bool:" << selectCurvs;};
 
 --------------
 
