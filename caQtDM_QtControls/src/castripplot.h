@@ -478,6 +478,7 @@ public slots:
     }
 
     void stopPlot();
+    void resumePlot();
     void restartPlot();
     void pausePlot(bool pausePlot);
 

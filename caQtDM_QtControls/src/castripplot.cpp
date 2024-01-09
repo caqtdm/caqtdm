@@ -477,6 +477,12 @@ void caStripPlot::stopPlot(){
     plotIsPaused = true;
 }
 
+/* Slot to resume the plot after stopping, e.g by a Button or Checkbox.
+ * */
+void caStripPlot::resumePlot(){
+    plotIsPaused = false;
+}
+
 /* Slot to restart  the plot, e.g by a Button or Checkbox.
  * Can be used to restart the plot e.g after having it stopped.
  * */
