@@ -1616,7 +1616,8 @@ This serves as the replacement for the StripChart Monitor in MEDM.
    and their points are drawn like the y-axis had the corresponding limits. Only the y-axis doesn't look like it.
    Because of that, you can cycle through the curves whose limits are displayed on the y-axis, either with the Property CurvesIterableInLegend
    or with CurvesSelectableInPlot or by using one of the slots described below. Due to backwards compatibility, any features that select a different curve
-   to dispay it's limits are disabled by default.
+   to dispay it's limits are disabled by default. The currently displayed axis is indicated by coloring the axis in the color of the represented curve
+   and by underlining the channel name for this curve in the legend.
    The caStripPlot can also dynamically calculate the limits itself by using the autoScale or selectiveAutoScale feature. With autoScale, the caStripPlot analyzes all
    currently drawn points on all curves and adjusts the limits to fit all curves in the plot entirely. Because this might cause the plot to be unreadable if
    one curve has extremely high or low spikes, selectiveAutoScale can be used instead to be able to deselect single curves from being taken into consideration
