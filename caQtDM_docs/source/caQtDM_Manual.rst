@@ -1610,6 +1610,7 @@ This serves as the replacement for the StripChart Monitor in MEDM.
    The data comes in the form of doubles, indicating the y values. The x values are automatically calculated by either taking
    the time a value was received or by setting a static value based on XaxisType. The caStripPlot can either display the values
    on a logarithmic scale to the base 10 or on a linear scale. There are also 3 different ways the caStripPlot is scaled.
+   
    It can have fixed limits (minimum and maximum) using the fixedScale feature. 
    You can have multiple curves, even with different limits; therefore the y-axis can only display the limits of one curve at a time. 
    By default, the limits of the first curve are displayed. The other curves still have their original limits
@@ -1618,6 +1619,7 @@ This serves as the replacement for the StripChart Monitor in MEDM.
    or with CurvesSelectableInPlot or by using one of the slots described below. Due to backwards compatibility, any features that select a different curve
    to dispay it's limits are disabled by default. The currently displayed axis is indicated by coloring the axis in the color of the represented curve
    and by underlining the channel name for this curve in the legend.
+   
    The caStripPlot can also dynamically calculate the limits itself by using the autoScale or selectiveAutoScale feature. With autoScale, the caStripPlot analyzes all
    currently drawn points on all curves and adjusts the limits to fit all curves in the plot entirely. Because this might cause the plot to be unreadable if
    one curve has extremely high or low spikes, selectiveAutoScale can be used instead to be able to deselect single curves from being taken into consideration
@@ -1628,7 +1630,13 @@ This serves as the replacement for the StripChart Monitor in MEDM.
    One important thing to consider is that even though the y-axis limits only display for one curve at a time with fixedScale, in autoScale the y-axis limits are
    correctly displayed for all curves, as then they all have the same, automatically computed limits. This is also why you cant change the y-axis to be displayed
    with autoScale or selectiveAutoScale, because there is only one.
-   You can also freeze the image currently drawn by the plot by pausing or resuming it using the provided public slots.
+   
+   You can also freeze the image currently drawn in the plot by pausing and resuming it using the provided public slots. You can also restart the plot if you want to
+   clear it or if graphical mistakes happen you want to erase.
+   
+   With the property plotpicker activated, a field will appear upon hovering over the plot, giving information about the point your cursor is currently on.
+   It will display the x- and y-axis values, so it can be easily spotted which value a curve had at a certain time. But remember: The y-data is for the
+   first curve only, the others might have different y-values there. To see their value, the displayed y-axis has to be switched first.
 
    **Title**
       QString: Titel of the plot
