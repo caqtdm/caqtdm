@@ -2,8 +2,8 @@
 caQtDM Manual
 =============
 
-| **Anton Mezger**
-| **February 2014**
+| **Anton Mezger/Helge Brands**
+| **November 2023**
 | Paul Scherrer Institute
 | CH-5232 Villigen
 | Switzerland
@@ -11,13 +11,12 @@ caQtDM Manual
 About this manual
 -----------------
 
-This manual has been written in HTML and after conversion introduced in
-the Qt assistant in order to get help for the caQtDM system. It has to
-be noted that caQtDM is thought as a replacement for the well known EPICS [#]_
+This manual has been written in Sphinx Ret. It has to
+be noted that caQtDM is thought of as a replacement of the well known EPICS [#]_
 Display Manager MEDM [#]_, therefore this manual is of course also inspired
 by the existing MEDM manual.
 
-The HTML was converted to restructured text using pandoc, then hand-edited.
+The HTML was converted to restructured text using spinx.
 
 .. [#] EPICS: https://epics.anl.gov
 .. [#] MEDM: https://epics.anl.gov/extensions/medm
@@ -98,10 +97,10 @@ necessary directories and files. In the upper directory you will find
 the necessary procedures to build the package, to install it, and to run it 
 locally without installing.
 
-#. you will have to install Qt-4.8 and qwt-6 if they are not already
-   installed. On modern systems Qt4 should already be installed, but the
-   qt4-designer not necessarily and you should install it (eventually
-   with sudo apt-get install qt4-designer). qwt is normally not
+#. you will have to install Qt and qwt if they are not already
+   installed. On modern systems Qt should already be installed, but the
+   qt-designer not necessarily and you should install it (eventually
+   with sudo apt-get install qt*-designer). qwt is normally not
    installed and you should install this too.
 #. you will have to install EPICS (base)
 #. all the environment variables used for the installation will be
@@ -123,7 +122,7 @@ locally without installing.
    pointing to them.
 #. running ``caQtDM``: when the package has been successfully built into the
    directory ``./caQtDM_Binaries``, you can start ``caQtDM`` by using the script
-   ``startDM_Local``. To start the qt4-designer use the script ``qtdesigner`` (all
+   ``startDM_Local`` and the qt-designer by the script ``qtdesigner`` (all
    located in the main directory where you expanded the tar file). These
    scripts will set some important environment variables in order to set
    the path, the plugin_path and to point to the test directory provided
@@ -133,17 +132,27 @@ locally without installing.
    the display some EPICS channels have to be defined. This can be done
    by running a softIoc shell called with run-epics, which is also provided in
    the test directory.
-#. in case you have qwt 6.1 you will have to use the file qwt_thermo_marker_61
-   in caQtDM_QtControls/src instead of qwt_thermo_marker.
-#. in case you already use Qt5.1 with qwt6.1 the build process should also be
+#. in case you have qwt 6.1 or greater you will have to use the file qwt_thermo_marker_61
+   in caQtDM_QtControls/src. (*instead of qwt_thermo_marker*)
+#. in case you are already using Qt5 or Qt6 with qwt6.2 the build process should also be
    straight forward.
-#. Instructions for compiling caQtDM on Windows Requirements:
+#. Instructions for compiling caQtDM on Windows/Linux/Mac Requirements:
 
-   -  Qt 4.8.2
+Min:
+   -  Qt 4.8.5
    -  Qwt 6.0.1
-   -  EPICS 3.12.2
+   -  EPICS 3.14.12
    -  MS Visual Studio 2010
-   -  Wix 3.0.5419.0
+   -  Wix 3.0
+
+Max:
+   -  Qt 6.5.2
+   -  Qwt 6.2.0
+   -  EPICS 7.0.7
+   -  MS Visual Studio 2019
+   -  Wix 3.11
+
+
 
    With ``caQtDM_Env.bat`` you can configure your system. All settings which
    are needed will be taken from here.
@@ -155,6 +164,216 @@ locally without installing.
    ``caQtDM_Binaries``.
 
    To clean the Folder you should use ``caQtDM_CleanAll.bat``.
+
+Example build settings for Debian 12
+------------------------------------
+
+.. sourcecode:: none 
+   :caption: installation
+
+    apt install git
+    apt install qtcreator
+    apt install gcc
+    apt install g++
+    apt install qwt
+    apt install qwt-qt6
+    apt install qwt-qt5
+    apt install libqwt
+    apt install libqwt-qt5-dev
+    apt install qmake
+    apt install qt5-dev
+    apt install qt6
+    apt install qt5-qmake
+    apt install qt5-default
+    apt install qtbase5-dev
+    apt install qt5designer
+    apt install qt5-designer
+    apt install qttools5-dev-tools
+    apt install qtsvg5-examples
+    apt install qttools5-dev
+    apt install qtsystems5-dev
+    apt install libqt5svg5-dev
+    apt install libzip-dev
+    apt install python3-dev
+    apt install libqt5x11extras5-dev
+
+
+.. code-block::
+   :caption: configuration
+
+	  #!/bin/bash
+	  if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
+	  fi
+	  if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
+	  fi
+	  if [ -z "$QWTINCLUDE" ];            then export   QWTINCLUDE=/usr/include/qwt;
+	  fi
+	  if [ -z "$QWTLIB" ];                then export   QWTLIB=/usr/lib;
+	  fi
+	  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
+	  fi
+	  # on unix library can be libqwt or libqwt-qt5 or ...
+	  if [ -z "$QWTLIBNAME" ];            then export   QWTLIBNAME=qwt-qt5;
+	  fi
+	  if [ -z "$EPICS_BASE" ];            then export   EPICS_BASE=/home/helge/epics-base;
+	  fi
+	  if [ -z "$EPICSINCLUDE" ];          then export   EPICSINCLUDE=${EPICS_BASE}/include;
+	  fi
+	  if [ -z "$EPICSLIB" ];              then  export  EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$EPICS4LOCATION" ];         then  export  EPICS4LOCATION=/home/mezger/EPICS-CPP-4.6.0/
+	  fi
+	  if [ -z "$EPICSEXTENSIONS" ];     then  export  EPICSEXTENSIONS=/usr/local/epics/extensions;
+	  fi
+	  if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_COLLECT" ];       then export  CAQTDM_COLLECT=`pwd`/caQtDM_Binaries;
+	  fi
+	  export  QTBASE=${QTCONTROLS_LIBS};
+
+	  if [ -z "$CAQTDM_CA_ARCHIVELIBS" ];       then export  CAQTDM_CA_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_LOGGING_ARCHIVELIBS" ];       then export  CAQTDM_LOGGING_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+
+	  if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
+	  fi
+
+	  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=3.11;
+	  fi
+	  if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
+	  fi
+	  if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
+	  fi 
+
+	  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local;
+	  fi 
+	  if [ -z "$ZMQINC" ];   then  export  ZMQINC=$ZMQ/include;
+	  fi 
+	  if [ -z "$ZMQLIB" ];   then  export  ZMQLIB=$ZMQ/lib;
+	  fi 
+
+
+
+	  if [ -z "$TROLLTECH" ]; then
+	    echo
+	    echo ====== do not use psi trolltech directories
+	    echo
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
+	    fi
+	  else
+	    echo
+	    echo ====== use psi trolltech directories
+	    echo 
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt;
+	    fi 
+	  fi
+
+	 if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
+	 fi
+
+
+Example build settings for Rocky Linux 9
+-----------------------------------------
+
+.. sourcecode:: none 
+   :caption: installation
+
+       dnf -y install epel-release
+       dnf install qt-creator
+       dnf install readline-devel
+       dnf install perl
+       dnf install qwt-qt5-devel
+       dnf install qt5-qttools-devel
+       dnf install qt5-qtx11extras
+       dnf install qt5-qttools-static
+       dnf install libzip-devel
+       dnf install zlib-devel
+       dnf install python3-devel
+       dnf install libXext-devel
+
+Please change the qmake call in ./caQtDM_BuildAll to qmake-qt5
+.. code-block::
+   
+   :caption: configuration
+
+	  #!/bin/bash
+	  if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
+	  fi
+	  if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
+	  fi
+	  if [ -z "$QWTINCLUDE" ];            then export   QWTINCLUDE=/usr/include/qt5/qwt;
+	  fi
+	  if [ -z "$QWTLIB" ];                then export   QWTLIB=${QWTHOME}/lib;
+	  fi
+	  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
+	  fi
+	  # on unix library can be libqwt or libqwt-qt5 or ...
+	  if [ -z "$QWTLIBNAME" ];            then export   QWTLIBNAME=qwt-qt5;
+	  fi
+	  if [ -z "$EPICS_HOST_ARCH" ];       then export   EPICS_HOST_ARCH=linux-x86_64;
+	  fi
+	  if [ -z "$EPICS_BASE" ];            then export   EPICS_BASE=/home/helge/base-7.0.7;
+	  fi
+	  if [ -z "$EPICSINCLUDE" ];          then export   EPICSINCLUDE=${EPICS_BASE}/include;
+	  fi
+	  if [ -z "$EPICSLIB" ];              then  export  EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$EPICS4LOCATION" ];         then  export  EPICS4LOCATION=/home/mezger/EPICS-CPP-4.6.0/
+	  fi
+	  if [ -z "$EPICSEXTENSIONS" ];     then  export  EPICSEXTENSIONS=/usr/local/epics/extensions;
+	  fi
+	  if [ -z "$QTCONTROLS_LIBS" ];       then export  QTCONTROLS_LIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_COLLECT" ];       then export  CAQTDM_COLLECT=`pwd`/caQtDM_Binaries;
+	  fi
+	  export  QTBASE=${QTCONTROLS_LIBS};
+
+	  if [ -z "$CAQTDM_CA_ARCHIVELIBS" ];       then export  CAQTDM_CA_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+	  if [ -z "$CAQTDM_LOGGING_ARCHIVELIBS" ];       then export  CAQTDM_LOGGING_ARCHIVELIBS=`pwd`/caQtDM_Binaries;
+	  fi
+
+	  if [ -z "$QTDM_LIBINSTALL" ];  then  export  QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib/$EPICS_HOST_ARCH;
+	  fi
+	  if [ -z "$QTDM_BININSTALL" ];   then  export  QTDM_BININSTALL=$EPICSEXTENSIONS/bin/$EPICS_HOST_ARCH;
+	  fi
+
+	  if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=3.9;
+	  fi
+	  if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
+	  fi
+	  if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
+	  fi
+
+	  if [ -z "$ZMQ" ];   then  export  ZMQ=/usr/local;
+	  fi
+	  if [ -z "$ZMQINC" ];   then  export  ZMQINC=$ZMQ/include;
+	  fi
+	  if [ -z "$ZMQLIB" ];   then  export  ZMQLIB=$ZMQ/lib;
+	  fi
+
+
+
+	  if [ -z "$TROLLTECH" ]; then
+	    echo
+	    echo ====== do not use psi trolltech directories
+	    echo
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:${QTBASE};
+	    fi
+	  else
+	    echo
+	    echo ====== use psi trolltech directories
+	    echo
+	    if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt;
+	    fi
+	  fi
+
+	 if [ -z "$QTDM_RPATH" ];   then export  QTDM_RPATH=${QTDM_LIBINSTALL}:$TROLLTECH/binQt:${QTBASE};
+	 fi
+
 
 Development history
 -----------------------
@@ -864,6 +1083,8 @@ the used version has been solved.
 -  keeping the medm command line parameters.
 -  caQtDM runs in native mode on linux as well as on microsoft windows.
 
+
+
 caQtDM Custom Widgets
 -------------------------
 
@@ -1039,8 +1260,8 @@ is the equivalent of the Text Update in MEDM.
 
 .. _caThermo:
 
-caThermo
-~~~~~~~~
+``caThermo``
+~~~~~~~~~~~~
 
 is the equivalent of the Bar Monitor in MEDM.
 
@@ -1097,8 +1318,8 @@ is the equivalent of the Bar Monitor in MEDM.
 
 .. _caLed:
 
-caLed
-~~~~~
+``caLed``
+~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1127,8 +1348,8 @@ has no equivalent in MEDM.
 
 .. _caLinearGauge:
 
-caLinearGauge
-~~~~~~~~~~~~~
+``caLinearGauge``
+~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Bar Monitor in MEDM.
 
@@ -1139,8 +1360,8 @@ is the equivalent of the Bar Monitor in MEDM.
 
 .. _caCircularGauge:
 
-caCircularGauge
-~~~~~~~~~~~~~~~
+``caCircularGauge``
+~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Meter Monitor in MEDM.
 
@@ -1151,8 +1372,8 @@ is the equivalent of the Meter Monitor in MEDM.
 
 .. _caCartesianPlot:
 
-caCartesianPlot
-~~~~~~~~~~~~~~~
+``caCartesianPlot``
+~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Cartesian plot in MEDM and will plot up to 6
 curves
@@ -1377,8 +1598,8 @@ curves
 
 .. _caStripPlot:
 
-caStripPlot
-~~~~~~~~~~~
+``caStripPlot``
+~~~~~~~~~~~~~~~
 
 is the equivalent of the StripChart Monitor in MEDM.
 
@@ -1457,8 +1678,8 @@ is the equivalent of the StripChart Monitor in MEDM.
 
 .. _caByte:
 
-caByte
-~~~~~~
+``caByte``
+~~~~~~~~~~
 
 is the equivalent of the Byte Monitor in MEDM.
 
@@ -1469,32 +1690,233 @@ is the equivalent of the Byte Monitor in MEDM.
 
 .. _caCamera:
 
-caCamera
-~~~~~~~~
+``caCamera``
+~~~~~~~~~~~~
 
-has no equivalent in MEDM.
+   | **Description:** 
+        The main idea of the camera widget is to display 2D data in a widget. This can be any data that has the one format that the widget 
+        can decode. The widget uses EPICS data types, but can use the data as a memory bob and decodes the data in various ways that are common 
+        for image encoding. Be aware that we can't implement every way. We tested against two different vendors/color cameras (Basler acA4600-10uc/acA1300-30gc and Prosilica GC1660C)
+        to cover most needed conversions.
+        Be aware that the conversion matrixes between YUV and RGB are based on the used color room. We are using these functions:
 
-   :ref:`geometry` is used for any object
-   **Description:**
+	.. math::
+	       
+	       \begin{aligned}
+	       YUV2R(y,cb,cr) &= \frac{298.082*y}{256} & &+ \frac{408.583 * cr }{256} &- 222.291 \\
+	       YUV2G(y,cb,cr) &= \frac{298.082*y}{256} &- \frac{100.291 * cb }{256} &- \frac{208.120 * cr  }{256} &+ 135.576 \\
+	       YUV2B(y,cb,cr) &= \frac{298.082*y}{256} &+ \frac{561.412 * cb }{256} & &- 276.836
+	       \end{aligned}
+	       
+	       
+	       
+
+   **channelData**
+      Image data channel. Typically a waveform with the data in different formats comming directly from the hardware. 
+   **channelWidth**
+      channel with the horizontal resolution in pixel
+   **channelHeight**
+      channel with the vertical resolution in pixel
+   **simpleZoomedView**
+      boolean to reduce the complexity of the widget to get an image only view
+   **Zoom**
+      enables/disables the zoom bar on the right site of the widget 
+   **automaticLevels**
+      enables the scan over the image data to define the min and the max value. These values are needed to 
+   **minLevel**
+      define in the widget a static min level. This can be changed during runtime.
+   **maxLevel**
+      define in the widget a static max level. This can be changed during runtime.
+   **colorMode**
+	Enum: how the data should be interpreted
+	    =============  ==========  ========================================================================================== 
+            Enum value     datatype    simple description
+            -------------  ----------  ------------------------------------------------------------------------------------------
+	    Mono           EPICS       data of the waveform used to generate the image from data defined in the EPICS data type   
+	    Mono12p        Binary      12 bit packed mono format 
+	    Mono10p        Binary      10 bit packed mono format (5 Byte)
+	    Mono10Packed   Binary      10 bit packed mono format (3 Byte)
+	    Mono8          Binary      8 bit mono data
+	    RGB1_CA        EPICS       3 Layer RGB data pixel by pixel
+	    RGB2_CA        EPICS       3 Layer RGB data line by line
+	    RGB3_CA        EPICS       3 Layer RGB data image by image
+	    BayerRG_8      Binary      8 bit Bayerpatternformat RGB 
+	    BayerGB_8      Binary      8 bit Bayerpatternformat GBR
+	    BayerGR_8      Binary      8 bit Bayerpatternformat GRB
+	    BayerBG_8      Binary      8 bit Bayerpatternformat BGR
+	    BayerRG_12     Binary      12 bit Bayerpatternformat RGB
+	    BayerGB_12     Binary      12 bit Bayerpatternformat GBR
+	    BayerGR_12     Binary      12 bit Bayerpatternformat GRB
+	    BayerBG_12     Binary      12 bit Bayerpatternformat BGR
+	    RGB_8          Binary      8 bit RGB data
+	    BGR_8          Binary      8 bit BGR data
+	    RGBA_8         Binary      8 bit RGBA data
+	    BGRA_8         Binary      8 bit BGRA data
+	    YUV444         Binary      converted data from the colorshift data model to RGB (bit representation see packMode too) 
+	    YUV422         Binary      converted data from the colorshift data model to RGB (bit representation see packMode too) 
+	    YUV411         Binary      converted data from the colorshift data model to RGB (bit representation see packMode too) 
+	    YUV421         -           not yet supported image format
+	    =============  ==========  ========================================================================================== 
+    
+   **colorModeOverwriteChannel**
+      channel to select one of the color modes. The value of the channel has to be a string to let the widget seatch inside it enum list.
+      This should be supported by the hardware IOC because this is hardware depended setting. If this is not available enable the combo boxes to do it manual
+   **packMode**
+         =================== ================================================
+         packNo              no modification of the bit representation
+         MSB12Bit            for 12 bit color modes set most significant bit 
+         LSB12Bit            for 12 bit color modes set least significant bit
+         Reversed            for YUV to reverse the decoding to VUY
+         =================== ================================================
+   **packingModeOverwriteChannel**
+      channel to select one of the packing modes. The value of the channel has to be a string to let the widget seatch inside it enum list. 
+      This should be supported by the hardware IOC because this is hardware depended setting. If this is not available enable the combo boxes to do it manual
+   **showComboBoxes**
+      enable/disable the visibility for changing the data interpretation from the user side
+   
+   **ColorMap**
+       color map used to display experimental data to the 8Bit RGB world of a monitor
+         =================== ==============================================
+         Maps                rough description
+         color_to_mono       grayscale images
+         mono_to_wavelength  different colors optimal for detector testing
+         mono_to_hot         red and yellow colloring            
+         mono_to_heat        thermal representation
+         mono_to_jet         optimal for flow data  
+         mono_to_custom      user defined color mapping
+         =================== ==============================================
+         
+   **customColorMap**
+      QString: list of color values (value,r,g,b), seperated by a semicolon
+   **discreteCustomColorMap**
+      QString: list of color values (value,r,g,b), seperated by a semicolon. This map is not smoothed over the value area.      
+   **ROI_readChannelsList**
+      edit list of 4 channels seperated by a semicolon to draw rectangle into the image
+   **ROI_readChannels**
+      see the actual ROI_readChannelsList
+   **ROI_readmarkerType**
+      define the cursor marker for the selection
+             =================== ==============================================
+             cursor              selection type
+             box                 simple box
+             box_crosshairs      box with extra lines
+             line                line connection       
+             arrow               arrow connection
+             =================== ==============================================
+
+   **ROI_readType**
+      how the data from the channels are interpreted
+             ===================== ================================================
+             type                  description
+             none                  data is ignored
+             xy_only               only the first 2 channels are used for a center
+             xy1_xy2               box with 2 coordinates       
+             xyUpleft_xyLowright   box with a upper left and lower right version
+             xycenter_width_height box with center coordinats and a size 
+             ===================== ================================================
+  
+   **ROI_writeChannelsList**
+      edit list of 4 channels seperated by a semicolon to write rectangle data into channels
+   
+   **ROI_writeChannels**
+      see the actual ROI_writeChannelsList
+   **ROI_writemarkerType**
+      define the cursor marker for the selection
+             =================== ==============================================
+             cursor              selection type
+             ------------------- ----------------------------------------------
+             box                 simple box
+             box_crosshairs      box with extra lines
+             line                line connection       
+             arrow               arrow connection
+             =================== ==============================================
+   **ROI_writeType**
+     how the data is written to the channels 
+             ===================== ================================================
+             type                  description
+             none                  data is ignored
+             xy_only               only the first 2 channels are used for a center
+             xy1_xy2               box with 2 coordinates       
+             xyUpleft_xyLowright   box with a upper left and lower right version
+             xycenter_width_height box with center coordinats and a size 
+             ===================== ================================================
+   **channelXaverage**
+      waveform channel to display a pixel wise plot into an image for the x-axis
+   **channelYaverage**
+      waveform channel to display a pixel wise plot into an image for the y-axis
+   
+   
+   
 
 --------------
 
 .. _caCalc:
 
-caCalc
-~~~~~~
-
-has no equivalent in MEDM.
-
-   :ref:`geometry` is used for any object
+``caCalc``
+~~~~~~~~~~
+   
    **Description:**
+      The idea of caCalc is to have a posibility to do calculations for supporting and optimizing the graphical interface. Thinks like complex visibility and specific data handling/distributions. It is *NOT* meant for a simple replacement for a real IOC.
+      The advantage of caCalc is to open a connection between channel data and data transportation and modification of Qt. This Signal/Slot mechanisem helps to access deeper graphical functionalities, like moving widgets aaround or get control over the main window e.g. remote displays.
+   **variable**
+      this string generates a process wide variable (softPV) inside caQtDM. This contains the value of the calculation. If this string is empty there will be an automatic name generated, everytime the panels is opened. To guarantee that this name is unique caQtDM is using the UUID generator. 
+   **variableType**
+      this defines the output type of the softPV. The only decission you can made is sclar or vector.
+       ====== ====================
+       scalar a single double
+       vector an array of doubles
+       ====== ====================
+       
+   **foreground**
+      defines the foreground color of the widget
+   **background**
+      defines the background color of the widget
+   **channels**
+      if variableType is vector you can add a number of single channels to a list. caCalc is generating a softPV that can be used for plotting  
+   **channelList**
+      visualisation of all channels 
+   **calc**
+      this string represents the calculation that is executed when one of the 4 channels got a monitor. The calculation is exactly the same mechanisem like in the calc or the calcout record in EPICS. There are additional way to use caCalc.
+
+      #. EPICS calc string
+      #. %/regexp/ : to use Regular Expressions
+      #. %QRect : to use Siganl/Slot mechanisem to control positions and size. For this you need to add all 4 channel properties a data source
+      #. %P/ : to use Python for calculations (extra support is needed during build time, typically only Linux support)
+      
+      inside the calculation macros can be used.
+      
+   **channel**
+      data source for **A** can be a channel that gets the data over a plugin or a softPV. The reason for the not name this property not **channelA** is the naming in the origin of EPICS records.
+   **channelB**
+      datas source for the value **B** 
+   **channelC**
+      datas source for the value **C**
+   **channelD**
+      datas source for the value **D**
+   **initialValue**
+      this property initialize the widget with this value enterd here
+   **precision**
+      the precision gives the accuarcy of the graphical display part of this widget
+   **eventsignal**
+       if you are using the Signal/Slot mechanissen you must change this property. Otherwise there will be no signals emitted.   
+       ================= ====================
+       Never             there will never a signal generated
+       onFirstChange     there will be one signal emitted at the first change
+       onAnyChange       on every change ther will be signal emitted, this frequency can be sometimes a problem.
+       TriggerZeroToOne  there will be only signals when the value before was rounded 0 and now the rounded value is 1
+       TriggerOneToZero  there will be only a signal when the value was rounded 1 and is now rounded 0
+       ================= ====================
+     
+   **buddy**
+      Qt specific property because of the object characteristic of the caCalc widget 
+      
 
 --------------
 
 .. _caWaterfallPlot:
 
-caWaterfallPlot
-~~~~~~~~~~~~~~~
+``caWaterfallPlot``
+~~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1505,8 +1927,8 @@ has no equivalent in MEDM.
 
 .. _caBitNames:
 
-caBitNames
-~~~~~~~~~~
+``caBitNames``
+~~~~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1517,8 +1939,8 @@ has no equivalent in MEDM.
 
 .. _caTable:
 
-caTable
-~~~~~~~
+``caTable``
+~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1532,8 +1954,8 @@ all graphical objects
 
 .. _caLabel:
 
-caLabel
-~~~~~~~
+``caLabel``
+~~~~~~~~~~~
 
 is the equivalent of Text in MEDM.
 
@@ -1544,8 +1966,8 @@ is the equivalent of Text in MEDM.
 
 .. _caGraphics:
 
-caGraphics
-~~~~~~~~~~
+``caGraphics``
+~~~~~~~~~~~~~~
 
 is the equivalent of all primary graphical objects (like circles, lines,
 arcs, triangles, arrows, ...) in MEDM.
@@ -1557,8 +1979,8 @@ arcs, triangles, arrows, ...) in MEDM.
 
 .. _caFrame:
 
-caFrame
-~~~~~~~
+``caFrame``
+~~~~~~~~~~~
 
 has no equivalent in MEDM.
 
@@ -1569,8 +1991,8 @@ has no equivalent in MEDM.
 
 .. _caImage:
 
-caImage
-~~~~~~~
+``caImage``
+~~~~~~~~~~~
 
 is the equivalent of image in MEDM.
 
@@ -1619,8 +2041,8 @@ is the equivalent of image in MEDM.
 
 .. _caPolyLine:
 
-caPolyLine
-~~~~~~~~~~
+``caPolyLine``
+~~~~~~~~~~~~~~
 
 is the equivalent of Polyline and Polygone in MEDM.
 
@@ -1631,8 +2053,8 @@ is the equivalent of Polyline and Polygone in MEDM.
 
 .. _caInclude:
 
-caInclude
-~~~~~~~~~
+``caInclude``
+~~~~~~~~~~~~~
 
 is the equivalent of the Composite in MEDM
 
@@ -1649,8 +2071,8 @@ is the equivalent of the Composite in MEDM
 
 .. _caDoubleTabWidget:
 
-caDoubleTabWidget
-~~~~~~~~~~~~~~~~~
+``caDoubleTabWidget``
+~~~~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM and is not a controls object
 
@@ -1662,8 +2084,8 @@ all controller objects
 
 .. _caNumeric:
 
-caNumeric
-~~~~~~~~~
+``caNumeric``
+~~~~~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
@@ -1686,8 +2108,8 @@ is the equivalent of the Wheelswitch in MEDM
 
 .. _caApplyNumeric:
 
-caApplyNumeric
-~~~~~~~~~~~~~~
+``caApplyNumeric``
+~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Wheelswitch in MEDM
 
@@ -1700,8 +2122,8 @@ is the equivalent of the Wheelswitch in MEDM
 
 .. _caSlider:
 
-caSlider
-~~~~~~~~
+``caSlider``
+~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
@@ -1712,8 +2134,8 @@ has no equivalent in MEDM
 
 .. _caShellCommand:
 
-caShellCommand
-~~~~~~~~~~~~~~
+``caShellCommand``
+~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Shell command in MEDM
 
@@ -1724,8 +2146,8 @@ is the equivalent of the Shell command in MEDM
 
 .. _caMenu:
 
-caMenu
-~~~~~~
+``caMenu``
+~~~~~~~~~~
 
 is the equivalent of the Menu in MEDM
 
@@ -1736,8 +2158,8 @@ is the equivalent of the Menu in MEDM
 
 .. _caChoice:
 
-caChoice
-~~~~~~~~
+``caChoice``
+~~~~~~~~~~~~
 
 is the equivalent of the Choice Button in MEDM
 
@@ -1761,8 +2183,8 @@ is the equivalent of the Choice Button in MEDM
 
 .. _caRelatedDisplay:
 
-caRelatedDisplay
-~~~~~~~~~~~~~~~~
+``caRelatedDisplay``
+~~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Related Display in MEDM
 
@@ -1796,8 +2218,8 @@ is the equivalent of the Related Display in MEDM
 
 .. _caTextEntry:
 
-caTextEntry
-~~~~~~~~~~~
+``caTextEntry``
+~~~~~~~~~~~~~~~
 
 is the equivalent of the Text Entry in MEDM
 
@@ -1808,8 +2230,8 @@ is the equivalent of the Text Entry in MEDM
 
 .. _caMessageButton:
 
-caMessageButton
-~~~~~~~~~~~~~~~
+``caMessageButton``
+~~~~~~~~~~~~~~~~~~~
 
 is the equivalent of the Message Button in MEDM
 
@@ -1820,8 +2242,8 @@ is the equivalent of the Message Button in MEDM
 
 .. _caToggleButton:
 
-caToggleButton
-~~~~~~~~~~~~~~
+``caToggleButton``
+~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
@@ -1832,8 +2254,8 @@ has no equivalent in MEDM
 
 .. _caScriptButton:
 
-caScriptButton
-~~~~~~~~~~~~~~
+``caScriptButton``
+~~~~~~~~~~~~~~~~~~
 
 has no equivalent in MEDM
 
@@ -1844,8 +2266,8 @@ has no equivalent in MEDM
 
 .. _caSpinBox:
 
-caSpinBox
-~~~~~~~~~
+``caSpinBox``
+~~~~~~~~~~~~~
 
 represents a simplified Wheelswitch
 
@@ -1884,11 +2306,24 @@ option                                    meaning
 ``-x``                                    has no effect (MEDM's execute-only mode)
 ``-attach``                               attach to a running caQtDM process
 ``-noMsg``                                iconize the main window
-``-noStyles``                             no stylesheet will be loaded, works only when not attaching
-``-print``                                print file and exit
+``-stylefile filename``                   will replace the default stylesheet with the specified file (works only when not attaching)
 ``-noResize``                             prevent resizing, works only when not attaching
 ``-macro "xxx=aaa,yyy=bbb, ..."``         apply :ref:`macro substitution <macro-substitution>` to replace occurrences of ``$(xxx)`` with value ``aaa``.
+``-macrodefs filename``                   will load macro definitions from file
+
 ``-dg [xpos[xypos]][+xoffset[+yoffsets]`` specifies the geometry (location and size) of the synoptic display
+``-httpconfig``
+``-print``                                print file and exit
+``-savetoimage``                          will save image file and exit
+``-cs defaultcontrolsystempluginname``    will override the default epics3 datasource
+``-option "xxx=aaa,yyy=bbb, ..."``        e.g. -option "updatetype=direct" will set the updatetype to Direct
+                                          options for bsread:
+                                          * bsmodulo,bsoffset,
+                                          * bsinconsistency(drop|keep-as-is|adjust-individual|adjust-global),
+                                          * bsmapping(provide-as-is|drop|fill-null)
+                                          * bsstrategy(complete-all|complete-latest)
+``-url url``                              will look for files on the specified url and download them to a local directory
+``-emptycache``                           will empty the local cache used for downloading
 ========================================= ===================================
 
 Parameters in square brackets [] are optional.
@@ -2225,6 +2660,7 @@ The main window of caQTDM presents messages, a menu bar and a status
 bar.
 The menu bar has the following items:
 
+<<<<<<< HEAD
 +------------+-----------+-------------------------------------------+
 | Menu       | Open File | calls a dialog box for opening a ``.ui``  |
 |            |           | or ``.prc`` file (``.prc`` files          |
@@ -2254,6 +2690,38 @@ The menu bar has the following items:
 |            |           | x.{"caqtdm_monitor":{"maxdisplayrate":20}}|
 |            |           | Here you can choose your display rate.    |
 +------------+-----------+-------------------------------------------+
+=======
++------------+-----------+--------------------------------------------------+
+| Menu       | Open File | calls a dialog box for opening a ``.ui``         |
+|            |           | or ``.prc`` file (``.prc`` files                 |
+|            |           | represent PSI special ASCII files for            |
+|            |           | rapid prototyping)                               |
++------------+-----------+--------------------------------------------------+
+|            | Reload    | will close and reload all displays; very         |
+|            |           | handy during editing                             |
++------------+-----------+--------------------------------------------------+
+|            | Exit      | will exit caQTDM                                 |
++------------+-----------+--------------------------------------------------+
+|            | About     | gives some information about the build           |
+|            |           | and author                                       |
++------------+-----------+--------------------------------------------------+
+| PV         |           | will display a list of unconnected PV's          |
++------------+-----------+--------------------------------------------------+
+| UpdataType | Direct    | When caQtDM is in this mode, all the             |
+|            |           | monitors will be displayed as soon as            |
+|            |           | they come                                        |
++------------+-----------+--------------------------------------------------+
+|            | Timed     | When caQtDM is in this mode, all the             |
+|            |           | monitors will be displayed will be               |
+|            |           | displayed with a highest rate of 5Hz,            |
+|            |           | however this rate can be set on a                |
+|            |           | individual base by a JSON string after           |
+|            |           | the channel (in designer) with the               |
+|            |           | following syntax                                 |
+|            |           | channel{"caqtdm_monitor":{"maxdisplayrate":20}}, |
+|            |           | where you can choose your display rate.          |
++------------+-----------+--------------------------------------------------+
+>>>>>>> upstream/Development
 
 
 The Status bar will display the following information: memory used by
@@ -2338,6 +2806,7 @@ Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
 
 caQtDM uses the following environment variables:
+<<<<<<< HEAD
 
 +---------------------+-----------------------------------------------+
 | CAQTDM_DISPLAY_PATH | A colon-separated (semicolon-separated on     |
@@ -2351,3 +2820,72 @@ caQtDM uses the following environment variables:
 |                     | the :ref:`context.menu.customization` for     |
 |                     | the format.                                   |
 +---------------------+-----------------------------------------------+
+=======
+
+**form QT and EPICS Library:**
+
++------------------------------+-----------------------------------------------+
+| ``QT_PLUGIN_PATH``           | to find the plugins of qt and others          |
++------------------------------+-----------------------------------------------+
+| ``EPICS_CA_ADDR_LIST``       | see EPICS Documentation                       |
++------------------------------+-----------------------------------------------+
+| ``EPICS_CA_MAX_ARRAY_BYTES`` | see EPICS Documentation                       |
++------------------------------+-----------------------------------------------+
+
+**from caQtDM:**
+
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_DISPLAY_PATH``              | A colon-separated (semi-colon-separated on    |
+|                                      | Mircosoft Windows) list of directories in     |
+|                                      | which to look for display files. Only looks   |
+|                                      | in the current working directory if not       |
+|                                      | specified. Related Displays have to be in     |
+|                                      | your current directory or in this path        |
+|                                      |                                               |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_URL_DISPLAY_PATH``          | paths to look for ui and stylesheet files     | 
+|                                      | to download via http                          |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_EXEC_LIST``                 | A list of commands for the Context Menu . See |
+|                                      | the :ref:`context.menu.customization` for     |
+|                                      | the format.                                   |
++--------------------------------------+-----------------------------------------------+
+| ``MEDM_EXEC_LIST``                   | for backwards......                           |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_LAUNCHFILE``                | Enviroment file for Mobile devices            |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_TIMEOUT_HOURS``             | to exit caQtDM after some amount of time      |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_DIRECT``         | override all other find record settings       |
+|                                      | (direct json http download)                   |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_SRV``            | for autocompletion, the request URL           |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_FACILITY``       | search limitation for a facility              |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_FINDRECORD_LIMIT``          | search limit max number of entries            |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_DEFAULT_UNIT_REPLACEMENTS`` | if set to "false", default unit replacements  |
+|                                      | are disabled.                                 |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_CUSTOM_UNIT_REPLACEMENTS``  | define custom unit replacements. They are     |
+|                                      | replaced after default replacements took      |
+|                                      | place, if enabled.You can use unicode         |
+|                                      | characters or hexadecimal / decimal utf-8     |
+|                                      | character codes, seperated by (,) , (=)       |
+|                                      | and (;).                                      |
++--------------------------------------+-----------------------------------------------+
+
+**from plugins:**
+
++----------------------------------+-----------------------------------------------------------+
+| ``BSREAD_DISPATCHER``            | point the bsread plugin to the dispatcher                 |
++----------------------------------+-----------------------------------------------------------+
+| ``BSREAD_ZMQ_CONNECTION_TYPE``   | control the connection type of the bsread plugin          |
++----------------------------------+-----------------------------------------------------------+
+| ``BSREAD_ZMQ_ADDR_LIST``         | point the bsread plugin static sources                    |
++----------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVERSF_URL``        | point the archiver plugin to a different archiver backend |
++----------------------------------+-----------------------------------------------------------+
+
+>>>>>>> upstream/Development

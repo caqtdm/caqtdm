@@ -7429,6 +7429,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         info.append(asc);
 
                         info.append("<br>Value: ");
+                        const std::string edataUnits = QString::fromLatin1((const char*)&kPtr->edata.units,strlen(kPtr->edata.units)).toStdString();
                         switch (kPtr->edata.fieldtype) {
                         case caCHAR:
                             snprintf(asc, MAX_STRING_LENGTH, "%ld (0x%x)", kPtr->edata.ivalue, kPtr->edata.ivalue);
@@ -7448,7 +7449,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                             break;
 
                         case caENUM:{
-                            snprintf(asc, MAX_STRING_LENGTH, "%ld %s", kPtr->edata.ivalue, kPtr->edata.units);
+                            snprintf(asc, MAX_STRING_LENGTH, "%ld %s", kPtr->edata.ivalue, edataUnits.c_str());
                             info.append(asc);
                             snprintf(asc, MAX_STRING_LENGTH, "<br>nbStates: %d", kPtr->edata.enumCount);
                             info.append(asc);
@@ -7466,12 +7467,12 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         }
                         case caINT:
                         case caLONG:
-                            snprintf(asc, MAX_STRING_LENGTH, "%ld (0x%x) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, kPtr->edata.units);
+                            snprintf(asc, MAX_STRING_LENGTH, "%ld (0x%x) %s", kPtr->edata.ivalue, kPtr->edata.ivalue, edataUnits.c_str());
                             info.append(asc);
                             break;
                         case caFLOAT:
                         case caDOUBLE:
-                            snprintf(asc, MAX_STRING_LENGTH, "%lf %s", kPtr->edata.rvalue, kPtr->edata.units);
+                            snprintf(asc, MAX_STRING_LENGTH, "%lf %s", kPtr->edata.rvalue, edataUnits.c_str());
                             info.append(asc);
                             break;
 

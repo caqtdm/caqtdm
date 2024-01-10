@@ -32,6 +32,7 @@
 #include <QLineEdit>
 #include <QWidget>
 #include <QDebug>
+#include <QPair>
 #include "QtControls"
 
 /**
@@ -72,10 +73,100 @@ MutexKnobData::MutexKnobData()
     myUpdateType = UpdateTimed;
 
     BlockProcessing(false);
+
+    // Initialize doDefaultUnitReplacements with env. var CAQTDM_DEFAULT_UNIT_REPLACEMENTS
+    doDefaultUnitReplacements = true;
+    if (qgetenv("CAQTDM_DEFAULT_UNIT_REPLACEMENTS").toLower().replace("\"","") == "false") doDefaultUnitReplacements = false;
+
+    // Create unit replacement strings
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QString defaultReplaceUnitString = QString( "muA=0x00b5,0x0041;"
+                                               "uA=0x00b5,0x0041;"
+                                               "?A=0x00b5,0x0041;"
+                                               "muJ=0x00b5,0x004A;"
+                                               "?J=0x00b5,0x004A;"
+                                               "uJ=0x00b5,0x004A");
+#else
+    // Degree char coming from epics (0x00b0)    |||||    is replaced with two characters, one being the degree charachter itself (0x00b0), the other being an Â (0x00c2).
+    // Without this Â char the degree character  ⌄⌄⌄⌄⌄  cannot be displayed correctly, the Â itself is not displayed. We don't know why though.
+    QString defaultReplaceUnitString = QString( "0x00b0=0x00c2,0x00b0;"
+                                                "0x00b5=0x00ce,0x00bc;"
+                                                "muA=0x00ce,0x00bc,0x0041;"
+                                                "uA=0x00ce,0x00bc,0x0041;"
+                                                "?A=0x00ce,0x00bc,0x0041;"
+                                                "muJ=0x00ce,0x00bc,0x004A;"
+                                                "?J=0x00ce,0x00bc,0x004A;"
+                                                "uJ=0x00ce,0x00bc,0x004A");
+#endif
+    // Convert the values from CAQTDM_CUSTOM_UNIT_REPLACEMENTS (from QString replaceUnits) in QStrings that can be inserted into a map to then easily replace all the strings.
+    QStringList replaceUnitsList = createUnitReplacementList();
+
+    // Initialize QMaps for default unit replacement and user defined unit replacement.
+    defaultReplaceUnitsPairList = createUnitReplacementPairList(defaultReplaceUnitString.split(";"));
+    replaceUnitsPairList = createUnitReplacementPairList(replaceUnitsList);
+    //qDebug() << defaultReplaceUnitsPairList;
 }
 
 MutexKnobData:: ~MutexKnobData()
 {
+}
+
+QStringList MutexKnobData::createUnitReplacementList()
+{
+    QString replaceUnits = (QString)  qgetenv("CAQTDM_CUSTOM_UNIT_REPLACEMENTS");
+    replaceUnits = replaceUnits.trimmed().remove("\"");
+    QStringList replaceUnitsList = replaceUnits.split(";");
+    return replaceUnitsList;
+}
+
+QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QStringList replaceUnitsList)
+{
+    QList<QPair<QString, QString> > replaceUnitsPairList;
+    if (replaceUnitsList.length() > 0) 
+    {   
+        QStringList::iterator replaceUnitsListIterator;
+        for (replaceUnitsListIterator = replaceUnitsList.begin(); replaceUnitsListIterator != replaceUnitsList.end(); ++replaceUnitsListIterator){
+            QStringList unitHalfs = replaceUnitsListIterator->split("=");
+            if (unitHalfs.length()%2!=0) continue;
+
+            QStringList unitKeyParts = unitHalfs[0].split(",");
+            QStringList unitValueParts = unitHalfs[1].split(",");
+            QString unitKey = "";
+            QString unitValue = "";
+            QStringList::iterator unitPartsIterator;
+            for (unitPartsIterator = unitKeyParts.begin(); unitPartsIterator != unitKeyParts.end(); ++unitPartsIterator) {
+                bool hexOk = true;
+                bool decOk = true;
+                quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
+                quint16 parsedValueDez = unitPartsIterator->toInt(&decOk, 10);
+                if (hexOk && unitPartsIterator->toLower().startsWith("0x")){
+                    unitKey += QString(parsedValueHex);
+                } else if (decOk) {
+                    unitKey += QString(parsedValueDez);
+                } else {
+                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string: " << QString(*unitPartsIterator);
+                    unitKey += QString(*unitPartsIterator);
+                }
+            }
+            for (unitPartsIterator = unitValueParts.begin(); unitPartsIterator != unitValueParts.end(); ++unitPartsIterator) {
+                bool hexOk = true;
+                bool decOk = true;
+                quint16 parsedValueHex = unitPartsIterator->toInt(&hexOk, 16);
+                quint16 parsedValueDez = unitPartsIterator->toInt(&decOk, 10);
+                if (hexOk && unitPartsIterator->toLower().startsWith("0x")){
+                    unitValue += QString(parsedValueHex);
+                } else if (decOk) {
+                    unitValue += QString(parsedValueDez);
+                } else {
+                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(*unitPartsIterator);
+                    unitValue += QString(*unitPartsIterator);
+                }
+            }
+            replaceUnitsPairList.append(QPair<QString, QString>(unitKey, unitValue));
+        }
+    }
+    return replaceUnitsPairList;
+    //qDebug() << "replaceUnitsMap: " << replaceUnitsMap;
 }
 
 /**
@@ -771,101 +862,30 @@ QString getBufferAsHexStr(char* buf, int buffsize) {
     result.chop(1);
     return result;
 }
-
-
-
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
     QString StringUnits = QString::fromLatin1(units);
     if(StringUnits.size() > 0) {
-        // special characters handling (should be done in constructor to save time; however
-        // then we will have somme application using caQtFM_Lib that will crash
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        static const QChar egrad = 0x00b0;              // º coming from epics
-        QString Egrad(egrad);
-        static const QChar grad = 0x00b0;   // will be replaced by this utf-8 code
-        QString Grad(grad);
-#else
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        static const QChar egrad = 0x00b0;              // º coming from epics
-        QString Egrad(egrad);
-        //QString Grad=QString::fromLatin1("º");
-        //QString Grad=QString::fromUtf8("\xc2\xb0");
-        static const QChar grad[2] = { 0x00c2, 0x00ba};   // will be replaced by this utf-8 code
-        QString Grad(grad, 2);
-#else
-        static const QChar egrad = QChar(0x00b0);              // º coming from epics
-        QString Egrad(egrad);
-        static const QChar grad[2] = { QChar(0x00c2), QChar(0x00ba)};   // will be replaced by this utf-8 code
-        QString Grad(grad, 2);
-#endif
-#endif
+        // iterator for both loops
+        QList<QPair<QString, QString> >::iterator i;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        static const QChar emu =  0x00b5;               // mu coming from epics
-        QString Emu(emu);
+        if (doDefaultUnitReplacements){
+            // replace default QStrings
+            for (i = defaultReplaceUnitsPairList.begin(); i != defaultReplaceUnitsPairList.end(); ++i){
+                StringUnits.replace(i->first, i->second);
+            }
+        }
 
-        static const QChar mu =  0x00b5;
-        QString Mu(mu);
-        static const QChar uA[2] = { 0x00b5, 0x0041};
-        static const QChar uJ[2] = { 0x00b5, 0x004A};
-        QString uAs(uA, 2);
-        QString uJs(uJ, 2);
-#else
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        static const QChar emu =  0x00b5;               // mu coming from epics
-        QString Emu(emu);
+        // replace QStrings defined in CAQTDM_REPLACE_UNITS
+        for (i = replaceUnitsPairList.begin(); i != replaceUnitsPairList.end(); ++i){
+            StringUnits.replace(i->first, i->second);
+        }
 
-        static const QChar mu[2] = { 0x00ce, 0x00bc};
-        QString Mu(mu, 2);
-        static const QChar uA[3] = { 0x00ce, 0x00bc, 0x0041}; // muA code for replacing ?A coming from epics
-        static const QChar uJ[3] = { 0x00ce, 0x00bc, 0x004A}; // muA code for replacing ?J coming from epics
-#else
-        static const QChar emu =   QChar(0x00b5);               // mu coming from epics
-        QString Emu(emu);
-
-        static const QChar mu[2] = { QChar(0x00ce), QChar(0x00bc)};
-        QString Mu(mu, 2);
-        static const QChar uA[3] = { QChar(0x00ce), QChar(0x00bc), QChar(0x0041)}; // muA code for replacing ?A coming from epics
-        static const QChar uJ[3] = { QChar(0x00ce), QChar(0x00bc), QChar(0x004A)}; // muA code for replacing ?J coming from epics
-
-#endif
-
-        QString uAs(uA, 3);
-        QString uJs(uJ, 3);
-
-#endif
-
-        // replace special characters
-        StringUnits.replace(Egrad, Grad);
-        StringUnits.replace(Emu, Mu);
-        //printf("Units(string): %s(%s)\n",StringUnits.toUtf8().data(),units);
-        //printf("Units(hex): %s\n",getBufferAsHexStr(units,strlen(units)).toLatin1().data());
-
-        // seems people did not know how to code mu in EGU
-        StringUnits.replace("muA", uAs);
-        StringUnits.replace("uA", uAs);
-        StringUnits.replace("?A", uAs);
-        StringUnits.replace("muJ", uJs);
-        StringUnits.replace("?J", uJs);
-        StringUnits.replace("uJ", uJs);
-
-        // neither grad
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        static const QChar spec =  0x00c2;
-#else
-        static const QChar spec =  QChar(0x00c2);
-#endif
-
-
-        QString special(spec);
-        if(StringUnits.contains("°C")) StringUnits.replace(special, "");
     }
+
     // send data to main thread
     emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
 }
-//*********************************************************************************************************************
-
 void MutexKnobData::UpdateTextLine(char *message, char *name)
 {
     QString String = QString::fromLatin1(message);

@@ -3,7 +3,7 @@
 
 #############################################################################
 # special EPICS things
-%define EPICS_TARGET_VERSION -7.0.6
+%define EPICS_TARGET_VERSION -7.0.7
 #############################################################################
 
 # build qt4 support (or not)
@@ -17,8 +17,8 @@
 #############################################################################
 Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
-Version: 4.4.1
-Release: 9%{?dist}
+Version: 4.4.2
+Release: 1%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm
@@ -41,8 +41,8 @@ BuildRequires: epics-base%{EPICS_TARGET_VERSION}-devel
 Requires: epics-base%{EPICS_TARGET_VERSION}-devel-static
 #####################################
 #EPICS Libs
-BuildRequires: epics-base-7.0.6-devel
-Requires: epics-base-7.0.6
+BuildRequires: epics-base-7.0.7-devel
+Requires: epics-base-7.0.7
 #####################################
 Provides: caqtdm = %{version}-%{release}
 Provides: caqtdm%{_isa} = %{version}-%{release}
@@ -354,8 +354,12 @@ popd
 
 
 %post qt4
-
-
+if [ "$1" = "2" ] ; then # upgrade
+        if [ -z "$(ls -A /usr/local/bin/caqtdm)" ]; then
+           echo "clean caqtdm when update"
+           %{__rm} -rf /usr/local/bin/caqtdm
+        fi
+fi
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/caqtdm
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/adl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt4/edl2ui
@@ -384,6 +388,13 @@ fi
 
 
 %post qt5
+echo "clean caqtdm when update"
+if [ "$1" = "2" ] ; then # upgrade
+        if [ -z "$(ls -A /usr/local/bin/caqtdm)" ]; then
+           %{__rm} -rf /usr/local/bin/caqtdm
+        fi
+fi
+
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/caqtdm
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/adl2ui
 ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt5/edl2ui
@@ -403,9 +414,7 @@ fi
 
 %postun doc
 if [ "$1" = "0" ] ; then # last uninstall
-        if [ -z "$(ls -A /opt/caqtdm)" ]; then
-           %{__rm} -rf /opt/caqtdm
-        fi
+  %{__rm} -rf /opt/caqtdm/doc
 fi
 
 %if 0%{?qt4}

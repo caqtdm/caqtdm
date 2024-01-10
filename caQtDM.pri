@@ -471,7 +471,7 @@ caQtDM_Lib {
 #for epics 3.15 and gcc we need this
                 INCLUDEPATH   += $(EPICSINCLUDE)/compiler/gcc
 
-      		QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
+
                 LIBS += -F$(QWTLIB) -framework $$(QWTLIBNAME)
                 LIBS += -L$$(CAQTDM_COLLECT) -lqtcontrols
       		LIBS += ${EPICSLIB}/libCom.dylib
@@ -713,7 +713,7 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 15.0
+                    target.value = 16.0
 
                     QMAKE_MAC_XCODE_SETTINGS += target
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
@@ -740,6 +740,7 @@ caQtDM_Viewer {
                          #LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
                          # build simulator only for 32 bit
                          INCLUDEPATH += $$(QWTHOME)/src
+                         QMAKE_LFLAGS += -all_load
                     }
                     iphoneos {
                         message("caQtDM_viewer configuration : iphoneos")
