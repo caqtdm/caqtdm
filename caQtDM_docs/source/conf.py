@@ -9,7 +9,9 @@
 project = "caQtDM"
 copyright = "2007, Anton Mezger, Helge Brands"  # GPL3
 author = "Anton Mezger, Helge Brands"
-release = "4.4.0"
+release = "4.4.1"
+root_doc = "documentation"
+
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -20,6 +22,7 @@ extensions = """
     sphinx.ext.githubpages
     sphinx.ext.todo
     sphinx.ext.viewcode
+    sphinx.ext.imgmath
 """.split()
 
 templates_path = ["_templates"]
