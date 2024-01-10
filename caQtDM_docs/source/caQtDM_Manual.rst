@@ -2947,9 +2947,9 @@ you can also just write them as a string without the need for commas. so "hi" wo
 Double quotes are possible but removed by caQtDM when parsing the environment variable, single quotes are treated literally as characters to replace, so don't use them to encapsulate.
 You have to first write the source characters you want to replace, then an equal sign (=) and finally the replacement characters that should be drawn instead. To set multiple
 character replacements, seperate them by semicolon (;). Parts that dont contain an equal sign but are seperated from other parts with semicolon are ignored. All put together this would be the structure:
-CAQTDM_CUSTOM_UNIT_REPLACEMENTS={sourceCharacters}={replacementCharacters};{secondReplacementInSameStructure}
+CAQTDM_CUSTOM_UNIT_REPLACEMENTS={sourceCharacters}={replacementCharacters};{anotherReplacement}
 An example (that doesnt make much sense but displays many possibilities) would be:
-CAQTDM_CUSTOM_UNIT_REPLACEMENTS=characterstoreplace=characterstouseinsted;0x48,0x68=bye;charactersConcatenatedWithHex,0x4f=someReplacement;°=o
+CAQTDM_CUSTOM_UNIT_REPLACEMENTS=charsToReplace=charsToUse;0x48,0x68=bye;charsWithHex,0x4f=something;°=o
 It can be seen that all combinations of strings, hex- and deciaml character codes are possible to form a source or replacement string.
 All replacements will be done sequentially, with the leftmost replacements being done first. Therefore, it can also be possible, that later replacements replace characters in a string
 that has already been replaced before by another replacements.
