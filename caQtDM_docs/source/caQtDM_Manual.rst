@@ -2927,6 +2927,40 @@ should get a print dialog.
 
 .. _env.var:
 
+Unit Replacements
+~~~~~~~~~~~~~~~~~
+
+When displaying values with units, it can happen that some characters cannot be drawn correctly,
+thus generating faulty units. It can also be that special display settings or configuration on the
+client, like a special linux build or manual font settings, lead to characters being drawn incorrectly.
+To address this issue, unit replacements can be done by the user. This means, all unit strings will be
+scanned for the given source characters ( or -sequences) and every occurrence will be replaced by the
+given replacement characters ( or -sequence). Unit replacements do not affect the UI file or EPICS data
+and are purely visible and around for the caQtDM process that was started with them.
+To start a caQtDM process with custom unit replacements, the following environment variable has to be set with the wanted replacements:
+CAQTDM_CUSTOM_UNIT_REPLACEMENTS
+The syntax for the custom unit replacements is as follows:
+The characters are written either in utf-8 coded characters or as a hexadecimal or decimal code for the character in utf-8 coding.
+Hexadeciaml codes need to start with "0x", caQtDM will try to parse all other characters first as a decimal code, if they are not purely numerical, it will
+interpret them as utf-8 coded characters. Multiple characters that should be treated as one string have to be seperated by comma (,). If you use utf-8 coded characters,
+you can also just write them as a string, without the need for commas. so "hi" would be written as "0x48,0x69", or simply just "hi".
+Double quotes are possible but removed by caQtDM when parsing the environment variable, single quotes are treaded literally as characters to replace, so don't use them to encapsulate.
+You have to first write the source characters you want to replace, then an equal sign (=) and finally the replacement characters that should be drawn instead. To set multiple
+character replacements, seperate them by semicolon (;). Parts that dont contain an equal sign but are seperated from other parts with semicolon are ignored. All put together this would be the structure:
+CAQTDM_CUSTOM_UNIT_REPLACEMENTS={sourceCharacters}={replacementCharacters};{secondReplacementInSameStructure}
+An example (that doesnt make much sense but displays many possibilities) would be:
+CAQTDM_CUSTOM_UNIT_REPLACEMENTS=characterstoreplace=characterstouseinsted;0x48,0x68=bye;charactersConcatenatedWithHex,0x4f=someReplacement;°=o
+It can be seen that all combinations of strings, hex- and deciaml character codes are possible to form a source or replacement string.
+All replacements will be done sequentially, with the leftmost replacements being done first. Therefore, it can also be possible, that later replacements replace characters in a string
+that has already been replaced before by another replacements.
+When doing custom unit replacements, always consider that your replacements might not be done to the original string from EPICS, but on the already
+processed string with the default unit replacements. To see how they are implemented, you might want to check out teh first few lines in caQtDM_Lib/src/mutexKnobData.cpp
+There are already some default unit replacements that were introduced because common systems had difficulties displaying widely-used characters.
+Those unit replacements always take place before custom unit replacements, you can disable them by setting the following environment variable to "false":
+CAQTDM_DEFAULT_UNIT_REPLACEMENTS
+It is not recommended to disable them, as they are tested on all common systems and should be working with most clients, however disabling might help
+in some edge cases.
+
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
 
