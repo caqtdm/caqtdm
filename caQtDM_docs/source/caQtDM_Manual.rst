@@ -2932,7 +2932,7 @@ Unit Replacements
 
 When displaying values with units, it can happen that some characters cannot be drawn correctly,
 thus generating faulty units. It can also be that special display settings or configuration on the
-client, like a special linux build or manual font settings, lead to characters being drawn incorrectly.
+client, like a special linux build or manual font settings, leading to characters being drawn incorrectly.
 To address this issue, unit replacements can be done by the user. This means, all unit strings will be
 scanned for the given source characters ( or -sequences) and every occurrence will be replaced by the
 given replacement characters ( or -sequence). Unit replacements do not affect the UI file or EPICS data
@@ -2941,10 +2941,10 @@ To start a caQtDM process with custom unit replacements, the following environme
 CAQTDM_CUSTOM_UNIT_REPLACEMENTS
 The syntax for the custom unit replacements is as follows:
 The characters are written either in utf-8 coded characters or as a hexadecimal or decimal code for the character in utf-8 coding.
-Hexadeciaml codes need to start with "0x", caQtDM will try to parse all other characters first as a decimal code, if they are not purely numerical, it will
+Hexadeciaml codes need to start with "0x", caQtDM will try to parse all other characters first as a decimal code, if they are not purely numerical it will
 interpret them as utf-8 coded characters. Multiple characters that should be treated as one string have to be seperated by comma (,). If you use utf-8 coded characters,
-you can also just write them as a string, without the need for commas. so "hi" would be written as "0x48,0x69", or simply just "hi".
-Double quotes are possible but removed by caQtDM when parsing the environment variable, single quotes are treaded literally as characters to replace, so don't use them to encapsulate.
+you can also just write them as a string without the need for commas. so "hi" would be written as "0x48,0x69", or simply just "hi".
+Double quotes are possible but removed by caQtDM when parsing the environment variable, single quotes are treated literally as characters to replace, so don't use them to encapsulate.
 You have to first write the source characters you want to replace, then an equal sign (=) and finally the replacement characters that should be drawn instead. To set multiple
 character replacements, seperate them by semicolon (;). Parts that dont contain an equal sign but are seperated from other parts with semicolon are ignored. All put together this would be the structure:
 CAQTDM_CUSTOM_UNIT_REPLACEMENTS={sourceCharacters}={replacementCharacters};{secondReplacementInSameStructure}
