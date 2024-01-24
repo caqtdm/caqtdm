@@ -867,6 +867,12 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
            loadMainWindow(position, fileS, macroS, resizeS, false, true, false);
         }
         reloadList.clear();
+        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
+        if (this->ui.directAction->isChecked()) {
+           mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
+           qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
+           QTimer::singleShot(10000, this, SLOT(setDirectUpdateTypeOnRestart()));
+        }
     }
 
     // any open windows ?
@@ -879,6 +885,15 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         userClose = true;
     }
 #endif
+}
+
+/**
+ * Slot to reset the UpdateType back to direct after resetting it to timed for the startup
+ * Should not be called for any other purpose  --> is a private slot
+ */
+void FileOpenWindow::setDirectUpdateTypeOnRestart(){
+    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
+    qDebug() << "UpdateType reset to direct";
 }
 
 /**
