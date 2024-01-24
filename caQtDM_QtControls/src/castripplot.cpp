@@ -37,7 +37,6 @@
 #include <QMetaProperty>
 #include "castripplot.h"
 #include <cmath>
-
 #include <qwt_picker_machine.h>
 #include <qelapsedtimer.h>
 
@@ -62,11 +61,11 @@
 #define MAXIMUMSIZE 5000
 #define SOMEMORE 500
 
-class TimeScaleDraw: public QwtScaleDraw
+class StripplotDateScaleDraw: public QwtDateScaleDraw
 {
 public:
 
-    TimeScaleDraw(const QTime &base): baseTime(base)
+    StripplotDateScaleDraw(const QDateTime &base): baseTime(base)
     {
     }
     virtual QwtText label(double v) const
@@ -75,13 +74,13 @@ public:
         double day = 24 * 3600;
         double normalized = v - day * floor(v/day);
 
-        QTime upTime = baseTime.addSecs((int) normalized);
+        QDateTime upTime = baseTime.addSecs((int) normalized);
         //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, qasc(baseTime.toString()),  qasc(upTime.toString()));
-        return upTime.toString();
+        return upTime.toString("hh:mm:ss");
     }
 
 private:
-    QTime baseTime;
+    QDateTime baseTime;
 
 };
 
@@ -626,7 +625,7 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
         newYAxisMax = qMax(newYAxisMax, 1e-19);
     }
 
-    qDebug() << "going from" << oldYAxisMin << "-" <<oldYAxisMax << "to" << newYAxisMin << "-" << newYAxisMax;
+    //qDebug() << "going from" << oldYAxisMin << "-" <<oldYAxisMax << "to" << newYAxisMin << "-" << newYAxisMax;
 
     bool isLinear = (thisYaxisType == linear);
     static_cast<StripplotScaleDraw*>(axisScaleDraw(yLeft))->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
@@ -668,16 +667,16 @@ void caStripPlot::setXaxis(double interval, double period)
     if(thisXticks < 1) nbTicks = 1; else nbTicks =  thisXticks;
 
     if(thisXaxisType != ValueScale) {
-        QTime timeNow= QTime::currentTime();
+        QDateTime timeNow= QDateTime::currentDateTime();
         timeNow = timeNow.addSecs((int) -interval);
         setAxisScale(QwtPlot::xBottom, 0, interval, interval/nbTicks);
-        setAxisScaleDraw ( QwtPlot::xBottom, new TimeScaleDraw (timeNow) );
+        setAxisScaleDraw(QwtPlot::xBottom, new StripplotDateScaleDraw(timeNow) );
 
         if(thisXaxisType == TimeScaleFix) {
               PlotScaleEngine *scaleEngine = new PlotScaleEngine(nbTicks);
               setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
         } else {
-           QwtLinearScaleEngine *scaleEngine= new QwtLinearScaleEngine();
+           QwtLinearScaleEngine *scaleEngine= new QwtDateScaleEngine();
            setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
         }
 
@@ -720,10 +719,10 @@ void caStripPlot::setYaxisType(yAxisType s)
  * */
 void caStripPlot::remapCurve(double newMin, double newMax,  quint8 curvIndex, bool isNewLog = false)
 {
-    qDebug() << "remapping Curve: " << curvIndex << "min/max:" << newMin << newMax << "isNewLog:"<< isNewLog;
+    //qDebug() << "remapping Curve: " << curvIndex << "min/max:" << newMin << newMax << "isNewLog:"<< isNewLog;
     // Start timer to measure performance:
-    QElapsedTimer timer;
-    timer.start();
+    //QElapsedTimer timer;
+    //timer.start();
 
     // Variables
     // Because the values are calculated from the raw data, old min and old max are always given.
@@ -808,7 +807,7 @@ void caStripPlot::remapCurve(double newMin, double newMax,  quint8 curvIndex, bo
     replot();
 
     // Print time it took to do conversions
-    qDebug() << "Conversion took ms: " << timer.nsecsElapsed()/1000000.0;
+    //qDebug() << "Conversion took ms: " << timer.nsecsElapsed()/1000000.0;
 }
 
 void caStripPlot::RescaleCurves(int width, units unit, double period)
@@ -1354,10 +1353,12 @@ void caStripPlot::TimeOut()
                 PlotScaleEngine *scaleEngine = new PlotScaleEngine(nbTicks);
                 setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
             } else {
-                QwtLinearScaleEngine *scaleEngine= new QwtLinearScaleEngine();
+                QwtLinearScaleEngine *scaleEngine= new QwtDateScaleEngine();
                 setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
             }
-            setAxisScaleDraw (QwtPlot::xBottom, new TimeScaleDraw (timeNow));
+            QDateTime dateTimeNow= QDateTime::currentDateTime();
+            dateTimeNow = dateTimeNow.addSecs((int) -INTERVAL);
+            setAxisScaleDraw (QwtPlot::xBottom, new StripplotDateScaleDraw(dateTimeNow));
         }
         if(thisYaxisType == linear){
             setAxisScaleEngine(yLeft, new StripplotLinearScaleEngine());
@@ -1809,7 +1810,7 @@ bool caStripPlot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         const quint8 nButton = ((QMouseEvent*) event)->button();
         if (nButton == 1){
-            // apply testing code, like enabling certain features or showing values --> EMPTY IN PROD!
+            // apply testing code like enabling certain features or showing values --> EMPTY IN PROD & COMMITS!
         }
         if (nButton == 1 && thisYaxisScaling == fixedScale && NumberOfCurves > 1 && thisIterableCurves) {
             // Ignore events on the canvas itself and stop them from being processed further, because it would generate another event.

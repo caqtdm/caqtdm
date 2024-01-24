@@ -60,6 +60,8 @@
 #include <QMouseEvent>
 #include <qtcontrols_global.h>
 #include <qnumeric.h>
+#include <qwt_date_scale_draw.h>
+#include <qwt_date_scale_engine.h>
 
 #include <stripplotthread.h>
 
@@ -486,8 +488,8 @@ public slots:
 
     void setPlotPickerMode(int mode);
 
-    void setIterableCurves(bool itCurvs) {thisIterableCurves = itCurvs; qDebug() << "signal it Called with bool:" << itCurvs;};
-    void setSelectableCurves(bool selectCurvs) {thisSelectableCurves = selectCurvs; qDebug() << "signal sel Called with bool:" << selectCurvs;};
+    void setIterableCurves(bool itCurvs) {thisIterableCurves = itCurvs;};
+    void setSelectableCurves(bool selectCurvs) {thisSelectableCurves = selectCurvs;};
 
 protected:
     void resizeEvent ( QResizeEvent * event);
