@@ -46,12 +46,17 @@ QString searchFile::findFile()
     // file was not found, go through path list
     if(!fi.exists()) {
        for(int i=0; i< paths.count(); i++) {
-           FileName = paths[i] + "/" + _FileName;
-           QFileInfo fin(FileName);
-           if(fin.exists()) {
-             fileFound = true;
-             break;
-           }
+#if defined(_WIN32) || defined(_WIN64)
+            // Replace "" which could be encapsulating spaces, as caQtDM paths only work without "".
+            paths[i] = paths[i].replace("\"", "");
+#endif
+            // If OS isn't Windows, there are no spaces either way.
+            FileName = paths[i] + "/" + _FileName;
+            QFileInfo fin(FileName);
+            if(fin.exists()) {
+            fileFound = true;
+            break;
+            }
         }
 
     // file was found in current directory
