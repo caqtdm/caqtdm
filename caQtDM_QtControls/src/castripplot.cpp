@@ -70,12 +70,7 @@ public:
     }
     virtual QwtText label(double v) const
     {
-        // while addsecs has a problem after some 3/4 of a month in seconds, we normalize the seconds to 24 * 3600 seconds
-        double day = 24 * 3600;
-        double normalized = v - day * floor(v/day);
-
-        QDateTime upTime = baseTime.addSecs((int) normalized);
-        //printf("label = addseconds=%d start plottime=%s labeltime=%s\n", seconds, qasc(baseTime.toString()),  qasc(upTime.toString()));
+        QDateTime upTime = baseTime.addSecs((int) v);
         return upTime.toString("hh:mm:ss");
     }
 
