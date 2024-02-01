@@ -39,7 +39,8 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
 
-    qDebug() << "ArchiveHTTP_Plugin:" << (__LINE__) << "Create (http-retrieval)";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+             << "Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon,
@@ -56,7 +57,7 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 
 ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()
 {
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__)
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
              << "ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()";
 }
 
@@ -177,13 +178,15 @@ void ArchiveHTTP_Plugin::handleResults(
     TimerN.resize(nbVal);
     YValsN.resize(nbVal);
 
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << "handle cartesian";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+             << "handle cartesian";
     if (nbVal > 0)
         archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
     TimerN.resize(0);
     YValsN.resize(0);
 
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << "handle cartesian fisnished";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+             << "handle cartesian fisnished";
     QList<QString> removeKeys;
     removeKeys.clear();
 
@@ -221,7 +224,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
     // Index name (url)
     QString index_name = "https://data-api.psi.ch/sf/query";
 
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__)
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
              << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface";
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
@@ -229,8 +232,9 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
     while (i != listOfIndexes.constEnd()) {
         WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
         indexes indexNew = i.value();
-        qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << " -------------" << i.key() << ": "
-                 << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                 << " -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY
+                 << indexNew.pv << indexNew.w;
 
         QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(indexNew.key);
         while (j != listOfThreads.end() && j.key() == indexNew.key) {
@@ -239,8 +243,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         }
 
         if ((tmpThread != (WorkerHttpThread *) Q_NULLPTR) && tmpThread->isRunning()) {
-            qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << "thread is running" << tmpThread
-                     << tmpThread->isRunning();
+            qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                     << "thread is running" << tmpThread << tmpThread->isRunning();
 
         } else {
             // Get Index name if specified for this widget
@@ -290,7 +294,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 QString url = (QString) qgetenv("CAQTDM_ARCHIVERSF_URL");
                 if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
                     var = w->property("archiverIndex");
-                    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << "Check URL: " << var;
+                    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                             << "Check URL: " << var;
                     if (!var.isNull()) {
                         QString indexName = var.toString();
                         index_name = qasc(indexName);
@@ -347,14 +352,14 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 
         ++i;
     }
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__)
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
              << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface finished";
 }
 
 void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 {
     suspend = true;
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__)
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
              << "Callback_AbortOutstandingRequests for key" << key;
 
     WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
@@ -365,8 +370,8 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
             httpRetrieval *retrieval = tmpThread->getArchive();
             tmpThread->quit();
             if (retrieval != (httpRetrieval *) Q_NULLPTR) {
-                qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << "retrieval->cancelDownload()"
-                         << retrieval;
+                qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                         << "retrieval->cancelDownload()" << retrieval;
                 retrieval->cancelDownload();
                 retrieval->deleteLater();
             }
@@ -380,7 +385,8 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 
 void ArchiveHTTP_Plugin::closeEvent()
 {
-    qDebug() << "archiverSF_plugin.cpp:" << (__LINE__) << "ArchiveHTTP_Plugin::closeEvent ";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+             << "ArchiveHTTP_Plugin::closeEvent ";
     emit Signal_StopUpdateInterface();
 }
 // =======================================================================================================================================================

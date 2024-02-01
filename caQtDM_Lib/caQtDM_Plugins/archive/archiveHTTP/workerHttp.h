@@ -94,7 +94,7 @@ public slots:
 
         fromArchive = new httpRetrieval();
 
-        qDebug() << "ArchiveHTTP_plugin.h:" << (__LINE__)
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                  << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
         bool readdata_ok = fromArchive->requestUrl(url,
                                                    json_str,
@@ -114,7 +114,7 @@ public slots:
             mess.append(url.toString());
             messageWindow->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
             indexNew.w->setProperty("archiverIndex", QVariant(url.toString()));
-            qDebug() << "ArchiveHTTP_plugin.h:" << (__LINE__)
+            qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                      << "archiv PV" << indexNew.pv;
             fromArchive->deleteLater();
             fromArchive = new httpRetrieval();
@@ -149,7 +149,7 @@ public slots:
             }
         }
 
-        qDebug() << "ArchiveHTTP_plugin.h:"<< (__LINE__) << QTime::currentTime().toString()
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
                  << "number of values received" << nbVal << fromArchive << "for" << key;
 
         emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());

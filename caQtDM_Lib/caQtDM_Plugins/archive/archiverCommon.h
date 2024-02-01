@@ -25,18 +25,34 @@
 #ifndef ArchiverCommon_H
 #define ArchiverCommon_H
 
-#include <QObject>
+#include <QList>
 #include <QMap>
 #include <QMutex>
-#include <QList>
-#include <QTimer>
+#include <QObject>
 #include <QThread>
-#include <qwt.h>
+#include <QTimer>
+#include "MessageWindow.h"
 #include "cacartesianplot.h"
 #include "mutexKnobData.h"
-#include "MessageWindow.h"
+#include <qwt.h>
 
-struct indexes {QString key; int indexX; int indexY; int secondsPast; QString pv; float updateSeconds; struct timeb lastUpdateTime; QWidget *w; int nrOfBins; QMutex *mutexP; bool init; QString backend; int updateSecondsOrig; bool timeAxis;};
+struct indexes
+{
+    QString key;
+    int indexX;
+    int indexY;
+    int secondsPast;
+    QString pv;
+    float updateSeconds;
+    struct timeb lastUpdateTime;
+    QWidget *w;
+    int nrOfBins;
+    QMutex *mutexP;
+    bool init;
+    QString backend;
+    int updateSecondsOrig;
+    bool timeAxis;
+};
 #define CHAR_ARRAY_LENGTH 200
 
 class Q_DECL_EXPORT ArchiverCommon : public QObject
@@ -46,19 +62,24 @@ class Q_DECL_EXPORT ArchiverCommon : public QObject
 public:
     ArchiverCommon();
 
-    int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options);
+    int initCommunicationLayer(MutexKnobData *data,
+                               MessageWindow *messageWindow,
+                               QMap<QString, QString> options);
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
     int pvClearMonitor(knobData *kData);
     int pvFreeAllocatedData(knobData *kData);
-    int pvClearEvent(void * ptr);
-    int pvAddEvent(void * ptr);
-    int TerminateIO() {return true;}
-    void updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend);
+    int pvClearEvent(void *ptr);
+    int pvAddEvent(void *ptr);
+    int TerminateIO() { return true; }
+    void updateCartesian(int nbVal,
+                         indexes indexNew,
+                         QVector<double> TimerN,
+                         QVector<double> YValsN,
+                         QString backend);
     void updateSecondsPast(indexes indexNew, bool original);
     QTimer *timer;
 
 protected:
-
 signals:
     void Signal_UpdateInterface(QMap<QString, indexes> listOfIndexes);
     void Signal_AbortOutstandingRequests(QString key);
@@ -68,7 +89,10 @@ private slots:
     void stopUpdateInterface();
 
 private:
-    typedef struct  {char Dev[40];} device;
+    typedef struct
+    {
+        char Dev[40];
+    } device;
     QMutex mutex;
     QMutex *mutexP;
     MutexKnobData *mutexknobdataP;
@@ -78,7 +102,5 @@ private:
 
     bool timerRunning;
 };
-
-
 
 #endif

@@ -9,8 +9,8 @@
 #include <QTimer>
 #include <qwt.h>
 
-#include "workerHttp.h"
 #include "httpRetrieval.h"
+#include "workerHttp.h"
 
 class Q_DECL_EXPORT WorkerHttpThread : public QThread
 {

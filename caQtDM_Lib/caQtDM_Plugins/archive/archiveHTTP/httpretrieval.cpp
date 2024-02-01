@@ -61,7 +61,7 @@ httpRetrieval::httpRetrieval()
     manager = new QNetworkAccessManager(this);
     eventLoop = new QEventLoop(this);
     errorString = "";
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this
              << "constructor";
     connect(this, SIGNAL(requestFinished()), this, SLOT(downloadFinished()));
 }
@@ -69,15 +69,16 @@ httpRetrieval::httpRetrieval()
 void httpRetrieval::timeoutL()
 {
     errorString = "http request timeout";
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this << PV
-             << "timeout" << errorString;
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this
+             << PV << "timeout" << errorString;
     cancelDownload();
 }
 
 bool httpRetrieval::requestUrl(
     const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key)
 {
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << "httpRetrieval::requestUrl" << json;
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+             << "httpRetrieval::requestUrl" << json;
     aborted = false;
     finished = false;
     totalCount = 0;
@@ -112,7 +113,8 @@ bool httpRetrieval::requestUrl(
 
     reply = manager->post(*request, json);
 
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << "requesturl reply" << reply;
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+             << "requesturl reply" << reply;
 
     connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finishReply(QNetworkReply *)));
 
@@ -121,8 +123,8 @@ bool httpRetrieval::requestUrl(
     timeoutHelper->setInterval(60000);
     timeoutHelper->start();
     connect(timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this << PV
-             << "go on eventloop->exec";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this
+             << PV << "go on eventloop->exec";
     eventLoop->exec();
 
     //downloadfinished will continue
@@ -144,8 +146,8 @@ void httpRetrieval::cancelDownload()
 
     disconnect(manager);
     if (reply != Q_NULLPTR) {
-        qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this
-                 << PV << "!!!!!!!!!!!!!!!!! abort networkreply for";
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+                 << this << PV << "!!!!!!!!!!!!!!!!! abort networkreply for";
         reply->abort();
         reply->deleteLater();
         reply = Q_NULLPTR;
@@ -157,8 +159,8 @@ void httpRetrieval::cancelDownload()
 
 int httpRetrieval::downloadFinished()
 {
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this << PV
-             << "download finished";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this
+             << PV << "download finished";
     //eventLoop->processEvents();
 #if QT_VERSION > QT_VERSION_CHECK(4, 8, 0)
     eventLoop->quit();
@@ -172,8 +174,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
 {
     if (aborted)
         return;
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this << PV
-             << "reply received";
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this
+             << PV << "reply received";
     int count = 0;
     struct timeb now;
     int valueIndex = 2;
@@ -193,8 +195,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                   .arg(status.toInt())
                   .arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString())
                   .arg(downloadUrl.toString());
-        qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this
-                 << PV << "finishreply" << errorString;
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+                 << this << PV << "finishreply" << errorString;
         QByteArray header = reply->rawHeader("location");
         qDebug() << "location" << header;
         finished = true;
@@ -213,8 +215,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                   .arg(status.toInt())
                   .arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString())
                   .arg(downloadUrl.toString());
-        qDebug() << "httpRetrieval.cpp:" << QString::number(__LINE__)
-                 << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+                 << this << PV << "finishreply" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -222,8 +224,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
 
     if (reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
-        qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this
-                 << PV << "finishreply" << errorString;
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+                 << this << PV << "finishreply" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -301,8 +303,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
         errorString = tr("could not parse json string left=%1 right=%2")
                           .arg(out.left(20))
                           .arg(out.right(20));
-        qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this
-                 << PV << "finishreply" << errorString;
+        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+                 << this << PV << "finishreply" << errorString;
         emit requestFinished();
         return;
     } else {
@@ -323,7 +325,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
 
                     // find channel data inside this part of array
                     if (root.find(L"channel") != root.end() && root[L"channel"]->IsObject()) {
-                        qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                  << "\nchannel part found as object";
                         JSONValue *value2 = JSON::Parse(root[L"channel"]->Stringify().c_str());
                         JSONObject root0 = value2->AsObject();
@@ -333,8 +335,9 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                             std::wstring data = root0[L"name"]->Stringify();
                             char *channel = new char[data.size() + 1];
                             sprintf(channel, "%ls", data.c_str());
-                            qDebug() << "httpRetrieval.cpp:" << (__LINE__) << "channel name found"
-                                     << root0[L"name"]->AsString().c_str() << channel;
+                            qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                                     << "channel name found" << root0[L"name"]->AsString().c_str()
+                                     << channel;
                             delete[] channel;
                         }
 
@@ -346,7 +349,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                             sprintf(backend, "%ls", data.c_str());
                             Backend = QString(backend);
                             Backend = Backend.replace("\"", "");
-                            qDebug() << "httpRetrieval.cpp:" << (__LINE__) << "backend name found"
+                            qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                                     << "backend name found"
                                      << root0[L"backend"]->AsString().c_str() << backend;
                             delete[] backend;
                         }
@@ -356,7 +360,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                     // find data array inside this part of array
                     if (root.find(L"data") != root.end() && root[L"data"]->IsArray()) {
                         JSONArray array = root[L"data"]->AsArray();
-                        qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                  << "\ndata part found as array" << array.size();
 
                         // scan the data part (big array)
@@ -364,7 +368,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                             errorString = tr("no data from %1 : %2")
                                               .arg(downloadUrl.toString())
                                               .arg(Backend);
-                            qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                            qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                      << QTime::currentTime().toString() << this << PV
                                      << "finishreply" << errorString;
                             emit requestFinished();
@@ -396,7 +400,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                     // look for mean
                                     if (root2.find(L"mean") != root2.end()
                                         && root2[L"mean"]->IsNumber()) {
-                                        qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                                        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                                  << "mean part found";
                                         //stat = swscanf(root2[L"mean"]->Stringify().c_str(), L"%lf", &mean);
                                         mean = root2[L"mean"]->AsNumber();
@@ -408,7 +412,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                 // look for globalSeconds
                                 if (root1.find(L"globalSeconds") != root1.end()
                                     && root1[L"globalSeconds"]->IsString()) {
-                                    qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                                    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                              << "globalSeconds part found";
                                     if (getDoubleFromString(QString::fromWCharArray(
                                                                 root1[L"globalSeconds"]
@@ -430,8 +434,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                     else
                                         X[count] = archiveTime * 1000;
                                     Y[count] = mean;
-                                    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << "binned"
-                                             << X[count] << Y[count];
+                                    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                                             << "binned" << X[count] << Y[count];
                                     count++;
                                 }
                             }
@@ -458,7 +462,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                         && root1[L"value"]->IsArray()) {
                                         //qDebug() << "\nvalue part found as array, not yet supported" << array.size();
                                         errorString = tr("waveforms not supported");
-                                        qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                                        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                                  << QTime::currentTime().toString() << this << PV
                                                  << "finishreply" << errorString;
                                         emit requestFinished();
@@ -468,7 +472,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                 // look for globalSeconds
                                 if (root1.find(L"globalSeconds") != root1.end()
                                     && root1[L"globalSeconds"]->IsString()) {
-                                    qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                                    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                              << "globalSeconds part found";
                                     if (getDoubleFromString(QString::fromWCharArray(
                                                                 root1[L"globalSeconds"]
@@ -476,7 +480,7 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                                                     .c_str()),
                                                             archiveTime)) {
                                         timeFound = true;
-                                        qDebug() << "httpRetrieval.cpp:" << (__LINE__)
+                                        qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
                                                  << "time found" << archiveTime;
                                     } else {
                                         qDebug() << tr("could not decode globalSeconds ????");
@@ -492,8 +496,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
                                     else
                                         X[count] = archiveTime * 1000;
                                     Y[count] = mean;
-                                    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << "not binned"
-                                             << X[count] << Y[count];
+                                    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
+                                             << "not binned" << X[count] << Y[count];
                                     count++;
                                 }
                             }
@@ -507,8 +511,8 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     totalCount = count;
-    qDebug() << "httpRetrieval.cpp:" << (__LINE__) << QTime::currentTime().toString() << this << PV
-             << "finishreply totalcount =" << count << reply;
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this
+             << PV << "finishreply totalcount =" << count << reply;
 
 #endif
 
