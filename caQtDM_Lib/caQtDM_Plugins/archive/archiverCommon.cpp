@@ -40,7 +40,7 @@ ArchiverCommon::ArchiverCommon()
 void ArchiverCommon::stopUpdateInterface()
 {
     timer->stop();
-    //qDebug() << "timer stop";
+    qDebug() << "archiverCommon.cpp:43 " << "timer stop";
     QApplication::processEvents();
 }
 
@@ -70,7 +70,7 @@ void ArchiverCommon::updateInterface()
         diff = ((double) now.time + (double) now.millitm / (double)1000) -
                ((double) indexNew.lastUpdateTime.time + (double) indexNew.lastUpdateTime.millitm / (double)1000);
         // is it time to update ?
-        //qDebug() << i.key() << diff << indexNew.updateSeconds;
+        qDebug() << "archiverCommon.cpp:73 " << i.key() << diff << indexNew.updateSeconds;
         if(diff >= indexNew.updateSeconds) {
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(i.key(), indexNew);
@@ -78,7 +78,7 @@ void ArchiverCommon::updateInterface()
         }
         ++i;
     }
-    //qDebug() << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
+    qDebug() << "archiverCommon.cpp:81 " << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
 
     // call user routine for updating data
     if(listOfIndexesToBeExecuted.count() > 0) {
@@ -123,7 +123,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     QMutexLocker locker(&mutex);
 
-    //qDebug() << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
+    qDebug() << "archiverCommon.cpp:126 " << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
 
@@ -189,7 +189,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 indexes indexNew = i.value();
                 if(kData->specData[2] == caCartesianPlot::CH_X) indexNew.indexX = kData->index;
                 else if(kData->specData[2] == caCartesianPlot::CH_Y) indexNew.indexY = kData->index;
-                //qDebug() << "indexes x and y" << indexNew.indexX << indexNew.indexY;
+                qDebug() << "archiverCommon.cpp:192 " << "indexes x and y" << indexNew.indexX << indexNew.indexY;
 
                 if (kData->edata.info != (void *) Q_NULLPTR) free(kData->edata.info);
                 kData->edata.info = (char *) malloc(sizeof (asc));
@@ -218,12 +218,12 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
         indexes indexNew = i.value();
         if(original) {
             if(indexNew.updateSeconds != indexNew.updateSecondsOrig) {
-                //qDebug() << "resume original timing " << indexNew.updateSecondsOrig << " for" << indexNew.pv;
+                qDebug() << "archiverCommon.cpp:221 " << "resume original timing " << indexNew.updateSecondsOrig << " for" << indexNew.pv;
                 indexNew.updateSeconds = indexNew.updateSecondsOrig;
                 listOfIndexes.insert(key, indexNew);
             }
         } else if(indexNew.updateSeconds < SECONDSTIMEOUT) {
-            //qDebug() << "set new timing " <<  SECONDSTIMEOUT << " for" << indexNew.pv;
+            qDebug() << "archiverCommon.cpp:226 " << "set new timing " <<  SECONDSTIMEOUT << " for" << indexNew.pv;
             indexNew.updateSeconds = SECONDSTIMEOUT;
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(key, indexNew);
@@ -235,7 +235,7 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
 void ArchiverCommon::updateCartesian(int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
-    //qDebug() << "ArchiverCommon::updateCartesian";
+    qDebug() << "archiverCommon.cpp:238 " << "ArchiverCommon::updateCartesian";
     if(nbVal > 0) {
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if(kData.index == -1) return;
@@ -283,7 +283,7 @@ int ArchiverCommon::pvClearMonitor(knobData *kData) {
 
 
     if (kData->index == -1) return true;
-    //qDebug() << "clearmonitor" << kData->index << kData->pv;
+    qDebug() << "archiverCommon.cpp:286 " << "clearmonitor" << kData->index << kData->pv;
 
     if(caCartesianPlot* w = qobject_cast<caCartesianPlot *>((QWidget*) kData->dispW)) {
         Q_UNUSED(w);
@@ -340,7 +340,7 @@ int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
 int ArchiverCommon::pvClearEvent(void * ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
-    //qDebug() << "clear event" << ptr;
+    qDebug() << "archiverCommon.cpp:347 " << "clear event" << ptr;
 
     QMutexLocker locker(&mutex);
 
@@ -351,7 +351,7 @@ int ArchiverCommon::pvClearEvent(void * ptr)
     while (i !=listOfIndexes.end() && i.key() == key) {
         indexes indexNew = i.value();
         if(indexNew.updateSeconds != SECONDSSLEEP) {
-            //qDebug() << "update" << indexNew.pv << "to " << SECONDSSLEEP << "seconds";
+            qDebug() << "archiverCommon.cpp:354 " << "update" << indexNew.pv << "to " << SECONDSSLEEP << "seconds";
             indexNew.updateSeconds = SECONDSSLEEP;
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(key, indexNew);
@@ -365,7 +365,7 @@ int ArchiverCommon::pvClearEvent(void * ptr)
 int ArchiverCommon::pvAddEvent(void * ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
-    //qDebug() << "add event" << ptr;
+    qDebug() << "archiverCommon.cpp:368 " << "add event" << ptr;
     QMutexLocker locker(&mutex);
 
     memcpy(asc, ptr, sizeof(asc));
@@ -376,7 +376,7 @@ int ArchiverCommon::pvAddEvent(void * ptr)
         indexes indexNew = i.value();
         if(indexNew.updateSeconds != indexNew.updateSecondsOrig) {
             if(indexNew.updateSeconds != SECONDSTIMEOUT) {
-              //qDebug() << "update" << indexNew.pv << "to" << indexNew.updateSecondsOrig << "seconds";
+              qDebug() << "archiverCommon.cpp:379 " << "update" << indexNew.pv << "to" << indexNew.updateSecondsOrig << "seconds";
               indexNew.updateSeconds = indexNew.updateSecondsOrig;
               listOfIndexes.insert(key, indexNew);
             }

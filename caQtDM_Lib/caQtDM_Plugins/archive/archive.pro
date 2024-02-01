@@ -21,3 +21,6 @@ archiveSF: {
    SUBDIRS += archiveCA
   }
 }
+
+SUBDIRS += \
+    archiveHTTP
