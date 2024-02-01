@@ -176,16 +176,16 @@ private:
 
 };
 
-class Q_DECL_EXPORT myThread : public QThread
+class Q_DECL_EXPORT WorkerHttpThread : public QThread
 {
     Q_OBJECT
 
 public:
-    myThread(WorkerSF *worker) {
+    WorkerHttpThread(WorkerSF *worker) {
         pworker = worker;
         //qDebug() << "myThread::myThread()";
     }
-    ~myThread() {
+    ~WorkerHttpThread() {
         //qDebug() << "myThread::~myThread()";
     }
     WorkerSF *workersf() {
@@ -250,7 +250,7 @@ private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
-    QMap<QString, myThread*> listOfThreads;
+    QMap<QString, WorkerHttpThread*> listOfThreads;
     bool suspend;
 };
 
