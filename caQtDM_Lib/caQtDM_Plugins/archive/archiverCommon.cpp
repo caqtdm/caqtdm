@@ -33,15 +33,14 @@
 // constructor
 ArchiverCommon::ArchiverCommon()
 {
-    qDebug() << "ArchivePlugin: Create";
+    //QDebug() << "ArchivePlugin: Create";
     mutexP = new QMutex;
 }
 
 void ArchiverCommon::stopUpdateInterface()
 {
     timer->stop();
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "timer stop";
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "timer stop";
     QApplication::processEvents();
 }
 
@@ -72,8 +71,7 @@ void ArchiverCommon::updateInterface()
                - ((double) indexNew.lastUpdateTime.time
                   + (double) indexNew.lastUpdateTime.millitm / (double) 1000);
         // is it time to update ?
-        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << i.key() << diff
-                 << indexNew.updateSeconds;
+        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << i.key() << diff << indexNew.updateSeconds;
         if (diff >= indexNew.updateSeconds) {
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(i.key(), indexNew);
@@ -81,8 +79,7 @@ void ArchiverCommon::updateInterface()
         }
         ++i;
     }
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "number of indexes to execute" << listOfIndexesToBeExecuted.count();
 
     // call user routine for updating data
     if (listOfIndexesToBeExecuted.count() > 0) {
@@ -107,7 +104,7 @@ int ArchiverCommon::initCommunicationLayer(MutexKnobData *data,
                                            QMap<QString, QString> options)
 {
     Q_UNUSED(options);
-    qDebug() << "ArchivePlugin: InitCommunicationLayer with options" << options;
+    //QDebug() << "ArchivePlugin: InitCommunicationLayer with options" << options;
     mutexknobdataP = data;
     messagewindowP = messageWindow;
     timerRunning = false;
@@ -130,8 +127,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     QMutexLocker locker(&mutex);
 
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) kData->dispW)) {
         char asc[CHAR_ARRAY_LENGTH];
@@ -210,8 +206,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                     indexNew.indexX = kData->index;
                 else if (kData->specData[2] == caCartesianPlot::CH_Y)
                     indexNew.indexY = kData->index;
-                qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-                         << "indexes x and y" << indexNew.indexX << indexNew.indexY;
+                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
 
                 if (kData->edata.info != (void *) Q_NULLPTR)
                     free(kData->edata.info);
@@ -242,15 +237,12 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
         indexes indexNew = i.value();
         if (original) {
             if (indexNew.updateSeconds != indexNew.updateSecondsOrig) {
-                qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-                         << "resume original timing " << indexNew.updateSecondsOrig << " for"
-                         << indexNew.pv;
+                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "resume original timing " << indexNew.updateSecondsOrig << " for" << indexNew.pv;
                 indexNew.updateSeconds = indexNew.updateSecondsOrig;
                 listOfIndexes.insert(key, indexNew);
             }
         } else if (indexNew.updateSeconds < SECONDSTIMEOUT) {
-            qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-                     << "set new timing " << SECONDSTIMEOUT << " for" << indexNew.pv;
+            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "set new timing " << SECONDSTIMEOUT << " for" << indexNew.pv;
             indexNew.updateSeconds = SECONDSTIMEOUT;
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(key, indexNew);
@@ -263,8 +255,7 @@ void ArchiverCommon::updateCartesian(
     int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "ArchiverCommon::updateCartesian";
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
     if (nbVal > 0) {
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if (kData.index == -1)
@@ -316,8 +307,7 @@ int ArchiverCommon::pvClearMonitor(knobData *kData)
 {
     if (kData->index == -1)
         return true;
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "clearmonitor" << kData->index << kData->pv;
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "clearmonitor" << kData->index << kData->pv;
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) kData->dispW)) {
         Q_UNUSED(w);
@@ -374,8 +364,7 @@ int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
 int ArchiverCommon::pvClearEvent(void *ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "clear event" << ptr;
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "clear event" << ptr;
 
     QMutexLocker locker(&mutex);
 
@@ -386,8 +375,7 @@ int ArchiverCommon::pvClearEvent(void *ptr)
     while (i != listOfIndexes.end() && i.key() == key) {
         indexes indexNew = i.value();
         if (indexNew.updateSeconds != SECONDSSLEEP) {
-            qDebug() << "archiverCommon.cpp:354 "
-                     << "update" << indexNew.pv << "to " << SECONDSSLEEP << "seconds";
+            //QDebug() << "archiverCommon.cpp:354 " << "update" << indexNew.pv << "to " << SECONDSSLEEP << "seconds";
             indexNew.updateSeconds = SECONDSSLEEP;
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(key, indexNew);
@@ -401,8 +389,7 @@ int ArchiverCommon::pvClearEvent(void *ptr)
 int ArchiverCommon::pvAddEvent(void *ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "add event" << ptr;
+    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "add event" << ptr;
     QMutexLocker locker(&mutex);
 
     memcpy(asc, ptr, sizeof(asc));
@@ -413,9 +400,7 @@ int ArchiverCommon::pvAddEvent(void *ptr)
         indexes indexNew = i.value();
         if (indexNew.updateSeconds != indexNew.updateSecondsOrig) {
             if (indexNew.updateSeconds != SECONDSTIMEOUT) {
-                qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-                         << "update" << indexNew.pv << "to" << indexNew.updateSecondsOrig
-                         << "seconds";
+                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "update" << indexNew.pv << "to" << indexNew.updateSecondsOrig << "seconds";
                 indexNew.updateSeconds = indexNew.updateSecondsOrig;
                 listOfIndexes.insert(key, indexNew);
             }
