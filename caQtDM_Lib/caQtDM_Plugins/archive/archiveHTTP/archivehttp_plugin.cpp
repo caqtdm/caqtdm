@@ -56,6 +56,7 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 
 ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()
 {
+    delete archiverCommon;
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()";
 }
 
@@ -211,7 +212,7 @@ void ArchiveHTTP_Plugin::handleResults(
 //  private slots:
 
 // this routine will be called now every 10 seconds to update the cartesianplot
-// however when many data it may take much longer, then  suppress any new request
+// however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
     if (suspend)
@@ -315,17 +316,16 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     index_name = url;
                 }
             }
-
             WorkerHTTP *worker = new WorkerHTTP;
-            WorkerHttpThread *tmpThread = new WorkerHttpThread(worker);
+            WorkerHttpThread *tmpWorkerThread = new WorkerHttpThread(worker);
             //qDebug() << "tmpThread new" << tmpThread;
-            listOfThreads.insert(i.key(), tmpThread);
+            listOfThreads.insert(i.key(), tmpWorkerThread);
             ;
 
-            worker->moveToThread(tmpThread);
+            worker->moveToThread(tmpWorkerThread);
 
-            connect(tmpThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
-            connect(tmpThread, SIGNAL(finished()), tmpThread, SLOT(deleteLater()));
+            connect(tmpWorkerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+            connect(tmpWorkerThread, SIGNAL(finished()), tmpWorkerThread, SLOT(deleteLater()));
             connect(this,
                     SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *)),
                     worker,
@@ -334,7 +334,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)),
                     this,
                     SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
-            tmpThread->start();
+            tmpWorkerThread->start();
 
             emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
 

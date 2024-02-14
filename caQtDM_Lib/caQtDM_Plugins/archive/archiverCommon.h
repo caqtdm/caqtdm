@@ -61,6 +61,7 @@ class Q_DECL_EXPORT ArchiverCommon : public QObject
 
 public:
     ArchiverCommon();
+    ~ArchiverCommon();
 
     int initCommunicationLayer(MutexKnobData *data,
                                MessageWindow *messageWindow,

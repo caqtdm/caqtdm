@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 #include "archiverCommon.h"
+#include "QtWidgets/qapplication.h"
 #include <QApplication>
 #include <QDebug>
 #include <QThread>
@@ -35,6 +36,11 @@ ArchiverCommon::ArchiverCommon()
 {
     //QDebug() << "ArchivePlugin: Create";
     mutexP = new QMutex;
+}
+
+ArchiverCommon::~ArchiverCommon(){
+    delete mutexP;
+    delete timer;
 }
 
 void ArchiverCommon::stopUpdateInterface()
@@ -224,7 +230,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if (messagewindowP != (MessageWindow *) Q_NULLPTR)
             messagewindowP->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
     }
-
     return true;
 }
 

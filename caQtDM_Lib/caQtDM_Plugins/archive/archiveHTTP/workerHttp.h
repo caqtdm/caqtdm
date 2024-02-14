@@ -63,7 +63,7 @@ public slots:
 #ifdef CSV
         QString response = "'response':{'format':'csv'}";
 #else
-        QString response = "'response':{'format':'json'}";
+        QString response = "'response':{'format':'json','compression':'gzip'}";
 #endif
         QString channels;
         if (indexNew.backend.size() > 0) {
