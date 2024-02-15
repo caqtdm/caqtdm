@@ -39,7 +39,7 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
 
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "Create (http-retrieval)";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon,

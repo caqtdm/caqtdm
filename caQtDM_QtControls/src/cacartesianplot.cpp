@@ -306,7 +306,9 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
 caCartesianPlot::~caCartesianPlot()
 {
-   delete lgd;
+    delete plotGrid;
+    delete zoomer;
+    delete lgd;
 }
 
 void caCartesianPlot::updateLegendsPV() {

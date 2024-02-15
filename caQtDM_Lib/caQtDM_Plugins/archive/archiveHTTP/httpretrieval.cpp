@@ -96,7 +96,6 @@ bool httpRetrieval::requestUrl(
     finished = false;
     totalCount = 0;
     secndsPast = secondsPast;
-    QString out = QString(json);
     //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
     downloadUrl = url;
     isBinned = binned;
@@ -356,102 +355,92 @@ void httpRetrieval::finishReply(QNetworkReply *reply)
         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
         emit requestFinished();
         return;
-    } else {
-        for (unsigned int i = 0; i < array.size(); i++) {
-            //qDebug() << __LINE__ << "converting qJsonArray Item to qJsonObject";
-            QJsonObject root;
-            conversionOk = true;
-            try {
-                root = array[i].toObject();
-            } catch (...) {
-                conversionOk = false;
+    }
+
+    for (unsigned int i = 0; i < array.size(); i++) {
+        //qDebug() << __LINE__ << "converting qJsonArray Item to qJsonObject";
+        const QJsonObject &root = array[i].toObject();
+        //qDebug() << "finished converting qJsonArray Item to qJsonObject" << myTimer.restart();
+
+        // find channel data inside this part of array
+        if (root.contains(L"channel") && root[L"channel"].isObject()) {
+            //qDebug() << "converting JSONObject Item to JSONObject";
+            const QJsonObject &root0 = root["channel"].toObject();
+            //qDebug() << "finished converting JSONObject Item to JSONObject";
+
+            // get backend name
+            if (root0.contains(L"backend") && root0[L"backend"].isString()) {
+                Backend = root0[L"backend"].toString().replace("\"", "");
             }
-            //qDebug() << "finished converting qJsonArray Item to qJsonObject" << myTimer.restart();
 
-            if (conversionOk) {
-                // find channel data inside this part of array
-                if (root.find(L"channel") != root.end() && root[L"channel"].isObject()) {
-                    //qDebug() << "converting JSONObject Item to JSONObject";
-                    QJsonObject root0 = root[L"channel"].toObject();
-                    //qDebug() << "finished converting JSONObject Item to JSONObject";
+            // find data array inside this part of array
+            if (root.contains(L"data") && root[L"data"].isArray()) {
+                //qDebug() << "converting JSONObject Item to JSONArray";
+                const QJsonArray &array0 = root[L"data"].toArray();
+                //qDebug() << "finished converting JSONObject Item to JSONArray";
+                //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "\ndata part found as array" << array.size();
 
-                    // get backend name
-                    if (root0.find(L"backend") != root0.end() && root0[L"backend"].isString()) {
-                        Backend = root0[L"backend"].toString().replace("\"", "");
-                    }
+                // scan the data part (big array)
+                if (array0.size() < 1) {
+                    errorString = tr("no data from %1 : %2").arg(downloadUrl.toString()).arg(Backend);
+                    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
+                    emit requestFinished();
+                    return;
                 }
 
-                // find data array inside this part of array
-                if (root.find(L"data") != root.end() && root[L"data"].isArray()) {
-                    //qDebug() << "converting JSONObject Item to JSONArray";
-                    QJsonArray array0 = root[L"data"].toArray();
-                    //qDebug() << "finished converting JSONObject Item to JSONArray";
-                    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "\ndata part found as array" << array.size();
+                // set array size
+                X.resize(array0.size());
+                Y.resize(array0.size());
 
-                    // scan the data part (big array)
-                    if (array0.size() < 1) {
-                        errorString
-                            = tr("no data from %1 : %2").arg(downloadUrl.toString()).arg(Backend);
-                        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
-                        emit requestFinished();
-                        return;
-                    }
+                qDebug() << __LINE__ << "starting" << array0.size()
+                         << "iterations over qJsonArray with convertions";
+                for (unsigned int i = 0; i < array0.size(); i++) {
+                    bool valueFound = false;
+                    bool timeFound = false;
+                    double mean;
+                    double archiveTime;
 
-                    // set array size
-                    X.resize(array0.size());
-                    Y.resize(array0.size());
-
-                    qDebug() << __LINE__ << "starting" << array0.size()
-                             << "iterations over qJsonArray with convertions";
-                    for (unsigned int i = 0; i < array0.size(); i++) {
-                        bool valueFound = false;
-                        bool timeFound = false;
-                        double mean;
-                        double archiveTime;
-
-                        // find value part now
-                        QJsonObject root1 = array0[i].toObject();
-                        if (root1.find(L"value") != root1.end() && root1[L"value"].isObject()) {
-                            QJsonObject root2 = root1[L"value"].toObject();
-                            // look for mean
-                            if (root2.find(L"mean") != root2.end() && root2[L"mean"].isDouble()) {
-                                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "mean part found";
-                                //stat = swscanf(root2[L"mean"]->Stringify().c_str(), L"%lf", &mean);
-                                mean = root2[L"mean"].toDouble();
-                                valueFound = true;
-                            }
-                        }
-
-                        // look for globalSeconds
-                        if (root1.find(L"globalSeconds") != root1.end()
-                            && root1[L"globalSeconds"].isString()) {
-                            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "globalSeconds part found";
-                            if (getDoubleFromString(root1[L"globalSeconds"].toString(),
-                                                    archiveTime)) {
-                                timeFound = true;
-                            } else {
-                                //QDebug() << tr("could not decode globalSeconds ????");
-                                break;
-                            }
-                        }
-
-                        // fill in our data
-                        if (timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
-                            if (!timAxis)
-                                X[count] = -(seconds - archiveTime) / 3600.0;
-                            else
-                                X[count] = archiveTime * 1000;
-                            Y[count] = mean;
-                            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
-                            count++;
+                    // find value part now
+                    const QJsonObject &root1 = array0[i].toObject();
+                    if (root1.contains(L"value") && root1[L"value"].isObject()) {
+                        const QJsonObject &root2 = root1["value"].toObject();
+                        // look for mean
+                        if (root2.contains(L"mean") && root2[L"mean"].isDouble()) {
+                            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "mean part found";
+                            //stat = swscanf(root2[L"mean"]->Stringify().c_str(), L"%lf", &mean);
+                            mean = root2[L"mean"].toDouble();
+                            valueFound = true;
                         }
                     }
-                    qDebug() << "finished iterations over qJsonArray with convertions"
-                             << myTimer.restart();
+
+                    // look for globalSeconds
+                    if (root1.contains(L"globalSeconds") && root1[L"globalSeconds"].isString()) {
+                        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "globalSeconds part found";
+                        if (getDoubleFromString(root1[L"globalSeconds"].toString(), archiveTime)) {
+                            timeFound = true;
+                        } else {
+                            //QDebug() << tr("could not decode globalSeconds ????");
+                            break;
+                        }
+                    }
+
+                    // fill in our data
+                    if (timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
+                        if (!timAxis)
+                            X[count] = -(seconds - archiveTime) / 3600.0;
+                        else
+                            X[count] = archiveTime * 1000;
+                        Y[count] = mean;
+                        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
+                        count++;
+                    }
                 }
+                qDebug() << "finished iterations over qJsonArray with convertions"
+                         << myTimer.restart();
             }
         }
     }
+
 #else
     // Performance Measurement
     QElapsedTimer myTimer;
