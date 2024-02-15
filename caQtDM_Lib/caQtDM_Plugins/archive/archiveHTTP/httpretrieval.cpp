@@ -44,7 +44,13 @@
 #include <QDebug>
 #include <QThread>
 #include <QTime>
+
+#if defined(_WIN32) || defined(_WIN64)
 #include <QtZlib/zlib.h>
+#else
+#include <zlib.h>
+#endif
+
 #include <httpretrieval.h>
 #include <fstream>
 #include <iostream>
