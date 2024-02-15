@@ -10,7 +10,7 @@
 #include <qwt.h>
 
 #include "archiverCommon.h"
-#include "httpRetrieval.h"
+#include "httpretrieval.h"
 
 class Q_DECL_EXPORT WorkerHTTP : public QObject
 {

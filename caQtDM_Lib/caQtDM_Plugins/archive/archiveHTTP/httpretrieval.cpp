@@ -45,7 +45,7 @@
 #include <QThread>
 #include <QTime>
 #include <QtZlib/zlib.h>
-#include "httpRetrieval.h"
+#include <httpretrieval.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>

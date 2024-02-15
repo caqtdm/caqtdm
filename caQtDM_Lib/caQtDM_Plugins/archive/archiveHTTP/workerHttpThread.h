@@ -9,7 +9,7 @@
 #include <QTimer>
 #include <qwt.h>
 
-#include "httpRetrieval.h"
+#include "httpretrieval.h"
 #include "workerHttp.h"
 
 class Q_DECL_EXPORT WorkerHttpThread : public QThread

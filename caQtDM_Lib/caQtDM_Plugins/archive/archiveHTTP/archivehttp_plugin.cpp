@@ -25,7 +25,7 @@
 #include <QApplication>
 #include <QDebug>
 
-#include "archiveHTTP_plugin.h"
+#include "archivehttp_plugin.h"
 #include "archiverCommon.h"
 
 #define qasc(x) x.toLatin1().constData()
