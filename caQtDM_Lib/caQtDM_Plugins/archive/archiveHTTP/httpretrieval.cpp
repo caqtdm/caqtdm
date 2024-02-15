@@ -32,10 +32,6 @@
 #include <QSslConfiguration>
 #include <QTimer>
 #include <QWaitCondition>
-#include "qjsonarray.h"
-#include "qjsondocument.h"
-#include "qjsonobject.h"
-#include "qjsonvalue.h"
 #include <iostream>
 #include <time.h>
 
@@ -127,8 +123,6 @@ bool httpRetrieval::requestUrl(
     reply = manager->post(request, json);
     qDebug() << __LINE__ << "sending POST request to " << url
              << "TimeNow: " << QTime::currentTime();
-
-    connect(reply, SIGNAL(readyRead()), this, SLOT(readPartialReply()));
 
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "requesturl reply" << reply;
 
@@ -768,17 +762,6 @@ void httpRetrieval::timeoutL()
     errorString = "http request timeout";
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "timeout" << errorString;
     cancelDownload();
-}
-
-void httpRetrieval::readPartialReply()
-{
-    return;
-    QByteArray compressedData = reply->readAll();
-    QString partialReply = QString(gUncompress(compressedData));
-
-    //JSONValue *value = JSON::Parse(qasc(out));
-    //JSONArray array = value->AsArray();
-    qDebug() << partialReply << "\n\n---------------------------------------------------\n\n";
 }
 
 // =======================================================================================================================================================
