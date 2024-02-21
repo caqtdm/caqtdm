@@ -11,6 +11,7 @@
 
 #include "archiverCommon.h"
 #include "httpretrieval.h"
+#include "urlhandlerhttp.h"
 
 class Q_DECL_EXPORT WorkerHTTP : public QObject
 {
@@ -22,7 +23,7 @@ public:
         //qDebug() << "WorkerHTTP::WorkerHTTP()";
         qRegisterMetaType<indexes>("indexes");
         qRegisterMetaType<QVector<double> >("QVector<double>");
-        fromArchive = (httpRetrieval *) 0;
+        fromArchive = (HttpRetrieval *) 0;
     }
 
     ~WorkerHTTP()
@@ -31,13 +32,13 @@ public:
     }
 
 private:
-    QVector<double> TimerN, YValsN;
+    QVector<double> XValsN, YValsN;
 
 public slots:
 
     void workerFinish() { deleteLater(); }
 
-    httpRetrieval *getArchive() { return fromArchive; }
+    HttpRetrieval *getArchive() { return fromArchive; }
 
     void getFromArchive(QWidget *w,
                         indexes indexNew,
@@ -50,8 +51,6 @@ public slots:
         mutex->lock();
 
         struct timeb now;
-        QUrl url = QUrl(index_name);
-        QString fields, agg;
         bool isBinned;
 
         QString key = indexNew.pv;
@@ -60,50 +59,34 @@ public slots:
         ftime(&now);
         double endSeconds = (double) now.time + (double) now.millitm / (double) 1000;
         double startSeconds = endSeconds - indexNew.secondsPast;
-#ifdef CSV
-        QString response = "'response':{'format':'csv'}";
-#else
-        QString response = "'response':{'format':'json','compression':'gzip'}";
-#endif
-        QString channels;
-        if (indexNew.backend.size() > 0) {
-            channels = "'channels': [ {'name':'" + key + "', 'backend' : '" + indexNew.backend
-                       + "' }]";
-        } else {
-            channels = "'channels': [ {'name':'" + key + "' }]";
-        }
-
-        QString range = "'range': { 'startSeconds' : '" + QString::number(startSeconds, 'g', 10)
-                        + "', 'endSeconds' : '" + QString::number(endSeconds, 'g', 10) + "'}";
-        fields = "'fields':['channel','globalSeconds','value']";
 
         if (indexNew.nrOfBins != -1) {
             isBinned = true;
-            agg = tr(", 'aggregation': {'aggregationType':'value', "
-                     "'aggregations':['min','mean','max'], 'nrOfBins' : %1}")
-                      .arg(indexNew.nrOfBins);
         } else {
-            isBinned = true;
-            agg = ", 'aggregation': {'aggregationType':'value', "
-                  "'aggregations':['min','mean','max'], 'durationPerBin' : 'PT1S'}";
-            //agg = "";
+            isBinned = false;
         }
-        QString total = "{" + response + "," + range + "," + channels + "," + fields + agg + "}";
-        total = total.replace("'", "\"");
-        QByteArray json_str = total.toUtf8();
 
-        fromArchive = new httpRetrieval();
+        UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
+        urlHandler->setUrl(index_name);
+        urlHandler->setBackend(indexNew.backend);
+        urlHandler->setChannelName(indexNew.pv);
+        urlHandler->setBeginTime(QDateTime::fromSecsSinceEpoch(startSeconds));
+        urlHandler->setEndTime(QDateTime::fromSecsSinceEpoch(endSeconds));
+        urlHandler->setBinned(isBinned);
+        urlHandler->setBinCount(indexNew.nrOfBins);
+
+
+        fromArchive = new HttpRetrieval();
 
        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
-        bool readdata_ok = fromArchive->requestUrl(url,
-                                                   json_str,
+        bool readdata_ok = fromArchive->requestUrl(urlHandler,
                                                    indexNew.secondsPast,
                                                    isBinned,
                                                    indexNew.timeAxis,
                                                    key);
 
         if (fromArchive->is_Redirected()) {
-            url = QUrl(fromArchive->getRedirected_Url());
+            QUrl url = QUrl(fromArchive->getRedirected_Url());
             // Messages in case of a redirect and set the widget to the correct location
             // with a reload of the panel this information get lost.
             // the url storage location is the dynamic property of the widget
@@ -115,9 +98,10 @@ public slots:
             indexNew.w->setProperty("archiverIndex", QVariant(url.toString()));
            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "archiv PV" << indexNew.pv;
             fromArchive->deleteLater();
-            fromArchive = new httpRetrieval();
-            readdata_ok = fromArchive->requestUrl(url,
-                                                  json_str,
+            fromArchive = new HttpRetrieval();
+            UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
+            urlHandler->setUrl(url);
+            readdata_ok = fromArchive->requestUrl(urlHandler,
                                                   indexNew.secondsPast,
                                                   isBinned,
                                                   indexNew.timeAxis,
@@ -127,9 +111,9 @@ public slots:
         if (readdata_ok) {
             if ((nbVal = fromArchive->getCount()) > 0) {
                 //qDebug() << nbVal << total;
-                TimerN.resize(fromArchive->getCount());
+                XValsN.resize(fromArchive->getCount());
                 YValsN.resize(fromArchive->getCount());
-                fromArchive->getData(TimerN, YValsN);
+                fromArchive->getData(XValsN, YValsN);
             }
 
         } else {
@@ -149,7 +133,7 @@ public slots:
 
        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << "number of values received" << nbVal << fromArchive << "for" << key;
 
-        emit resultReady(indexNew, nbVal, TimerN, YValsN, fromArchive->getBackend());
+        emit resultReady(indexNew, nbVal, XValsN, YValsN, fromArchive->getBackend());
 
         mutex->unlock();
         fromArchive->deleteLater();
@@ -164,7 +148,7 @@ signals:
 
 public:
 private:
-    httpRetrieval *fromArchive;
+    HttpRetrieval *fromArchive;
 };
 
 #endif // WORKERHTTP_H

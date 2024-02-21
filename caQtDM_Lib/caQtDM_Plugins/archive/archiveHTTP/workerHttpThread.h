@@ -28,12 +28,12 @@ public:
     }
     WorkerHTTP *workerhttp() { return pworker; }
 
-    httpRetrieval *getArchive()
+    HttpRetrieval *getArchive()
     {
         if (pworker != (WorkerHTTP *) Q_NULLPTR) {
             return pworker->getArchive();
         } else {
-            return (httpRetrieval *) Q_NULLPTR;
+            return (HttpRetrieval *) Q_NULLPTR;
         }
     }
 

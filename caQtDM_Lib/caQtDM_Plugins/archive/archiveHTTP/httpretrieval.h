@@ -27,6 +27,7 @@
 #define HTTPRETRIEVAL_H
 
 #include "qtimer.h"
+#include "urlhandlerhttp.h"
 #include <QDebug>
 #include <QObject>
 #include <QNetworkReply>
@@ -45,14 +46,13 @@
 
 class QNetworkAccessManager;
 
-class httpRetrieval:public QObject
+class HttpRetrieval:public QObject
 {
     Q_OBJECT
 
 public:
-    httpRetrieval();
-    ~httpRetrieval();
-    bool requestUrl(const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key);
+    HttpRetrieval();
+    ~HttpRetrieval();
     const QString lastError();
     int getCount();
     void getData(QVector<double> &x, QVector<double> &y);
@@ -66,6 +66,10 @@ public:
 signals:
     void networkError(const QString);
     void requestFinished();
+    void signalRequestUrl(const UrlHandlerHttp*, int, bool, bool, QString);
+
+public slots:
+    bool requestUrl(const UrlHandlerHttp *urlHandler, int secondsPast, bool binned, bool timeAxis, QString key);
 
 protected slots:
     void finishReply(QNetworkReply*);
@@ -82,10 +86,12 @@ private:
     QTableWidget *thisTable;
     QString thisFile;
     int finished;
+    bool requestInProgress;
     QUrl downloadUrl;
     QString errorString;
     QVector<double> X,Y;
     int totalCount;
+    UrlHandlerHttp m_urlHandler;
     int secndsPast;
     QEventLoop *eventLoop;
     bool isBinned, timAxis;

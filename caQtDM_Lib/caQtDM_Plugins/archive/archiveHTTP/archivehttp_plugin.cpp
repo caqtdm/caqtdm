@@ -73,6 +73,16 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 {
     mutexknobdataP = data;
     messagewindowP = messageWindow;
+    // Inform user about CAQTDM_ARCHIVEHTTP_API_PATH custom path.
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+        QString customApiPath = QString(qgetenv("CAQTDM_ARCHIVEHTTP_API_PATH"));
+        if(customApiPath.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_ARCHIVEHTTP_API_PATH\" is defined with: " + customApiPath)));
+        else {
+            UrlHandlerHttp tempUrlHandler;
+            QString defaultApiPath = tempUrlHandler.apiPath();
+            messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_ARCHIVEHTTP_API_PATH\" is not defined or empty, default path is used: " + defaultApiPath + ". If you want to define defaultApiPath to be the root, simply set it to \"/\".")));
+        }
+    }
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
@@ -219,7 +229,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         return;
 
     // Index name (url)
-    QString index_name = "https://data-api.psi.ch/sf/query";
+    QString index_name = "https://data-api.psi.ch/";
 
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface";
 
@@ -356,9 +366,9 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
     while (j != listOfThreads.end() && j.key() == key) {
         tmpThread = (WorkerHttpThread *) j.value();
         if (tmpThread != (WorkerHttpThread *) Q_NULLPTR) {
-            httpRetrieval *retrieval = tmpThread->getArchive();
+            HttpRetrieval *retrieval = tmpThread->getArchive();
             tmpThread->quit();
-            if (retrieval != (httpRetrieval *) Q_NULLPTR) {
+            if (retrieval != (HttpRetrieval *) Q_NULLPTR) {
                 //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "retrieval->cancelDownload()" << retrieval;
                 retrieval->cancelDownload();
                 retrieval->deleteLater();
