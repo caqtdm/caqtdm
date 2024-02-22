@@ -72,7 +72,6 @@ void ArchiverCommon::updateInterface()
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
         indexes indexNew = i.value();
-
         diff = ((double) now.time + (double) now.millitm / (double) 1000)
                - ((double) indexNew.lastUpdateTime.time
                   + (double) indexNew.lastUpdateTime.millitm / (double) 1000);
@@ -201,9 +200,25 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             else
                 index.timeAxis = false;
         }
-
         if (!listOfIndexes.contains(key)) {
             listOfIndexes.insert(key, index);
+            if (key.contains(".minY", Qt::CaseInsensitive) || key.contains(".maxY", Qt::CaseInsensitive)) {
+                QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
+                while (i != listOfIndexes.end() && i.key() == key) {
+                    indexes indexNew = i.value();
+                    indexNew.indexX = kData->index - 1;
+                    indexNew.indexY = kData->index;
+                    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
+                    if (kData->edata.info != (void *) Q_NULLPTR)
+                        free(kData->edata.info);
+                    kData->edata.info = (char *) malloc(sizeof(asc));
+                    memcpy(kData->edata.info, qasc(key), sizeof(asc));
+                    indexNew.lastUpdateTime.time = 0;
+                    //ftime(&indexNew.lastUpdateTime);
+                    listOfIndexes.insert(key, indexNew);
+                    break;
+                }
+            }
         } else {
             QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
             while (i != listOfIndexes.end() && i.key() == key) {
@@ -213,7 +228,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 else if (kData->specData[2] == caCartesianPlot::CH_Y)
                     indexNew.indexY = kData->index;
                 //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
-
                 if (kData->edata.info != (void *) Q_NULLPTR)
                     free(kData->edata.info);
                 kData->edata.info = (char *) malloc(sizeof(asc));
@@ -257,7 +271,7 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
 }
 
 void ArchiverCommon::updateCartesian(
-    int nbVal, indexes indexNew, QVector<double> TimerN, QVector<double> YValsN, QString backend)
+    int nbVal, indexes indexNew, QVector<double> XValsN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
@@ -278,11 +292,10 @@ void ArchiverCommon::updateCartesian(
             kData.edata.dataB = (void *) malloc(nbVal * sizeof(double));
             kData.edata.dataSize = nbVal * sizeof(double);
         }
-        memcpy(kData.edata.dataB, &TimerN[0], nbVal * sizeof(double));
+        memcpy(kData.edata.dataB, &XValsN[0], nbVal * sizeof(double));
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
         mutexknobdataP->DataUnlock(&kData);
-
         kData = mutexknobdataP->GetMutexKnobData(indexNew.indexY);
         if (kData.index == -1)
             return;

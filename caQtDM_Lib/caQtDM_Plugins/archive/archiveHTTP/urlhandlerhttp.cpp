@@ -143,6 +143,8 @@ QString UrlHandlerHttp::channelName() const
 void UrlHandlerHttp::setChannelName(const QString &newChannelName)
 {
     m_channelName = newChannelName;
+    m_channelName.remove(".minY", Qt::CaseInsensitive);
+    m_channelName.remove(".maxY", Qt::CaseInsensitive);
 }
 
 QDateTime UrlHandlerHttp::beginTime() const

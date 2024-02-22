@@ -46,10 +46,9 @@ public slots:
                         MessageWindow *messageWindow)
     {
         Q_UNUSED(w);
-
-        QMutex *mutex = indexNew.mutexP;
-        mutex->lock();
-
+        // I have no idea why this mutex lock was here, it seems like it has only slowed down processing and ultimately rendered the whole workerHttp / workerHttpThread multiThreading useless...
+//QMutex *mutex = indexNew.mutexP;
+//mutex->lock();
         struct timeb now;
         bool isBinned;
 
@@ -59,7 +58,6 @@ public slots:
         ftime(&now);
         double endSeconds = (double) now.time + (double) now.millitm / (double) 1000;
         double startSeconds = endSeconds - indexNew.secondsPast;
-
         if (indexNew.nrOfBins != -1) {
             isBinned = true;
         } else {
@@ -75,10 +73,9 @@ public slots:
         urlHandler->setBinned(isBinned);
         urlHandler->setBinCount(indexNew.nrOfBins);
 
-
         fromArchive = new HttpRetrieval();
 
-       //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
+        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
         bool readdata_ok = fromArchive->requestUrl(urlHandler,
                                                    indexNew.secondsPast,
                                                    isBinned,
@@ -96,7 +93,7 @@ public slots:
             mess.append(url.toString());
             messageWindow->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
             indexNew.w->setProperty("archiverIndex", QVariant(url.toString()));
-           //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "archiv PV" << indexNew.pv;
+            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "archiv PV" << indexNew.pv;
             fromArchive->deleteLater();
             fromArchive = new HttpRetrieval();
             UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
@@ -131,11 +128,11 @@ public slots:
             }
         }
 
-       //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << "number of values received" << nbVal << fromArchive << "for" << key;
+        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << "number of values received" << nbVal << fromArchive << "for" << key;
 
         emit resultReady(indexNew, nbVal, XValsN, YValsN, fromArchive->getBackend());
 
-        mutex->unlock();
+//mutex->unlock();
         fromArchive->deleteLater();
     }
 

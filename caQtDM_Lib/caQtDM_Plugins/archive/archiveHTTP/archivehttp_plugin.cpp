@@ -73,16 +73,6 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 {
     mutexknobdataP = data;
     messagewindowP = messageWindow;
-    // Inform user about CAQTDM_ARCHIVEHTTP_API_PATH custom path.
-    if(messageWindow != (MessageWindow *) Q_NULLPTR) {
-        QString customApiPath = QString(qgetenv("CAQTDM_ARCHIVEHTTP_API_PATH"));
-        if(customApiPath.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_ARCHIVEHTTP_API_PATH\" is defined with: " + customApiPath)));
-        else {
-            UrlHandlerHttp tempUrlHandler;
-            QString defaultApiPath = tempUrlHandler.apiPath();
-            messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_ARCHIVEHTTP_API_PATH\" is not defined or empty, default path is used: " + defaultApiPath + ". If you want to define defaultApiPath to be the root, simply set it to \"/\".")));
-        }
-    }
     return archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
@@ -179,18 +169,18 @@ int ArchiveHTTP_Plugin::TerminateIO()
 //  public slots:
 
 void ArchiveHTTP_Plugin::handleResults(
-    indexes indexNew, int nbVal, QVector<double> TimerN, QVector<double> YValsN, QString backend)
+    indexes indexNew, int nbVal, QVector<double> XValsN, QVector<double> YValsN, QString backend)
 {
     //QThread *thread = QThread::currentThread();
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;
 
-    TimerN.resize(nbVal);
+    XValsN.resize(nbVal);
     YValsN.resize(nbVal);
 
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "handle cartesian";
     if (nbVal > 0)
-        archiverCommon->updateCartesian(nbVal, indexNew, TimerN, YValsN, backend);
-    TimerN.resize(0);
+        archiverCommon->updateCartesian(nbVal, indexNew, XValsN, YValsN, backend);
+    XValsN.resize(0);
     YValsN.resize(0);
 
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "handle cartesian fisnished";
@@ -294,7 +284,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 }
 
                 // first look if an environment variable is set for the url
-                QString url = (QString) qgetenv("CAQTDM_ARCHIVERSF_URL");
+                QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
                 if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
                     var = w->property("archiverIndex");
                     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "Check URL: " << var;

@@ -103,8 +103,7 @@ bool HttpRetrieval::requestUrl(
     const UrlHandlerHttp *urlHandler, int secondsPast, bool binned, bool timeAxis, QString key)
 {
     //requestInProgress = true;
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|"
-             << "httpRetrieval::requestUrl";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "httpRetrieval::requestUrl" << key;
     aborted = false;
     finished = false;
     totalCount = 0;
@@ -236,10 +235,10 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                   .arg(status.toInt())
                   .arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString())
                   .arg(downloadUrl.toString());
-        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
-                 << this << PV << "finishreply" << errorString;
+        //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+        //          << this << PV << "finishreply" << errorString;
         QByteArray header = reply->rawHeader("location");
-        qDebug() << "location" << header;
+        //qDebug() << "location" << header;
         finished = true;
         intern_is_Redirected = true;
         Redirected_Url = header;
@@ -256,8 +255,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                   .arg(status.toInt())
                   .arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString())
                   .arg(downloadUrl.toString());
-        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
-                 << this << PV << "finishreply" << errorString;
+        //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+        //<< this << PV << "finishreply" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -265,13 +264,13 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
     if (reply->error()) {
         errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
-        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
-                 << this << PV << "finishreply" << errorString;
+        //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+        //<< this << PV << "finishreply" << errorString;
         emit requestFinished();
         reply->deleteLater();
         return;
     }
-    qDebug() << "HTTP Response has lenght: " << reply->size();
+    //qDebug() << "HTTP Response has lenght: " << reply->size();
 
     QByteArray outCompressed = reply->readAll();
     QByteArray out;
@@ -305,7 +304,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     // Performance Measurement
     QElapsedTimer myTimer;
     myTimer.start();
-    qDebug() << __LINE__ << "parsing qJson reply";
+    //qDebug() << __LINE__ << "parsing qJson reply";
     bool conversionOk = true;
     QJsonObject rootObject;
     try {
@@ -313,7 +312,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     } catch (...) {
         conversionOk = false;
     }
-    qDebug() << "finished parsing qJson reply" << myTimer.restart();
+    //qDebug() << "finished parsing qJson reply" << myTimer.restart();
     //printf("\n\nout: %s\n\n", qasc(out));
 
     // Did it go wrong?
@@ -321,8 +320,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         errorString = tr("could not parse json string left=%1 right=%2")
                           .arg(QString(out).left(20))
                           .arg(QString(out).right(20));
-        qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
-                 << this << PV << "finishreply" << errorString;
+        //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
+        //       << this << PV << "finishreply" << errorString;
         emit requestFinished();
         return;
     }
@@ -336,96 +335,91 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         QDateTime newBeginTime = QDateTime::fromString(rootObject.value("continueAt").toString(),
                                                        Qt::ISODate);
         qDebug() << "continueAt present:" << rootObject.value("continueAt").toString()
-                 << "previous beginTime: " << m_urlHandler.beginTime();
+                 << "previous beginTime: " << m_urlHandler.beginTime()
+                 << "previous endTime: " << m_urlHandler.endTime();
         m_urlHandler.setBeginTime(newBeginTime);
         UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
         urlHandler->setUrl(m_urlHandler.assembleUrl());
-        qDebug() << "new beginTime:" << urlHandler->beginTime();
+        //qDebug() << "new beginTime:" << urlHandler->beginTime();
 
         //        emit signalRequestUrl(urlHandler, secndsPast, isBinned, timAxis, PV);
         //        qDebug() << "-----REQUESTFINISHED; CONTINUING----------------";
         //        requestInProgress = true;
     }
 
-    // const QJsonObject &root0 = root["channel"].toObject();
-
-    // const QJsonArray &array0 = root[L"data"].toArray();
-
-    QJsonArray ValueArray;
+    QJsonValue ValueJson;
     if (isBinned) {
-        ValueArray = rootObject["avgs"].toArray();
+        //qDebug() << "binned PV: " << PV;
+        if (PV.contains(".minY", Qt::CaseInsensitive)) {
+            ValueJson = rootObject["mins"];
+        } else if (PV.contains(".maxY", Qt::CaseInsensitive)) {
+            ValueJson = rootObject["maxs"];
+        } else {
+            ValueJson = rootObject["avgs"];
+        }
     } else {
-        ValueArray = rootObject["values"].toArray();
+        ValueJson = rootObject["values"];
     }
 
     // set array size
-    X.resize(ValueArray.size());
-    Y.resize(ValueArray.size());
+    X.resize(ValueJson.toArray().size());
+    Y.resize(ValueJson.toArray().size());
 
-    qDebug() << __LINE__ << "starting" << ValueArray.size()
-             << "iterations over qJsonArray with convertions";
+    // set count
+    count = ValueJson.toArray().size();
+
+    //qDebug() << __LINE__ << "starting" << ValueArray.size()
+    //       << "iterations over qJsonArray with convertions";
     int secondsAnchor = rootObject.value("tsAnchor").toInt();
-    bool isDouble = ValueArray[0].isDouble();
+    bool isDouble = ValueJson[0].isDouble();
+    double mean = 0;
+    double archiveTime = 0;
     if (isBinned) {
-        qDebug() << "data is binned";
-        QJsonArray FirstMsArray = rootObject["ts1Ms"].toArray();
-        QJsonArray LastMsArray = rootObject["ts2Ms"].toArray();
-        for (unsigned int i = 0; i < ValueArray.size(); i++) {
-            double mean;
-            double archiveTime;
-
+        QJsonValue FirstMsJson = rootObject["ts1Ms"];
+        QJsonValue LastMsJson = rootObject["ts2Ms"];
+        for (quint32 i = 0; i < ValueJson.toArray().size(); i++) {
             // look for mean (or simply the value for non-binned data)
             if (isDouble) { // We have to check for datatype because QJsonValue wont convert Int to Double and vice versa...
-                mean = ValueArray[i].toDouble();
+                mean = ValueJson[i].toDouble();
             } else {
-                mean = ValueArray[i].toInt();
+                mean = ValueJson[i].toInt();
             }
 
             archiveTime = secondsAnchor
-                          + ((FirstMsArray[i].toInt() + LastMsArray[i].toInt()) * 0.0005);
-            if (archiveTime)
-
-                // fill in our data
-                if ((seconds - archiveTime) < secndsPast) {
-                    if (!timAxis) {
-                        X[count] = -(seconds - archiveTime) / 3600.0;
-                    } else {
-                        X[count] = archiveTime * 1000;
-                        Y[count] = mean;
-                        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
-                        count++;
-                    }
-                }
-        }
-    } else {
-        QJsonArray MsArray = rootObject["tsMs"].toArray();
-        for (unsigned int i = 0; i < ValueArray.size(); i++) {
-            double mean;
-            double archiveTime;
-
-            // look for mean (or simply the value for non-binned data)
-            if (isDouble) { // We have to check for datatype because QJsonValue wont convert Int to Double and vice versa...
-                mean = ValueArray[i].toDouble();
-            } else {
-                mean = ValueArray[i].toInt();
-            }
-
-            archiveTime = secondsAnchor + (MsArray[i].toInt() * 0.001);
+                          + ((FirstMsJson[i].toInt() + LastMsJson[i].toInt()) * 0.0005);
 
             // fill in our data
-            if ((seconds - archiveTime) < secndsPast) {
-                if (!timAxis) {
-                    X[count] = -(seconds - archiveTime) / 3600.0;
-                } else {
-                    X[count] = archiveTime * 1000;
-                    Y[count] = mean;
-                    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
-                    count++;
-                }
+            if (!timAxis) {
+                X.push_front(-(seconds - archiveTime) / 3600.0);
+            } else {
+                X.push_front(archiveTime * 1000);
+                Y.push_front(mean);
+                // << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[i] << Y[i];
+            }
+        }
+    } else {
+        QJsonValue MsJson = rootObject["tsMs"];
+        for (quint32 i = 0; i < ValueJson.toArray().size(); i++) {
+            // look for mean (or simply the value for non-binned data)
+            if (isDouble) { // We have to check for datatype because QJsonValue wont convert Int to Double and vice versa...
+                mean = ValueJson[i].toDouble();
+            } else {
+                mean = ValueJson[i].toInt();
+            }
+
+            archiveTime = secondsAnchor + (MsJson[i].toInt() * 0.001);
+
+            // fill in our data
+            if (!timAxis) {
+                X.push_front(-(seconds - archiveTime) / 3600.0);
+            } else {
+                X.push_front(archiveTime * 1000);
+                Y.push_front(mean);
+                // << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[i] << Y[i];
             }
         }
     }
-    qDebug() << "finished iterations over qJsonArray with convertions" << myTimer.restart();
+    //qDebug() << "finished iterations over qJsonArray with convertions" << myTimer.restart();
 
 #else
     // Performance Measurement

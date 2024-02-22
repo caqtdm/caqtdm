@@ -74,7 +74,7 @@ public:
     int TerminateIO() { return true; }
     void updateCartesian(int nbVal,
                          indexes indexNew,
-                         QVector<double> TimerN,
+                         QVector<double> XValsN,
                          QVector<double> YValsN,
                          QString backend);
     void updateSecondsPast(indexes indexNew, bool original);
