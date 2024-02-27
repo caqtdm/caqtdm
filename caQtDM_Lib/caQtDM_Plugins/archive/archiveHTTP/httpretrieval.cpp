@@ -365,8 +365,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     X.resize(ValueJson.toArray().size());
     Y.resize(ValueJson.toArray().size());
 
-    // set count
-    count = ValueJson.toArray().size();
+    // set count to zero, will be incremented according to values
+    count = 0;
 
     //qDebug() << __LINE__ << "starting" << ValueArray.size()
     //       << "iterations over qJsonArray with convertions";
@@ -384,17 +384,22 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             } else {
                 mean = ValueJson[i].toInt();
             }
-
             archiveTime = secondsAnchor
                           + ((FirstMsJson[i].toInt() + LastMsJson[i].toInt()) * 0.0005);
 
-            // fill in our data
-            if (!timAxis) {
-                X.push_front(-(seconds - archiveTime) / 3600.0);
-            } else {
-                X.push_front(archiveTime * 1000);
-                Y.push_front(mean);
-                // << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[i] << Y[i];
+            // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
+            if (archiveTime) {
+                // fill in our data
+                if ((seconds - archiveTime) < secndsPast) {
+                    if (!timAxis) {
+                        X[count] = -(seconds - archiveTime) / 3600.0;
+                    } else {
+                        X[count] = archiveTime * 1000;
+                        Y[count] = mean;
+                        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
+                        count++;
+                    }
+                }
             }
         }
     } else {
@@ -409,13 +414,19 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
             archiveTime = secondsAnchor + (MsJson[i].toInt() * 0.001);
 
-            // fill in our data
-            if (!timAxis) {
-                X.push_front(-(seconds - archiveTime) / 3600.0);
-            } else {
-                X.push_front(archiveTime * 1000);
-                Y.push_front(mean);
-                // << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[i] << Y[i];
+            // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
+            if (archiveTime) {
+                // fill in our data
+                if ((seconds - archiveTime) < secndsPast) {
+                    if (!timAxis) {
+                        X[count] = -(seconds - archiveTime) / 3600.0;
+                    } else {
+                        X[count] = archiveTime * 1000;
+                        Y[count] = mean;
+                        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
+                        count++;
+                    }
+                }
             }
         }
     }
