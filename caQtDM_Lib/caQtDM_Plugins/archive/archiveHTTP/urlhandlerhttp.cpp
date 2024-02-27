@@ -56,8 +56,13 @@ QUrl UrlHandlerHttp::assembleUrl() const
     query.addQueryItem(m_channelNameKey, m_channelName);
     query.addQueryItem(m_beginTimeKey, m_beginTime.toTimeSpec(Qt::OffsetFromUTC).toString(Qt::ISODate));
     query.addQueryItem(m_endTimeKey, m_endTime.toTimeSpec(Qt::OffsetFromUTC).toString(Qt::ISODate));
+
     if (m_binned) {
         query.addQueryItem(m_binCountKey, QString::number(m_binCount));
+    }
+
+    if (m_allowLargeResult) {
+        query.addQueryItem(m_allowLargeResultKey, "true");
     }
 
     assembledUrl.setQuery(query);
@@ -103,6 +108,16 @@ QString UrlHandlerHttp::apiPath() const
 void UrlHandlerHttp::setApiPath(const QString &newApiPath)
 {
     m_apiPath = newApiPath;
+}
+
+bool UrlHandlerHttp::allowLargeResult() const
+{
+    return m_allowLargeResult;
+}
+
+void UrlHandlerHttp::setAllowLargeResult(bool newAllowLargeResults)
+{
+    m_allowLargeResult = newAllowLargeResults;
 }
 
 bool UrlHandlerHttp::binned() const

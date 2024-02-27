@@ -63,17 +63,22 @@ public:
     QString apiPath() const;
     void setApiPath(const QString &newApiPath);
 
+    bool allowLargeResult() const;
+    void setAllowLargeResult(bool newAllowLargeResults);
+
 private:
     const QString m_binCountKey = "binCount";
     const QString m_backendKey = "backend";
     const QString m_channelNameKey = "channelName";
     const QString m_beginTimeKey = "begDate";
     const QString m_endTimeKey = "endDate";
+    const QString m_allowLargeResultKey = "allowLargeResult";
 
     const QString m_endpointBinned = "/binned";
     const QString m_endpointRaw = "/events";
 
     QString m_apiPath = "/api/4";
+    bool m_allowLargeResult = true;
 
     QUrl m_baseUrl;
     bool m_binned;
