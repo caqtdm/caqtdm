@@ -147,13 +147,15 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if (!var.isNull()) {
             bool ok;
             index.secondsPast = var.toInt(&ok);
-            if (!ok)
+            if (!ok) {
                 index.secondsPast = 3600;
+            }
         } else {
             QString mess("Archive plugin -- no secondsPast defined as dynamic property in widget "
                          + QString(kData->dispName) + ", default to 1 hour back");
-            if (messagewindowP != (MessageWindow *) Q_NULLPTR && !QString(kData->pv).contains(".Y"))
+            if (messagewindowP != (MessageWindow *) Q_NULLPTR && !QString(kData->pv).contains(".Y")) {
                 messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+            }
             index.secondsPast = 3600;
         }
 
@@ -161,14 +163,16 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         if (!var.isNull()) {
             bool ok;
             index.updateSeconds = var.toInt(&ok);
-            if (!ok)
+            if (!ok) {
                 index.updateSeconds = SECONDSTIMEOUT;
+            }
 
             // override the user specification if too many data are going to be requested
-            if (index.secondsPast > 7200)
+            if (index.secondsPast > 7200) {
                 index.updateSeconds = 60;
-            else if (index.secondsPast > 3600)
+            } else if (index.secondsPast > 3600) {
                 index.updateSeconds = 30;
+            }
 
         } else {
             QString mess("Archive plugin -- no secondsUpdate defined as dynamic property in widget "
@@ -189,16 +193,18 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         index.pv = index.pv.replace(".Y", "");
         index.w = (QWidget *) kData->dispW;
         index.indexX = index.indexY = 0;
-        if (kData->specData[2] == caCartesianPlot::CH_X)
+        if (kData->specData[2] == caCartesianPlot::CH_X) {
             index.indexX = kData->index; // x
-        else if (kData->specData[2] == caCartesianPlot::CH_Y)
+        } else if (kData->specData[2] == caCartesianPlot::CH_Y) {
             index.indexY = kData->index; // y
+        }
 
         if (caCartesianPlot *ww = qobject_cast<caCartesianPlot *>((QWidget *) index.w)) {
-            if (ww->getXaxisType() == caCartesianPlot::time)
+            if (ww->getXaxisType() == caCartesianPlot::time) {
                 index.timeAxis = true;
-            else
+            } else {
                 index.timeAxis = false;
+            }
         }
 
         if (!AlreadyProcessedIndexes.contains(key)) {
@@ -210,8 +216,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                     indexNew.indexX = kData->index - 1;
                     indexNew.indexY = kData->index;
                     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
-                    if (kData->edata.info != (void *) Q_NULLPTR)
+                    if (kData->edata.info != (void *) Q_NULLPTR) {
                         free(kData->edata.info);
+                    }
                     kData->edata.info = (char *) malloc(sizeof(asc));
                     memcpy(kData->edata.info, qasc(key), sizeof(asc));
                     indexNew.lastUpdateTime.time = 0;
@@ -224,13 +231,15 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             QMap<QString, indexes>::iterator i = AlreadyProcessedIndexes.find(key);
             while (i != AlreadyProcessedIndexes.end() && i.key() == key) {
                 indexes indexNew = i.value();
-                if (kData->specData[2] == caCartesianPlot::CH_X)
+                if (kData->specData[2] == caCartesianPlot::CH_X) {
                     indexNew.indexX = kData->index;
-                else if (kData->specData[2] == caCartesianPlot::CH_Y)
+                } else if (kData->specData[2] == caCartesianPlot::CH_Y) {
                     indexNew.indexY = kData->index;
+                }
                 //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
-                if (kData->edata.info != (void *) Q_NULLPTR)
+                if (kData->edata.info != (void *) Q_NULLPTR) {
                     free(kData->edata.info);
+                }
                 kData->edata.info = (char *) malloc(sizeof(asc));
                 memcpy(kData->edata.info, qasc(key), sizeof(asc));
                 indexNew.lastUpdateTime.time = 0;
@@ -242,8 +251,9 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     } else {
         QString mess("archivedata can only be used in a cartesianplot");
-        if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
             messagewindowP->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
+        }
     }
     return true;
 }
@@ -278,8 +288,9 @@ void ArchiverCommon::updateCartesian(
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
     if (nbVal > 0) {
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
-        if (kData.index == -1)
+        if (kData.index == -1) {
             return;
+        }
         mutexknobdataP->DataLock(&kData);
         kData.edata.fieldtype = caDOUBLE;
         kData.edata.connected = true;
@@ -288,8 +299,9 @@ void ArchiverCommon::updateCartesian(
         strcpy(kData.edata.fec, qasc(backend));
 
         if ((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
-            if (kData.edata.dataB != (void *) Q_NULLPTR)
+            if (kData.edata.dataB != (void *) Q_NULLPTR) {
                 free(kData.edata.dataB);
+            }
             kData.edata.dataB = (void *) malloc(nbVal * sizeof(double));
             kData.edata.dataSize = nbVal * sizeof(double);
         }
@@ -298,8 +310,9 @@ void ArchiverCommon::updateCartesian(
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
         mutexknobdataP->DataUnlock(&kData);
         kData = mutexknobdataP->GetMutexKnobData(indexNew.indexY);
-        if (kData.index == -1)
+        if (kData.index == -1) {
             return;
+        }
         mutexknobdataP->DataLock(&kData);
         kData.edata.fieldtype = caDOUBLE;
         kData.edata.connected = true;
@@ -308,8 +321,9 @@ void ArchiverCommon::updateCartesian(
         strcpy(kData.edata.fec, qasc(backend));
 
         if ((nbVal * sizeof(double)) > (size_t) kData.edata.dataSize) {
-            if (kData.edata.dataB != (void *) Q_NULLPTR)
+            if (kData.edata.dataB != (void *) Q_NULLPTR) {
                 free(kData.edata.dataB);
+            }
             kData.edata.dataB = (void *) malloc(nbVal * sizeof(double));
             kData.edata.dataSize = nbVal * sizeof(double);
         }
@@ -324,8 +338,9 @@ void ArchiverCommon::updateCartesian(
 // caQtDM_Lib will call this routine for getting rid of a monitor
 int ArchiverCommon::pvClearMonitor(knobData *kData)
 {
-    if (kData->index == -1)
+    if (kData->index == -1) {
         return true;
+    }
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "clearmonitor" << kData->index << kData->pv;
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) kData->dispW)) {

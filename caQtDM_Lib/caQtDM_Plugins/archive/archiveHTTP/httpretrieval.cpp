@@ -154,10 +154,11 @@ bool HttpRetrieval::requestUrl(
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "go on eventloop->exec";
 
     //downloadfinished will continue
-    if (finished)
+    if (finished) {
         return true;
-    else
+    } else {
         return false;
+    }
 }
 
 const QString HttpRetrieval::lastError()
@@ -218,8 +219,9 @@ bool HttpRetrieval::is_Redirected() const
 
 void HttpRetrieval::finishReply(QNetworkReply *reply)
 {
-    if (aborted)
+    if (aborted) {
         return;
+    }
     qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime() << this << PV
              << "reply received";
     int count = 0;
@@ -397,8 +399,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                         X[count] = archiveTime * 1000;
                         Y[count] = mean;
                         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
-                        count++;
                     }
+                    count++;
                 }
             }
         }
@@ -424,8 +426,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                         X[count] = archiveTime * 1000;
                         Y[count] = mean;
                         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
-                        count++;
                     }
+                    count++;
                 }
             }
         }
@@ -714,8 +716,9 @@ QByteArray HttpRetrieval::gUncompress(const QByteArray &data)
     strm.next_in = (Bytef *) (data.data());
 
     ret = inflateInit2(&strm, 15 + 32); // gzip decoding
-    if (ret != Z_OK)
+    if (ret != Z_OK) {
         return QByteArray();
+    }
 
     // run inflate()
     do {

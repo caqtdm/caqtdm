@@ -200,10 +200,11 @@ void ArchiveHTTP_Plugin::handleResults(
         listOfThreads.remove(removeKeys.at(i));
     }
 
-    if (nbVal == 0)
+    if (nbVal == 0) {
         archiverCommon->updateSecondsPast(indexNew, false);
-    else
+    } else {
         archiverCommon->updateSecondsPast(indexNew, true);
+    }
 
     //qDebug() << "in sf handle results finished";
 }
@@ -215,8 +216,9 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
-    if (suspend)
+    if (suspend) {
         return;
+    }
 
     // Index name (url)
     QString index_name = "https://data-api.psi.ch/";
@@ -248,14 +250,16 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 if (!var.isNull()) {
                     bool ok;
                     indexNew.nrOfBins = var.toInt(&ok);
-                    if (!ok)
+                    if (!ok) {
                         indexNew.nrOfBins = -1;
+                    }
                 } else if (indexNew.init) {
                     QString mess(
                         "ArchiveHTTP plugin -- no nrOfBins defined as dynamic property in widget "
                         + w->objectName() + ", defaulting to maximum number of points");
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
                         messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    }
                 }
 
                 var = w->property("backend");
@@ -271,16 +275,18 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                             "but not known (use sf-archiverappliance or sf-databuffer) in widget "
                             + w->objectName());
                         indexNew.backend = var.toString();
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
                             messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        }
                     }
                 } else if (indexNew.init) {
                     QString mess(
                         "ArchiveHTTP plugin -- no backend defined as dynamic property in widget "
                         + w->objectName()
                         + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
                         messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    }
                 }
 
                 // first look if an environment variable is set for the url
@@ -295,23 +301,26 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                             QString mess("ArchiveHTTP plugin -- archiverIndex defined as dynamic "
                                          "property in widget "
                                          + w->objectName() + ", set to " + index_name);
-                            if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+                            if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
                                 messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                            }
                         }
                     } else if (indexNew.init) {
                         QString mess(
                             "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERSF_URL "
                             "set and no archiverIndex defined as dynamic property in widget "
                             + w->objectName() + ", defaulting to " + index_name);
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
                             messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        }
                     }
                 } else {
                     if (indexNew.init) {
                         QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
                                      + " from environment variable CAQTDM_ARCHIVERSF_URL");
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR)
+                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
                             messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        }
                     }
                     index_name = url;
                 }
