@@ -200,11 +200,12 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             else
                 index.timeAxis = false;
         }
-        if (!listOfIndexes.contains(key)) {
-            listOfIndexes.insert(key, index);
+
+        if (!AlreadyProcessedIndexes.contains(key)) {
+            AlreadyProcessedIndexes.insert(key, index);
             if (key.contains(".minY", Qt::CaseInsensitive) || key.contains(".maxY", Qt::CaseInsensitive)) {
-                QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
-                while (i != listOfIndexes.end() && i.key() == key) {
+                QMap<QString, indexes>::iterator i = AlreadyProcessedIndexes.find(key);
+                while (i != AlreadyProcessedIndexes.end() && i.key() == key) {
                     indexes indexNew = i.value();
                     indexNew.indexX = kData->index - 1;
                     indexNew.indexY = kData->index;
@@ -220,8 +221,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 }
             }
         } else {
-            QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
-            while (i != listOfIndexes.end() && i.key() == key) {
+            QMap<QString, indexes>::iterator i = AlreadyProcessedIndexes.find(key);
+            while (i != AlreadyProcessedIndexes.end() && i.key() == key) {
                 indexes indexNew = i.value();
                 if (kData->specData[2] == caCartesianPlot::CH_X)
                     indexNew.indexX = kData->index;

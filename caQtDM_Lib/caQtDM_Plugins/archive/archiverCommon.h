@@ -100,6 +100,7 @@ private:
     MessageWindow *messagewindowP;
 
     QMap<QString, indexes> listOfIndexes;
+    QMap<QString, indexes> AlreadyProcessedIndexes; // used to prevent Indexes from being processed twice
 
     bool timerRunning;
 };
