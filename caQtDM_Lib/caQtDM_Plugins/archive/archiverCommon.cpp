@@ -207,11 +207,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             }
         }
 
-        if (!AlreadyProcessedIndexes.contains(key)) {
-            AlreadyProcessedIndexes.insert(key, index);
+        if (!alreadyProcessedIndexes.contains(key)) {
+            alreadyProcessedIndexes.insert(key, index);
             if (key.contains(".minY", Qt::CaseInsensitive) || key.contains(".maxY", Qt::CaseInsensitive)) {
-                QMap<QString, indexes>::iterator i = AlreadyProcessedIndexes.find(key);
-                while (i != AlreadyProcessedIndexes.end() && i.key() == key) {
+                QMap<QString, indexes>::iterator i = alreadyProcessedIndexes.find(key);
+                while (i != alreadyProcessedIndexes.end() && i.key() == key) {
                     indexes indexNew = i.value();
                     indexNew.indexX = kData->index - 1;
                     indexNew.indexY = kData->index;
@@ -228,8 +228,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 }
             }
         } else {
-            QMap<QString, indexes>::iterator i = AlreadyProcessedIndexes.find(key);
-            while (i != AlreadyProcessedIndexes.end() && i.key() == key) {
+            QMap<QString, indexes>::iterator i = alreadyProcessedIndexes.find(key);
+            while (i != alreadyProcessedIndexes.end() && i.key() == key) {
                 indexes indexNew = i.value();
                 if (kData->specData[2] == caCartesianPlot::CH_X) {
                     indexNew.indexX = kData->index;
@@ -285,7 +285,7 @@ void ArchiverCommon::updateCartesian(
     int nbVal, indexes indexNew, QVector<double> XValsN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&mutex);
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
     if (nbVal > 0) {
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if (kData.index == -1) {
@@ -371,6 +371,7 @@ int ArchiverCommon::pvClearMonitor(knobData *kData)
 
             for (int i = 0; i < removeKeys.count(); i++) {
                 listOfIndexes.remove(removeKeys.at(i));
+                alreadyProcessedIndexes.remove(removeKeys.at(i));
             }
             emit Signal_AbortOutstandingRequests(key);
         }
