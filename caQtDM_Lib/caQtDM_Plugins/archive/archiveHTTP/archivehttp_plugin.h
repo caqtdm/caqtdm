@@ -101,6 +101,8 @@ private:
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
     QMap<QString, WorkerHttpThread *> listOfThreads;
+    QMap<QString, indexes> m_listOfIndexes;
+    QRegularExpression regexStr;
     bool suspend;
 };
 

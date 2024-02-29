@@ -57,7 +57,7 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()
 {
     delete archiverCommon;
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()";
 }
 
 // gives the plugin name back
@@ -85,6 +85,28 @@ int ArchiveHTTP_Plugin::pvAddMonitor(int index, knobData *kData, int rate, int s
 // clear routines
 int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
 {
+    // get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant, resulting in none actually being updated.
+    QString keyInCheck = kData->pv;
+    keyInCheck.replace(".X", "", Qt::CaseInsensitive);
+    keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
+    // We need that address, because it was added to the key in order to prevent mix ups from different widgets...
+    char dispWAddress[CHAR_ARRAY_LENGTH];
+    sprintf(dispWAddress, "_%p",kData->dispW);
+    keyInCheck += QString(dispWAddress);
+    for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
+         tempI != m_listOfIndexes.constEnd();
+         tempI++) {
+        QString keyStored = tempI.key();
+        regexStr.setPattern("\\b[0-7]_");
+        keyStored.replace(regexStr, "");
+
+        if (keyStored == keyInCheck) {
+            m_listOfIndexes.remove(tempI.key());
+            break;
+        }
+    }
+
+    // now just let archiverCommon do the usual stuff
     return archiverCommon->pvClearMonitor(kData);
 }
 int ArchiveHTTP_Plugin::pvFreeAllocatedData(knobData *kData)
@@ -178,8 +200,25 @@ void ArchiveHTTP_Plugin::handleResults(
     YValsN.resize(nbVal);
 
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "handle cartesian";
-    if (nbVal > 0)
-        archiverCommon->updateCartesian(nbVal, indexNew, XValsN, YValsN, backend);
+
+    // set data for other indexes with same channel
+    indexes indexInCheck = indexNew;
+    regexStr.setPattern("\\b[0-7]_");
+    indexInCheck.key.replace(regexStr, "");
+    indexInCheck.key.replace(regexStr, "");
+    if (nbVal > 0) {
+        for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
+             tempI != m_listOfIndexes.constEnd();
+             tempI++) {
+            QString keyStored = tempI.key();
+            keyStored.replace(regexStr, "");
+            keyStored.replace(regexStr, "");
+
+            if (keyStored == indexInCheck.key) {
+                archiverCommon->updateCartesian(nbVal, tempI.value(), XValsN, YValsN, backend);
+            }
+        }
+    }
     XValsN.resize(0);
     YValsN.resize(0);
 
@@ -200,10 +239,16 @@ void ArchiveHTTP_Plugin::handleResults(
         listOfThreads.remove(removeKeys.at(i));
     }
 
-    if (nbVal == 0) {
-        archiverCommon->updateSecondsPast(indexNew, false);
-    } else {
-        archiverCommon->updateSecondsPast(indexNew, true);
+    for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
+         tempI != m_listOfIndexes.constEnd();
+         tempI++) {
+        QString keyStored = tempI.key();
+        keyStored.replace(regexStr, "");
+        keyStored.replace(regexStr, "");
+
+        if (keyStored == indexInCheck.key) {
+            archiverCommon->updateSecondsPast(tempI.value(), nbVal != 0);
+        }
     }
 
     //qDebug() << "in sf handle results finished";
@@ -223,11 +268,40 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
     // Index name (url)
     QString index_name = "https://data-api.psi.ch/";
 
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface";
+
+    regexStr.setPattern("\\b[0-7]_");
 
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
-
     while (i != listOfIndexes.constEnd()) {
+        // Don't retrieve data twice
+        QString keyInCheck = i.key();
+        keyInCheck.replace(regexStr, "");
+        keyInCheck.replace(regexStr, "");
+        indexes indexInCheck = i.value();
+        indexInCheck.key.replace(regexStr, "");
+        indexInCheck.key.replace(regexStr, "");
+        bool keyAlreadyPresent = false;
+        for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
+             tempI != m_listOfIndexes.constEnd();
+             tempI++) {
+            QString keyStored = tempI.key();
+            keyStored.replace(regexStr, "");
+            keyStored.replace(regexStr, "");
+
+            if (keyStored == keyInCheck) {
+                m_listOfIndexes.insert(i.key(), i.value());
+                keyAlreadyPresent = true;
+                break;
+            }
+        }
+        if (keyAlreadyPresent) {
+            i++;
+            continue;
+        }
+        m_listOfIndexes.insert(i.key(), i.value());
+
+        // Now initiate the retrieval
         WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
         indexes indexNew = i.value();
         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << " -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
@@ -382,7 +456,7 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 
 void ArchiveHTTP_Plugin::closeEvent()
 {
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"  << "ArchiveHTTP_Plugin::closeEvent ";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|"  << "ArchiveHTTP_Plugin::closeEvent ";
     emit Signal_StopUpdateInterface();
 }
 // =======================================================================================================================================================
