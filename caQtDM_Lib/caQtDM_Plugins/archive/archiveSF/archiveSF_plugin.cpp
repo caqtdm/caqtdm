@@ -74,11 +74,11 @@ void ArchiveSF_Plugin::Callback_AbortOutstandingRequests(QString key)
     suspend = true;
     //qDebug()  << "Callback_AbortOutstandingRequests for key" << key;
     
-    WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
-    QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(key);
+    WorkerSfThread *tmpThread = (WorkerSfThread *) Q_NULLPTR;
+    QMap<QString, WorkerSfThread *>::iterator j = listOfThreads.find(key);
     while (j !=listOfThreads.end() && j.key() == key) {
-        tmpThread = (WorkerHttpThread *) j.value();
-        if(tmpThread != (WorkerHttpThread *) Q_NULLPTR) {
+        tmpThread = (WorkerSfThread *) j.value();
+        if(tmpThread != (WorkerSfThread *) Q_NULLPTR) {
             sfRetrieval *retrieval = tmpThread->getArchive();
             tmpThread->quit();
             if(retrieval != (sfRetrieval *) Q_NULLPTR){
@@ -110,17 +110,17 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
 
     while (i != listOfIndexes.constEnd()) {
         
-        WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
+        WorkerSfThread *tmpThread = (WorkerSfThread *) Q_NULLPTR;
         indexes indexNew = i.value();
         //qDebug() <<" -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
         
-        QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(indexNew.key);
+        QMap<QString, WorkerSfThread *>::iterator j = listOfThreads.find(indexNew.key);
         while (j !=listOfThreads.end() && j.key() == indexNew.key) {
-            tmpThread = (WorkerHttpThread *) j.value();
+            tmpThread = (WorkerSfThread *) j.value();
             ++j;
         }
         
-        if((tmpThread != (WorkerHttpThread *) Q_NULLPTR) && tmpThread->isRunning()) {
+        if((tmpThread != (WorkerSfThread *) Q_NULLPTR) && tmpThread->isRunning()) {
             //qDebug() << "thread is running" << tmpThread << tmpThread->isRunning();
 
         } else {
@@ -182,7 +182,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
             }
 
             WorkerSF *worker = new WorkerSF;
-            WorkerHttpThread *tmpThread = new WorkerHttpThread(worker);
+            WorkerSfThread *tmpThread = new WorkerSfThread(worker);
             //qDebug() << "tmpThread new" << tmpThread;
             listOfThreads.insert(i.key(), tmpThread);;
 
@@ -223,9 +223,10 @@ void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double
     QList<QString> removeKeys;
     removeKeys.clear();
     
-    QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(indexNew.key);
+    QMap<QString, WorkerSfThread *>::iterator j = listOfThreads.find(indexNew.key);
     while (j !=listOfThreads.end() && j.key() == indexNew.key) {
-        WorkerHttpThread *tmpThread = (WorkerHttpThread*) j.value();
+        WorkerSfThread *tmpThread = (WorkerSfThread*) j.value();
+        qDebug() << "tmpThread->quit";
         tmpThread->quit();
         removeKeys.append(indexNew.key);
         //qDebug() << tmpThread << "sf quit";
