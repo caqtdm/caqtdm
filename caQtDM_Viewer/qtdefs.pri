@@ -141,13 +141,7 @@ message("Modbus Plugin will not be build")
 }
 else {
     greaterThan(QT_VER_MAJ, 4) {
-        unix:!macx:!ios:!android  {
-            packagesExist(serialbus){
-                CONFIG += modbus
-            }
-        }else{
-            CONFIG += modbus
-        }
+        CONFIG += modbus
         modbus {
            message( "Configuring build for modbus plugin" )
         }
@@ -160,13 +154,7 @@ message("GPS Plugin will not be build")
 }
 else {
     greaterThan(QT_VER_MAJ, 4) {
-        unix:!macx:!ios:!android {
-            packagesExist(positioning){
-                CONFIG += gps
-            }
-        }else{
-            CONFIG += gps
-        }
+        CONFIG += gps
         gps {
            message( "Configuring build for GPS plugin" )
         }
