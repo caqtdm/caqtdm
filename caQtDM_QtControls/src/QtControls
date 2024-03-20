@@ -11,6 +11,7 @@
 #include <ewidget.h>
 #include <calineedit.h>
 #include <camultilinestring.h>
+#include <catextlog.h>
 #include <caslider.h>
 #include <cathermo.h>
 #include <cagraphics.h>

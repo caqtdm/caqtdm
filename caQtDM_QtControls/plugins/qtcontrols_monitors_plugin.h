@@ -144,6 +144,15 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caTextLogInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caTextLogInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
 
 class caThermoInterface : public CustomWidgetInterface_Monitors
 {

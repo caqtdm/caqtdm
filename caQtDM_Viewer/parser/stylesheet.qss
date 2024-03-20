@@ -20,6 +20,17 @@ caTextEntry {
     padding: 1px;
 }
 
+caTextLog {
+    color: rgb(127, 0, 63);
+    background-color: cornsilk;
+    selection-color: #0a214c;
+    selection-background-color: wheat;
+    border: 1px groove black;
+    border-radius: 1px;
+    padding: 1px;
+}
+
+
 caTextEntry:focus {
     padding: 0px;
     border: 2px groove darkred;

@@ -66,6 +66,19 @@
      <string notr="true">environment://PATH</string>
     </property>
    </widget>
+   <widget class="caTextLog" name="catextlog">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>330</y>
+      <width>471</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">environment://PATH</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

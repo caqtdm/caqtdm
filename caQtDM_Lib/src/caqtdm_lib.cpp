@@ -1864,6 +1864,32 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         multilinestringWidget->setProperty("MonitorList", integerList);
 
         multilinestringWidget->setProperty("Taken", true);
+        //==================================================================================================================
+    } else if(caTextLog* texlogWidget = qobject_cast<caTextLog *>(w1)) {
+        QString text;
+        //qDebug() << "create caMultilineString";
+        w1->setProperty("ObjectType", caTextLog_Widget);
+
+        if(texlogWidget->getPV().size() > 0) {
+            texlogWidget->setCursor(QCursor());
+            texlogWidget->setReadOnly(true);
+
+            //multilinestringWidget->setAlignment(lineeditWidget->alignment());
+            int num = addMonitor(myWidget, &kData, texlogWidget->getPV(), w1, specData, map, &pv);
+            integerList.append(num);
+            texlogWidget->setPV(pv);
+            nbMonitors++;
+        }
+        text= texlogWidget->toolTip();
+        if(reaffectText(map, &text, w1))  texlogWidget->setToolTip(text);
+        text= texlogWidget->statusTip();
+        if(reaffectText(map, &text, w1))  texlogWidget->setStatusTip(text);
+
+        // insert dataindex list
+        integerList.insert(0, nbMonitors);
+        texlogWidget->setProperty("MonitorList", integerList);
+
+        texlogWidget->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w1)) {
@@ -5350,6 +5376,62 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             multilinestringWidget->setProperty("Connect", false);
         }
 
+        // textlog ====================================================================================================
+    } else if (caTextLog *textlogWidget = qobject_cast<caTextLog *>(w)) {
+
+        qDebug() << "we have a textlog : " << textlogWidget << data.edata.rvalue <<  data.edata.ivalue;
+
+        QColor bg = textlogWidget->property("BColor").value<QColor>();
+        QColor fg = textlogWidget->property("FColor").value<QColor>();
+
+        if(data.edata.connected) {
+            QString separator((QChar)27);
+            QString CR((QChar)13);
+
+            // enum string
+            if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
+
+                int colorMode = textlogWidget->getColorMode();
+                if(colorMode == caTextLog::Static || colorMode == caTextLog::Default) { // done at initialisation
+                    if(!textlogWidget->property("Connect").value<bool>()) {                    // but was disconnected before
+                        textlogWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
+                        textlogWidget->setProperty("Connect", true);
+                    }
+                } else {
+                    textlogWidget->setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
+                }
+
+                // qDebug() << textlogWidget << String << list << data.pv << (int) data.edata.ivalue << data.edata.valueCount;
+
+                // an enum
+                if(data.edata.fieldtype == caENUM) {
+                    QString enumList = String;
+                    enumList.replace(separator, CR);
+                    textlogWidget->setTextLine(enumList);
+
+                // just one char
+                } else if((data.edata.fieldtype == caCHAR) && (data.edata.nelm == 1)) {
+                    QString str = QString(QChar((int) data.edata.ivalue));
+                    textlogWidget->setTextLine(str);
+
+                // one or more strings, or a char array
+                } else if(data.edata.fieldtype == caCHAR){
+                    textlogWidget->setTextLine(String);
+                } else if(data.edata.fieldtype == caSTRING) {
+                    QString List = String;
+                    List.replace(separator, CR);
+                    textlogWidget->setTextLine(List);
+                }
+            } else {
+                textlogWidget->setTextLine("not supported");
+            }
+
+        } else {
+            textlogWidget->setTextLine("");
+            textlogWidget->setAlarmColors(NOTCONNECTED, 0.0, bg, fg);        \
+            textlogWidget->setProperty("Connect", false);
+        }
+        
         // Graphics ==================================================================================================================
     } else if (caGraphics *graphicsWidget = qobject_cast<caGraphics *>(w)) {
         //qDebug() << "caGraphics" << graphicsWidget->objectName() << graphicsWidget->getColorMode() << data.pv;
@@ -7041,6 +7123,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w)) {
         if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Default) strcpy(colMode, "Alarm");
         else if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Static) strcpy(colMode, "Alarm");
+        else strcpy(colMode, "Static");
+
+    } else if(caTextLog* textlogWidget = qobject_cast<caTextLog *>(w)) {
+        if(textlogWidget->getColorMode() == caTextLog::Alarm_Default) strcpy(colMode, "Alarm");
+        else if(textlogWidget->getColorMode() == caTextLog::Alarm_Static) strcpy(colMode, "Alarm");
         else strcpy(colMode, "Static");
 
     } else if (caApplyNumeric* applynumericWidget = qobject_cast<caApplyNumeric *>(w)) {
@@ -9684,6 +9771,9 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     } else if (caMultiLineString *multilinestringWidget = qobject_cast<caMultiLineString *>(w->parent())) {
         multilinestringWidget->setEnabled(true);  // enable after initiating drag for context menu
         mimeData->setText(multilinestringWidget->getPV());
+    } else if (caTextLog *textlogWidget = qobject_cast<caTextLog *>(w->parent())) {
+        textlogWidget->setEnabled(true);  // enable after initiating drag for context menu
+        mimeData->setText(textlogWidget->getPV());
     } else if (caLed *ledWidget = qobject_cast<caLed *>(w)) {
         mimeData->setText(ledWidget->getPV());
     } else if (caApplyNumeric *applynumeric1Widget = qobject_cast<caApplyNumeric *>(w)) {
