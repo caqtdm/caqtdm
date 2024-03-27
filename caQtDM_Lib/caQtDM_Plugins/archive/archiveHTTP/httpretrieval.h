@@ -81,7 +81,7 @@ public slots:
 
 protected slots:
     void finishReply(QNetworkReply*);
-    const QString parseError(QNetworkReply::NetworkError error);
+    const QString parseError(QNetworkReply::NetworkError error, int statusCode);
     int downloadFinished();
     void timeoutL();
 

@@ -266,7 +266,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     if (reply->error()) {
-        m_errorString = tr("%1: %2").arg(parseError(reply->error())).arg(m_downloadUrl.toString());
+        m_errorString = tr("%1: %2").arg(parseError(reply->error(), status.toInt())).arg(m_downloadUrl.toString());
         //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
         //<< this << PV << "finishreply" << errorString;
         emit requestFinished();
@@ -584,7 +584,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     emit requestFinished();
 }
 
-const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error)
+const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error, int statusCode)
 {
     QString errstr = "";
     switch (error) {
@@ -657,7 +657,7 @@ const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error)
         errstr = tr("ProtocolFailure");
         break;
     default:
-        if (error.attribute(QNetworkRequest::HttpStatusCodeAttribute) == 418)
+        if (statusCode == 418)
             errstr = tr("ImATeapot");
         else {
             errstr = tr("unknownError %1").arg(error);
