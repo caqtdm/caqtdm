@@ -23,12 +23,13 @@ public:
         //qDebug() << "WorkerHTTP::WorkerHTTP()";
         qRegisterMetaType<indexes>("indexes");
         qRegisterMetaType<QVector<double> >("QVector<double>");
-        fromArchive = (HttpRetrieval *) 0;
+        m_httpRetrieval = (HttpRetrieval *) 0;
     }
 
     ~WorkerHTTP()
     {
         //qDebug() << "WorkerHTTP::~WorkerHTTP()";
+        PRINTFLUSH("WorkerHTTP::~WorkerHTTP()");
     }
 
 private:
@@ -38,17 +39,15 @@ public slots:
 
     void workerFinish() { deleteLater(); }
 
-    HttpRetrieval *getArchive() { return fromArchive; }
+    HttpRetrieval *getArchive() { return m_httpRetrieval; }
 
     void getFromArchive(QWidget *w,
                         indexes indexNew,
                         QString index_name,
                         MessageWindow *messageWindow)
     {
+        PRINTFLUSH("getFromArchive\n");
         Q_UNUSED(w);
-        // I have no idea why this mutex lock was here, it seems like it has only slowed down processing and ultimately rendered the whole workerHttp / workerHttpThread multiThreading useless...
-//QMutex *mutex = indexNew.mutexP;
-//mutex->lock();
         struct timeb now;
         bool isBinned;
 
@@ -73,17 +72,17 @@ public slots:
         urlHandler->setBinned(isBinned);
         urlHandler->setBinCount(indexNew.nrOfBins);
 
-        fromArchive = new HttpRetrieval();
+        m_httpRetrieval = new HttpRetrieval();
 
         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "fromArchive pointer=" << fromArchive << indexNew.timeAxis;
-        bool readdata_ok = fromArchive->requestUrl(urlHandler,
+        bool readdata_ok = m_httpRetrieval->requestUrl(urlHandler,
                                                    indexNew.secondsPast,
                                                    isBinned,
                                                    indexNew.timeAxis,
                                                    key);
 
-        if (fromArchive->is_Redirected()) {
-            QUrl url = QUrl(fromArchive->getRedirected_Url());
+        if (m_httpRetrieval->is_Redirected()) {
+            QUrl url = QUrl(m_httpRetrieval->getRedirected_Url());
             // Messages in case of a redirect and set the widget to the correct location
             // with a reload of the panel this information get lost.
             // the url storage location is the dynamic property of the widget
@@ -94,11 +93,11 @@ public slots:
             messageWindow->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
             indexNew.w->setProperty("archiverIndex", QVariant(url.toString()));
             //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "archiv PV" << indexNew.pv;
-            fromArchive->deleteLater();
-            fromArchive = new HttpRetrieval();
+            m_httpRetrieval->deleteLater();
+            m_httpRetrieval = new HttpRetrieval();
             UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
             urlHandler->setUrl(url);
-            readdata_ok = fromArchive->requestUrl(urlHandler,
+            readdata_ok = m_httpRetrieval->requestUrl(urlHandler,
                                                   indexNew.secondsPast,
                                                   isBinned,
                                                   indexNew.timeAxis,
@@ -106,17 +105,17 @@ public slots:
         }
 
         if (readdata_ok) {
-            if ((nbVal = fromArchive->getCount()) > 0) {
+            if ((nbVal = m_httpRetrieval->getCount()) > 0) {
                 //qDebug() << nbVal << total;
-                XValsN.resize(fromArchive->getCount());
-                YValsN.resize(fromArchive->getCount());
-                fromArchive->getData(XValsN, YValsN);
+                XValsN.resize(m_httpRetrieval->getCount());
+                YValsN.resize(m_httpRetrieval->getCount());
+                m_httpRetrieval->getData(XValsN, YValsN);
             }
 
         } else {
             if (messageWindow != (MessageWindow *) Q_NULLPTR) {
                 QString mess("ArchiveHTTP plugin -- lastError: ");
-                mess.append(fromArchive->lastError());
+                mess.append(m_httpRetrieval->lastError());
                 mess.append(" for pv: ");
                 mess.append(key);
 #if QT_VERSION > 0x050000
@@ -128,12 +127,9 @@ public slots:
             }
         }
 
-        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << "number of values received" << nbVal << fromArchive << "for" << key;
+        emit resultReady(indexNew, nbVal, XValsN, YValsN, m_httpRetrieval->getBackend());
 
-        emit resultReady(indexNew, nbVal, XValsN, YValsN, fromArchive->getBackend());
-
-//mutex->unlock();
-        fromArchive->deleteLater();
+        m_httpRetrieval->deleteLater();
     }
 
 signals:
@@ -145,7 +141,7 @@ signals:
 
 public:
 private:
-    HttpRetrieval *fromArchive;
+    HttpRetrieval *m_httpRetrieval;
 };
 
 #endif // WORKERHTTP_H

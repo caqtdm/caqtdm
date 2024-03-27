@@ -195,7 +195,7 @@ public:
     enum cpuUsage {Low, Medium, High};
 
     enum axisScaling {Channel, User};
-    enum  curvStyle {Lines = 1, FillUnder = 5};
+    enum curvStyle {Lines = 1, FillUnder = 5};
     enum units { Millisecond = 0, Second, Minute};
     enum xAxisType {ValueScale, TimeScale, TimeScaleFix};
     enum yAxisType {linear=0, log10};

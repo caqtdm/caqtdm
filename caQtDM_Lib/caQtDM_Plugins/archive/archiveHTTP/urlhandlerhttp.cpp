@@ -43,7 +43,13 @@ UrlHandlerHttp::~UrlHandlerHttp()
 
 QUrl UrlHandlerHttp::assembleUrl() const
 {
-    QUrl assembledUrl = m_baseUrl;
+    QUrl assembledUrl;
+
+    if (m_https) {
+        assembledUrl = QUrl(QString(QString("https://") + m_baseUrl.toString()));
+    } else {
+        assembledUrl = QUrl(QString(QString("http://") + m_baseUrl.toString()));
+    }
 
     if (m_binned) {
         assembledUrl.setPath("/api/4/binned");
@@ -79,6 +85,7 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
 {
     QUrlQuery query(newUrl);
 
+    // Check for all GET parameters and set member variables
     if (query.hasQueryItem(m_backendKey)){
         m_backend = query.queryItemValue(m_backendKey);
     }
@@ -94,30 +101,32 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
     if (query.hasQueryItem(m_binCountKey)){
         m_binCount = query.queryItemValue(m_binCountKey).toInt();
         m_binned = true;
+    } else {
+        m_binned = false;
     }
-    // remove path and query parameters to save base url
+    if (newUrl.toString().toLower().startsWith("https")) {
+        m_https = true;
+    } else {
+        m_https = false;
+    }
+
+    // Remove path and query parameters to save base url.
     QStringList urlParts = newUrl.toString().split("/");
-    m_baseUrl = urlParts[0] + "//" + urlParts[2];
+    if (newUrl.toString().toLower().startsWith("http")) {
+        m_baseUrl = urlParts[2];
+    } else {
+        m_baseUrl = urlParts[0];
+    }
 }
 
-QString UrlHandlerHttp::apiPath() const
+bool UrlHandlerHttp::https() const
 {
-    return m_apiPath;
+    return m_https;
 }
 
-void UrlHandlerHttp::setApiPath(const QString &newApiPath)
+void UrlHandlerHttp::setHttps(const bool &newHttps)
 {
-    m_apiPath = newApiPath;
-}
-
-bool UrlHandlerHttp::allowLargeResult() const
-{
-    return m_allowLargeResult;
-}
-
-void UrlHandlerHttp::setAllowLargeResult(bool newAllowLargeResults)
-{
-    m_allowLargeResult = newAllowLargeResults;
+    m_https = newHttps;
 }
 
 bool UrlHandlerHttp::binned() const
@@ -180,4 +189,24 @@ QDateTime UrlHandlerHttp::endTime() const
 void UrlHandlerHttp::setEndTime(const QDateTime &newEndTime)
 {
     m_endTime = newEndTime;
+}
+
+bool UrlHandlerHttp::allowLargeResult() const
+{
+    return m_allowLargeResult;
+}
+
+void UrlHandlerHttp::setAllowLargeResult(const bool &newAllowLargeResults)
+{
+    m_allowLargeResult = newAllowLargeResults;
+}
+
+QString UrlHandlerHttp::apiPath() const
+{
+    return m_apiPath;
+}
+
+void UrlHandlerHttp::setApiPath(const QString &newApiPath)
+{
+    m_apiPath = newApiPath;
 }

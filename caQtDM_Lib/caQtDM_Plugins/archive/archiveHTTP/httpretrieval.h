@@ -44,6 +44,14 @@
 #include <QJsonValue>
 #endif
 
+#define PRINTFLUSH(...) \
+    do { \
+        printf(__VA_ARGS__); \
+        printf("\n"); \
+        std::fflush(stdout); \
+    } while (0)
+
+
 class QNetworkAccessManager;
 
 class HttpRetrieval:public QObject
@@ -80,26 +88,25 @@ protected slots:
 private:
     bool getDoubleFromString(QString input, double &value);
     QByteArray gUncompress(const QByteArray &data);
-    QTimer *timeoutHelper;
-    QNetworkAccessManager *manager;
-    QNetworkReply *reply;
-    QTableWidget *thisTable;
-    QString thisFile;
-    int finished;
-    bool requestInProgress;
-    QUrl downloadUrl;
-    QString errorString;
-    QVector<double> X,Y;
-    int totalCount;
+    QTimer *m_timeoutHelper;
+    QNetworkAccessManager *m_networkManager;
+    QNetworkReply *m_networkReply;
+    int m_isFinished;
+    bool m_requestInProgress;
+    QUrl m_downloadUrl;
+    QString m_errorString;
+    QVector<double> m_vecX,m_vecY;
+    int m_totalNumberOfPoints;
     UrlHandlerHttp m_urlHandler;
-    int secndsPast;
-    QEventLoop *eventLoop;
-    bool isBinned, timAxis;
-    QString Backend;
-    bool aborted;
-    QString PV;
-    bool intern_is_Redirected;
-    QString Redirected_Url;
+    int m_secondsPast;
+    QEventLoop *m_eventLoop;
+    bool m_isBinned;
+    bool m_isAbsoluteTimeAxis;
+    QString m_backend;
+    bool m_isAborted;
+    QString m_PV;
+    bool m_isRedirected;
+    QString m_redirectedUrl;
 };
 
 #endif

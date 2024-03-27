@@ -42,6 +42,9 @@ public:
     QUrl baseUrl() const;
     void setUrl(const QUrl &newBaseUrl);
 
+    bool https() const;
+    void setHttps(const bool &newHttps);
+
     bool binned() const;
     void setBinned(const bool &newBinned);
 
@@ -64,7 +67,7 @@ public:
     void setApiPath(const QString &newApiPath);
 
     bool allowLargeResult() const;
-    void setAllowLargeResult(bool newAllowLargeResults);
+    void setAllowLargeResult(const bool &newAllowLargeResults);
 
 private:
     const QString m_binCountKey = "binCount";
@@ -81,6 +84,7 @@ private:
     bool m_allowLargeResult = true;
 
     QUrl m_baseUrl;
+    bool m_https;
     bool m_binned;
     int m_binCount;
     QString m_backend;

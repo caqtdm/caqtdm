@@ -32,11 +32,11 @@ android {
    INCLUDEPATH += $(ANDROIDFUNCTIONSINCLUDE)
 }
 
-HEADERS         = ../../controlsinterface.h archiveHTTP_plugin.h httpRetrieval.h ../archiverCommon.h \
+HEADERS         = ../../controlsinterface.h archivehttp_plugin.h httpretrieval.h ../archiverCommon.h \
     urlhandlerhttp.h \
     workerHttp.h \
     workerHttpThread.h
-SOURCES         =  archiveHTTP_plugin.cpp httpRetrieval.cpp ../archiverCommon.cpp \
+SOURCES         =  archivehttp_plugin.cpp httpretrieval.cpp ../archiverCommon.cpp \
     urlhandlerhttp.cpp
 TARGET          = archiveHTTP_plugin
 

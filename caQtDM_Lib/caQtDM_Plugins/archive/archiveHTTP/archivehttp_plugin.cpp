@@ -24,6 +24,7 @@
  */
 #include <QApplication>
 #include <QDebug>
+#include <QThreadPool>
 
 #include "archivehttp_plugin.h"
 #include "archiverCommon.h"
@@ -38,7 +39,6 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     suspend = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
-
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
 
@@ -93,15 +93,15 @@ int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
     char dispWAddress[CHAR_ARRAY_LENGTH];
     sprintf(dispWAddress, "_%p",kData->dispW);
     keyInCheck += QString(dispWAddress);
-    for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
-         tempI != m_listOfIndexes.constEnd();
+    for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
+         tempI != m_IndexesToUpdate.constEnd();
          tempI++) {
         QString keyStored = tempI.key();
         regexStr.setPattern("\\b[0-7]_");
         keyStored.replace(regexStr, "");
 
         if (keyStored == keyInCheck) {
-            m_listOfIndexes.remove(tempI.key());
+            m_IndexesToUpdate.remove(tempI.key());
             break;
         }
     }
@@ -195,6 +195,12 @@ void ArchiveHTTP_Plugin::handleResults(
 {
     //QThread *thread = QThread::currentThread();
     //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;
+    QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = listOfThreads.find(indexNew.key);
+    if (listOfThreadsEntry == listOfThreads.end()) {
+        // This should never happen
+        return;
+    }
+    const bool isActive =  listOfThreadsEntry.value()->isActive();
 
     XValsN.resize(nbVal);
     YValsN.resize(nbVal);
@@ -207,50 +213,50 @@ void ArchiveHTTP_Plugin::handleResults(
     indexInCheck.key.replace(regexStr, "");
     indexInCheck.key.replace(regexStr, "");
     if (nbVal > 0) {
-        for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
-             tempI != m_listOfIndexes.constEnd();
+        for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
+             tempI != m_IndexesToUpdate.constEnd();
              tempI++) {
             QString keyStored = tempI.key();
             keyStored.replace(regexStr, "");
             keyStored.replace(regexStr, "");
 
             if (keyStored == indexInCheck.key) {
-                archiverCommon->updateCartesian(nbVal, tempI.value(), XValsN, YValsN, backend);
+                if (isActive) {
+                    archiverCommon->updateCartesian(nbVal, tempI.value(), XValsN, YValsN, backend);
+                }
             }
         }
     }
     XValsN.resize(0);
     YValsN.resize(0);
 
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "handle cartesian fisnished";
-    QList<QString> removeKeys;
-    removeKeys.clear();
-
-    QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(indexNew.key);
-    while (j != listOfThreads.end() && j.key() == indexNew.key) {
-        WorkerHttpThread *tmpThread = (WorkerHttpThread *) j.value();
+    WorkerHttpThread *tmpThread = (WorkerHttpThread *) listOfThreadsEntry.value();
+    if (tmpThread != Q_NULLPTR) {
         tmpThread->quit();
-        removeKeys.append(indexNew.key);
-        //qDebug() << tmpThread << "sf quit";
-        ++j;
+        tmpThread->wait();
     }
+    listOfThreads.remove(indexNew.key);
+    listOfThreadsEntry = Q_NULLPTR;
 
-    for (int i = 0; i < removeKeys.count(); i++) {
-        listOfThreads.remove(removeKeys.at(i));
-    }
-
-    for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
-         tempI != m_listOfIndexes.constEnd();
+    QList<QString> removeKeys;
+    regexStr.setPattern("\\b[0-7]_");
+    for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
+         tempI != m_IndexesToUpdate.constEnd();
          tempI++) {
         QString keyStored = tempI.key();
         keyStored.replace(regexStr, "");
         keyStored.replace(regexStr, "");
-
         if (keyStored == indexInCheck.key) {
-            archiverCommon->updateSecondsPast(tempI.value(), nbVal != 0);
+            if (!isActive) {
+                archiverCommon->updateSecondsPast(tempI.value(), nbVal != 0);
+            }
+            removeKeys.append(tempI.key());;
         }
     }
 
+    for (int i = 0; i < removeKeys.count(); i++) {
+        m_IndexesToUpdate.remove(removeKeys.at(i));
+    }
     //qDebug() << "in sf handle results finished";
 }
 
@@ -261,17 +267,19 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
+    PRINTFLUSH("Callback_UpdateInterface called\n");
     if (suspend) {
+        PRINTFLUSH("Callback_UpdateInterface suspended - returning");
         return;
     }
+
 
     // Index name (url)
     QString index_name = "https://data-api.psi.ch/";
 
-    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface";
-
+    // remove the curve index that seperates indexes from different curve,
+    // so we can avoid requesting the same index multiple times.
     regexStr.setPattern("\\b[0-7]_");
-
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
         // Don't retrieve data twice
@@ -282,151 +290,138 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         indexInCheck.key.replace(regexStr, "");
         indexInCheck.key.replace(regexStr, "");
         bool keyAlreadyPresent = false;
-        for (QMap<QString, indexes>::const_iterator tempI = m_listOfIndexes.constBegin();
-             tempI != m_listOfIndexes.constEnd();
+        for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
+             tempI != m_IndexesToUpdate.constEnd();
              tempI++) {
             QString keyStored = tempI.key();
             keyStored.replace(regexStr, "");
             keyStored.replace(regexStr, "");
 
             if (keyStored == keyInCheck) {
-                m_listOfIndexes.insert(i.key(), i.value());
+                m_IndexesToUpdate.insert(i.key(), i.value());
                 keyAlreadyPresent = true;
                 break;
             }
         }
         if (keyAlreadyPresent) {
             i++;
+            PRINTFLUSH("keyAlreadyPresent - continue");
             continue;
         }
-        m_listOfIndexes.insert(i.key(), i.value());
+        m_IndexesToUpdate.insert(i.key(), i.value());
 
         // Now initiate the retrieval
         WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
         indexes indexNew = i.value();
         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << " -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
 
-        QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(indexNew.key);
-        while (j != listOfThreads.end() && j.key() == indexNew.key) {
-            tmpThread = (WorkerHttpThread *) j.value();
-            ++j;
-        }
-
-        if ((tmpThread != (WorkerHttpThread *) Q_NULLPTR) && tmpThread->isRunning()) {
-            //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"            << "thread is running" << tmpThread << tmpThread->isRunning();
-
-        } else {
-            // Get Index name if specified for this widget
-            indexNew.nrOfBins = -1;
-            indexNew.backend = "";
-            if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) indexNew.w)) {
-                QVariant var = w->property("nrOfBins");
-                if (!var.isNull()) {
-                    bool ok;
-                    indexNew.nrOfBins = var.toInt(&ok);
-                    if (!ok) {
-                        indexNew.nrOfBins = -1;
-                    }
-                } else if (indexNew.init) {
-                    QString mess(
-                        "ArchiveHTTP plugin -- no nrOfBins defined as dynamic property in widget "
-                        + w->objectName() + ", defaulting to maximum number of points");
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
-                    }
+        // Get Index name if specified for this widget
+        indexNew.nrOfBins = -1;
+        indexNew.backend = "";
+        if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) indexNew.w)) {
+            QVariant var = w->property("nrOfBins");
+            if (!var.isNull()) {
+                bool ok;
+                indexNew.nrOfBins = var.toInt(&ok);
+                if (!ok) {
+                    indexNew.nrOfBins = -1;
                 }
-
-                var = w->property("backend");
-                if (!var.isNull()) {
-                    QString backend = var.toString().trimmed().toLower();
-                    if (QString::compare(backend, "sf-archiverappliance") == 0) {
-                        indexNew.backend = var.toString();
-                    } else if (QString::compare(backend, "sf-databuffer") == 0) {
-                        indexNew.backend = var.toString();
-                    } else {
-                        QString mess(
-                            "ArchiveHTTP plugin -- backend defined as dynamic property in widget "
-                            "but not known (use sf-archiverappliance or sf-databuffer) in widget "
-                            + w->objectName());
-                        indexNew.backend = var.toString();
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                            messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
-                        }
-                    }
-                } else if (indexNew.init) {
-                    QString mess(
-                        "ArchiveHTTP plugin -- no backend defined as dynamic property in widget "
-                        + w->objectName()
-                        + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
-                    }
-                }
-
-                // first look if an environment variable is set for the url
-                QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
-                if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
-                    var = w->property("archiverIndex");
-                    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "Check URL: " << var;
-                    if (!var.isNull()) {
-                        QString indexName = var.toString();
-                        index_name = qasc(indexName);
-                        if (indexNew.init) {
-                            QString mess("ArchiveHTTP plugin -- archiverIndex defined as dynamic "
-                                         "property in widget "
-                                         + w->objectName() + ", set to " + index_name);
-                            if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                                messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
-                            }
-                        }
-                    } else if (indexNew.init) {
-                        QString mess(
-                            "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERSF_URL "
-                            "set and no archiverIndex defined as dynamic property in widget "
-                            + w->objectName() + ", defaulting to " + index_name);
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                            messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
-                        }
-                    }
-                } else {
-                    if (indexNew.init) {
-                        QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
-                                     + " from environment variable CAQTDM_ARCHIVERSF_URL");
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                            messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
-                        }
-                    }
-                    index_name = url;
+            } else if (indexNew.init) {
+                QString mess(
+                    "ArchiveHTTP plugin -- no nrOfBins defined as dynamic property in widget "
+                    + w->objectName() + ", defaulting to maximum number of points");
+                if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
+                    messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                 }
             }
-            WorkerHTTP *worker = new WorkerHTTP;
-            WorkerHttpThread *tmpWorkerThread = new WorkerHttpThread(worker);
-            //qDebug() << "tmpThread new" << tmpThread;
-            listOfThreads.insert(i.key(), tmpWorkerThread);
-            ;
 
-            worker->moveToThread(tmpWorkerThread);
+            var = w->property("backend");
+            if (!var.isNull()) {
+                QString backend = var.toString().trimmed().toLower();
+                if (QString::compare(backend, "sf-archiverappliance") == 0) {
+                    indexNew.backend = var.toString();
+                } else if (QString::compare(backend, "sf-databuffer") == 0) {
+                    indexNew.backend = var.toString();
+                } else {
+                    QString mess(
+                        "ArchiveHTTP plugin -- backend defined as dynamic property in widget "
+                        "but not known (use sf-archiverappliance or sf-databuffer) in widget "
+                        + w->objectName());
+                    indexNew.backend = var.toString();
+                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
+                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    }
+                }
+            } else if (indexNew.init) {
+                QString mess(
+                    "ArchiveHTTP plugin -- no backend defined as dynamic property in widget "
+                    + w->objectName()
+                    + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
+                if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
+                    messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                }
+            }
 
-            connect(tmpWorkerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
-            connect(tmpWorkerThread, SIGNAL(finished()), tmpWorkerThread, SLOT(deleteLater()));
-            connect(this,
-                    SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *)),
-                    worker,
-                    SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *)));
-            connect(worker,
-                    SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)),
-                    this,
-                    SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
-            tmpWorkerThread->start();
-
-            emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
-
-            disconnect(worker);
+            // first look if an environment variable is set for the url
+            QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
+            if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
+                var = w->property("archiverIndex");
+                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "Check URL: " << var;
+                if (!var.isNull()) {
+                    QString indexName = var.toString();
+                    index_name = qasc(indexName);
+                    if (indexNew.init) {
+                        QString mess("ArchiveHTTP plugin -- archiverIndex defined as dynamic "
+                                     "property in widget "
+                                     + w->objectName() + ", set to " + index_name);
+                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
+                            messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        }
+                    }
+                } else if (indexNew.init) {
+                    QString mess(
+                        "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERSF_URL "
+                        "set and no archiverIndex defined as dynamic property in widget "
+                        + w->objectName() + ", defaulting to " + index_name);
+                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
+                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    }
+                }
+            } else {
+                if (indexNew.init) {
+                    QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
+                                 + " from environment variable CAQTDM_ARCHIVERSF_URL");
+                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
+                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    }
+                }
+                index_name = url;
+            }
         }
+        WorkerHTTP *worker = new WorkerHTTP;
+        WorkerHttpThread *tmpWorkerThread = new WorkerHttpThread(worker);
+        //qDebug() << "tmpThread new" << tmpThread;
+        listOfThreads.insert(i.key(), tmpWorkerThread);
+
+        worker->moveToThread(tmpWorkerThread);
+
+        connect(tmpWorkerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
+        connect(tmpWorkerThread, SIGNAL(finished()), tmpWorkerThread, SLOT(deleteLater()));
+        connect(this,
+                SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *)),
+                worker,
+                SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *)));
+        connect(worker,
+                SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)),
+                this,
+                SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
+        tmpWorkerThread->start();
+
+        emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
+        disconnect(worker);
 
         ++i;
     }
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"   << "====================== ArchiveHTTP_Plugin::Callback_UpdateInterface finished";
 }
 
 void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
@@ -434,20 +429,10 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
     suspend = true;
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "Callback_AbortOutstandingRequests for key" << key;
 
-    WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
-    QMap<QString, WorkerHttpThread *>::iterator j = listOfThreads.find(key);
-    while (j != listOfThreads.end() && j.key() == key) {
-        tmpThread = (WorkerHttpThread *) j.value();
-        if (tmpThread != (WorkerHttpThread *) Q_NULLPTR) {
-            HttpRetrieval *retrieval = tmpThread->getArchive();
-            tmpThread->quit();
-            if (retrieval != (HttpRetrieval *) Q_NULLPTR) {
-                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "retrieval->cancelDownload()" << retrieval;
-                retrieval->cancelDownload();
-                retrieval->deleteLater();
-            }
-        }
-        ++j;
+    QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = listOfThreads.find(key);
+    if (listOfThreadsEntry != listOfThreads.end()) {
+        listOfThreadsEntry.value()->setIsActive(false);
+        listOfThreadsEntry.value()->getHttpRetrieval()->cancelDownload();
     }
 
     QApplication::processEvents();

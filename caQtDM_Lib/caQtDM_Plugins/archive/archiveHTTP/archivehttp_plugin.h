@@ -32,6 +32,7 @@
 #include <QThread>
 #include <QTimer>
 #include <qwt.h>
+#include <qwt/qwt.h>
 
 #include "archiverCommon.h"
 #include "controlsinterface.h"
@@ -100,8 +101,8 @@ private:
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;
     ArchiverCommon *archiverCommon;
-    QMap<QString, WorkerHttpThread *> listOfThreads;
-    QMap<QString, indexes> m_listOfIndexes;
+    QMap<QString, WorkerHttpThread*> listOfThreads;
+    QMap<QString, indexes> m_IndexesToUpdate;
     QRegularExpression regexStr;
     bool suspend;
 };

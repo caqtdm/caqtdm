@@ -18,27 +18,41 @@ class Q_DECL_EXPORT WorkerHttpThread : public QThread
 
 public:
     WorkerHttpThread(WorkerHTTP *worker)
-    {
-        pworker = worker;
+    { // 672947 124704
+        //  672947 126748
+        m_worker = worker;
         //qDebug() << "myThread::myThread()";
     }
     ~WorkerHttpThread()
     {
         //qDebug() << "myThread::~myThread()";
+        PRINTFLUSH("WorkerHTTPThread::~WorkerHTTPThread()");
     }
-    WorkerHTTP *workerhttp() { return pworker; }
+    WorkerHTTP *workerhttp() { return m_worker; }
 
-    HttpRetrieval *getArchive()
+    HttpRetrieval *getHttpRetrieval()
     {
-        if (pworker != (WorkerHTTP *) Q_NULLPTR) {
-            return pworker->getArchive();
+        if (m_worker != (WorkerHTTP *) Q_NULLPTR) {
+            return m_worker->getArchive();
         } else {
             return (HttpRetrieval *) Q_NULLPTR;
         }
     }
 
+    const bool isActive () {
+        return m_isActive;
+    }
+
+    void setIsActive(const bool &newIsActive) {
+        m_mutex.lock();
+        m_isActive = newIsActive;
+        m_mutex.unlock();
+    }
+
 private:
-    WorkerHTTP *pworker;
+    WorkerHTTP *m_worker;
+    bool m_isActive = true;
+    QMutex m_mutex;
 };
 
 #endif // WORKERHTTPTHREAD_H

@@ -70,13 +70,13 @@
 
 HttpRetrieval::HttpRetrieval()
 {
-    finished = false;
-    totalCount = 0;
-    requestInProgress = false;
-    intern_is_Redirected = false;
-    manager = new QNetworkAccessManager(this);
-    eventLoop = new QEventLoop(this);
-    errorString = "";
+    m_isFinished = false;
+    m_totalNumberOfPoints = 0;
+    m_requestInProgress = false;
+    m_isRedirected = false;
+    m_networkManager = new QNetworkAccessManager(this);
+    m_eventLoop = new QEventLoop(this);
+    m_errorString = "";
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << "constructor";
     //const QUrl url, const QByteArray &json, int secondsPast, bool binned, bool timeAxis, QString key
     connect(this, SIGNAL(requestFinished()), this, SLOT(downloadFinished()));
@@ -84,18 +84,18 @@ HttpRetrieval::HttpRetrieval()
             SIGNAL(signalRequestUrl(const UrlHandlerHttp *, int, bool, bool, QString)),
             this,
             SLOT(requestUrl(const UrlHandlerHttp *, int, bool, bool, QString)));
-    timeoutHelper = new QTimer(this);
-    timeoutHelper->setInterval(60000);
-    connect(timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
+    m_timeoutHelper = new QTimer(this);
+    m_timeoutHelper->setInterval(60000);
+    connect(m_timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
 }
 
 HttpRetrieval::~HttpRetrieval()
 {
-    X.clear();
-    Y.clear();
-    delete manager;
-    delete eventLoop;
-    delete timeoutHelper;
+    m_vecX.clear();
+    m_vecY.clear();
+    delete m_networkManager;
+    delete m_eventLoop;
+    delete m_timeoutHelper;
     //Debug() << this << "destructor" << PV;
 }
 
@@ -104,26 +104,26 @@ bool HttpRetrieval::requestUrl(
 {
     //requestInProgress = true;
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "httpRetrieval::requestUrl" << key;
-    aborted = false;
-    finished = false;
-    totalCount = 0;
-    secndsPast = secondsPast;
+    m_isAborted = false;
+    m_isFinished = false;
+    m_totalNumberOfPoints = 0;
+    m_secondsPast = secondsPast;
     //printf("caQtDM -- request from %s with %s\n", qasc(url.toString()), qasc(out));
-    downloadUrl = urlHandler->assembleUrl();
-    isBinned = binned;
-    timAxis = timeAxis;
-    errorString = "";
-    Backend = urlHandler->backend();
-    PV = key;
-    m_urlHandler.setUrl(downloadUrl);
+    m_downloadUrl = urlHandler->assembleUrl();
+    m_isBinned = binned;
+    m_isAbsoluteTimeAxis = timeAxis;
+    m_errorString = "";
+    m_backend = urlHandler->backend();
+    m_PV = key;
+    m_urlHandler.setUrl(m_downloadUrl);
     delete urlHandler;
 
-    QNetworkRequest request(downloadUrl);
+    QNetworkRequest request(m_downloadUrl);
 
 //for https we need some configuration (with no verify socket)
 #ifndef CAQTDM_SSL_IGNORE
 #ifndef QT_NO_SSL
-    if (downloadUrl.toString().toUpper().contains("HTTPS")) {
+    if (m_downloadUrl.toString().toUpper().contains("HTTPS")) {
         QSslConfiguration config = request.sslConfiguration();
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
         config.setProtocol(QSsl::TlsV1);
@@ -140,21 +140,21 @@ bool HttpRetrieval::requestUrl(
     request.setRawHeader("Accept-Encoding", "gzip, deflate");
     request.setRawHeader("Accept", "*/*");
 
-    reply = manager->get(request);
-    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finishReply(QNetworkReply *)));
-    qDebug() << __LINE__ << "sending GET request to " << downloadUrl
+    m_networkReply = m_networkManager->get(request);
+    connect(m_networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finishReply(QNetworkReply *)));
+    qDebug() << __LINE__ << "sending GET request to m_downloadUrladUrl"
              << "TimeNow: " << QTime::currentTime();
-    finished = false;
+    m_isFinished = false;
 
     // makes sure the timeout signal can be recieved and handled if eventLoop doesn't terminate before
-    timeoutHelper->start();
-    if (!eventLoop->isRunning()) {
-        eventLoop->exec();
+    m_timeoutHelper->start();
+    if (!m_eventLoop->isRunning()) {
+        m_eventLoop->exec();
     }
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "go on eventloop->exec";
 
     //downloadfinished will continue
-    if (finished) {
+    if (m_isFinished) {
         return true;
     } else {
         return false;
@@ -163,36 +163,36 @@ bool HttpRetrieval::requestUrl(
 
 const QString HttpRetrieval::lastError()
 {
-    return errorString;
+    return m_errorString;
 }
 
 int HttpRetrieval::getCount()
 {
-    return totalCount;
+    return m_totalNumberOfPoints;
 }
 
 void HttpRetrieval::getData(QVector<double> &x, QVector<double> &y)
 {
-    x = X;
-    y = Y;
+    x = m_vecX;
+    y = m_vecY;
 }
 
 const QString HttpRetrieval::getBackend()
 {
-    return Backend;
+    return m_backend;
 }
 
 void HttpRetrieval::cancelDownload()
 {
-    totalCount = 0;
-    aborted = true;
+    m_totalNumberOfPoints = 0;
+    m_isAborted = true;
 
-    disconnect(manager);
-    if (reply != Q_NULLPTR) {
+    disconnect(m_networkManager);
+    if (m_networkReply != Q_NULLPTR) {
         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "!!!!!!!!!!!!!!!!! abort networkreply for";
-        reply->abort();
-        reply->deleteLater();
-        reply = Q_NULLPTR;
+        m_networkReply->abort();
+        m_networkReply->deleteLater();
+        m_networkReply = Q_NULLPTR;
     }
 
     downloadFinished();
@@ -206,12 +206,12 @@ void HttpRetrieval::close()
 
 QString HttpRetrieval::getRedirected_Url() const
 {
-    return Redirected_Url;
+    return m_redirectedUrl;
 }
 
 bool HttpRetrieval::is_Redirected() const
 {
-    return intern_is_Redirected;
+    return m_isRedirected;
 }
 
 // =======================================================================================================================================================
@@ -219,10 +219,11 @@ bool HttpRetrieval::is_Redirected() const
 
 void HttpRetrieval::finishReply(QNetworkReply *reply)
 {
-    if (aborted) {
+    if (m_isAborted) {
+        m_errorString += "\n Retrieval was aborted \n";
         return;
     }
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime() << this << PV
+    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime() << this << m_PV
              << "reply received";
     int count = 0;
     struct timeb now;
@@ -232,18 +233,18 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
     if (status.toInt() == 301 || status.toInt() == 302 || status.toInt() == 303
         || status.toInt() == 307 || status.toInt() == 308) {
-        errorString
+        m_errorString
             = tr("Temporary Redirect status code %1 [%2] from %3")
                   .arg(status.toInt())
                   .arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString())
-                  .arg(downloadUrl.toString());
+                  .arg(m_downloadUrl.toString());
         //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
         //          << this << PV << "finishreply" << errorString;
         QByteArray header = reply->rawHeader("location");
         //qDebug() << "location" << header;
-        finished = true;
-        intern_is_Redirected = true;
-        Redirected_Url = header;
+        m_isFinished = true;
+        m_isRedirected = true;
+        m_redirectedUrl = header;
 
         emit requestFinished();
         reply->deleteLater();
@@ -252,11 +253,11 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     if (status.toInt() != 200) {
-        errorString
+        m_errorString
             = tr("unexpected http status code %1 [%2] from %3")
                   .arg(status.toInt())
                   .arg(reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString())
-                  .arg(downloadUrl.toString());
+                  .arg(m_downloadUrl.toString());
         //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
         //<< this << PV << "finishreply" << errorString;
         emit requestFinished();
@@ -265,7 +266,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     if (reply->error()) {
-        errorString = tr("%1: %2").arg(parseError(reply->error())).arg(downloadUrl.toString());
+        m_errorString = tr("%1: %2").arg(parseError(reply->error())).arg(m_downloadUrl.toString());
         //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
         //<< this << PV << "finishreply" << errorString;
         emit requestFinished();
@@ -293,12 +294,13 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                      << "Response is empty, aborting request.";
             emit requestFinished();
             reply->deleteLater();
+            m_errorString += "\n HTTP response was empty \n";
             return;
         }
     }
 
     reply->deleteLater();
-    errorString = "";
+    m_errorString = "";
     ftime(&now);
     seconds = (double) now.time + (double) now.millitm / (double) 1000;
 
@@ -319,11 +321,11 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
     // Did it go wrong?
     if (rootObject.isEmpty() || !conversionOk) {
-        errorString = tr("could not parse json string left=%1 right=%2")
+        m_errorString = tr("could not parse json string left=%1 right=%2")
                           .arg(QString(out).left(20))
                           .arg(QString(out).right(20));
         //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString()
-        //       << this << PV << "finishreply" << errorString;
+        //       << this << PV << "finishreply" << m_errorString;
         emit requestFinished();
         return;
     }
@@ -344,17 +346,17 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         urlHandler->setUrl(m_urlHandler.assembleUrl());
         //qDebug() << "new beginTime:" << urlHandler->beginTime();
 
-        //        emit signalRequestUrl(urlHandler, secndsPast, isBinned, timAxis, PV);
+        //        emit signalRequestUrl(urlHandler, m_secondsPast, isBinned, timAxis, PV);
         //        qDebug() << "-----REQUESTFINISHED; CONTINUING----------------";
-        //        requestInProgress = true;
+        //        m_requestInProgress = true;
     }
 
     QJsonValue ValueJson;
-    if (isBinned) {
+    if (m_isBinned) {
         //qDebug() << "binned PV: " << PV;
-        if (PV.contains(".minY", Qt::CaseInsensitive)) {
+        if (m_PV.contains(".minY", Qt::CaseInsensitive)) {
             ValueJson = rootObject["mins"];
-        } else if (PV.contains(".maxY", Qt::CaseInsensitive)) {
+        } else if (m_PV.contains(".maxY", Qt::CaseInsensitive)) {
             ValueJson = rootObject["maxs"];
         } else {
             ValueJson = rootObject["avgs"];
@@ -364,8 +366,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     // set array size
-    X.resize(ValueJson.toArray().size());
-    Y.resize(ValueJson.toArray().size());
+    m_vecX.resize(ValueJson.toArray().size());
+    m_vecY.resize(ValueJson.toArray().size());
 
     // set count to zero, will be incremented according to values
     count = 0;
@@ -376,7 +378,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     bool isDouble = ValueJson[0].isDouble();
     double mean = 0;
     double archiveTime = 0;
-    if (isBinned) {
+    if (m_isBinned) {
         QJsonValue FirstMsJson = rootObject["ts1Ms"];
         QJsonValue LastMsJson = rootObject["ts2Ms"];
         for (quint32 i = 0; i < ValueJson.toArray().size(); i++) {
@@ -392,12 +394,12 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
             if (archiveTime) {
                 // fill in our data
-                if ((seconds - archiveTime) < secndsPast) {
-                    if (!timAxis) {
-                        X[count] = -(seconds - archiveTime) / 3600.0;
+                if ((seconds - archiveTime) < m_secondsPast) {
+                    if (!m_isAbsoluteTimeAxis) {
+                        m_vecX[count] = -(seconds - archiveTime) / 3600.0;
                     } else {
-                        X[count] = archiveTime * 1000;
-                        Y[count] = mean;
+                        m_vecX[count] = archiveTime * 1000;
+                        m_vecY[count] = mean;
                         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
                     }
                     count++;
@@ -419,12 +421,12 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
             if (archiveTime) {
                 // fill in our data
-                if ((seconds - archiveTime) < secndsPast) {
-                    if (!timAxis) {
-                        X[count] = -(seconds - archiveTime) / 3600.0;
+                if ((seconds - archiveTime) < m_secondsPast) {
+                    if (!m_isAbsoluteTimeAxis) {
+                        m_vecX[count] = -(seconds - archiveTime) / 3600.0;
                     } else {
-                        X[count] = archiveTime * 1000;
-                        Y[count] = mean;
+                        m_vecX[count] = archiveTime * 1000;
+                        m_vecY[count] = mean;
                         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
                     }
                     count++;
@@ -451,7 +453,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
     // Did it go wrong?
     if (array.isEmpty() || !conversionOk) {
-        errorString = tr("could not parse json string left=%1 right=%2")
+        m_errorString = tr("could not parse json string left=%1 right=%2")
                           .arg(QString(out).left(20))
                           .arg(QString(out).right(20));
         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
@@ -472,7 +474,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     //    if (continueAtExists){
     //        emit signalRequestUrl(downloadUrl, QJsonDocument(newPayLoad), secndsPast, isBinned, timAxis, PV);
     //        // wait until previous request(s) have been processed
-    //        while (requestInProgress) {
+    //        while (m_requestInProgress) {
     //            continue;
     //        }
     //        qDebug() << "-----REQUESTFINISHED; CONTINUING----------------";
@@ -499,7 +501,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
             // get backend name
             if (root0.contains(L"backend") && root0[L"backend"].isString()) {
-                Backend = root0[L"backend"].toString().replace("\"", "");
+                m_backend = root0[L"backend"].toString().replace("\"", "");
             }
 
             // find data array inside this part of array
@@ -511,15 +513,15 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
                 // scan the data part (big array)
                 if (array0.size() < 1) {
-                    errorString = tr("no data from %1 : %2").arg(downloadUrl.toString()).arg(Backend);
+                    m_errorString = tr("no data from %1 : %2").arg(m_downloadUrl.toString()).arg(m_backend);
                     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "finishreply" << errorString;
                     emit requestFinished();
                     return;
                 }
 
                 // set array size
-                X.resize(array0.size());
-                Y.resize(array0.size());
+                m_vecX.resize(array0.size());
+                m_vecY.resize(array0.size());
 
                 qDebug() << __LINE__ << "starting" << array0.size()
                          << "iterations over qJsonArray with convertions";
@@ -554,12 +556,12 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                     }
 
                     // fill in our data
-                    if (timeFound && valueFound && (seconds - archiveTime) < secndsPast) {
-                        if (!timAxis)
-                            X[count] = -(seconds - archiveTime) / 3600.0;
+                    if (timeFound && valueFound && (seconds - archiveTime) < m_secondsPast) {
+                        if (!m_isAbsoluteTimeAxis)
+                            m_vecX[count] = -(seconds - archiveTime) / 3600.0;
                         else
-                            X[count] = archiveTime * 1000;
-                        Y[count] = mean;
+                            m_vecX[count] = archiveTime * 1000;
+                        m_vecY[count] = mean;
                         //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "binned" << X[count] << Y[count];
                         count++;
                     }
@@ -570,7 +572,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         }
     }
 #endif
-    totalCount = count;
+    m_totalNumberOfPoints = count;
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "finishreply totalcount =" << count << reply;
 
     //    if (rootObject.contains("continueAt")){
@@ -578,7 +580,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     //        return;
     //    }
 
-    finished = true;
+    m_isFinished = true;
     emit requestFinished();
 }
 
@@ -655,7 +657,11 @@ const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error)
         errstr = tr("ProtocolFailure");
         break;
     default:
-        errstr = tr("unknownError %1").arg(error);
+        if (error.attribute(QNetworkRequest::HttpStatusCodeAttribute) == 418)
+            errstr = tr("ImATeapot");
+        else {
+            errstr = tr("unknownError %1").arg(error);
+        }
         break;
     }
     return errstr;
@@ -665,16 +671,16 @@ int HttpRetrieval::downloadFinished()
 {
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "download finished";
 #if QT_VERSION > QT_VERSION_CHECK(4, 8, 0)
-    eventLoop->quit();
+    m_eventLoop->quit();
 #else
-    eventLoop->exit();
+    m_eventLoop->exit();
 #endif
-    return finished;
+    return m_isFinished;
 }
 
 void HttpRetrieval::timeoutL()
 {
-    errorString = "http request timeout";
+    m_errorString = "http request timeout";
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime().toString() << this << PV << "timeout" << errorString;
     cancelDownload();
 }
@@ -708,7 +714,7 @@ QByteArray HttpRetrieval::gUncompress(const QByteArray &data)
     static const int CHUNK_SIZE = 1024;
     char out[CHUNK_SIZE];
 
-    /* allocate inflate state */
+    // allocate inflate state
     strm.zalloc = Z_NULL;
     strm.zfree = Z_NULL;
     strm.opaque = Z_NULL;
