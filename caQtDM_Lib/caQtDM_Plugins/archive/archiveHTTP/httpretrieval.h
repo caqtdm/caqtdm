@@ -95,7 +95,7 @@ private:
     bool m_requestInProgress;
     QUrl m_downloadUrl;
     QString m_errorString;
-    QVector<double> m_vecX,m_vecY;
+    QVector<double> m_vecX, m_vecY;
     int m_totalNumberOfPoints;
     UrlHandlerHttp m_urlHandler;
     int m_secondsPast;

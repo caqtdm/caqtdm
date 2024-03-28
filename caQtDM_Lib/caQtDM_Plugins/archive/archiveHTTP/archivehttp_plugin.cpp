@@ -36,6 +36,7 @@
 
 ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 {
+    qDebug() << "Slept for 10000 ms";
     suspend = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
@@ -109,6 +110,7 @@ int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
     // now just let archiverCommon do the usual stuff
     return archiverCommon->pvClearMonitor(kData);
 }
+
 int ArchiveHTTP_Plugin::pvFreeAllocatedData(knobData *kData)
 {
     return archiverCommon->pvFreeAllocatedData(kData);
@@ -236,7 +238,6 @@ void ArchiveHTTP_Plugin::handleResults(
         tmpThread->wait();
     }
     listOfThreads.remove(indexNew.key);
-    listOfThreadsEntry = Q_NULLPTR;
 
     QList<QString> removeKeys;
     regexStr.setPattern("\\b[0-7]_");
@@ -419,7 +420,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 
         emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
         disconnect(worker);
-
         ++i;
     }
 }

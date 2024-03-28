@@ -37,7 +37,9 @@ HEADERS         = ../../controlsinterface.h archivehttp_plugin.h httpretrieval.h
     workerHttp.h \
     workerHttpThread.h
 SOURCES         =  archivehttp_plugin.cpp httpretrieval.cpp ../archiverCommon.cpp \
-    urlhandlerhttp.cpp
+    urlhandlerhttp.cpp \
+    workerHttp.cpp \
+    workerHttpThread.cpp
 TARGET          = archiveHTTP_plugin
 
 DISTFILES +=

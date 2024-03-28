@@ -31,8 +31,14 @@
 #include <QObject>
 #include <QThread>
 #include <QTimer>
+
+#if defined(_MSC_VER)
 #include <qwt.h>
+#endif
+
+#if defined(linux) || defined TARGET_OS_MAC
 #include <qwt/qwt.h>
+#endif
 
 #include "archiverCommon.h"
 #include "controlsinterface.h"

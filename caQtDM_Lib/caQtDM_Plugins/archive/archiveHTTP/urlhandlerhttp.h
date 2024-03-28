@@ -80,8 +80,8 @@ private:
     const QString m_endpointBinned = "/binned";
     const QString m_endpointRaw = "/events";
 
-    QString m_apiPath = "/api/4";
-    bool m_allowLargeResult = true;
+    QString m_apiPath;
+    bool m_allowLargeResult;
 
     QUrl m_baseUrl;
     bool m_https;

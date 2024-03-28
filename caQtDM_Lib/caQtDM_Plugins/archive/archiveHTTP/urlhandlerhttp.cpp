@@ -34,7 +34,10 @@ UrlHandlerHttp::UrlHandlerHttp()
     QString customApiPath = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_API_PATH");
     if (!customApiPath.isEmpty() && !customApiPath.isNull()) {
         m_apiPath = customApiPath;
+    } else {
+        m_apiPath = "/api/4";
     }
+    m_allowLargeResult = true;
 }
 
 UrlHandlerHttp::~UrlHandlerHttp()
