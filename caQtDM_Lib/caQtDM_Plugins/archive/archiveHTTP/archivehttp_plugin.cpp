@@ -40,7 +40,6 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     suspend = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
-    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "Create (http-retrieval)";
     archiverCommon = new ArchiverCommon();
 
     connect(archiverCommon,
@@ -58,16 +57,13 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()
 {
     delete archiverCommon;
-    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()";
 }
 
-// gives the plugin name back
 QString ArchiveHTTP_Plugin::pluginName()
 {
     return "archiveHTTP";
 }
 
-// init communication
 int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
                                                MessageWindow *messageWindow,
                                                QMap<QString, QString> options)
@@ -195,10 +191,8 @@ int ArchiveHTTP_Plugin::TerminateIO()
 void ArchiveHTTP_Plugin::handleResults(
     indexes indexNew, int nbVal, QVector<double> XValsN, QVector<double> YValsN, QString backend)
 {
-    //QThread *thread = QThread::currentThread();
-    //qDebug() << "in sf handle results" << nbVal << TimerN.count() << indexNew.indexX << indexNew.indexY << thread;
-    QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = listOfThreads.find(indexNew.key);
-    if (listOfThreadsEntry == listOfThreads.end()) {
+    QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = listOfThreads.constFind(indexNew.key);
+    if (listOfThreadsEntry == listOfThreads.constEnd()) {
         // This should never happen
         return;
     }
@@ -206,8 +200,6 @@ void ArchiveHTTP_Plugin::handleResults(
 
     XValsN.resize(nbVal);
     YValsN.resize(nbVal);
-
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "handle cartesian";
 
     // set data for other indexes with same channel
     indexes indexInCheck = indexNew;
@@ -232,33 +224,32 @@ void ArchiveHTTP_Plugin::handleResults(
     XValsN.resize(0);
     YValsN.resize(0);
 
-    WorkerHttpThread *tmpThread = (WorkerHttpThread *) listOfThreadsEntry.value();
-    if (tmpThread != Q_NULLPTR) {
-        tmpThread->quit();
-        tmpThread->wait();
+    WorkerHttpThread *finishedThread = (WorkerHttpThread *) listOfThreadsEntry.value();
+    if (finishedThread != Q_NULLPTR) {
+        finishedThread->quit();
+        finishedThread->wait();
     }
     listOfThreads.remove(indexNew.key);
 
     QList<QString> removeKeys;
     regexStr.setPattern("\\b[0-7]_");
-    for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
-         tempI != m_IndexesToUpdate.constEnd();
-         tempI++) {
-        QString keyStored = tempI.key();
+    for (QMap<QString, indexes>::const_iterator indexesToUpdateIterator = m_IndexesToUpdate.constBegin();
+         indexesToUpdateIterator != m_IndexesToUpdate.constEnd();
+         indexesToUpdateIterator++) {
+        QString keyStored = indexesToUpdateIterator.key();
         keyStored.replace(regexStr, "");
         keyStored.replace(regexStr, "");
         if (keyStored == indexInCheck.key) {
             if (!isActive) {
-                archiverCommon->updateSecondsPast(tempI.value(), nbVal != 0);
+                archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), nbVal != 0);
             }
-            removeKeys.append(tempI.key());;
+            removeKeys.append(indexesToUpdateIterator.key());;
         }
     }
 
     for (int i = 0; i < removeKeys.count(); i++) {
         m_IndexesToUpdate.remove(removeKeys.at(i));
     }
-    //qDebug() << "in sf handle results finished";
 }
 
 // =======================================================================================================================================================
@@ -268,9 +259,7 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
-    PRINTFLUSH("Callback_UpdateInterface called\n");
     if (suspend) {
-        PRINTFLUSH("Callback_UpdateInterface suspended - returning");
         return;
     }
 
@@ -306,15 +295,12 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         }
         if (keyAlreadyPresent) {
             i++;
-            PRINTFLUSH("keyAlreadyPresent - continue");
             continue;
         }
         m_IndexesToUpdate.insert(i.key(), i.value());
 
         // Now initiate the retrieval
-        WorkerHttpThread *tmpThread = (WorkerHttpThread *) Q_NULLPTR;
         indexes indexNew = i.value();
-        //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << " -------------" << i.key() << ": " << indexNew.indexX << indexNew.indexY << indexNew.pv << indexNew.w;
 
         // Get Index name if specified for this widget
         indexNew.nrOfBins = -1;
@@ -367,7 +353,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
             if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
                 var = w->property("archiverIndex");
-                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "Check URL: " << var;
                 if (!var.isNull()) {
                     QString indexName = var.toString();
                     index_name = qasc(indexName);
@@ -399,27 +384,26 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 index_name = url;
             }
         }
-        WorkerHTTP *worker = new WorkerHTTP;
-        WorkerHttpThread *tmpWorkerThread = new WorkerHttpThread(worker);
-        //qDebug() << "tmpThread new" << tmpThread;
-        listOfThreads.insert(i.key(), tmpWorkerThread);
+        WorkerHTTP *newWorker = new WorkerHTTP;
+        WorkerHttpThread *newWorkerThread = new WorkerHttpThread(newWorker);
+        listOfThreads.insert(i.key(), newWorkerThread);
 
-        worker->moveToThread(tmpWorkerThread);
+        newWorker->moveToThread(newWorkerThread);
 
-        connect(tmpWorkerThread, SIGNAL(finished()), worker, SLOT(workerFinish()));
-        connect(tmpWorkerThread, SIGNAL(finished()), tmpWorkerThread, SLOT(deleteLater()));
+        connect(newWorkerThread, SIGNAL(finished()), newWorker, SLOT(workerFinish()));
+        connect(newWorkerThread, SIGNAL(finished()), newWorkerThread, SLOT(deleteLater()));
         connect(this,
                 SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *)),
-                worker,
+                newWorker,
                 SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *)));
-        connect(worker,
+        connect(newWorker,
                 SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)),
                 this,
                 SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
-        tmpWorkerThread->start();
+        newWorkerThread->start();
 
         emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
-        disconnect(worker);
+        disconnect(newWorker);
         ++i;
     }
 }
@@ -427,7 +411,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 {
     suspend = true;
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|"<< "Callback_AbortOutstandingRequests for key" << key;
 
     QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = listOfThreads.find(key);
     if (listOfThreadsEntry != listOfThreads.end()) {
@@ -441,12 +424,7 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 
 void ArchiveHTTP_Plugin::closeEvent()
 {
-    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|"  << "ArchiveHTTP_Plugin::closeEvent ";
     emit Signal_StopUpdateInterface();
 }
 // =======================================================================================================================================================
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-#else
-Q_EXPORT_PLUGIN2(ArchiveHTTP_Plugin, ArchiveHTTP_Plugin)
-#endif

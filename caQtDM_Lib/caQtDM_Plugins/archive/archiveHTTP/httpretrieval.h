@@ -35,15 +35,12 @@
 #include <QMessageBox>
 #include <QEventLoop>
 
-//#define CSV 1
-
-#ifndef CSV
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
-#endif
 
+// Used for debugging on Linux
 #define PRINTFLUSH(...) \
     do { \
         printf(__VA_ARGS__); \
@@ -71,6 +68,10 @@ public:
     QString getRedirected_Url() const;
     bool is_Redirected() const;
 
+    bool hasContinueAt() const;
+
+    QDateTime continueAt() const;
+
 signals:
     void networkError(const QString);
     void requestFinished();
@@ -92,7 +93,6 @@ private:
     QNetworkAccessManager *m_networkManager;
     QNetworkReply *m_networkReply;
     int m_isFinished;
-    bool m_requestInProgress;
     QUrl m_downloadUrl;
     QString m_errorString;
     QVector<double> m_vecX, m_vecY;
@@ -107,6 +107,7 @@ private:
     QString m_PV;
     bool m_isRedirected;
     QString m_redirectedUrl;
+    QDateTime m_continueAt;
 };
 
 #endif
