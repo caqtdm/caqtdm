@@ -91,10 +91,10 @@ public:
 
     // From hereon downwards everything is new, so not available through ControlsInterface (without cast)
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>, QString);
+    void handleResults(indexes, int, QVector<double>, QVector<double>, QString, bool);
 
 signals:
-    void operate(QWidget *, const indexes, const QString, MessageWindow *);
+    void operate(QWidget *, const indexes, const QString, MessageWindow *, MutexKnobData *);
     void Signal_StopUpdateInterface();
 
 private slots:

@@ -189,8 +189,9 @@ int ArchiveHTTP_Plugin::TerminateIO()
 //  public slots:
 
 void ArchiveHTTP_Plugin::handleResults(
-    indexes indexNew, int nbVal, QVector<double> XValsN, QVector<double> YValsN, QString backend)
+    indexes indexNew, int nbVal, QVector<double> XValsN, QVector<double> YValsN, QString backend, bool isFinalIteration)
 {
+    QMutexLocker mutexLocker(&mutex);
     QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = listOfThreads.constFind(indexNew.key);
     if (listOfThreadsEntry == listOfThreads.constEnd()) {
         // This should never happen
@@ -223,32 +224,34 @@ void ArchiveHTTP_Plugin::handleResults(
     }
     XValsN.resize(0);
     YValsN.resize(0);
-
-    WorkerHttpThread *finishedThread = (WorkerHttpThread *) listOfThreadsEntry.value();
-    if (finishedThread != Q_NULLPTR) {
-        finishedThread->quit();
-        finishedThread->wait();
-    }
-    listOfThreads.remove(indexNew.key);
-
-    QList<QString> removeKeys;
-    regexStr.setPattern("\\b[0-7]_");
-    for (QMap<QString, indexes>::const_iterator indexesToUpdateIterator = m_IndexesToUpdate.constBegin();
-         indexesToUpdateIterator != m_IndexesToUpdate.constEnd();
-         indexesToUpdateIterator++) {
-        QString keyStored = indexesToUpdateIterator.key();
-        keyStored.replace(regexStr, "");
-        keyStored.replace(regexStr, "");
-        if (keyStored == indexInCheck.key) {
-            if (!isActive) {
-                archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), nbVal != 0);
-            }
-            removeKeys.append(indexesToUpdateIterator.key());;
+    if (isFinalIteration) {
+        WorkerHttpThread *finishedThread = (WorkerHttpThread *) listOfThreadsEntry.value();
+        if (finishedThread != Q_NULLPTR) {
+            finishedThread->quit();
+            finishedThread->wait();
         }
-    }
+        listOfThreads.remove(indexNew.key);
 
-    for (int i = 0; i < removeKeys.count(); i++) {
-        m_IndexesToUpdate.remove(removeKeys.at(i));
+
+        QList<QString> removeKeys;
+        regexStr.setPattern("\\b[0-7]_");
+        for (QMap<QString, indexes>::const_iterator indexesToUpdateIterator = m_IndexesToUpdate.constBegin();
+             indexesToUpdateIterator != m_IndexesToUpdate.constEnd();
+             indexesToUpdateIterator++) {
+            QString keyStored = indexesToUpdateIterator.key();
+            keyStored.replace(regexStr, "");
+            keyStored.replace(regexStr, "");
+            if (keyStored == indexInCheck.key) {
+                if (!isActive) {
+                    archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), nbVal != 0);
+                }
+                removeKeys.append(indexesToUpdateIterator.key());;
+            }
+        }
+
+        for (int i = 0; i < removeKeys.count(); i++) {
+            m_IndexesToUpdate.remove(removeKeys.at(i));
+        }
     }
 }
 
@@ -259,10 +262,10 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
+    QMutexLocker mutexLocker(&mutex);
     if (suspend) {
         return;
     }
-
 
     // Index name (url)
     QString index_name = "https://data-api.psi.ch/";
@@ -393,16 +396,16 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         connect(newWorkerThread, SIGNAL(finished()), newWorker, SLOT(workerFinish()));
         connect(newWorkerThread, SIGNAL(finished()), newWorkerThread, SLOT(deleteLater()));
         connect(this,
-                SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *)),
+                SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *)),
                 newWorker,
-                SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *)));
+                SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *)));
         connect(newWorker,
-                SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString)),
+                SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString, bool)),
                 this,
-                SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString)));
+                SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString, bool)));
         newWorkerThread->start();
 
-        emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP);
+        emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP, mutexknobdataP);
         disconnect(newWorker);
         ++i;
     }
@@ -410,15 +413,16 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 
 void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 {
+    QMutexLocker mutexLocker(&mutex);
     suspend = true;
 
     QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = listOfThreads.find(key);
     if (listOfThreadsEntry != listOfThreads.end()) {
         listOfThreadsEntry.value()->setIsActive(false);
-        listOfThreadsEntry.value()->getHttpRetrieval()->cancelDownload();
+        //listOfThreadsEntry.value()->getHttpRetrieval()->cancelDownload();
+        QMetaObject::invokeMethod(listOfThreadsEntry.value()->getHttpRetrieval(), "cancelDownload");
     }
 
-    QApplication::processEvents();
     suspend = false;
 }
 

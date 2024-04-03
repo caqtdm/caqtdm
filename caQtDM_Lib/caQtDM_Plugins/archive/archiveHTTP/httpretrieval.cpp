@@ -27,7 +27,6 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QFile>
-#include <QMutex>
 #include <QNetworkAccessManager>
 #include <QSslConfiguration>
 #include <QTimer>
@@ -77,10 +76,6 @@ HttpRetrieval::HttpRetrieval()
     m_eventLoop = new QEventLoop(this);
     m_errorString = "";
     connect(this, SIGNAL(requestFinished()), this, SLOT(downloadFinished()));
-    connect(this,
-            SIGNAL(signalRequestUrl(const UrlHandlerHttp *, int, bool, bool, QString)),
-            this,
-            SLOT(requestUrl(const UrlHandlerHttp *, int, bool, bool, QString)));
     m_timeoutHelper = new QTimer(this);
     m_timeoutHelper->setInterval(60000);
     connect(m_timeoutHelper, SIGNAL(timeout()), this, SLOT(timeoutL()));
@@ -88,6 +83,7 @@ HttpRetrieval::HttpRetrieval()
 
 HttpRetrieval::~HttpRetrieval()
 {
+    //qDebug() << "HttpRetrieval Destructor" << QThread::currentThread() << this;
     m_vecX.clear();
     m_vecY.clear();
     delete m_networkManager;
@@ -96,20 +92,19 @@ HttpRetrieval::~HttpRetrieval()
 }
 
 bool HttpRetrieval::requestUrl(
-    const UrlHandlerHttp *urlHandler, int secondsPast, bool binned, bool timeAxis, QString key)
+    const QUrl downloadUrl, const QString backend, const int secondsPast, const bool binned, const bool timeAxis, const QString key)
 {
+
     m_isAborted = false;
     m_isFinished = false;
     m_totalNumberOfPoints = 0;
     m_secondsPast = secondsPast;
-    m_downloadUrl = urlHandler->assembleUrl();
+    m_downloadUrl = downloadUrl;
     m_isBinned = binned;
     m_isAbsoluteTimeAxis = timeAxis;
     m_errorString = "";
-    m_backend = urlHandler->backend();
+    m_backend = backend;
     m_PV = key;
-    m_urlHandler.setUrl(m_downloadUrl);
-    delete urlHandler;
 
     QNetworkRequest request(m_downloadUrl);
 
@@ -132,17 +127,18 @@ bool HttpRetrieval::requestUrl(
 
     m_networkReply = m_networkManager->get(request);
     connect(m_networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finishReply(QNetworkReply *)));
-    qDebug() << __LINE__ << "sending GET request to m_downloadUrladUrl"
-             << "TimeNow: " << QTime::currentTime();
+    //qDebug() << __LINE__ << "sending GET request to" << m_downloadUrl
+    //         << "TimeNow: " << QTime::currentTime();
     m_isFinished = false;
 
     // makes sure the timeout signal can be recieved and handled if eventLoop doesn't terminate before
     m_timeoutHelper->start();
-    if (!m_eventLoop->isRunning()) {
-        m_eventLoop->exec();
-    }
+    m_eventLoop->exec();
 
-    //downloadfinished will continue
+    //qDebug() << "HttpRetrieval delete m_networkReply" << QThread::currentThread() << this;
+    delete m_networkReply;
+    m_networkReply = Q_NULLPTR;
+
     if (m_isFinished) {
         return true;
     } else {
@@ -160,10 +156,10 @@ int HttpRetrieval::getCount()
     return m_totalNumberOfPoints;
 }
 
-void HttpRetrieval::getData(QVector<double> &x, QVector<double> &y)
+void HttpRetrieval::getDataAppended(QVector<double> &x, QVector<double> &y)
 {
-    x = m_vecX;
-    y = m_vecY;
+    x.append(m_vecX);
+    y.append(m_vecY);
 }
 
 const QString HttpRetrieval::getBackend()
@@ -173,22 +169,19 @@ const QString HttpRetrieval::getBackend()
 
 void HttpRetrieval::cancelDownload()
 {
+    //qDebug() << "HttpRetrieval cancelDownload" << QThread::currentThread() << this;
     m_totalNumberOfPoints = 0;
     m_isAborted = true;
 
-    disconnect(m_networkManager);
+
     if (m_networkReply != Q_NULLPTR) {
         m_networkReply->abort();
         m_networkReply->deleteLater();
         m_networkReply = Q_NULLPTR;
     }
+    disconnect(m_networkManager);
 
     downloadFinished();
-}
-
-void HttpRetrieval::close()
-{
-    deleteLater();
 }
 
 QString HttpRetrieval::getRedirected_Url() const
@@ -210,8 +203,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         m_errorString += "\n Retrieval was aborted \n";
         return;
     }
-    qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime() << this << m_PV
-             << "reply received";
+    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << QTime::currentTime() << this << m_PV
+    //         << "reply received";
     int count = 0;
     struct timeb now;
     double seconds;
@@ -244,7 +237,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     if (reply->error()) {
-        m_errorString = QString("%1: %2").arg(parseError(reply->error(), status.toInt()), m_downloadUrl.toString());
+        m_errorString = QString("%1: %2").arg(parseError(reply->error()), m_downloadUrl.toString());
         emit requestFinished();
         reply->deleteLater();
         return;
@@ -312,11 +305,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         ValueJson = rootObject["values"];
     }
 
-    // set array size
-    m_vecX.resize(ValueJson.toArray().size());
-    m_vecY.resize(ValueJson.toArray().size());
-
-    // set count to zero, will be incremented according to values
+    // set count to zero, it will be incremented according to values
     count = 0;
 
     int secondsAnchor = rootObject.value("tsAnchor").toInt();
@@ -333,18 +322,19 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             } else {
                 mean = ValueJson[i].toInt();
             }
+            // get average timestamp in seconds
             archiveTime = secondsAnchor
-                          + ((FirstMsJson[i].toInt() + LastMsJson[i].toInt()) * 0.0005);
+                          + ((FirstMsJson[i].toInt() + LastMsJson[i].toInt()) / 2000);
 
             // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
             if (archiveTime) {
                 // fill in our data
                 if ((seconds - archiveTime) < m_secondsPast) {
                     if (!m_isAbsoluteTimeAxis) {
-                        m_vecX[count] = -(seconds - archiveTime) / 3600.0;
+                        m_vecX.append(-(seconds - archiveTime) / 3600.0);
                     } else {
-                        m_vecX[count] = archiveTime * 1000;
-                        m_vecY[count] = mean;
+                        m_vecX.append(archiveTime * 1000);
+                        m_vecY.append(mean);
                     }
                     count++;
                 }
@@ -360,17 +350,18 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                 mean = ValueJson[i].toInt();
             }
 
-            archiveTime = secondsAnchor + (MsJson[i].toInt() * 0.001);
+            // get timestamp in seconds
+            archiveTime = secondsAnchor + (MsJson[i].toInt() / 1000);
 
             // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
             if (archiveTime) {
                 // fill in our data
                 if ((seconds - archiveTime) < m_secondsPast) {
                     if (!m_isAbsoluteTimeAxis) {
-                        m_vecX[count] = -(seconds - archiveTime) / 3600.0;
+                        m_vecX.append(-(seconds - archiveTime) / 3600.0);
                     } else {
-                        m_vecX[count] = archiveTime * 1000;
-                        m_vecY[count] = mean;
+                        m_vecX.append(archiveTime * 1000);
+                        m_vecY.append(mean);
                     }
                     count++;
                 }
@@ -383,7 +374,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     emit requestFinished();
 }
 
-const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error, int statusCode)
+const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error)
 {
     QString errstr = "";
     switch (error) {
@@ -454,11 +445,7 @@ const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error, int s
         errstr = tr("ProtocolFailure");
         break;
     default:
-        if (statusCode == 418)
-            errstr = tr("ImATeapot");
-        else {
-            errstr = tr("unknownError %1").arg(error);
-        }
+        errstr = tr("unknownError %1").arg(error);
         break;
     }
     return errstr;

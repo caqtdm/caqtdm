@@ -38,6 +38,9 @@ public:
     ~WorkerHTTP();
 
 private:
+    /* Watch out when working with this element, it might behave entirely different amongst Qt versions.
+     * In Qt 5.15 QVector is a distinct Class, whereas since Qt 6.0 it is a mere alias for QList.
+     * */
     QVector<double> m_vecX, m_vecY;
 
 public slots:
@@ -46,17 +49,21 @@ public slots:
     void getFromArchive(QWidget *w,
                         indexes indexNew,
                         QString index_name,
-                        MessageWindow *messageWindow);
+                        MessageWindow *messageWindow,
+                        MutexKnobData *mutexKnobDataP);
 
 signals:
     void resultReady(indexes indexNew,
                      int nbVal,
                      QVector<double> TimerN,
                      QVector<double> YValsN,
-                     QString backend);
+                     QString backend,
+                     bool isFinalIteration);
 
 private:
     HttpRetrieval *m_httpRetrieval;
+    bool m_receivedContinueAt;
+    QMutex m_globalMutex;
 };
 
 #endif // WORKERHTTP_H

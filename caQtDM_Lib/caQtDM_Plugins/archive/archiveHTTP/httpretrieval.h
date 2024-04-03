@@ -26,6 +26,7 @@
 #ifndef HTTPRETRIEVAL_H
 #define HTTPRETRIEVAL_H
 
+#include "qmutex.h"
 #include "qtimer.h"
 #include "urlhandlerhttp.h"
 #include <QDebug>
@@ -60,31 +61,24 @@ public:
     ~HttpRetrieval();
     const QString lastError();
     int getCount();
-    void getData(QVector<double> &x, QVector<double> &y);
+    void getDataAppended(QVector<double> &x, QVector<double> &y);
     const QString getBackend();
-    void cancelDownload();
-    void close();
-
     QString getRedirected_Url() const;
     bool is_Redirected() const;
-
     bool hasContinueAt() const;
-
     QDateTime continueAt() const;
+    bool requestUrl(const QUrl downloadUrl, const QString backend, const int secondsPast, const bool binned, const bool timeAxis, const QString key);
 
 signals:
     void networkError(const QString);
     void requestFinished();
-    void signalRequestUrl(const UrlHandlerHttp*, int, bool, bool, QString);
-
-public slots:
-    bool requestUrl(const UrlHandlerHttp *urlHandler, int secondsPast, bool binned, bool timeAxis, QString key);
 
 protected slots:
     void finishReply(QNetworkReply*);
-    const QString parseError(QNetworkReply::NetworkError error, int statusCode);
+    const QString parseError(QNetworkReply::NetworkError error);
     int downloadFinished();
     void timeoutL();
+    void cancelDownload();
 
 private:
     bool getDoubleFromString(QString input, double &value);
@@ -97,7 +91,6 @@ private:
     QString m_errorString;
     QVector<double> m_vecX, m_vecY;
     int m_totalNumberOfPoints;
-    UrlHandlerHttp m_urlHandler;
     int m_secondsPast;
     QEventLoop *m_eventLoop;
     bool m_isBinned;
@@ -108,6 +101,7 @@ private:
     bool m_isRedirected;
     QString m_redirectedUrl;
     QDateTime m_continueAt;
+    QMutex m_globalMutex;
 };
 
 #endif
