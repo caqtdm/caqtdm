@@ -62,6 +62,7 @@ public:
     const QString lastError();
     int getCount();
     void getDataAppended(QVector<double> &x, QVector<double> &y);
+    void getBinnedDataAppended(QVector<double> &x, QVector<double> &avgY, QVector<double> &minY, QVector<double> &maxY);
     const QString getBackend();
     QString getRedirected_Url() const;
     bool is_Redirected() const;
@@ -89,7 +90,7 @@ private:
     int m_isFinished;
     QUrl m_downloadUrl;
     QString m_errorString;
-    QVector<double> m_vecX, m_vecY;
+    QVector<double> m_vecX, m_vecY, m_vecMinY, m_vecMaxY;
     int m_totalNumberOfPoints;
     int m_secondsPast;
     QEventLoop *m_eventLoop;

@@ -36,7 +36,6 @@
 
 ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 {
-    qDebug() << "Slept for 10000 ms";
     suspend = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
@@ -189,7 +188,7 @@ int ArchiveHTTP_Plugin::TerminateIO()
 //  public slots:
 
 void ArchiveHTTP_Plugin::handleResults(
-    indexes indexNew, int nbVal, QVector<double> XValsN, QVector<double> YValsN, QString backend, bool isFinalIteration)
+    indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration)
 {
     QMutexLocker mutexLocker(&mutex);
     QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = listOfThreads.constFind(indexNew.key);
@@ -199,31 +198,40 @@ void ArchiveHTTP_Plugin::handleResults(
     }
     const bool isActive =  listOfThreadsEntry.value()->isActive();
 
-    XValsN.resize(nbVal);
-    YValsN.resize(nbVal);
+    XVals.resize(valueCount);
+    YVals.resize(valueCount);
 
-    // set data for other indexes with same channel
+    // set data for other indexes with same channel (& widget because different widgets might have different time spans etc.)
     indexes indexInCheck = indexNew;
     regexStr.setPattern("\\b[0-7]_");
     indexInCheck.key.replace(regexStr, "");
     indexInCheck.key.replace(regexStr, "");
-    if (nbVal > 0) {
+    indexInCheck.key.replace(".minY", "");
+    indexInCheck.key.replace(".maxY", "");
+    if (valueCount > 0) {
         for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
              tempI != m_IndexesToUpdate.constEnd();
              tempI++) {
             QString keyStored = tempI.key();
             keyStored.replace(regexStr, "");
             keyStored.replace(regexStr, "");
-
+            keyStored.replace(".minY", "");
+            keyStored.replace(".maxY", "");
             if (keyStored == indexInCheck.key) {
                 if (isActive) {
-                    archiverCommon->updateCartesian(nbVal, tempI.value(), XValsN, YValsN, backend);
+                    if (tempI.key().contains(".minY")) {
+                        archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YMinVals, backend);
+                    } else if (tempI.key().contains(".maxY")) {
+                        archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YMaxVals, backend);
+                    } else {
+                        archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YVals, backend);
+                    }
                 }
             }
         }
     }
-    XValsN.resize(0);
-    YValsN.resize(0);
+    XVals.resize(0);
+    YVals.resize(0);
     if (isFinalIteration) {
         WorkerHttpThread *finishedThread = (WorkerHttpThread *) listOfThreadsEntry.value();
         if (finishedThread != Q_NULLPTR) {
@@ -231,7 +239,6 @@ void ArchiveHTTP_Plugin::handleResults(
             finishedThread->wait();
         }
         listOfThreads.remove(indexNew.key);
-
 
         QList<QString> removeKeys;
         regexStr.setPattern("\\b[0-7]_");
@@ -241,9 +248,11 @@ void ArchiveHTTP_Plugin::handleResults(
             QString keyStored = indexesToUpdateIterator.key();
             keyStored.replace(regexStr, "");
             keyStored.replace(regexStr, "");
+            keyStored.replace(".minY", "");
+            keyStored.replace(".maxY", "");
             if (keyStored == indexInCheck.key) {
                 if (!isActive) {
-                    archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), nbVal != 0);
+                    archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), valueCount != 0);
                 }
                 removeKeys.append(indexesToUpdateIterator.key());;
             }
@@ -277,11 +286,12 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
     while (i != listOfIndexes.constEnd()) {
         // Don't retrieve data twice
         QString keyInCheck = i.key();
+        // Account for different curve Numbers
         keyInCheck.replace(regexStr, "");
         keyInCheck.replace(regexStr, "");
-        indexes indexInCheck = i.value();
-        indexInCheck.key.replace(regexStr, "");
-        indexInCheck.key.replace(regexStr, "");
+        // Account for .minY and .maxY
+        keyInCheck.replace(".minY", "");
+        keyInCheck.replace(".maxY", "");
         bool keyAlreadyPresent = false;
         for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
              tempI != m_IndexesToUpdate.constEnd();
@@ -289,6 +299,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             QString keyStored = tempI.key();
             keyStored.replace(regexStr, "");
             keyStored.replace(regexStr, "");
+            keyStored.replace(".minY", "");
+            keyStored.replace(".maxY", "");
 
             if (keyStored == keyInCheck) {
                 m_IndexesToUpdate.insert(i.key(), i.value());
@@ -400,9 +412,9 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 newWorker,
                 SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *)));
         connect(newWorker,
-                SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QString, bool)),
+                SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QVector<double>, QVector<double>, QString, bool)),
                 this,
-                SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QString, bool)));
+                SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QVector<double>, QVector<double>, QString, bool)));
         newWorkerThread->start();
 
         emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP, mutexknobdataP);

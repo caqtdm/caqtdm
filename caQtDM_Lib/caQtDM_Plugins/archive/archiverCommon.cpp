@@ -139,7 +139,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
         indexes index;
 
         sprintf(asc, "%d_%s_%p", kData->specData[0], kData->pv, kData->dispW);
+
         QString key = QString(asc);
+        // We need to construct new, temporary QString objects, else we modify the actual string, which is unintended
+        QString possibleXKeyForMinY = QString(key).replace(".minY", "");
+        QString possibleXKeyForMaxY = QString(key).replace(".maxY", "");
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
 
@@ -206,46 +210,42 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                 index.timeAxis = false;
             }
         }
-
-        if (!alreadyProcessedIndexes.contains(key)) {
+        if (!alreadyProcessedIndexes.contains(key) && !alreadyProcessedIndexes.contains(possibleXKeyForMinY) && !alreadyProcessedIndexes.contains(possibleXKeyForMaxY)) {
             alreadyProcessedIndexes.insert(key, index);
-            if (key.contains(".minY", Qt::CaseInsensitive) || key.contains(".maxY", Qt::CaseInsensitive)) {
-                QMap<QString, indexes>::iterator i = alreadyProcessedIndexes.find(key);
-                while (i != alreadyProcessedIndexes.end() && i.key() == key) {
+        } else if (!listOfIndexes.contains(key) && !listOfIndexes.contains(possibleXKeyForMinY) && !listOfIndexes.contains(possibleXKeyForMaxY)) {
+            QMap<QString, indexes>::iterator i;
+            QVector<QMap<QString, indexes>::iterator > listOfIterators;
+            listOfIterators.append(alreadyProcessedIndexes.find(key));
+            listOfIterators.append(alreadyProcessedIndexes.find(possibleXKeyForMinY));
+            listOfIterators.append(alreadyProcessedIndexes.find(possibleXKeyForMaxY));
+            // Iterate through all possible forms of an already processed index to find indexX or indexY, depending on what we already have.
+            for (int j = 0; j < listOfIterators.count(); j++) {
+                i = listOfIterators[j];
+                while (i != alreadyProcessedIndexes.end()) {
                     indexes indexNew = i.value();
-                    indexNew.indexX = kData->index - 1;
-                    indexNew.indexY = kData->index;
-                    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
+                    // Get the already processed Index and extend it by the current index for this axis.
+                    // So if we currently have the Y axis, then the already processed Index must contain the X axis
+                    // and should therefore be extended by the index for the Y axis.
+                    if (kData->specData[2] == caCartesianPlot::CH_Y) {
+                        indexNew.indexY = kData->index;
+                    } else if (kData->specData[2] == caCartesianPlot::CH_X) { // This case usually doesn't happen, as X axis is typically processed first and therefore in alreadyProcessedIndexes.
+                        indexNew.indexX = kData->index;
+                    }
                     if (kData->edata.info != (void *) Q_NULLPTR) {
                         free(kData->edata.info);
                     }
                     kData->edata.info = (char *) malloc(sizeof(asc));
                     memcpy(kData->edata.info, qasc(key), sizeof(asc));
                     indexNew.lastUpdateTime.time = 0;
-                    //ftime(&indexNew.lastUpdateTime);
+                    // Make sure that the key of indexNew contains ".minY" or ".maxY", if it exists in the current index
+                    if (key.contains(".maxY") || key.contains(".minY")) {
+                        indexNew.key = key;
+                    }
                     listOfIndexes.insert(key, indexNew);
+                    // This list is only used to find all indexes that have to be removed again upon reload
+                    alreadyProcessedIndexes.insert(key, indexNew);
                     break;
                 }
-            }
-        } else {
-            QMap<QString, indexes>::iterator i = alreadyProcessedIndexes.find(key);
-            while (i != alreadyProcessedIndexes.end() && i.key() == key) {
-                indexes indexNew = i.value();
-                if (kData->specData[2] == caCartesianPlot::CH_X) {
-                    indexNew.indexX = kData->index;
-                } else if (kData->specData[2] == caCartesianPlot::CH_Y) {
-                    indexNew.indexY = kData->index;
-                }
-                //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "indexes x and y" << indexNew.indexX << indexNew.indexY;
-                if (kData->edata.info != (void *) Q_NULLPTR) {
-                    free(kData->edata.info);
-                }
-                kData->edata.info = (char *) malloc(sizeof(asc));
-                memcpy(kData->edata.info, qasc(key), sizeof(asc));
-                indexNew.lastUpdateTime.time = 0;
-                //ftime(&indexNew.lastUpdateTime);
-                listOfIndexes.insert(key, indexNew);
-                break;
             }
         }
 
@@ -348,27 +348,31 @@ int ArchiverCommon::pvClearMonitor(knobData *kData)
         char asc[CHAR_ARRAY_LENGTH];
         sprintf(asc, "%d_%s_%p", kData->specData[0], kData->pv, kData->dispW);
         QString key = QString(asc);
+        QString possibleXKeyForMinY = QString(key).replace(".minY", "");
+        QString possibleXKeyForMaxY = QString(key).replace(".maxY", "");
         key = key.replace(".X", "");
         key = key.replace(".Y", "");
 
-        // already removed ?
+
+        QMap<QString, indexes>::iterator i;
+        QVector<QMap<QString, indexes>::iterator > listOfIterators;
+        listOfIterators.append(alreadyProcessedIndexes.find(key));
+        listOfIterators.append(alreadyProcessedIndexes.find(possibleXKeyForMinY));
+        listOfIterators.append(alreadyProcessedIndexes.find(possibleXKeyForMaxY));
+
+        // find keys to be removed
+        QList<QString> removeKeys;
+        removeKeys.clear();
         bool found = false;
-        QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
-        while (i != listOfIndexes.end() && i.key() == key) {
-            found = true;
-            ++i;
-        }
-
-        if (found) {
-            QList<QString> removeKeys;
-            removeKeys.clear();
-
-            QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
-            while (i != listOfIndexes.end() && i.key() == key) {
-                removeKeys.append(key);
+        for (int j = 0; j < listOfIterators.count(); j++) {
+            i = listOfIterators[j];
+            while (i != alreadyProcessedIndexes.end()) {
+                found = true;
+                removeKeys.append(i.key());
                 ++i;
             }
-
+        }
+        if (found) {
             for (int i = 0; i < removeKeys.count(); i++) {
                 listOfIndexes.remove(removeKeys.at(i));
                 alreadyProcessedIndexes.remove(removeKeys.at(i));

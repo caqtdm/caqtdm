@@ -31,7 +31,6 @@
 #include <QSslConfiguration>
 #include <QTimer>
 #include <QWaitCondition>
-#include "urlhandlerhttp.h"
 #include <iostream>
 #include <time.h>
 
@@ -86,6 +85,8 @@ HttpRetrieval::~HttpRetrieval()
     //qDebug() << "HttpRetrieval Destructor" << QThread::currentThread() << this;
     m_vecX.clear();
     m_vecY.clear();
+    m_vecMinY.clear();
+    m_vecMaxY.clear();
     delete m_networkManager;
     delete m_eventLoop;
     delete m_timeoutHelper;
@@ -160,6 +161,14 @@ void HttpRetrieval::getDataAppended(QVector<double> &x, QVector<double> &y)
 {
     x.append(m_vecX);
     y.append(m_vecY);
+}
+
+void HttpRetrieval::getBinnedDataAppended(QVector<double> &x, QVector<double> &avgY, QVector<double> &minY, QVector<double> &maxY)
+{
+    x.append(m_vecX);
+    avgY.append(m_vecY);
+    minY.append(m_vecMinY);
+    maxY.append(m_vecMaxY);
 }
 
 const QString HttpRetrieval::getBackend()
@@ -288,39 +297,35 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         return;
     }
 
+    // Set continueAt so the worker can figure out whether to send another request or not
     if (rootObject.contains("continueAt")) {
         m_continueAt = QDateTime::fromString(rootObject.value("continueAt").toString(), Qt::ISODate);
     }
 
-    QJsonValue ValueJson;
-    if (m_isBinned) {
-        if (m_PV.contains(".minY", Qt::CaseInsensitive)) {
-            ValueJson = rootObject["mins"];
-        } else if (m_PV.contains(".maxY", Qt::CaseInsensitive)) {
-            ValueJson = rootObject["maxs"];
-        } else {
-            ValueJson = rootObject["avgs"];
-        }
-    } else {
-        ValueJson = rootObject["values"];
-    }
-
     // set count to zero, it will be incremented according to values
     count = 0;
-
     int secondsAnchor = rootObject.value("tsAnchor").toInt();
-    bool isDouble = ValueJson[0].isDouble();
-    double mean = 0;
     double archiveTime = 0;
     if (m_isBinned) {
+        QJsonValue minsObject = rootObject["mins"];
+        QJsonValue maxsObject = rootObject["maxs"];
+        QJsonValue avgsObject = rootObject["avgs"];
         QJsonValue FirstMsJson = rootObject["ts1Ms"];
         QJsonValue LastMsJson = rootObject["ts2Ms"];
-        for (quint32 i = 0; i < ValueJson.toArray().size(); i++) {
-            // look for mean (or simply the value for non-binned data)
+        double min = 0;
+        double max = 0;
+        double avg = 0;
+        bool isDouble = avgsObject[0].isDouble();
+        for (quint32 i = 0; i < avgsObject.toArray().size(); i++) {
+            // Get Values
             if (isDouble) { // We have to check for datatype because QJsonValue wont convert Int to Double and vice versa...
-                mean = ValueJson[i].toDouble();
+                min = minsObject[i].toDouble();
+                max = maxsObject[i].toDouble();
+                avg = avgsObject[i].toDouble();
             } else {
-                mean = ValueJson[i].toInt();
+                min = minsObject[i].toInt();
+                max = maxsObject[i].toInt();
+                avg = avgsObject[i].toInt();
             }
             // get average timestamp in seconds
             archiveTime = secondsAnchor
@@ -334,20 +339,25 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                         m_vecX.append(-(seconds - archiveTime) / 3600.0);
                     } else {
                         m_vecX.append(archiveTime * 1000);
-                        m_vecY.append(mean);
                     }
+                    m_vecY.append(avg);
+                    m_vecMinY.append(min);
+                    m_vecMaxY.append(max);
                     count++;
                 }
             }
         }
     } else {
         QJsonValue MsJson = rootObject["tsMs"];
+        QJsonValue ValueJson = rootObject["values"];
+        double value = 0;
+        bool isDouble = ValueJson[0].isDouble();
         for (quint32 i = 0; i < ValueJson.toArray().size(); i++) {
             // look for mean (or simply the value for non-binned data)
             if (isDouble) { // We have to check for datatype because QJsonValue wont convert Int to Double and vice versa...
-                mean = ValueJson[i].toDouble();
+                value = ValueJson[i].toDouble();
             } else {
-                mean = ValueJson[i].toInt();
+                value = ValueJson[i].toInt();
             }
 
             // get timestamp in seconds
@@ -361,8 +371,8 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                         m_vecX.append(-(seconds - archiveTime) / 3600.0);
                     } else {
                         m_vecX.append(archiveTime * 1000);
-                        m_vecY.append(mean);
                     }
+                    m_vecY.append(value);
                     count++;
                 }
             }

@@ -91,7 +91,7 @@ public:
 
     // From hereon downwards everything is new, so not available through ControlsInterface (without cast)
 public slots:
-    void handleResults(indexes, int, QVector<double>, QVector<double>, QString, bool);
+    void handleResults(indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration);
 
 signals:
     void operate(QWidget *, const indexes, const QString, MessageWindow *, MutexKnobData *);
