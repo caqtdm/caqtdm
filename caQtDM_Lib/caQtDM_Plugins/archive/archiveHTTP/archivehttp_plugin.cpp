@@ -219,9 +219,10 @@ void ArchiveHTTP_Plugin::handleResults(
             keyStored.replace(".maxY", "");
             if (keyStored == indexInCheck.key) {
                 if (isActive) {
-                    if (tempI.key().contains(".minY")) {
+                    // If we have binned data and the channel contains min/max then use the according values.
+                    if (tempI.key().contains(".minY") && indexNew.nrOfBins > 0) {
                         archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YMinVals, backend);
-                    } else if (tempI.key().contains(".maxY")) {
+                    } else if (tempI.key().contains(".maxY") && indexNew.nrOfBins > 0) {
                         archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YMaxVals, backend);
                     } else {
                         archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YVals, backend);

@@ -226,7 +226,6 @@ void ArchiveSF_Plugin::handleResults(indexes indexNew, int nbVal, QVector<double
     QMap<QString, WorkerSfThread *>::iterator j = listOfThreads.find(indexNew.key);
     while (j !=listOfThreads.end() && j.key() == indexNew.key) {
         WorkerSfThread *tmpThread = (WorkerSfThread*) j.value();
-        qDebug() << "tmpThread->quit";
         tmpThread->quit();
         removeKeys.append(indexNew.key);
         //qDebug() << tmpThread << "sf quit";

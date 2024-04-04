@@ -328,7 +328,6 @@ void ArchiverCommon::updateCartesian(
             kData.edata.dataSize = nbVal * sizeof(double);
         }
         memcpy(kData.edata.dataB, &YValsN[0], nbVal * sizeof(double));
-
         kData.edata.valueCount = nbVal;
         mutexknobdataP->SetMutexKnobDataReceived(&kData);
         mutexknobdataP->DataUnlock(&kData);

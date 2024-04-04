@@ -95,6 +95,8 @@ HttpRetrieval::~HttpRetrieval()
 bool HttpRetrieval::requestUrl(
     const QUrl downloadUrl, const QString backend, const int secondsPast, const bool binned, const bool timeAxis, const QString key)
 {
+    // Make sure that no cancelDownload is processed while we are still preparing the network request.
+    m_globalMutex.lock();
 
     m_isAborted = false;
     m_isFinished = false;
@@ -126,19 +128,23 @@ bool HttpRetrieval::requestUrl(
     request.setRawHeader("Accept-Encoding", "gzip, deflate");
     request.setRawHeader("Accept", "*/*");
 
-    m_networkReply = m_networkManager->get(request);
-    connect(m_networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finishReply(QNetworkReply *)));
-    //qDebug() << __LINE__ << "sending GET request to" << m_downloadUrl
-    //         << "TimeNow: " << QTime::currentTime();
     m_isFinished = false;
 
-    // makes sure the timeout signal can be recieved and handled if eventLoop doesn't terminate before
-    m_timeoutHelper->start();
-    m_eventLoop->exec();
+    if (!m_isAborted) {
+        connect(m_networkManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finishReply(QNetworkReply *)));
+        m_networkReply = m_networkManager->get(request);
+        // Unlock the mutex so the cancelDownload function can now run as we have sent the request.
+        m_globalMutex.unlock();
+        //qDebug() << __LINE__ << "sending GET request to" << m_downloadUrl
+        //         << "TimeNow: " << QTime::currentTime();
+        // Makes sure the timeout signal can be recieved and handled if eventLoop doesn't terminate before
+        m_timeoutHelper->start();
+        m_eventLoop->exec();
 
-    //qDebug() << "HttpRetrieval delete m_networkReply" << QThread::currentThread() << this;
-    delete m_networkReply;
-    m_networkReply = Q_NULLPTR;
+        //qDebug() << "HttpRetrieval delete m_networkReply" << QThread::currentThread() << this;
+        delete m_networkReply;
+        m_networkReply = Q_NULLPTR;
+    }
 
     if (m_isFinished) {
         return true;
@@ -178,19 +184,23 @@ const QString HttpRetrieval::getBackend()
 
 void HttpRetrieval::cancelDownload()
 {
+    // Make sure we don't try to cancel the download while it is being prepared.
+    m_globalMutex.lock();
     //qDebug() << "HttpRetrieval cancelDownload" << QThread::currentThread() << this;
     m_totalNumberOfPoints = 0;
     m_isAborted = true;
-
 
     if (m_networkReply != Q_NULLPTR) {
         m_networkReply->abort();
         m_networkReply->deleteLater();
         m_networkReply = Q_NULLPTR;
     }
-    disconnect(m_networkManager);
+    if (m_networkManager != Q_NULLPTR) {
+        disconnect(m_networkManager);
+    }
 
     downloadFinished();
+    m_globalMutex.unlock();
 }
 
 QString HttpRetrieval::getRedirected_Url() const
@@ -463,7 +473,9 @@ const QString HttpRetrieval::parseError(QNetworkReply::NetworkError error)
 
 int HttpRetrieval::downloadFinished()
 {
-    m_eventLoop->quit();
+    if (m_eventLoop->isRunning()) {
+        m_eventLoop->quit();
+    }
     return m_isFinished;
 }
 
@@ -536,6 +548,11 @@ QByteArray HttpRetrieval::gUncompress(const QByteArray &data)
     // clean up and return
     inflateEnd(&strm);
     return result;
+}
+
+bool HttpRetrieval::isAborted() const
+{
+    return m_isAborted;
 }
 
 QDateTime HttpRetrieval::continueAt() const

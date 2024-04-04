@@ -70,6 +70,8 @@ public:
     QDateTime continueAt() const;
     bool requestUrl(const QUrl downloadUrl, const QString backend, const int secondsPast, const bool binned, const bool timeAxis, const QString key);
 
+    bool isAborted() const;
+
 signals:
     void networkError(const QString);
     void requestFinished();
