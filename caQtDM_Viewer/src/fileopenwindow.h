@@ -99,6 +99,7 @@
                     bool attach = false, bool minimize = false, QString geometry = "", bool printscreen = false, bool resizing = true,
                     QMap<QString, QString> options = (QMap<QString, QString>()));
 
+     ~FileOpenWindow();
      QMainWindow *loadMainWindow(const QPoint &position, const QString &fileS, const QString &macroS, const QString &resizeS,
                                          const bool &printexit, const bool &moveit, const bool &centerwindow);
      bool isRunning();

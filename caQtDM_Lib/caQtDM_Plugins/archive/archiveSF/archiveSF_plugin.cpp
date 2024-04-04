@@ -53,6 +53,7 @@ ArchiveSF_Plugin::ArchiveSF_Plugin()
 }
 
 ArchiveSF_Plugin:: ~ArchiveSF_Plugin() {
+    delete archiverCommon;
     //qDebug() << "ArchiveSF_Plugin::~ArchiveSF_Plugin()";
 }
 

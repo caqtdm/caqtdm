@@ -257,8 +257,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #endif
 
     // message window used by library and here
-    QWidget *widget =new QWidget();
-    messageWindow = new MessageWindow(widget);
+    messageWindow = new MessageWindow();
 
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
@@ -587,6 +586,10 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         QString displayTimeOut="environment variable CAQTDM_TIMEOUT_HOURS could be set for quitting caQtDM automatically after some time";
         messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
     }
+}
+
+FileOpenWindow::~FileOpenWindow() {
+    delete messageWindow;
 }
 
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)

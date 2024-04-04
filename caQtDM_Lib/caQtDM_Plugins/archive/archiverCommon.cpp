@@ -115,8 +115,8 @@ int ArchiverCommon::initCommunicationLayer(MutexKnobData *data,
     timerRunning = false;
 
     // start a timer in order to update the interface at the specified rate
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateInterface()));
+    timer = new QTimer((QObject*)this);
+    connect(timer, SIGNAL(timeout()), (QObject*)this, SLOT(updateInterface()));
 
     timer->start(100);
 

@@ -180,7 +180,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             if (m_httpRetrieval->isAborted()) {
                 previousHttpRetrievalAborted = true;
             }
-            // Assign a new HttpRetrieval to our publicly accessible member without deleting it so an abort would never be referencing a dangling pointer.
+            // Assign a new HttpRetrieval to our publicly accessible member without deleting it so an abort would never be referencing a null pointer.
             m_httpRetrieval = new HttpRetrieval();
             // Because we saved the pointer in this temporary variable, we can now safely delete it without the risk of it being referenced.
             delete lastHttpRetrieval;
