@@ -32,7 +32,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
     Q_UNUSED(debugWindow);
 
 #ifndef MOBILE
-    float COMBOHEIGHTFACTOR = 1.3;
+    float COMBOHEIGHTFACTOR = 1.3f;
 #else
     float COMBOHEIGHTFACTOR = 1.0;
 #endif

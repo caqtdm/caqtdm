@@ -73,6 +73,7 @@ bool caDoubleTabWidgetExtension::canAddWidget() const{
 
 }
 bool caDoubleTabWidgetExtension::canRemove(int index) const{
+    Q_UNUSED(index);
     return true;
 }
 #endif
