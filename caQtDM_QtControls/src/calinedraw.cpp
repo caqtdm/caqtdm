@@ -486,7 +486,7 @@ void caLineDraw::setFormat(int prec)
     case sexagesimal_dms:
         break;
     case user_defined_format:{
-            strncpy(m_Format,thisFormatUserString.toLatin1().data(),MAX_STRING_LENGTH);
+            qstrncpy(m_Format,thisFormatUserString.toLatin1().data(),MAX_STRING_LENGTH);
             break;
      }
 

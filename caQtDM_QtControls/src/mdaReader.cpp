@@ -102,13 +102,13 @@ void mdaReaderThread(const char *dataFile, int y_cpt) {
 	FILE *fp;
 	static char saved_dataFile[NAMELEN] = "";
 	static int saved_ycpt = 0;
-	char fname[100] = "";
+    char fname[NAMELEN] = "";
 
 	if ((strncmp(dataFile, saved_dataFile, NAMELEN) == 0) && (y_cpt <= saved_ycpt)) {
 		return;
 	}
 
-	strncpy(saved_dataFile, dataFile, NAMELEN);
+    qstrncpy(saved_dataFile, dataFile, NAMELEN);
 	saved_ycpt = y_cpt;
 
 	// for now, because mda_load doesn't know how to add to data structure
@@ -120,10 +120,10 @@ void mdaReaderThread(const char *dataFile, int y_cpt) {
 		// a valid path to file is "/net/server/dir1/dir2/file".  I don't know how
 		// portable this is, but sysadmins here suggest it's common for an automounter.
 		// I'm out of my league here.
-		strcpy(fname, "/net");
-		strcat(fname, dataFile);
+        qstrncpy(fname, "/net",NAMELEN);
+        strncat(fname, dataFile,NAMELEN-1);
 	} else {
-		strcat(fname, dataFile);
+        strncat(fname, dataFile,NAMELEN-1);
 	}
 	fp = fopen(fname, "rb");
 	if (fp) mdaData = mda_load(fp);

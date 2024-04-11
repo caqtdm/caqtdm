@@ -165,9 +165,9 @@
     size1 = qMin(Parameter_1.size(), MAXPVLEN-1); \
     size2 = qMin(Parameter_2.size(), 255-1); \
     size3 = qMin(Parameter_3.size(), 80-1); \
-    strncpy(param1, Parameter_1.constData(), size1); \
-    strncpy(param2, Parameter_2.constData(), size2); \
-    strncpy(param3, Parameter_3.constData(), size3); \
+    qstrncpy(param1, Parameter_1.constData(), size1); \
+    qstrncpy(param2, Parameter_2.constData(), size2); \
+    qstrncpy(param3, Parameter_3.constData(), size3); \
     param1[size1] = '\0'; \
     param2[size2] = '\0'; \
     param3[size3] = '\0';
@@ -3836,7 +3836,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     strcpy(kData->pluginFlavor, (char*) qasc(pluginFlavor));
 
     cpylen = qMin(trimmedPV.length(), MAXPVLEN-1);
-    strncpy(kData->pv, (char*) qasc(trimmedPV), (size_t) cpylen);
+    qstrncpy(kData->pv, (char*) qasc(trimmedPV), (size_t) cpylen);
     kData->pv[cpylen] = '\0';
 
     // find the plugin we are going to use
@@ -3899,17 +3899,17 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     // keep actual object name
     cpylen = qMin(w->objectName().length(), MAXDISPLEN-1);
-    strncpy(kData->dispName, qasc(w->objectName().toLower()), (size_t) cpylen);
+    qstrncpy(kData->dispName, qasc(w->objectName().toLower()), (size_t) cpylen);
     kData->dispName[cpylen] = '\0';
 
     QString classname = w->metaObject()->className();
     cpylen = qMin(classname.length(), MAXDISPLEN-1);
-    strncpy(kData->clasName, qasc(classname.toLower()), (size_t) cpylen);
+    qstrncpy(kData->clasName, qasc(classname.toLower()), (size_t) cpylen);
     kData->clasName[cpylen] = '\0';
 
     // keep actual filename
     cpylen = qMin( savedFile[level].length(), MAXFILELEN-1);
-    strncpy(kData->fileName, (char*) qasc(savedFile[level]), (size_t) cpylen);
+    qstrncpy(kData->fileName, (char*) qasc(savedFile[level]), (size_t) cpylen);
     kData->fileName[cpylen] = '\0';
 
     if (QLineEdit *lineedit = qobject_cast<QLineEdit *>(w)) {
@@ -8540,7 +8540,7 @@ bool CaQtDM_Lib::parseForQRectConst(QString &inputc, double *valueArray)
     bool success = false;
     char input[MAXPVLEN];
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
+    qstrncpy(input, (char*) qasc(inputc), (size_t) cpylen);
     input[cpylen] = '\0';
 
     JSONValue *value = JSON::Parse(input);
@@ -8581,7 +8581,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     bool success = false;
     char input[MAXPVLEN];
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
+    qstrncpy(input, (char*) qasc(inputc), (size_t) cpylen);
     input[cpylen] = '\0';
 
     JSONValue *value = JSON::Parse(input);
@@ -8652,7 +8652,7 @@ bool CaQtDM_Lib::checkJsonString(QString &inputc)
     bool success = false;
     char input[MAXPVLEN];
     int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
+    qstrncpy(input, (char*) qasc(inputc), (size_t) cpylen);
     input[cpylen] = '\0';
     JSONValue *value = JSON::Parse(input);
 
@@ -9900,35 +9900,35 @@ extern "C"  {
                 if(pvMaxLength > 0) strcpy(pv, " " );
                 if (caSlider *w = qobject_cast<caSlider *>(widget)) {
                     *value = w->getSliderValue();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caTextEntry *w = qobject_cast<caTextEntry *>(widget)) {
                     *value = w->text().toDouble();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caLineEdit *w = qobject_cast<caLineEdit *>(widget)) {
                     *value = w->text().toDouble();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caMeter *w = qobject_cast<caMeter *>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caThermo *w = qobject_cast<caThermo*>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (caToggleButton *w = qobject_cast<caToggleButton*>(widget)) {
                     *value = w->isChecked();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
                     ok = true;
                 } else if (QCheckBox *w = qobject_cast<QCheckBox*>(widget)) {
                     *value = w->isChecked();
