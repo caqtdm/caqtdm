@@ -64,8 +64,10 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     indexes indexNew,
                     QString index_name,
                     MessageWindow *messageWindow,
-                    MutexKnobData *mutexKnobDataP)
+                    MutexKnobData *mutexKnobDataP,
+                    QSharedPointer<HttpPerformanceData> httpPerformanceData)
 {
+    qDebug() << "Current Time is: " << QTime::currentTime();
     QMutexLocker locker(&m_globalMutex);
     Q_UNUSED(w);
     struct timeb now;
@@ -110,51 +112,15 @@ void WorkerHTTP::getFromArchive(QWidget *w,
     urlHandler->setEndTime(QDateTime::fromSecsSinceEpoch(endSeconds));
 
     // Now we collect all already stored data so we can reuse it and minimize network traffic.
-    // However, this is only possible for non-binned data, as with binned data values such as .minY and .maxY exist,
-    // which may not be stored in the knobData from our retrieving index. So we would have to have a list of all indexes
-    // to access and look through their KnobDatas, which would be terrible because of thread safety and because this worker
-    // really shouldn't be accessing all that data. The fact we are accessing mutexKnobData is already dangerous if we aren't careful.
-    if (!isBinned) {
-        knobData kData = mutexKnobDataP->GetMutexKnobData(indexNew.indexX);
-        mutexKnobDataP->DataLock(&kData);
-        int nbValsX = kData.edata.dataSize / sizeof(double);
-        QVector<double> tempVecX;
-        tempVecX.clear();
-        tempVecX.resize(nbValsX);
-        //double *tempDoublePtr = (double*)kData.edata.dataB;
-        memcpy(tempVecX.data(), kData.edata.dataB, nbValsX * sizeof(double));
-        mutexKnobDataP->DataUnlock(&kData);
+    knobData kData = mutexKnobDataP->GetMutexKnobData(indexNew.indexX);
+    mutexKnobDataP->DataLock(&kData);
 
-        kData = mutexKnobDataP->GetMutexKnobData(indexNew.indexY);
-        mutexKnobDataP->DataLock(&kData);
-        int nbValsY = kData.edata.dataSize / sizeof(double);
-        QVector<double> tempVecY;
-        tempVecY.clear();
-        tempVecY.resize(nbValsY);
-        memcpy(tempVecY.data(), kData.edata.dataB, nbValsY * sizeof(double));
-        mutexKnobDataP->DataUnlock(&kData);
-
-        if (nbValsX > 0 && nbValsX == nbValsY) {
-            // Get an iterator to the first already saved X value within the currently requested time range
-            // Make sure to account for the fact that the mutexKnobData data is in milliseconds but our startSeconds is in seconds
-            QVector<double>::iterator firstNeededX = std::upper_bound(tempVecX.begin(), tempVecX.end(), startSeconds * 1000);
-
-            // populate our X vector with already existing data so we dont have to request it again
-            QVector<double> alreadyExistingXValues(firstNeededX, tempVecX.end());
-            m_vecX.append(alreadyExistingXValues);
-
-            // Update the time from which we have to request new data
-            // Data is stored in miliseconds but we want seconds so convert it and add 1 to make sure we start requesting one second later
-            startSeconds = (m_vecX.constLast() / 1000) + 1;
-
-            // Get an iterator for the Y value that corresponds to the first needed X value
-            QVector<double>::iterator firstNeededY = tempVecY.begin() + std::distance(tempVecX.begin(), firstNeededX);
-
-            // Now, also populate the existing Y values
-            QVector<double> alreadyExistingYValues(firstNeededY, tempVecY.end());
-            m_vecY.append(alreadyExistingYValues);
-        }
+    if (kData.edata.valueCount > 0) {
+        // Update the time from which we have to request new data
+        // Data is stored in miliseconds but we want seconds so convert it
+        startSeconds = (reinterpret_cast<double*>(kData.edata.dataB)[kData.edata.valueCount - 1] / 1000);
     }
+    mutexKnobDataP->DataUnlock(&kData);
 
     do {
         // If member is set, then this isn't the first iteration, so wait a bit before stressing the backend again
@@ -191,13 +157,13 @@ void WorkerHTTP::getFromArchive(QWidget *w,
 
         bool readdata_ok;
         if (!previousHttpRetrievalAborted) {
+            httpPerformanceData->addNewRequest(urlHandler);
             readdata_ok = m_httpRetrieval->requestUrl(urlHandler->assembleUrl(),
                                                            urlHandler->backend(),
                                                            endSeconds - startSeconds,
                                                            isBinned,
                                                            indexNew.timeAxis,
                                                            key);
-
             if (m_httpRetrieval->is_Redirected()) {
                 QUrl url = QUrl(m_httpRetrieval->getRedirected_Url());
                 // Messages in case of a redirect and set the widget to the correct location
@@ -224,10 +190,17 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         }
 
         if (readdata_ok) {
+            httpPerformanceData->addNewResponse(0, 200, m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             if (m_httpRetrieval->getCount() > 0) {
                 if (isBinned) {
+                    m_vecX.clear();
+                    m_vecY.clear();
+                    m_vecMinY.clear();
+                    m_vecMaxY.clear();
                     m_httpRetrieval->getBinnedDataAppended(m_vecX, m_vecY, m_vecMinY, m_vecMaxY);
                 } else {
+                    m_vecX.clear();
+                    m_vecY.clear();
                     m_httpRetrieval->getDataAppended(m_vecX, m_vecY);
                 }
             }
@@ -238,12 +211,14 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     m_receivedContinueAt = true;
                 }
             }
+
             nbVal = m_vecX.count();
             if (nbVal != m_vecY.count()) {
-                // Api is messing with us
+                // API is messing with us
                 throw;
             }
         } else {
+            httpPerformanceData->addNewResponse(0, 400, m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             if (messageWindow != (MessageWindow *) Q_NULLPTR) {
                 QString mess("ArchiveHTTP plugin -- lastError: ");
                 if (previousHttpRetrievalAborted) {
@@ -262,7 +237,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             m_vecMaxY.clear();
             nbVal = 0;
         }
-        //qDebug() << "emitting resultReady for endSeconds: " << Qt::fixed << endSeconds;
         emit resultReady(indexNew, nbVal, m_vecX, m_vecY, m_vecMinY, m_vecMaxY, m_httpRetrieval->getBackend(), !m_receivedContinueAt);
     } while (m_receivedContinueAt);
     m_vecX.clear();

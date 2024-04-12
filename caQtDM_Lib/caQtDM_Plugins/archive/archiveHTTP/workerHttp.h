@@ -27,6 +27,7 @@
 #define WORKERHTTP_H
 
 #include "archiverCommon.h"
+#include "httpperformancedata.h"
 #include "httpretrieval.h"
 
 class Q_DECL_EXPORT WorkerHTTP : public QObject
@@ -44,7 +45,8 @@ public slots:
                         indexes indexNew,
                         QString index_name,
                         MessageWindow *messageWindow,
-                        MutexKnobData *mutexKnobDataP);
+                        MutexKnobData *mutexKnobDataP,
+                        QSharedPointer<HttpPerformanceData> httpPerformanceData);
 
 signals:
     void resultReady(indexes indexNew,

@@ -50,6 +50,11 @@ void ArchiverCommon::stopUpdateInterface()
     QApplication::processEvents();
 }
 
+QMutex* ArchiverCommon::globalMutex()
+{
+    return &m_globalMutex;
+}
+
 void ArchiverCommon::updateInterface()
 {
     double diff;
@@ -57,7 +62,7 @@ void ArchiverCommon::updateInterface()
     QMap<QString, indexes> listOfIndexesToBeExecuted;
     listOfIndexesToBeExecuted.clear();
 
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_globalMutex);
 
     // after first start, set timer to wanted period
     if (!timerRunning) {
@@ -130,7 +135,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     Q_UNUSED(rate);
     Q_UNUSED(skip);
 
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_globalMutex);
 
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
@@ -260,7 +265,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
 void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_globalMutex);
     QString key = indexNew.key;
     QMap<QString, indexes>::iterator i = listOfIndexes.find(key);
     while (i != listOfIndexes.end() && i.key() == key) {
@@ -284,7 +289,7 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
 void ArchiverCommon::updateCartesian(
     int nbVal, indexes indexNew, QVector<double> XValsN, QVector<double> YValsN, QString backend)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_globalMutex);
     //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
     if (nbVal > 0) {
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
@@ -404,7 +409,7 @@ int ArchiverCommon::pvClearEvent(void *ptr)
     char asc[CHAR_ARRAY_LENGTH];
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "clear event" << ptr;
 
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_globalMutex);
 
     memcpy(asc, ptr, sizeof(asc));
     QString key = QString(asc);
@@ -428,7 +433,7 @@ int ArchiverCommon::pvAddEvent(void *ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "add event" << ptr;
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_globalMutex);
 
     memcpy(asc, ptr, sizeof(asc));
     QString key = QString(asc);

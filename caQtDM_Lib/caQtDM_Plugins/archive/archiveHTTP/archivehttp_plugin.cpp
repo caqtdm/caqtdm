@@ -36,26 +36,26 @@
 
 ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 {
-    suspend = false;
+    m_IsSuspended = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
-    archiverCommon = new ArchiverCommon();
+    m_archiverCommon = new ArchiverCommon();
 
-    connect(archiverCommon,
+    connect(m_archiverCommon,
             SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)),
             this,
             SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
-    connect(archiverCommon,
+    connect(m_archiverCommon,
             SIGNAL(Signal_AbortOutstandingRequests(QString)),
             this,
             SLOT(Callback_AbortOutstandingRequests(QString)));
-    connect(this, SIGNAL(Signal_StopUpdateInterface()), archiverCommon, SLOT(stopUpdateInterface()));
+    connect(this, SIGNAL(Signal_StopUpdateInterface()), m_archiverCommon, SLOT(stopUpdateInterface()));
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 }
 
 ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()
 {
-    delete archiverCommon;
+    delete m_archiverCommon;
 }
 
 QString ArchiveHTTP_Plugin::pluginName()
@@ -67,21 +67,21 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
                                                MessageWindow *messageWindow,
                                                QMap<QString, QString> options)
 {
-    mutexknobdataP = data;
-    messagewindowP = messageWindow;
-    return archiverCommon->initCommunicationLayer(data, messageWindow, options);
+    m_mutexKnobDataP = data;
+    m_messageWindowP = messageWindow;
+    return m_archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
 // define data to be called
 int ArchiveHTTP_Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 {
-    return archiverCommon->pvAddMonitor(index, kData, rate, skip);
+    return m_archiverCommon->pvAddMonitor(index, kData, rate, skip);
 }
 
 // clear routines
 int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
 {
-    // get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant, resulting in none actually being updated.
+    // Get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant, resulting in none actually being updated.
     QString keyInCheck = kData->pv;
     keyInCheck.replace(".X", "", Qt::CaseInsensitive);
     keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
@@ -93,22 +93,27 @@ int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
          tempI != m_IndexesToUpdate.constEnd();
          tempI++) {
         QString keyStored = tempI.key();
-        regexStr.setPattern("\\b[0-7]_");
-        keyStored.replace(regexStr, "");
+        m_regexStr.setPattern("\\b[0-7]_");
+        keyStored.replace(m_regexStr, "");
 
         if (keyStored == keyInCheck) {
+            // Remove entry for updating the data
             m_IndexesToUpdate.remove(tempI.key());
+            // Also remove the  perfomance data
+            if (m_retrievalPerformancePerPV.contains(tempI.key())) {
+                m_retrievalPerformancePerPV.remove(tempI.key());
+            }
             break;
         }
     }
 
     // now just let archiverCommon do the usual stuff
-    return archiverCommon->pvClearMonitor(kData);
+    return m_archiverCommon->pvClearMonitor(kData);
 }
 
 int ArchiveHTTP_Plugin::pvFreeAllocatedData(knobData *kData)
 {
-    return archiverCommon->pvFreeAllocatedData(kData);
+    return m_archiverCommon->pvFreeAllocatedData(kData);
 }
 
 int ArchiveHTTP_Plugin::pvSetValue(
@@ -152,17 +157,27 @@ int ArchiveHTTP_Plugin::pvGetTimeStamp(char *pv, char *timestamp)
 }
 int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
 {
-    Q_UNUSED(pv);
-    Q_UNUSED(description);
+    QString report = "";
+    QString keyInCheck = pv;
+    keyInCheck.replace(".X", "", Qt::CaseInsensitive);
+    keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
+    keyInCheck.replace(".minY", "", Qt::CaseInsensitive);
+    keyInCheck.replace(".maxY", "", Qt::CaseInsensitive);
+    for (auto entry = m_retrievalPerformancePerPV.constBegin(); entry != m_retrievalPerformancePerPV.constEnd(); ++entry) {
+        if (entry.key().contains(keyInCheck)) {
+            report.append(entry.value()->generateReport());
+        }
+    }
+    qstrncpy(description, report.toUtf8().constData(), 40);
     return true;
 }
 int ArchiveHTTP_Plugin::pvClearEvent(void *ptr)
 {
-    return archiverCommon->pvClearEvent(ptr);
+    return m_archiverCommon->pvClearEvent(ptr);
 }
 int ArchiveHTTP_Plugin::pvAddEvent(void *ptr)
 {
-    return archiverCommon->pvAddEvent(ptr);
+    return m_archiverCommon->pvAddEvent(ptr);
 }
 int ArchiveHTTP_Plugin::pvReconnect(knobData *kData)
 {
@@ -181,7 +196,112 @@ int ArchiveHTTP_Plugin::FlushIO()
 
 int ArchiveHTTP_Plugin::TerminateIO()
 {
-    return archiverCommon->TerminateIO();
+    return m_archiverCommon->TerminateIO();
+}
+
+void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
+                                         indexes indexNew,
+                                         QVector<double> XValues,
+                                         QVector<double> YValues,
+                                         QString backend)
+{
+    // We have to make sure that we are synchronized with the archiverCommon
+    QMutex *archiverCommonMutex = m_archiverCommon->globalMutex();
+    QMutexLocker locker(archiverCommonMutex);
+
+    if (numberOfValues > 0) {
+        // Check for a valid index
+        knobData kDataX = m_mutexKnobDataP->GetMutexKnobData(indexNew.indexX);
+        knobData kDataY = m_mutexKnobDataP->GetMutexKnobData(indexNew.indexY);
+        if (kDataX.index == -1 || kDataY.index == -1) {
+            return;
+        }
+
+        // Initialize values used amongst both indexes
+        QVector<double> alreadyStoredValues;
+        timeb now;
+        ftime(&now);
+        double endSeconds = (double) now.time + (double) now.millitm / (double) 1000;
+        double startSeconds = endSeconds - indexNew.secondsPast;
+
+        // Lock both indexes so the correspond
+        m_mutexKnobDataP->DataLock(&kDataX);
+        m_mutexKnobDataP->DataLock(&kDataY);
+
+        // Start updating the X index
+        kDataX.edata.fieldtype = caDOUBLE;
+        kDataX.edata.connected = true;
+        kDataX.edata.accessR = true;
+        kDataX.edata.accessW = false;
+        kDataX.edata.monitorCount++;
+        qstrncpy(kDataX.edata.fec, qasc(backend), sizeof(caqtdm_string_t));
+        int offsetOfFirstNeededValue = -1;
+
+        // If there is already useful data in the knobData, reuse it
+        if (kDataX.edata.valueCount > 0) {
+            alreadyStoredValues.resize(kDataX.edata.valueCount);
+            memcpy(alreadyStoredValues.data(), kDataX.edata.dataB, kDataX.edata.dataSize);
+            QVector<double>::iterator firstNeededX = std::upper_bound(alreadyStoredValues.begin(), alreadyStoredValues.end(), startSeconds * 1000);
+            offsetOfFirstNeededValue = std::distance(alreadyStoredValues.begin(), firstNeededX);
+            QVector<double> stillUsedValues(firstNeededX, alreadyStoredValues.end());
+            // Update the number of values according to the amount of reused values
+            numberOfValues += stillUsedValues.count();
+            // Add the new data to the reused data
+            stillUsedValues.append(XValues);
+            XValues = std::move(stillUsedValues);
+        }
+
+        // reallocate the memory to fit the new data
+        kDataX.edata.dataSize = numberOfValues * sizeof(double);
+        kDataX.edata.dataB = (void *) realloc(kDataX.edata.dataB, kDataX.edata.dataSize);
+        if (kDataX.edata.dataB == NULL) {
+            // Uhhhhhm, no this should not happen
+            printf("Realloc failed to allocate memory, maybe the system ran out of memory...\n");
+            throw;
+        }
+
+        // Now copy the new data to be plotted into the knobData
+        memcpy(kDataX.edata.dataB, XValues.data(), kDataX.edata.dataSize);
+        kDataX.edata.valueCount = numberOfValues;
+        m_mutexKnobDataP->SetMutexKnobDataReceived(&kDataX);
+
+        // Do the same thing with the Y Index
+        kDataY.edata.fieldtype = caDOUBLE;
+        kDataY.edata.connected = true;
+        kDataY.edata.accessR = true;
+        kDataY.edata.accessW = false;
+        kDataY.edata.monitorCount++;
+        qstrncpy(kDataY.edata.fec, qasc(backend), sizeof(caqtdm_string_t));
+
+        // Here, we have to modify the reusing part slightly
+        if (kDataY.edata.valueCount > 0 && offsetOfFirstNeededValue != -1) {
+            alreadyStoredValues.resize(kDataY.edata.valueCount);
+            memcpy(alreadyStoredValues.data(), kDataY.edata.dataB, kDataY.edata.dataSize);
+
+            // Because this data does not contain a timestamp we can use, we just use the same offset as used in the X axis to ensure we get the corresponding elements.
+            QVector<double>::iterator firstNeededY = alreadyStoredValues.begin() + offsetOfFirstNeededValue;
+            QVector<double> stillUsedValues(firstNeededY, alreadyStoredValues.end());
+            stillUsedValues.append(YValues);
+            YValues = std::move(stillUsedValues);
+            // We don't have to calculate the number of values again as they are equal amongst both axes.
+        }
+
+        kDataY.edata.dataSize = numberOfValues * sizeof(double);
+        kDataY.edata.dataB = (void *) realloc(kDataY.edata.dataB, kDataY.edata.dataSize);
+        if (kDataY.edata.dataB == NULL) {
+            // Uhhhhhm, no this should not happen
+            printf("Realloc failed to allocate memory, maybe the system ran out of memory...\n");
+            throw;
+        }
+
+        memcpy(kDataY.edata.dataB, &YValues[0], kDataY.edata.dataSize);
+        kDataY.edata.valueCount = numberOfValues;
+        m_mutexKnobDataP->SetMutexKnobDataReceived(&kDataY);
+
+        // Unlock both indexes again
+        m_mutexKnobDataP->DataUnlock(&kDataX);
+        m_mutexKnobDataP->DataUnlock(&kDataY);
+    }
 }
 
 // =======================================================================================================================================================
@@ -190,9 +310,9 @@ int ArchiveHTTP_Plugin::TerminateIO()
 void ArchiveHTTP_Plugin::handleResults(
     indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration)
 {
-    QMutexLocker mutexLocker(&mutex);
-    QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = listOfThreads.constFind(indexNew.key);
-    if (listOfThreadsEntry == listOfThreads.constEnd()) {
+    QMutexLocker mutexLocker(&m_globalMutex);
+    QMap<QString, WorkerHttpThread*>::const_iterator listOfThreadsEntry = m_listOfThreads.constFind(indexNew.key);
+    if (listOfThreadsEntry == m_listOfThreads.constEnd()) {
         // This should never happen
         return;
     }
@@ -203,9 +323,9 @@ void ArchiveHTTP_Plugin::handleResults(
 
     // set data for other indexes with same channel (& widget because different widgets might have different time spans etc.)
     indexes indexInCheck = indexNew;
-    regexStr.setPattern("\\b[0-7]_");
-    indexInCheck.key.replace(regexStr, "");
-    indexInCheck.key.replace(regexStr, "");
+    m_regexStr.setPattern("\\b[0-7]_");
+    indexInCheck.key.replace(m_regexStr, "");
+    indexInCheck.key.replace(m_regexStr, "");
     indexInCheck.key.replace(".minY", "");
     indexInCheck.key.replace(".maxY", "");
     if (valueCount > 0) {
@@ -213,19 +333,19 @@ void ArchiveHTTP_Plugin::handleResults(
              tempI != m_IndexesToUpdate.constEnd();
              tempI++) {
             QString keyStored = tempI.key();
-            keyStored.replace(regexStr, "");
-            keyStored.replace(regexStr, "");
+            keyStored.replace(m_regexStr, "");
+            keyStored.replace(m_regexStr, "");
             keyStored.replace(".minY", "");
             keyStored.replace(".maxY", "");
             if (keyStored == indexInCheck.key) {
                 if (isActive) {
                     // If we have binned data and the channel contains min/max then use the according values.
                     if (tempI.key().contains(".minY") && indexNew.nrOfBins > 0) {
-                        archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YMinVals, backend);
+                        updateCartesianAppended(valueCount, tempI.value(), XVals, YMinVals, backend);
                     } else if (tempI.key().contains(".maxY") && indexNew.nrOfBins > 0) {
-                        archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YMaxVals, backend);
+                        updateCartesianAppended(valueCount, tempI.value(), XVals, YMaxVals, backend);
                     } else {
-                        archiverCommon->updateCartesian(valueCount, tempI.value(), XVals, YVals, backend);
+                        updateCartesianAppended(valueCount, tempI.value(), XVals, YVals, backend);
                     }
                 }
             }
@@ -239,21 +359,21 @@ void ArchiveHTTP_Plugin::handleResults(
             finishedThread->quit();
             finishedThread->wait();
         }
-        listOfThreads.remove(indexNew.key);
+        m_listOfThreads.remove(indexNew.key);
 
         QList<QString> removeKeys;
-        regexStr.setPattern("\\b[0-7]_");
+        m_regexStr.setPattern("\\b[0-7]_");
         for (QMap<QString, indexes>::const_iterator indexesToUpdateIterator = m_IndexesToUpdate.constBegin();
              indexesToUpdateIterator != m_IndexesToUpdate.constEnd();
              indexesToUpdateIterator++) {
             QString keyStored = indexesToUpdateIterator.key();
-            keyStored.replace(regexStr, "");
-            keyStored.replace(regexStr, "");
+            keyStored.replace(m_regexStr, "");
+            keyStored.replace(m_regexStr, "");
             keyStored.replace(".minY", "");
             keyStored.replace(".maxY", "");
             if (keyStored == indexInCheck.key) {
                 if (!isActive) {
-                    archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), valueCount != 0);
+                    m_archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), valueCount != 0);
                 }
                 removeKeys.append(indexesToUpdateIterator.key());;
             }
@@ -272,8 +392,8 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
-    QMutexLocker mutexLocker(&mutex);
-    if (suspend) {
+    QMutexLocker mutexLocker(&m_globalMutex);
+    if (m_IsSuspended) {
         return;
     }
 
@@ -282,14 +402,14 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 
     // remove the curve index that seperates indexes from different curve,
     // so we can avoid requesting the same index multiple times.
-    regexStr.setPattern("\\b[0-7]_");
+    m_regexStr.setPattern("\\b[0-7]_");
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
         // Don't retrieve data twice
         QString keyInCheck = i.key();
         // Account for different curve Numbers
-        keyInCheck.replace(regexStr, "");
-        keyInCheck.replace(regexStr, "");
+        keyInCheck.replace(m_regexStr, "");
+        keyInCheck.replace(m_regexStr, "");
         // Account for .minY and .maxY
         keyInCheck.replace(".minY", "");
         keyInCheck.replace(".maxY", "");
@@ -298,8 +418,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
              tempI != m_IndexesToUpdate.constEnd();
              tempI++) {
             QString keyStored = tempI.key();
-            keyStored.replace(regexStr, "");
-            keyStored.replace(regexStr, "");
+            keyStored.replace(m_regexStr, "");
+            keyStored.replace(m_regexStr, "");
             keyStored.replace(".minY", "");
             keyStored.replace(".maxY", "");
 
@@ -314,6 +434,12 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             continue;
         }
         m_IndexesToUpdate.insert(i.key(), i.value());
+
+        // If it doesn't already exist, create an Object to measure performance
+        if (!m_retrievalPerformancePerPV.contains(i.key())) {
+            HttpPerformanceData *newHttpPerformanceData = new HttpPerformanceData;
+            m_retrievalPerformancePerPV.insert(i.key(), QSharedPointer<HttpPerformanceData>(newHttpPerformanceData));
+        }
 
         // Now initiate the retrieval
         indexes indexNew = i.value();
@@ -333,8 +459,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 QString mess(
                     "ArchiveHTTP plugin -- no nrOfBins defined as dynamic property in widget "
                     + w->objectName() + ", defaulting to maximum number of points");
-                if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                    messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                    m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                 }
             }
 
@@ -351,8 +477,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                         "but not known (use sf-archiverappliance or sf-databuffer) in widget "
                         + w->objectName());
                     indexNew.backend = var.toString();
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                        m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
             } else if (indexNew.init) {
@@ -360,8 +486,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     "ArchiveHTTP plugin -- no backend defined as dynamic property in widget "
                     + w->objectName()
                     + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
-                if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                    messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                    m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                 }
             }
 
@@ -376,8 +502,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                         QString mess("ArchiveHTTP plugin -- archiverIndex defined as dynamic "
                                      "property in widget "
                                      + w->objectName() + ", set to " + index_name);
-                        if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                            messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                            m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                         }
                     }
                 } else if (indexNew.init) {
@@ -385,16 +511,16 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                         "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERSF_URL "
                         "set and no archiverIndex defined as dynamic property in widget "
                         + w->objectName() + ", defaulting to " + index_name);
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                        m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
             } else {
                 if (indexNew.init) {
                     QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
                                  + " from environment variable CAQTDM_ARCHIVERSF_URL");
-                    if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-                        messagewindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                        m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
                 index_name = url;
@@ -402,23 +528,23 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         }
         WorkerHTTP *newWorker = new WorkerHTTP;
         WorkerHttpThread *newWorkerThread = new WorkerHttpThread(newWorker);
-        listOfThreads.insert(i.key(), newWorkerThread);
+        m_listOfThreads.insert(i.key(), newWorkerThread);
 
         newWorker->moveToThread(newWorkerThread);
 
         connect(newWorkerThread, SIGNAL(finished()), newWorker, SLOT(workerFinish()));
         connect(newWorkerThread, SIGNAL(finished()), newWorkerThread, SLOT(deleteLater()));
         connect(this,
-                SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *)),
+                SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>)),
                 newWorker,
-                SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *)));
+                SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>)));
         connect(newWorker,
                 SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QVector<double>, QVector<double>, QString, bool)),
                 this,
                 SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QVector<double>, QVector<double>, QString, bool)));
         newWorkerThread->start();
 
-        emit operate((QWidget *) messagewindowP, indexNew, index_name, messagewindowP, mutexknobdataP);
+        emit operate((QWidget *) m_messageWindowP, indexNew, index_name, m_messageWindowP, m_mutexKnobDataP, m_retrievalPerformancePerPV.value(i.key()));
         disconnect(newWorker);
         ++i;
     }
@@ -426,17 +552,17 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 
 void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
 {
-    QMutexLocker mutexLocker(&mutex);
-    suspend = true;
+    QMutexLocker mutexLocker(&m_globalMutex);
+    m_IsSuspended = true;
 
-    QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = listOfThreads.find(key);
-    if (listOfThreadsEntry != listOfThreads.end()) {
+    QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = m_listOfThreads.find(key);
+    if (listOfThreadsEntry != m_listOfThreads.end()) {
         listOfThreadsEntry.value()->setIsActive(false);
         //listOfThreadsEntry.value()->getHttpRetrieval()->cancelDownload();
         QMetaObject::invokeMethod(listOfThreadsEntry.value()->getHttpRetrieval(), "cancelDownload");
     }
 
-    suspend = false;
+    m_IsSuspended = false;
 }
 
 void ArchiveHTTP_Plugin::closeEvent()
