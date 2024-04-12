@@ -19,10 +19,10 @@ fi
 
 # If you want to compile latest release candidate uncomment this line
 REPOSITORY_NAME=caqtdm
-PACKAGE_VERSION=4.4.1
+PACKAGE_VERSION=4.4.2
 REPOSITORY=https://github.com/caqtdm/$REPOSITORY_NAME.git
 # BRANCH_OR_TAG=V${PACKAGE_VERSION}
-BRANCH_OR_TAG=Release
+BRANCH_OR_TAG=Development
 
 #### Clone and build caqtdm sources
 git clone $REPOSITORY
@@ -36,6 +36,13 @@ if [ "$1" != "--rpmdev" ]; then
     cp ./caqtdm/caQtDM_Viewer/package/rhel7/caqtdm.spec ./
 fi
 
+
+
+find ./caqtdm/caQtDM_Viewer/src -type f | xargs chmod 644
+find ./caqtdm/caQtDM_QtControls/src -type f | xargs chmod 644
+find ./caqtdm/caQtDM_Lib/src -type f | xargs chmod 644
+find ./caqtdm/caQtDM_Lib/caQtDM_Plugins -type f | xargs chmod 644
+
 mv caqtdm caqtdm-${PACKAGE_VERSION}
 tar -czf caqtdm-${PACKAGE_VERSION}.tar.gz ./caqtdm-${PACKAGE_VERSION}
 
@@ -45,8 +52,7 @@ fi
 
 rm -rf caqtdm-${PACKAGE_VERSION}
 
-export   EPICS_BASE_TARGET=/usr/local/epics/base-7.0.6;
-
+export   EPICS_BASE_TARGET=/usr/local/epics/base-7.0.7;
 
 mv caqtdm-${PACKAGE_VERSION}.tar.gz  ../rpmbuild/SOURCES/
  
