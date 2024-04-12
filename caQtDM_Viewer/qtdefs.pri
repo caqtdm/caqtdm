@@ -153,13 +153,14 @@ isEmpty(_CAQTDM_GPS) {
 message("GPS Plugin will not be build")
 }
 else {
-    greaterThan(QT_VER_MAJ, 4) {
+greaterThan(QT_VER_MAJ, 4) {
+  greaterThan(QT_VER_MIN, 10){
         CONFIG += gps
         gps {
            message( "Configuring build for GPS plugin" )
         }
+      }
     }
-
 }
 
 # undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)
