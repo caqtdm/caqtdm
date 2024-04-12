@@ -7371,7 +7371,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 if((kPtr != (knobData *) Q_NULLPTR)) {
                     char asc[MAX_STRING_LENGTH] = {'\0'};
                     char timestamp[50] = {'\0'};
-                    char description[40] = {'\0'};
+                    char description[MAX_STRING_LENGTH] = {'\0'};
                     info.append("<br>");
                     info.append(kPtr->pv);
 
