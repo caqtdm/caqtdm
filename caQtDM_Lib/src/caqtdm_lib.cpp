@@ -3721,7 +3721,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QMutex *mutex;
     struct timeb now;
     bool doNothing = false;
-    int cpylen;
+
     int indx;
     QString pluginName="";
     QString pluginFlavor="";
@@ -8530,9 +8530,9 @@ bool CaQtDM_Lib::parseForQRectConst(QString &inputc, double *valueArray)
     // Parse data
     bool success = false;
     char input[MAXPVLEN];
-    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    qstrncpy(input, (char*) qasc(inputc), (size_t) cpylen);
-    input[cpylen] = '\0';
+    memset(&input,0,MAXPVLEN);
+    qstrncpy(input, qasc(inputc), MAXPVLEN-1);
+
 
     JSONValue *value = JSON::Parse(input);
     if (value == Q_NULLPTR) {
