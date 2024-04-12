@@ -432,7 +432,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
                  kData->edata.valueCount=data.length()+1;
                  kData->edata.dataB=malloc(kData->edata.nelm+1);
 
-                 strncpy((char*) kData->edata.dataB, data.toLatin1().data(), (size_t) kData->edata.dataSize);
+                 qstrncpy((char*) kData->edata.dataB, data.toLatin1().data(), (size_t) kData->edata.dataSize);
                  ((char*) kData->edata.dataB)[data.length()+1]='\0';
 
              }
@@ -451,7 +451,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
 
                  kData->edata.dataB=malloc(kData->edata.nelm+2);
 
-                 strncpy((char*) kData->edata.dataB,data.toLatin1().data(),(size_t) kData->edata.dataSize);
+                 qstrncpy((char*) kData->edata.dataB,data.toLatin1().data(),(size_t) kData->edata.dataSize);
                  ((char*) kData->edata.dataB)[data.length()+1]='\0';
 
              }
@@ -635,7 +635,7 @@ int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata,
            //qDebug() << "Ping:" << d;
            switch (bsreadPV->getType()){
                case bsread_internalchannel::in_string:{
-                 strncpy((char *)kData->edata.dataB, sdata, kData->edata.dataSize);
+                 qstrncpy((char *)kData->edata.dataB, sdata, kData->edata.dataSize);
                  break;
                }
                case bsread_internalchannel::in_enum:{

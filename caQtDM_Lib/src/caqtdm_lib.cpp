@@ -158,19 +158,12 @@
 // used for interfacing epics routines with (pv, text, ...)
 #define QStringsToChars(x,y,z) \
     char param1[MAXPVLEN], param2[255], param3[80]; \
-    int size1, size2, size3; \
     QByteArray Parameter_1 = x.toLatin1().constData(); \
     QByteArray Parameter_2 = y.toLatin1().constData(); \
     QByteArray Parameter_3 = z.toLatin1().constData(); \
-    size1 = qMin(Parameter_1.size(), MAXPVLEN-1); \
-    size2 = qMin(Parameter_2.size(), 255-1); \
-    size3 = qMin(Parameter_3.size(), 80-1); \
-    strncpy(param1, Parameter_1.constData(), size1); \
-    strncpy(param2, Parameter_2.constData(), size2); \
-    strncpy(param3, Parameter_3.constData(), size3); \
-    param1[size1] = '\0'; \
-    param2[size2] = '\0'; \
-    param3[size3] = '\0';
+    strncpy(param1, Parameter_1.constData(), MAXPVLEN-1); \
+    strncpy(param2, Parameter_2.constData(), 255-1); \
+    strncpy(param3, Parameter_3.constData(), 80-1); \
 
 // common code too many widgets; for several reasons we did not try to put similar code in base classes.
 // colors back after no connect
@@ -3728,7 +3721,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     QMutex *mutex;
     struct timeb now;
     bool doNothing = false;
-    int cpylen;
+
     int indx;
     QString pluginName="";
     QString pluginFlavor="";
@@ -3755,7 +3748,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
         status = parseForDisplayRate(JSONString, rate);
         trimmedPV = trimmedPV + "." + JSONString;
         if(!status) {
-            snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
+            snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"caqtdm_monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
         } else {
             snprintf(asc, MAX_STRING_LENGTH, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
         }
@@ -3835,9 +3828,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     strcpy(kData->pluginName, (char*) qasc(pluginName));
     strcpy(kData->pluginFlavor, (char*) qasc(pluginFlavor));
 
-    cpylen = qMin(trimmedPV.length(), MAXPVLEN-1);
-    strncpy(kData->pv, (char*) qasc(trimmedPV), (size_t) cpylen);
-    kData->pv[cpylen] = '\0';
+    memset(&kData->pv,0,MAXPVLEN);
+    qstrncpy(kData->pv, qasc(trimmedPV), MAXPVLEN-1);
 
     // find the plugin we are going to use
     if(!pluginName.contains("intern")) {
@@ -3898,19 +3890,18 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     kData->mutex = (void*)  mutex;
 
     // keep actual object name
-    cpylen = qMin(w->objectName().length(), MAXDISPLEN-1);
-    strncpy(kData->dispName, qasc(w->objectName().toLower()), (size_t) cpylen);
-    kData->dispName[cpylen] = '\0';
+    memset(&kData->dispName,0,MAXDISPLEN);
+    qstrncpy(kData->dispName, qasc(w->objectName().toLower()), (size_t)  MAXDISPLEN-1);
+
 
     QString classname = w->metaObject()->className();
-    cpylen = qMin(classname.length(), MAXDISPLEN-1);
-    strncpy(kData->clasName, qasc(classname.toLower()), (size_t) cpylen);
-    kData->clasName[cpylen] = '\0';
+    memset(&kData->clasName,0,MAXDISPLEN);
+    qstrncpy(kData->clasName, qasc(classname.toLower()), (size_t) MAXDISPLEN-1);
+
 
     // keep actual filename
-    cpylen = qMin( savedFile[level].length(), MAXFILELEN-1);
-    strncpy(kData->fileName, (char*) qasc(savedFile[level]), (size_t) cpylen);
-    kData->fileName[cpylen] = '\0';
+    memset(&kData->fileName,0,MAXFILELEN);
+    qstrncpy(kData->fileName, (char*) qasc(savedFile[level]), (size_t) MAXFILELEN-1);
 
     if (QLineEdit *lineedit = qobject_cast<QLineEdit *>(w)) {
         lineedit->setText("");
@@ -7380,7 +7371,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                 if((kPtr != (knobData *) Q_NULLPTR)) {
                     char asc[MAX_STRING_LENGTH] = {'\0'};
                     char timestamp[50] = {'\0'};
-                    char description[40] = {'\0'};
+                    char description[MAX_STRING_LENGTH] = {'\0'};
                     info.append("<br>");
                     info.append(kPtr->pv);
 
@@ -7791,7 +7782,7 @@ bool CaQtDM_Lib::SoftPVusesItsself(QWidget* widget, QMap<QString, QString> map)
                 if(pos != -1) {
                     int status = parseForDisplayRate(JSONString, rate);
                     if(!status) {
-                        snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
+                        snprintf(asc, MAX_STRING_LENGTH, "JSON parsing error on %s ,should be like {\"caqtdm_monitor\":{\"maxdisplayrate\":10}}", (char*) qasc(pv.trimmed()));
                     } else {
                         snprintf(asc, MAX_STRING_LENGTH, "pv %s display rate set to maximum %dHz", qasc(trimmedPV), rate);
                     }
@@ -8539,9 +8530,9 @@ bool CaQtDM_Lib::parseForQRectConst(QString &inputc, double *valueArray)
     // Parse data
     bool success = false;
     char input[MAXPVLEN];
-    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
-    input[cpylen] = '\0';
+    memset(&input,0,MAXPVLEN);
+    qstrncpy(input, qasc(inputc), MAXPVLEN-1);
+
 
     JSONValue *value = JSON::Parse(input);
     if (value == Q_NULLPTR) {
@@ -8580,16 +8571,15 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     // Parse data
     bool success = false;
     char input[MAXPVLEN];
-    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
-    input[cpylen] = '\0';
+    memset(&input,0,MAXPVLEN);
+    qstrncpy(input, (char*) qasc(inputc), (size_t) MAXPVLEN-1);
 
     JSONValue *value = JSON::Parse(input);
-
     // Did it go wrong?
     if (value == Q_NULLPTR) {
         //printf("failed to parse <%s>\n", input);
         inputc = "{}";
+        qDebug()<<"JSON DEBUG "<< input;
         return success;
     } else {
         // Retrieve the main object
@@ -8640,8 +8630,6 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
 #else
     inputc.remove(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
 #endif
-    //qDebug() << "final1" << inputc;
-
     return success;
 }
 
@@ -8651,9 +8639,8 @@ bool CaQtDM_Lib::checkJsonString(QString &inputc)
 
     bool success = false;
     char input[MAXPVLEN];
-    int cpylen = qMin(inputc.length(), MAXPVLEN-1);
-    strncpy(input, (char*) qasc(inputc), (size_t) cpylen);
-    input[cpylen] = '\0';
+    memset(&input,0,MAXPVLEN);
+    qstrncpy(input, (char*) qasc(inputc), (size_t) MAXPVLEN-1);
     JSONValue *value = JSON::Parse(input);
 
     // Did it go wrong?, when yes then get rid of it
@@ -9900,35 +9887,35 @@ extern "C"  {
                 if(pvMaxLength > 0) strcpy(pv, " " );
                 if (caSlider *w = qobject_cast<caSlider *>(widget)) {
                     *value = w->getSliderValue();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caNumeric *w = qobject_cast<caNumeric *>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caTextEntry *w = qobject_cast<caTextEntry *>(widget)) {
                     *value = w->text().toDouble();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caSpinbox *w = qobject_cast<caSpinbox *>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caLineEdit *w = qobject_cast<caLineEdit *>(widget)) {
                     *value = w->text().toDouble();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caMeter *w = qobject_cast<caMeter *>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caThermo *w = qobject_cast<caThermo*>(widget)) {
                     *value = w->value();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (caToggleButton *w = qobject_cast<caToggleButton*>(widget)) {
                     *value = w->isChecked();
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
+                    qstrncpy(pv,  qasc(w->getPV()),(size_t) pvMaxLength);
                     ok = true;
                 } else if (QCheckBox *w = qobject_cast<QCheckBox*>(widget)) {
                     *value = w->isChecked();
@@ -9951,8 +9938,8 @@ extern "C"  {
             if(widget->objectName().contains(object)) {
 
                 if (caMenu *w = qobject_cast<caMenu*>(widget)) {
-                    strncpy(pv,  qasc(w->getPV()), qMin(pvMaxLength, w->getPV().size()));
-                    strncpy(value,  qasc(w->currentText()), qMin(valueMaxLength, w->currentText().size()));
+                    qstrncpy(pv,  qasc(w->getPV()), (size_t) pvMaxLength);
+                    qstrncpy(value,  qasc(w->currentText()),(size_t) valueMaxLength);
                     ok = true;
                 }
             }

@@ -14,11 +14,15 @@
 %endif
 # build qt5 support (or not)
 %global qt5 1
+
+
+
+
 #############################################################################
 Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
 Version: 4.4.2
-Release: 1%{?dist}
+Release: 0.1%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm
@@ -27,10 +31,14 @@ Source:  https://github.com/caqtdm/caqtdm/%{name}/%{name}-%{version}.tar.gz
 
 %if 0%{?qt5}
 # Requires: caqtdm_archiver
-BuildRequires: pkgconfig(Qt5Concurrent) pkgconfig(Qt5PrintSupport) pkgconfig(Qt5Widgets)
-BuildRequires: pkgconfig(Qt5OpenGL) pkgconfig(Qt5Svg)
-BuildRequires: pkgconfig(Qt5Designer)
+%if 0%{?rhel} <  7
+BuildRequires: qt5-devel
+%else
+BuildRequires: qt5-qtbase-devel
 %endif
+BuildRequires: qt5-qtserialbus-devel qt5-qtsvg-devel qt5-qttools-devel qwt-qt5-devel libXext-devel czmq-devel cppzmq-devel 
+%endif
+
 %if 0%{?qt4}
 BuildRequires: pkgconfig(QtGui) pkgconfig(QtSvg)
 BuildRequires: pkgconfig(QtDesigner)

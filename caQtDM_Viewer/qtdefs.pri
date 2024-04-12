@@ -35,7 +35,7 @@ message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
-TARGET_COPYRIGHT = "Copyright (C) 2022 Paul Scherrer Institut"
+TARGET_COPYRIGHT = "Copyright (C) 2012-2024 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
@@ -141,13 +141,7 @@ message("Modbus Plugin will not be build")
 }
 else {
     greaterThan(QT_VER_MAJ, 4) {
-        unix:!macx:!ios:!android  {
-            packagesExist(serialbus){
-                CONFIG += modbus
-            }
-        }else{
-            CONFIG += modbus
-        }
+        CONFIG += modbus
         modbus {
            message( "Configuring build for modbus plugin" )
         }
@@ -160,13 +154,7 @@ message("GPS Plugin will not be build")
 }
 else {
     greaterThan(QT_VER_MAJ, 4) {
-        unix:!macx:!ios:!android {
-            packagesExist(positioning){
-                CONFIG += gps
-            }
-        }else{
-            CONFIG += gps
-        }
+        CONFIG += gps
         gps {
            message( "Configuring build for GPS plugin" )
         }

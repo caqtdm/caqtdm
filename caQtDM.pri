@@ -301,7 +301,7 @@ epics4_plugin {
 
                 !EPICS4_STATICBUILD {
                    message( "epics4_plugin build with shared object libraries of epics4" )
-                   LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom -lpvAccess -lpvData -lpvaClient -lnt
+                   LIBS += -L$(EPICSLIB) -Wl,-rpath,$(EPICSLIB) -lca -lCom -lpvAccess -lpvAccessCA -lpvData -lpvaClient -lnt
                    LIBS += -L$(QTBASE) -Wl,-rpath,$(QTDM_RPATH) -lcaQtDM_Lib
                 }
                 EPICS4_STATICBUILD  {
