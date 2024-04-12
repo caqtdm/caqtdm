@@ -33,10 +33,12 @@ android {
 }
 
 HEADERS         = ../../controlsinterface.h archivehttp_plugin.h httpretrieval.h ../archiverCommon.h \
+    httpperformancedata.h \
     urlhandlerhttp.h \
     workerHttp.h \
     workerHttpThread.h
 SOURCES         =  archivehttp_plugin.cpp httpretrieval.cpp ../archiverCommon.cpp \
+    httpperformancedata.cpp \
     urlhandlerhttp.cpp \
     workerHttp.cpp \
     workerHttpThread.cpp

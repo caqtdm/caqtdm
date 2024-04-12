@@ -80,6 +80,8 @@ public:
     void updateSecondsPast(indexes indexNew, bool original);
     QTimer *timer;
 
+    QMutex* globalMutex();
+
 protected:
 signals:
     void Signal_UpdateInterface(QMap<QString, indexes> listOfIndexes);
@@ -94,7 +96,7 @@ private:
     {
         char Dev[40];
     } device;
-    QMutex mutex;
+    QMutex m_globalMutex;
     QMutex *mutexP;
     MutexKnobData *mutexknobdataP;
     MessageWindow *messagewindowP;

@@ -94,7 +94,7 @@ public slots:
     void handleResults(indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration);
 
 signals:
-    void operate(QWidget *, const indexes, const QString, MessageWindow *, MutexKnobData *);
+    void operate(QWidget *, const indexes, const QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>);
     void Signal_StopUpdateInterface();
 
 private slots:
@@ -103,14 +103,20 @@ private slots:
     void closeEvent();
 
 private:
-    QMutex mutex;
-    MutexKnobData *mutexknobdataP;
-    MessageWindow *messagewindowP;
-    ArchiverCommon *archiverCommon;
-    QMap<QString, WorkerHttpThread*> listOfThreads;
+    void updateCartesianAppended(int numberOfValues,
+                         indexes indexNew,
+                         QVector<double> XValues,
+                         QVector<double> YValues,
+                         QString backend);
+    QMutex m_globalMutex;
+    MutexKnobData *m_mutexKnobDataP;
+    MessageWindow *m_messageWindowP;
+    ArchiverCommon *m_archiverCommon;
+    QMap<QString, WorkerHttpThread*> m_listOfThreads;
     QMap<QString, indexes> m_IndexesToUpdate;
-    QRegularExpression regexStr;
-    bool suspend;
+    QRegularExpression m_regexStr;
+    bool m_IsSuspended;
+    QMap<QString, QSharedPointer<HttpPerformanceData> > m_retrievalPerformancePerPV;
 };
 
 #endif
