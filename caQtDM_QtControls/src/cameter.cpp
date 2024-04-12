@@ -227,7 +227,7 @@ void caMeter::setFormat(int prec)
         sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
         break;
     case truncated:
-        strcpy(thisFormat, "%d");
+        qstrncpy(thisFormat, "%d",SMALL_STRING_LENGTH);
         break;
     default:
         sprintf(thisFormat, "%s.%dlf", "%", precision);

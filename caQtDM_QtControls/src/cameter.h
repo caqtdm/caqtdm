@@ -168,8 +168,8 @@ private:
    SourceMode thisPrecMode;
    FormatType thisFormatType;
    bool thisUnitMode;
-   char thisFormat[20];
-   char thisFormatC[20];
+   char thisFormat[SMALL_STRING_LENGTH];
+   char thisFormatC[SMALL_STRING_LENGTH];
    QString lastUnits;
    QColor thisBaseColor, thisScaleColor, prevScaleColor;
    bool thisScaleDefaultColor, prevScaleDefaultColor;

@@ -593,8 +593,8 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     if(myUpdateType == UpdateDirect) {
         QWidget *dispW = (QWidget*) kData->dispW;
         dataString[0] = '\0';
-        strcpy(units, kData->edata.units);
-        strcpy(fec, kData->edata.fec);
+        qstrncpy(units, kData->edata.units,caqtdm_string_t_length);
+        qstrncpy(fec, kData->edata.fec,caqtdm_string_t_length);
         int caFieldType= kData->edata.fieldtype;
 
         if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
@@ -776,8 +776,8 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 int index = kPtr->index;
                 QWidget *dispW = (QWidget*) kPtr->dispW;
                 dataString[0] = '\0';
-                strcpy(units, kPtr->edata.units);
-                strcpy(fec, kPtr->edata.fec);
+                qstrncpy(units, kPtr->edata.units,caqtdm_string_t_length);
+                qstrncpy(fec, kPtr->edata.fec,caqtdm_string_t_length);
                 int caFieldType= kPtr->edata.fieldtype;
 
                 if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) Q_NULLPTR) {

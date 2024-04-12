@@ -168,8 +168,8 @@ private:
     int thisPrecision;
     SourceMode thisPrecMode;
     FormatType thisFormatType;
-    char thisFormat[20];
-    char thisFormatC[20];
+    char thisFormat[SMALL_STRING_LENGTH];
+    char thisFormatC[SMALL_STRING_LENGTH];
     double thisMaximum;
     double thisMinimum;
     double thisValue;

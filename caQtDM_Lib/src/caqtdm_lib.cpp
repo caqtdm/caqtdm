@@ -251,7 +251,7 @@
     myMenu.addAction(SETCUSTOM); \
 
 //===============================================================================================
-
+#define calcstring_length 256
 #define MIN_FONT_SIZE 3
 
 Q_DECLARE_METATYPE(QList<int>)
@@ -694,7 +694,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     snprintf(asc, MAX_STRING_LENGTH, "special macro CAQTDM_INTERNAL_UIPATH set to %s\n", qasc(path));
     postMessage(QtWarningMsg, asc);
 
-    strcpy(asc,"unresolved macros present, press context in display to obtain a list");
+    qstrncpy(asc,"unresolved macros present, press context in display to obtain a list",MAX_STRING_LENGTH);
     if(unknownMacrosList.count() > 0) postMessage(QtCriticalMsg, asc);
 }
 
@@ -3825,8 +3825,8 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
     }
 
     *pvRep = trimmedPV;
-    strcpy(kData->pluginName, (char*) qasc(pluginName));
-    strcpy(kData->pluginFlavor, (char*) qasc(pluginFlavor));
+    qstrncpy(kData->pluginName, (char*) qasc(pluginName),caqtdm_string_t_length);
+    qstrncpy(kData->pluginFlavor, (char*) qasc(pluginFlavor),caqtdm_string_t_length);
 
     memset(&kData->pv,0,MAXPVLEN);
     qstrncpy(kData->pv, qasc(trimmedPV), MAXPVLEN-1);
@@ -3916,7 +3916,7 @@ int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget 
 
     // insert into the softpv list when we create a soft channel
     if(kData->soft) {
-        strcpy(kData->pluginName, "intern");
+        qstrncpy(kData->pluginName, "intern",caqtdm_string_t_length);
         mutexKnobDataP->InsertSoftPV(kData->pv, num, thisW);
     }
 
@@ -4118,9 +4118,10 @@ bool CaQtDM_Lib::Python_Error(QWidget *w, QString message)
   */
 bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
 {
+
     double valueArray[MAX_CALC_INPUTS];
-    char post[256];
-    char calcString[256];
+    char post[calcstring_length];
+    char calcString[calcstring_length];
     long status;
     short errnum;
     bool visible = true;
@@ -4158,7 +4159,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
     }
 
     calcQString=calcQString.trimmed();
-    strcpy(calcString, qasc(calcQString));
+    qstrncpy(calcString, qasc(calcQString),calcstring_length);
 
     // any monitors ?
     QVariant monitorList=w->property("MonitorList");
@@ -4218,7 +4219,7 @@ bool CaQtDM_Lib::CalcVisibility(QWidget *w, double &result, bool &valid)
                                 if(list.at((int) ptr->edata.ivalue).trimmed().size() != 0)  {  // string seems to empty, give value
                                     QString strng = list.at((int) ptr->edata.ivalue);
                                     QByteArray ba = strng.toLatin1();
-                                    strcpy(dataString, ba.data());
+                                    qstrncpy(dataString, ba.data(),STRING_EXCHANGE_SIZE);
                                 }
                             }
                         }
@@ -5708,8 +5709,8 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
     } else if(caImage *imageWidget = qobject_cast<caImage *>(w)) {
 
         double valueArray[MAX_CALC_INPUTS];
-        char post[256];
-        char calcString[256];
+        char post[calcstring_length];
+        char calcString[calcstring_length];
         long status;
         short errnum;
         double result;
@@ -5742,7 +5743,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
                 // get calc string
                 //printf("get calc string <%s>\n", qasc(imageWidget->getImageCalc()));
-                strcpy(calcString, (char*) qasc(imageWidget->getImageCalc()));
+                qstrncpy(calcString, (char*) qasc(imageWidget->getImageCalc()),calcstring_length);
 
                 // scan and get the channels
                 for(int i=0; i < 4; i++) valueArray[i] = 0.0;
@@ -6390,7 +6391,7 @@ void CaQtDM_Lib::Callback_UpdateLine(const QString& text, const QString& name)
  */
 void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
 {
-    char errmess[255];
+    char errmess[SMALL_STRING_LENGTH];
 
     caChoice *choice = qobject_cast<caChoice *>(sender());
 
@@ -6419,7 +6420,7 @@ void CaQtDM_Lib::Callback_ChoiceClicked(const QString& text)
  */
 void CaQtDM_Lib::Callback_MenuClicked(const QString& text)
 {
-    char errmess[255];
+    char errmess[SMALL_STRING_LENGTH];
     caMenu *menu = qobject_cast<caMenu *>(sender());
 
     if(!menu->getAccessW()) return;
@@ -7000,20 +7001,20 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w)) {
         GetDefinedCalcString(caGraphics, graphicsWidget, calcString);
-        if(graphicsWidget->getColorMode() == caGraphics::Alarm) strcpy(colMode, "Alarm");
-        else strcpy(colMode, "Static");
+        if(graphicsWidget->getColorMode() == caGraphics::Alarm) qstrncpy(colMode, "Alarm",20);
+        else qstrncpy(colMode, "Static",20);
 
     } else if(caPolyLine* polylineWidget = qobject_cast<caPolyLine *>(w)) {
         GetDefinedCalcString(caPolyLine, polylineWidget, calcString);
-        if(polylineWidget->getColorMode() == caPolyLine::Alarm) strcpy(colMode, "Alarm");
-        else strcpy(colMode, "Static");
+        if(polylineWidget->getColorMode() == caPolyLine::Alarm) qstrncpy(colMode, "Alarm",20);
+        else qstrncpy(colMode, "Static",20);
 
     } else if(caCalc* calcWidget = qobject_cast<caCalc *>(w)) {
         calcString = calcWidget->getCalc();
 
     } else if(caChoice* choiceWidget = qobject_cast<caChoice *>(w)) {
-        if(choiceWidget->getColorMode() == caChoice::Alarm) strcpy(colMode, "Alarm");
-        else strcpy(colMode, "Static");
+        if(choiceWidget->getColorMode() == caChoice::Alarm) qstrncpy(colMode, "Alarm",20);
+        else qstrncpy(colMode, "Static",20);
 
     } else if(caLineEdit* lineeditWidget = qobject_cast<caLineEdit *>(w)) {
         if(lineeditWidget->getPrecisionMode() == caLineEdit::User) {
@@ -7025,14 +7026,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             limitsMax = lineeditWidget->getMaxValue();
             limitsMin = lineeditWidget->getMinValue();
         }
-        if(lineeditWidget->getColorMode() == caLineEdit::Alarm_Default) strcpy(colMode, "Alarm");
-        else if(lineeditWidget->getColorMode() == caLineEdit::Alarm_Static) strcpy(colMode, "Alarm");
-        else strcpy(colMode, "Static");
+        if(lineeditWidget->getColorMode() == caLineEdit::Alarm_Default) qstrncpy(colMode, "Alarm",20);
+        else if(lineeditWidget->getColorMode() == caLineEdit::Alarm_Static) qstrncpy(colMode, "Alarm",20);
+        else qstrncpy(colMode, "Static",20);
 
     } else if(caMultiLineString* multilinestringWidget = qobject_cast<caMultiLineString *>(w)) {
-        if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Default) strcpy(colMode, "Alarm");
-        else if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Static) strcpy(colMode, "Alarm");
-        else strcpy(colMode, "Static");
+        if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Default) qstrncpy(colMode, "Alarm",20);
+        else if(multilinestringWidget->getColorMode() == caMultiLineString::Alarm_Static) qstrncpy(colMode, "Alarm",20);
+        else qstrncpy(colMode, "Static",20);
 
     } else if (caApplyNumeric* applynumericWidget = qobject_cast<caApplyNumeric *>(w)) {
         if(applynumericWidget->getPrecisionMode() == caApplyNumeric::User) {
@@ -7947,10 +7948,10 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
     QString className = widget->metaObject()->className();
     if((nbMon == 0) && !className.contains("caCalc") && text.length() > 0) {
         double valueArray[MAX_CALC_INPUTS];
-        char post[256], calcString[256], asc[MAX_STRING_LENGTH];
+        char post[calcstring_length], calcString[calcstring_length], asc[MAX_STRING_LENGTH];
         short errnum;
 
-        strcpy(calcString, qasc(text));
+        qstrncpy(calcString, qasc(text),calcstring_length);
 
         for(int i=0; i < MAX_CALC_INPUTS; i++) valueArray[i] = 0.0;
         long status = postfix(calcString, post, &errnum);
@@ -8137,7 +8138,7 @@ int CaQtDM_Lib::Execute(char *command)
 
 void CaQtDM_Lib::TreatOrdinaryValue(QString pvo, double value, int32_t idata,  QString svalue, QWidget *w)
 {
-    char errmess[255];
+    char errmess[SMALL_STRING_LENGTH];
     int indx;
 
     QString pv = pvo.trimmed();
@@ -8213,10 +8214,10 @@ double CaQtDM_Lib::getDoubleValueFromString(char *textValue, FormatType fType, c
   */
 void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType, QWidget *w)
 {
-    char errmess[255];
+    char errmess[SMALL_STRING_LENGTH];
     double value;
     long longValue;
-    char *end = Q_NULLPTR, textValue[255];
+    char *end = Q_NULLPTR, textValue[SMALL_STRING_LENGTH];
     bool match;
     int indx;
     ControlsInterface * plugininterface = (ControlsInterface *) Q_NULLPTR;
@@ -8344,7 +8345,7 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
     default:
         match = false;
         //qDebug() << "assume it is a double";
-        strcpy(textValue, qasc(text));
+        qstrncpy(textValue, qasc(text),SMALL_STRING_LENGTH);
         value = getDoubleValueFromString(textValue, fTypeNew, &end);
         if(*end == '\0' && end != textValue) {        // decoded
             match = true;
@@ -8391,13 +8392,13 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
   */
 void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
-    char    errmess[255], sdata[40], asc[MAX_STRING_LENGTH];
+    char    errmess[SMALL_STRING_LENGTH], sdata[40], asc[MAX_STRING_LENGTH];
     int32_t data32[1];
     int16_t data16[1];
     float   fdata[1];
     double  value, ddata[1];
     long    longValue;
-    char    *end = Q_NULLPTR, textValue[255];
+    char    *end = Q_NULLPTR, textValue[SMALL_STRING_LENGTH];
     bool    match;
 
     QString pv = pvo.trimmed();
@@ -8429,7 +8430,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     case caINT:
     case caLONG:
     case caCHAR:
-        strcpy(textValue, qasc(text));
+        qstrncpy(textValue, qasc(text),SMALL_STRING_LENGTH);
         longValue = getLongValueFromString(textValue, fTypeNew, &end);
 
         if(kPtr->edata.fieldtype == caLONG) {
@@ -8484,7 +8485,7 @@ void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::Form
     case caDOUBLE:
         match = false;
         // Treat as a double
-        strcpy(textValue, qasc(text));
+        qstrncpy(textValue, qasc(text),SMALL_STRING_LENGTH);
         value = getDoubleValueFromString(textValue, fTypeNew, &end);
         if(*end == '\0' && end != textValue) {        // decoded
             match = true;
@@ -8572,7 +8573,7 @@ int CaQtDM_Lib::parseForDisplayRate(QString &inputc, int &rate)
     bool success = false;
     char input[MAXPVLEN];
     memset(&input,0,MAXPVLEN);
-    qstrncpy(input, (char*) qasc(inputc), (size_t) MAXPVLEN-1);
+    qstrncpy(input,qasc(inputc), (size_t) MAXPVLEN-1);
 
     JSONValue *value = JSON::Parse(input);
     // Did it go wrong?
