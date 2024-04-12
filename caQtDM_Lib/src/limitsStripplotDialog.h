@@ -28,6 +28,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QLineEdit>
 #include <QGridLayout>
 #include <QDialogButtonBox>
@@ -77,12 +78,22 @@
      virtual void paintEvent(QPaintEvent *e);
 
  private:
+     QGridLayout *Layout;
+
+     QLabel *overRideAutoScale;
+     QCheckBox *overRideAutoScaleActive;
+     QLabel *overRideAutoScaleValueLabel;
+     QLineEdit *minLineEditAutoScale;
+     double autoscaleMinY;
+
      QComboBox *minComboBox[caStripPlot::MAXCURVES];
      QComboBox *maxComboBox[caStripPlot::MAXCURVES];
      QLineEdit *minLineEdit[caStripPlot::MAXCURVES];
      QLineEdit *maxLineEdit[caStripPlot::MAXCURVES];
+     QCheckBox *sAutoScaleSelected[caStripPlot::MAXCURVES];
      QComboBox *YaxisType;
      QComboBox *YaxisScaling;
+
      QStringList vars;
      caStripPlot *StripPlot;
      MutexKnobData *monData;

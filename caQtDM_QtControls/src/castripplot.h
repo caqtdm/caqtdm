@@ -60,6 +60,8 @@
 #include <QMouseEvent>
 #include <qtcontrols_global.h>
 #include <qnumeric.h>
+#include <qwt_date_scale_draw.h>
+#include <qwt_date_scale_engine.h>
 
 #include <stripplotthread.h>
 
@@ -92,6 +94,7 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_ENUMS(yAxisType)
     Q_ENUMS(yAxisScaling)
     Q_ENUMS(cpuUsage)
+    Q_ENUMS(PlotPicker)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -108,6 +111,9 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY( int numberOfXticks READ getXticks WRITE setXticks)
     Q_PROPERTY(yAxisType YAxisType READ getYaxisType WRITE setYaxisType)
     Q_PROPERTY(yAxisScaling YAxisScaling READ getYaxisScaling WRITE setYaxisScaling)
+    Q_PROPERTY(PlotPicker plotpicker READ getPlotPicker WRITE setPlotPicker)
+    Q_PROPERTY(bool CurvesIterableInLegend READ getIterableCurves WRITE setIterableCurves)
+    Q_PROPERTY(bool CurvesSelectableInPlot READ getSelectableCurves WRITE setSelectableCurves)
 
     // would have been nice to define all this with a define statement, however moc does not support that
 
@@ -196,11 +202,11 @@ public:
 
     enum axisScaling {Channel, User};
     enum curvStyle {Lines = 1, FillUnder = 5};
-    enum units { Millisecond = 0, Second, Minute};
+    enum units {Millisecond = 0, Second, Minute};
     enum xAxisType {ValueScale, TimeScale, TimeScaleFix};
     enum yAxisType {linear=0, log10};
-    enum yAxisScaling {fixedScale=0, autoScale};
-
+    enum yAxisScaling {fixedScale=0, autoScale=1, selectiveAutoScale=2};
+    enum PlotPicker {off = 0, on = 1};
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
 
@@ -210,10 +216,20 @@ public:
     void setXticks( int nb ) {thisXticks = nb; defineXaxis(thisUnits, thisPeriod);}
     int getXticks() {return thisXticks;}
 
+
+    void setPlotPicker(PlotPicker p) {thisPlotPicker = p;}
+    PlotPicker getPlotPicker() {return thisPlotPicker;}
+
+    bool getIterableCurves() const {return thisIterableCurves;}
+    // setter defined as public slot
+
+    bool getSelectableCurves() const {return thisSelectableCurves;}
+    // setter defined as public slot
+
     caStripPlot(QWidget * = 0);
     ~caStripPlot();
 
-    void defineCurves(QStringList titres, units unit, double period, int width, int nb);
+    void defineCurves(QStringList titles, units unit, double period, int width, int nb);
     void setData(struct timeb now, double Y, int curvIndex);
 
     bool getXaxisEnabled() const { return thisXshow; }
@@ -222,6 +238,12 @@ public:
     void setYaxisEnabled(bool thisYshow);
     bool getLegendEnabled() const { return thisLegendshow; }
     void setLegendEnabled(bool thisLegendshow);
+
+    bool getAutoscaleMinYOverride() const {return autoscaleMinYOverride;}
+    void setAutoscaleMinYOverride(bool const newAutoscaleMinYOverride) {autoscaleMinYOverride = newAutoscaleMinYOverride;}
+
+    double getAutoscaleMinY() const {return manualAutoscaleMinY;}
+    void setAutoscaleMinY(double const newAutoscaleMinY) {manualAutoscaleMinY = newAutoscaleMinY;}
 
     QString getTitlePlot() const {return thisTitle;}
     void setTitlePlot(QString const &title);
@@ -436,6 +458,9 @@ public:
     void setYscalingMin(int i, axisScaling s) {if(i>= MAXCURVES) return; else setYscalingMin(s, i); }
     void setYscalingMax(int i, axisScaling s) {if(i>= MAXCURVES) return; else setYscalingMax(s, i); }
 
+    bool getSeleticeAutoScaleCurves(int i) {if(i>= MAXCURVES) return false; else return sAutoScaleCurves[i];}
+    void setSelectiveAutoScaleCurves(int i, bool enable = true) {if(i>= MAXCURVES) return; else sAutoScaleCurves[i] = enable;}
+
     void showCurve(int number, bool on);
     void addText(double x, double y, char* text, QColor c, int fontsize);
     void startPlot();
@@ -454,6 +479,18 @@ public slots:
 #include "hideobjectcode.h"
     }
 
+    void stopPlot();
+    void resumePlot();
+    void restartPlot();
+    void pausePlot(bool pausePlot);
+
+    void selectFixedYAxis(int newYAxisIndex);
+
+    void setPlotPickerMode(int mode);
+
+    void setIterableCurves(bool itCurvs) {thisIterableCurves = itCurvs;};
+    void setSelectableCurves(bool selectCurvs) {thisSelectableCurves = selectCurvs;};
+
 protected:
     void resizeEvent ( QResizeEvent * event);
 
@@ -465,6 +502,7 @@ signals:
 private slots:
      void TimeOut();
      void TimeOutThread();
+     void onSelected(const QPointF& point);
 
 private:
     int HISTORY;
@@ -476,6 +514,7 @@ private:
     struct timeb  timeStart;
     struct timeb plotStart;
     bool RestartPlot1, RestartPlot2;
+    bool plotIsPaused;
 
     bool eventFilter(QObject *obj, QEvent *event);
     void setXaxis(double interval, double period);
@@ -483,6 +522,8 @@ private:
     void RescaleCurves(int width, units unit, double period);
     void RescaleAxis();
     void TimersStart();
+    void selectYAxis(quint8 newYAxisIndex);
+    void remapCurve(double newMin, double newMax, quint8 curvIndex, bool isNewLog);
 
     // curve only used to define nicely the legend
     QwtPlotCurve *curve[MAXCURVES];
@@ -495,15 +536,23 @@ private:
     QVector<QwtIntervalSample> rangeData[MAXCURVES];
     QVector<QPointF> fillData[MAXCURVES];
 
+    // original, raw y data for conversions
+    QVector<QwtIntervalSample> rangeDataRaw[MAXCURVES];
+    QVector<QPointF> fillDataRaw[MAXCURVES];
+
+    QwtPlotPicker * plotPicker;
+
     double timeData;
     int dataCount;
 
     cpuUsage  thisUsageCPU;
 
     bool thisXshow, thisYshow, thisLegendshow, thisGrid;
+    bool thisIterableCurves, thisSelectableCurves;
     xAxisType thisXaxisType;
     yAxisType thisYaxisType;
     yAxisScaling thisYaxisScaling;
+    PlotPicker thisPlotPicker;
 
     QString thisTitle, thisTitleX, thisTitleY;
     units thisUnits;
@@ -516,6 +565,9 @@ private:
     QColor thisLineColor[MAXCURVES], thisGridColor;
     double AutoscaleMaxY;
     double AutoscaleMinY;
+    double manualAutoscaleMinY;
+    bool sAutoScaleCurves[MAXCURVES];
+    bool autoscaleMinYOverride;
 
     axisScaling thisYscalingMax[MAXCURVES], thisYscalingMin[MAXCURVES];
 
@@ -535,7 +587,8 @@ private:
     double realVal[MAXCURVES], realMax[MAXCURVES], realMin[MAXCURVES];
     struct timeb realTim[MAXCURVES];
 
-    QStringList savedTitres;
+    QStringList originalTitles;
+    QStringList savedTitles;
     QString legendText(int i);
 
     stripplotthread *timerThread;
@@ -548,5 +601,8 @@ private:
     int thisXticks;
     float ResizeFactorX, ResizeFactorY;
     float oldResizeFactorX, oldResizeFactorY;
+
+    quint8 YAxisIndex;
+    float xAxisToleranceFactor;
 };
 #endif
