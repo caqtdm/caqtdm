@@ -190,7 +190,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         }
 
         if (readdata_ok) {
-            httpPerformanceData->addNewResponse(0, 200, m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
+            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             if (m_httpRetrieval->getCount() > 0) {
                 if (isBinned) {
                     m_vecX.clear();
@@ -218,7 +218,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 throw;
             }
         } else {
-            httpPerformanceData->addNewResponse(0, 400, m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
+            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             if (messageWindow != (MessageWindow *) Q_NULLPTR) {
                 QString mess("ArchiveHTTP plugin -- lastError: ");
                 if (previousHttpRetrievalAborted) {

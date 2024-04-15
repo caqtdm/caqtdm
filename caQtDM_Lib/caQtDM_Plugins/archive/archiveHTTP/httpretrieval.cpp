@@ -229,6 +229,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     double seconds;
 
     QVariant status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    m_httpStatusCode = status.toInt();
 
     if (status.toInt() == 301 || status.toInt() == 302 || status.toInt() == 303
         || status.toInt() == 307 || status.toInt() == 308) {
@@ -261,7 +262,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         reply->deleteLater();
         return;
     }
-
+    m_requestSizeKB = reply->size();
     QByteArray outCompressed = reply->readAll();
     QByteArray out;
     // This sometimes fails for whatever reasons
@@ -548,6 +549,16 @@ QByteArray HttpRetrieval::gUncompress(const QByteArray &data)
     // clean up and return
     inflateEnd(&strm);
     return result;
+}
+
+quint64 HttpRetrieval::requestSizeKB() const
+{
+    return m_requestSizeKB;
+}
+
+int HttpRetrieval::httpStatusCode() const
+{
+    return m_httpStatusCode;
 }
 
 bool HttpRetrieval::isAborted() const

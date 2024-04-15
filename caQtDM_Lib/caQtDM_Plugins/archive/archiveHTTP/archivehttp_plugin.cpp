@@ -157,18 +157,22 @@ int ArchiveHTTP_Plugin::pvGetTimeStamp(char *pv, char *timestamp)
 }
 int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
 {
-    QString report = "";
+    QString report = "<br>Performance data for all curves with this channel across all panels: <br>";
     QString keyInCheck = pv;
     keyInCheck.replace(".X", "", Qt::CaseInsensitive);
     keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
     keyInCheck.replace(".minY", "", Qt::CaseInsensitive);
     keyInCheck.replace(".maxY", "", Qt::CaseInsensitive);
+    int nthResult = 0;
     for (auto entry = m_retrievalPerformancePerPV.constBegin(); entry != m_retrievalPerformancePerPV.constEnd(); ++entry) {
         if (entry.key().contains(keyInCheck)) {
+            nthResult++;
+            report.append(QString::number(nthResult) + ". curve: <br>");
             report.append(entry.value()->generateReport());
+            report.append("-----------------------------------------------------------------<br>");
         }
     }
-    qstrncpy(description, report.toUtf8().constData(), 40);
+    qstrncpy(description, report.toUtf8().constData(), MAX_STRING_LENGTH);
     return true;
 }
 int ArchiveHTTP_Plugin::pvClearEvent(void *ptr)

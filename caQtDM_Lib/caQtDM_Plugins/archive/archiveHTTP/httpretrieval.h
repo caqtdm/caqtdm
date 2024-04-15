@@ -72,6 +72,10 @@ public:
 
     bool isAborted() const;
 
+    int httpStatusCode() const;
+
+    quint64 requestSizeKB() const;
+
 signals:
     void networkError(const QString);
     void requestFinished();
@@ -105,6 +109,8 @@ private:
     QString m_redirectedUrl;
     QDateTime m_continueAt;
     QMutex m_globalMutex;
+    int m_httpStatusCode;
+    quint64 m_requestSizeKB;
 };
 
 #endif

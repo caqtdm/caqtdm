@@ -87,11 +87,12 @@
 #define PRINT(x)
 #define min(x,y)   (((x) < (y)) ? (x) : (y))
 
-#define ToolTipPrefix "<p style='background-color:yellow'><font color='#000000'>"
-#define ToolTipPostfix "</font></font></p>"
+#define ToolTipPrefix "<p style='background-color:yellow; color:black;'>"
+#define ToolTipPostfix "</p>"
 
-#define InfoPrefix "<p style='background-color:lightyellow'><font color='#000000'>"
-#define InfoPostfix "</font></font></p>"
+#define InfoStyle "style='background-color:lightyellow; color:black; white-space: pre-wrap;"
+#define InfoPrefix "<div " InfoStyle ">"
+#define InfoPostfix "</div>"
 
 // context texts
 #define GETINFO         "Get Info"
@@ -7406,7 +7407,6 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                             if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvGetDescription(kPtr->pv, description);
                             info.append(description);
                             if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvGetTimeStamp(kPtr->pv, timestamp);
-                            info.append("<br>");
                             info.append(timestamp);
                         }
                         info.append("<br>Type: ");
@@ -7560,7 +7560,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             info.append(InfoPostfix);
 
             myMessageBox box(this);
-            box.setText("<html>" + info + "</html>");
+            box.setText("<!DOCTYPE html><html>" + info + "</html>");
             box.exec();
 
         // add a file dialog to simplify user path+file input
