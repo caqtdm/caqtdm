@@ -1,3 +1,28 @@
+/*
+ *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
+ *  Villigen, Switzerland
+ *
+ *  The caQtDM Framework is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  The caQtDM Framework is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Copyright (c) 2010 - 2024
+ *
+ *  Author:
+ *    Erik Schwarz
+ *  Contact details:
+ *    erik.schwarz@psi.ch
+ */
+
 #include "httpperformancedata.h"
 
 HttpPerformanceData::HttpPerformanceData()
@@ -16,7 +41,7 @@ QString HttpPerformanceData::generateReport() {
     QMutexLocker locker(&m_globalMutex);
     QString report;
     if (m_inProgress) {
-        report = "Request is currently in Progress.<br>";
+        report = "Request is currently in Progress. <br>";
     } else {
         if (m_finishedSuccessfully) {
             report = "Request has finished successfully. <br>";
@@ -24,26 +49,16 @@ QString HttpPerformanceData::generateReport() {
             report = "Request has finished with errors. <br>";
         }
     }
-    // Qt can't really handle this table and the background color which it should inherit (which works for regular html, just not for Qt)
-    // would be gone not only for this table, but also for all subsequent elements if we used normal html. To workaround this bug,
-    // we close the existing div, which caQtDM_Lib created, specify the background color for this table, and then reopen the div we previously closed
-    // such that the rest of the text is still rendered correctly.
-    //report += InfoPostfix;
-    //report += "<table style='background-color:lightyellow; width:100%;'>";
-    /*report += "<tr><td>Last request queried data since:</td><td>" + m_beginTime.toString() + "</td></tr>"
-              + "<tr><td>Data has been retrieved until:</td><td>" + m_lastRetrievedTime.toString() + "</td></tr>"
-              + "<tr><td>API server response took</td><td>" + QString::number(m_responseTimesinMs[0]) + "ms</td></tr>"
-              + "<tr><td>Response has size:</td><td>" + QString::number(m_responseBytes[0] / 1000) + "kb</td></tr>"
-              + "<tr><td>Http response code was:</td><td>" + QString::number(m_httpStatusCode) + "</td></tr>"
-              + "<tr><td>Request received continueAt:</td><td>" + QVariant(m_receivedContinueAt).toString() + "</td></tr>";*/
-    report += "Last request queried data since:  " + m_beginTime.toString() + "<br>"
-              + "Data has been retrieved until:      " + m_lastRetrievedTime.toString() + "<br>"
-              + "API server response took:             " + QString::number(m_responseTimesinMs[0]) + "ms<br>"
-              + "Response has size:                         " + QString::number(m_responseBytes[0] / 1000) + "kb<br>"
+    report += "Last update queried data since:  " + m_beginTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
+              + "Data has been retrieved until:      " + m_lastRetrievedTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
+              + "API server response took:             " + QString::number(m_responseTimeinMs) + "ms<br>"
+              + "Response had size:                         " + QString::number(m_responseBytes / 1000) + "kb<br>"
               + "Http response code was:              " + QString::number(m_httpStatusCode) + "<br>"
-              + "Request received continueAt:      " + QVariant(m_receivedContinueAt).toString() + "<br>";
-    //report += "</table>";
-    //report += InfoPrefix;
+              + "Request received continueAt:      " + QVariant(m_receivedContinueAt).toString() + "<br>"
+              + "Data is binned:                   " + QVariant(m_isBinned).toString() + "<br>";
+    if (m_isBinned) {
+        report += "Number of bins:                  " + QString::number(m_isBinned) + "<br>";
+    }
 
     return report;
 }
@@ -55,6 +70,8 @@ void HttpPerformanceData::addNewRequest(UrlHandlerHttp *urlHandler)
     if (!m_inProgress) {
         m_beginTime = urlHandler->beginTime();
         m_endTime = urlHandler->endTime();
+        m_isBinned = urlHandler->binned();
+        m_binCount = urlHandler->binCount();
         m_inProgress = true;
     }
     m_numberOfRequests++;
@@ -65,8 +82,8 @@ void HttpPerformanceData::addNewResponse(quint64 responseBytes, int httpStatusCo
     long responseTimeInMs = m_requestTimer.elapsed();
     m_requestTimer.invalidate();
     QMutexLocker locker(&m_globalMutex);
-    m_responseTimesinMs.append(responseTimeInMs);
-    m_responseBytes.append(responseBytes);
+    m_responseTimeinMs = responseTimeInMs;
+    m_responseBytes = responseBytes;
     m_httpStatusCode = httpStatusCode;
     if (receivedContinueAt) {
         // Only set it to true, if it is false, leave it as is, maybe it was true before so it still received a continueAt, just not this time.

@@ -68,6 +68,7 @@
 
 HttpRetrieval::HttpRetrieval()
 {
+    m_retryAfter = 0;
     m_isFinished = false;
     m_totalNumberOfPoints = 0;
     m_isRedirected = false;
@@ -243,7 +244,26 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 
         emit requestFinished();
         reply->deleteLater();
+        return;
+    }
 
+    if (status.toInt() == 429) {
+        m_errorString
+            = QString("Too many requests status code %1 [%2] from %3")
+                  .arg(status.toString(), reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), m_downloadUrl.toString());
+        if (reply->hasRawHeader("Retry-After")) {
+            QByteArray retryAfterRawValue = reply->rawHeader("Retry-After");
+            bool conversionOk = false;
+            long retryAfterValue = retryAfterRawValue.toLong(&conversionOk);
+            if (conversionOk) {
+                m_retryAfter = retryAfterValue;
+                m_errorString.append(QString("\n Response has Retry-After Header with value %1").arg(retryAfterValue));
+            }
+        }
+        // Set this to false so requestUrl returns false and the worker knows the request failed
+        m_isFinished = false;
+        emit requestFinished();
+        reply->deleteLater();
         return;
     }
 
@@ -311,6 +331,16 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     // Set continueAt so the worker can figure out whether to send another request or not
     if (rootObject.contains("continueAt")) {
         m_continueAt = QDateTime::fromString(rootObject.value("continueAt").toString(), Qt::ISODate);
+    }
+
+    // If we got a valid reponse but a retry-after statement is present, save that
+    if (rootObject.contains("retryAfter")) {
+        bool conversionOk = false;
+        long retryAfterValue = rootObject.value("retryAfter").toString().toLong(&conversionOk);
+        if (conversionOk) {
+            m_retryAfter = retryAfterValue;
+        }
+        // If it isn't convertible to a long, we also cannot wait for that amount...
     }
 
     // set count to zero, it will be incremented according to values
@@ -549,6 +579,11 @@ QByteArray HttpRetrieval::gUncompress(const QByteArray &data)
     // clean up and return
     inflateEnd(&strm);
     return result;
+}
+
+long HttpRetrieval::retryAfter() const
+{
+    return m_retryAfter;
 }
 
 quint64 HttpRetrieval::requestSizeKB() const

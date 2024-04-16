@@ -22,6 +22,7 @@
  *  Contact details:
  *    erik.schwarz@psi.ch
  */
+
 #include <QApplication>
 #include <QDebug>
 #include <QThreadPool>
@@ -157,21 +158,35 @@ int ArchiveHTTP_Plugin::pvGetTimeStamp(char *pv, char *timestamp)
 }
 int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
 {
-    QString report = "<br>Performance data for all curves with this channel across all panels: <br>";
+    QString report = "<br>Performance data for last request to this pv: <br>";
     QString keyInCheck = pv;
+    // Get rid of the suffix
     keyInCheck.replace(".X", "", Qt::CaseInsensitive);
     keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
     keyInCheck.replace(".minY", "", Qt::CaseInsensitive);
     keyInCheck.replace(".maxY", "", Qt::CaseInsensitive);
-    int nthResult = 0;
+    // Get rid of curve number
+    m_regexStr.setPattern("\\b[0-7]_");
+    keyInCheck.replace(m_regexStr, "");
+
+    // Now, the only thing remaining besides the pv name is the plot identifier, which we need, as different plots have different performance data.
+
+    // Search for the entry that contains our pv and plot
+    bool foundAnEntry = false;
     for (auto entry = m_retrievalPerformancePerPV.constBegin(); entry != m_retrievalPerformancePerPV.constEnd(); ++entry) {
         if (entry.key().contains(keyInCheck)) {
-            nthResult++;
-            report.append(QString::number(nthResult) + ". curve: <br>");
+            foundAnEntry = true;
+            // Generate a nice report and append it to our string
             report.append(entry.value()->generateReport());
-            report.append("-----------------------------------------------------------------<br>");
+            // This should only return one result either way, however we don't want useless iterations.
+            break;
         }
     }
+    if (!foundAnEntry) {
+        // Something isn't right...
+        return false;
+    }
+    // Write back our return value
     qstrncpy(description, report.toUtf8().constData(), MAX_STRING_LENGTH);
     return true;
 }

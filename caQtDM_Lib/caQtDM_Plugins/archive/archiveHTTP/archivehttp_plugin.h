@@ -22,6 +22,7 @@
  *  Contact details:
  *    erik.schwarz@psi.ch
  */
+
 #ifndef ARCHIVEHTTP_PLUGIN_H
 #define ARCHIVEHTTP_PLUGIN_H
 

@@ -140,12 +140,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchivePlugin:pvAddMonitor" << kData->pv << kData->index << kData->dispName;
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) kData->dispW)) {
-        char asc[CHAR_ARRAY_LENGTH];
         indexes index;
 
-        sprintf(asc, "%d_%s_%p", kData->specData[0], kData->pv, kData->dispW);
+        // Generate key to distinguish curves with the same pv but from different curves or plots.
+        QString key = QString("%1_%2_%3").arg(kData->specData[0]).arg(kData->pv).arg(reinterpret_cast<quintptr>(kData->dispW), sizeof(void*) * 2, 16, QChar('0'));
 
-        QString key = QString(asc);
         // We need to construct new, temporary QString objects, else we modify the actual string, which is unintended
         QString possibleXKeyForMinY = QString(key).replace(".minY", "");
         QString possibleXKeyForMaxY = QString(key).replace(".maxY", "");
@@ -239,8 +238,8 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
                     if (kData->edata.info != (void *) Q_NULLPTR) {
                         free(kData->edata.info);
                     }
-                    kData->edata.info = (char *) malloc(sizeof(asc));
-                    memcpy(kData->edata.info, qasc(key), sizeof(asc));
+                    kData->edata.info = (char *) malloc(key.length());
+                    qstrncpy((char*)kData->edata.info, qasc(key), key.length());
                     indexNew.lastUpdateTime.time = 0;
                     // Make sure that the key of indexNew contains ".minY" or ".maxY", if it exists in the current index
                     if (key.contains(".maxY") || key.contains(".minY")) {

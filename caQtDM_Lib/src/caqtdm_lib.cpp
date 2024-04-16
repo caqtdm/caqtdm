@@ -90,7 +90,7 @@
 #define ToolTipPrefix "<p style='background-color:yellow; color:black;'>"
 #define ToolTipPostfix "</p>"
 
-#define InfoStyle "style='background-color:lightyellow; color:black; white-space: pre-wrap;"
+#define InfoStyle "style='background-color:lightyellow; color:black; white-space: pre-wrap;'"
 #define InfoPrefix "<div " InfoStyle ">"
 #define InfoPostfix "</div>"
 
@@ -7404,7 +7404,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                         if(!kPtr->soft) {
                             info.append("<br>");
                             info.append("Description: ");
-                            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvGetDescription(kPtr->pv, description);
+                            if(plugininterface != (ControlsInterface *) Q_NULLPTR) {
+                                if (qstrcmp(kPtr->pluginName, "archiveHTTP") == 0) {
+                                        char specificKey[MAX_STRING_LENGTH];
+                                        // Use the key created by archiverCommon to distinguish data for the same pv but different widgets and curves.
+                                        qstrncpy(specificKey, reinterpret_cast<char*>(kPtr->edata.info), sizeof(specificKey));
+                                        plugininterface->pvGetDescription(specificKey, description);
+                                } else {
+                                    plugininterface->pvGetDescription(kPtr->pv, description);
+                                }
+                            }
                             info.append(description);
                             if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvGetTimeStamp(kPtr->pv, timestamp);
                             info.append(timestamp);

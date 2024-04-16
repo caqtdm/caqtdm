@@ -76,6 +76,8 @@ public:
 
     quint64 requestSizeKB() const;
 
+    long retryAfter() const;
+
 signals:
     void networkError(const QString);
     void requestFinished();
@@ -111,6 +113,7 @@ private:
     QMutex m_globalMutex;
     int m_httpStatusCode;
     quint64 m_requestSizeKB;
+    long m_retryAfter;
 };
 
 #endif

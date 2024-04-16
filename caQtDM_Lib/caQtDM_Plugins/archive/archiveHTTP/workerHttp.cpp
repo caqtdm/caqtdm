@@ -79,7 +79,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
     ftime(&now);
     double endSeconds = (double) now.time + (double) now.millitm / (double) 1000;
     double startSeconds = endSeconds - indexNew.secondsPast;
-    if (indexNew.nrOfBins != -1) {
+    if (indexNew.nrOfBins > 0) {
         isBinned = true;
     } else {
         isBinned = false;
@@ -125,14 +125,22 @@ void WorkerHTTP::getFromArchive(QWidget *w,
     do {
         // If member is set, then this isn't the first iteration, so wait a bit before stressing the backend again
         if (m_receivedContinueAt) {
-            QThread::sleep(1);
+            if (m_retryAfter != 0) {
+                // Wait as long as the server requested
+                QThread::sleep(m_retryAfter);
+            } else {
+                // Just wait for a second
+                QThread::sleep(1);
+            }
         }
+        m_retryAfter = 0;
         m_receivedContinueAt = false;
 
-        // Set Bin Count according to initial density, so the density is consitent across multiple succeeding requests
+        // Set bin count according to initial density, so the density is consitent across multiple succeeding requests
         timeDifference = endSeconds - startSeconds;
-        // The count cannot be 0 because then we would be requesting no data
-        urlHandler->setBinCount(qMax(1, int(timeDifference * nrOfBinsPerSecond)));
+        urlHandler->setBinCount(int(timeDifference * nrOfBinsPerSecond));
+        // When the bin count is less than two, then not enough time has passed to make another request
+        bool binCountLessThanTwo = urlHandler->binCount() < 2;
 
         // Set Begin Time within loop to modify it if we get a continueAt
         urlHandler->setBeginTime(QDateTime::fromSecsSinceEpoch(startSeconds));
@@ -156,11 +164,13 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         }
 
         bool readdata_ok;
-        if (!previousHttpRetrievalAborted) {
+        // If the previous retrieval aborted, don't even request.
+        // If the bin Count is less than one and we have binned data, don't even request.
+        if (!previousHttpRetrievalAborted && !(binCountLessThanTwo && isBinned)) {
             httpPerformanceData->addNewRequest(urlHandler);
             readdata_ok = m_httpRetrieval->requestUrl(urlHandler->assembleUrl(),
                                                            urlHandler->backend(),
-                                                           endSeconds - startSeconds,
+                                                           timeDifference,
                                                            isBinned,
                                                            indexNew.timeAxis,
                                                            key);
@@ -168,22 +178,20 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 QUrl url = QUrl(m_httpRetrieval->getRedirected_Url());
                 // Messages in case of a redirect and set the widget to the correct location
                 // with a reload of the panel this information get lost.
-                // the url storage location is the dynamic property of the widget
-                QString mess("ArchiveHTTP plugin -- redirect: ");
-                mess.append(key);
-                mess.append(" to ");
-                mess.append(url.toString());
-                messageWindow->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
+                if (messageWindow != (MessageWindow *) Q_NULLPTR) {
+                    QString mess("ArchiveHTTP plugin -- redirect: ");
+                    mess.append(key);
+                    mess.append(" to ");
+                    mess.append(url.toString());
+                    messageWindow->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
+                }
+                // Set a dynamic property containing the new url so the next update doesnt run into the same error again
                 indexNew.w->setProperty("archiverIndex", QVariant(url.toString()));
-                delete m_httpRetrieval;
-                m_httpRetrieval = new HttpRetrieval();
+                // Update the url for the next request
                 urlHandler->setUrl(url);
-                readdata_ok = m_httpRetrieval->requestUrl(urlHandler->assembleUrl(),
-                                                          urlHandler->backend(),
-                                                          indexNew.secondsPast,
-                                                          isBinned,
-                                                          indexNew.timeAxis,
-                                                          key);
+                // Make sure we do another request
+                m_receivedContinueAt = true;
+                readdata_ok = false;
             }
         } else {
             readdata_ok = false;
@@ -197,7 +205,14 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     m_vecY.clear();
                     m_vecMinY.clear();
                     m_vecMaxY.clear();
+                    // Get the data
                     m_httpRetrieval->getBinnedDataAppended(m_vecX, m_vecY, m_vecMinY, m_vecMaxY);
+                    // Because we have binned data the latest point is faulty as it does not contain as much data as the others
+                    // Due to this, there might be unproportional spikes, so remove the last point.
+                    m_vecX.removeLast();
+                    m_vecY.removeLast();
+                    m_vecMinY.removeLast();
+                    m_vecMaxY.removeLast();
                 } else {
                     m_vecX.clear();
                     m_vecY.clear();
@@ -210,6 +225,16 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     startSeconds = m_httpRetrieval->continueAt().toSecsSinceEpoch();
                     m_receivedContinueAt = true;
                 }
+                if (m_httpRetrieval->retryAfter() != 0) {
+                    // If the API told us how long to wait, follow that instruction
+                    m_retryAfter = m_httpRetrieval->retryAfter();
+
+                    if (m_httpRetrieval->retryAfter() > 5) {
+                        // No, we are not waiting this long...
+                        // Just say we didn't receive a continueAt so this is the last request in this series.
+                        m_receivedContinueAt = false;
+                    }
+                }
             }
 
             nbVal = m_vecX.count();
@@ -219,23 +244,41 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             }
         } else {
             httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
-            if (messageWindow != (MessageWindow *) Q_NULLPTR) {
-                QString mess("ArchiveHTTP plugin -- lastError: ");
-                if (previousHttpRetrievalAborted) {
-                    mess.append(" request was aborted ");
-                } else {
-                    mess.append(m_httpRetrieval->lastError());
+            // If we intentionally did not send out a request because the bin count was too low, don't generate an error
+            // If the request was redirected, an error has already been displayed but the request is not aborted, so don't generate an error
+            if (!(binCountLessThanTwo && isBinned) && !m_httpRetrieval->is_Redirected()) {
+                if (messageWindow != (MessageWindow *) Q_NULLPTR) {
+                    QString mess("ArchiveHTTP plugin -- lastError: ");
+                    if (previousHttpRetrievalAborted) {
+                        mess.append(" request was aborted ");
+                    } else {
+                        mess.append(m_httpRetrieval->lastError());
+                    }
+                    mess.append(" for pv: ");
+                    mess.append(key);
+                    mess = QString(mess.toHtmlEscaped());
+                    messageWindow->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
                 }
-                mess.append(" for pv: ");
-                mess.append(key);
-                mess = QString(mess.toHtmlEscaped());
-                messageWindow->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
             }
+
             m_vecX.clear();
             m_vecY.clear();
             m_vecMinY.clear();
             m_vecMaxY.clear();
             nbVal = 0;
+
+            // If the server is temporarily at capacity, try again
+            if (m_httpRetrieval->retryAfter() != 0) {
+                // Set this to indicate we are trying again.
+                // A retry after is basically a continueAt, just that the server coulnd't give ANY data, instead of not all.
+                m_receivedContinueAt = true;
+                m_retryAfter = m_httpRetrieval->retryAfter();
+
+                if (m_httpRetrieval->retryAfter() > 5) {
+                    // No, we are not waiting this long...
+                    m_receivedContinueAt = false;
+                }
+            }
         }
         emit resultReady(indexNew, nbVal, m_vecX, m_vecY, m_vecMinY, m_vecMaxY, m_httpRetrieval->getBackend(), !m_receivedContinueAt);
     } while (m_receivedContinueAt);
