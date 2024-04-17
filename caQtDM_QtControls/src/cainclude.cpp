@@ -560,7 +560,7 @@ void caInclude::update_geometrysave(){
 QRect caInclude::scanChildsneededArea(){
     foreach(QWidget* l ,this->findChildren<QWidget *>()){
        QRect resizedata=l->childrenRect();
-       if ((resizedata.width()>0) && (resizedata.height()>0));
+       if ((resizedata.width()>0) && (resizedata.height()>0))
          l->resize(resizedata.width(),resizedata.height());
     }
     return this->childrenRect();

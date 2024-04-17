@@ -30,6 +30,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include "zmq.h"
+#include "dbrString.h"
 #include <exception>
 #include "bsread_decode.h"
 #include "knobData.h"
@@ -812,7 +813,7 @@ void bsread_Decode::bsread_EndofData()
                 QString key = kData->pv;
                 //qDebug() << kData->pv;
                 QString ioc_string=StreamConnectionPoint.leftJustified(39, ' ');
-                strcpy(kData->edata.fec,ioc_string.toLatin1().constData());
+                qstrncpy(kData->edata.fec,ioc_string.toLatin1().constData(),caqtdm_string_t_length);
                 // find this pv in our internal values list
                 // and update its value
                 bsreadPV=Q_NULLPTR;

@@ -466,20 +466,20 @@ void caLineDraw::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        if(thisDatatype == caDOUBLE) strcpy(m_Format, "%lld");
-        else strcpy(m_Format, "%d");
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%lld",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "%d",MAX_STRING_LENGTH);
         break;
     case utruncated:
-        if(thisDatatype == caDOUBLE) strcpy(m_Format, "%llu");
-        else strcpy(m_Format, "%u");
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%llu",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "%u",MAX_STRING_LENGTH);
         break;
     case hexadecimal:
-        if(thisDatatype == caDOUBLE) strcpy(m_Format, "0x%llx");
-        else strcpy(m_Format, "0x%x");
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "0x%llx",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "0x%x",MAX_STRING_LENGTH);
         break;
     case octal:
-        if(thisDatatype == caDOUBLE) strcpy(m_Format, "O%llo");
-        else strcpy(m_Format, "O%o");
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "O%llo",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "O%o",MAX_STRING_LENGTH);
         break;
     case sexagesimal:
     case sexagesimal_hms:

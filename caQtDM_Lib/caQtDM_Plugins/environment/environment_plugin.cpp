@@ -149,7 +149,7 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
 
 
 
-        strcpy((char*)kData->edata.dataB, (char*)qasc(value));
+        qstrncpy((char*)kData->edata.dataB, (char*)qasc(value),(size_t)kData->edata.dataSize);
 
         kData->edata.fieldtype = caSTRING;
         kData->edata.connected = true;

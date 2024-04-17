@@ -25,7 +25,7 @@
 
 #ifndef DBRSTRING_H
 #define DBRSTRING_H
-
-typedef char caqtdm_string_t[40];
+#define caqtdm_string_t_length 40
+typedef char caqtdm_string_t[caqtdm_string_t_length];
 
 #endif // DBRSTRING_H
