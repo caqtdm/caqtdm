@@ -221,10 +221,10 @@ int ArchiveHTTP_Plugin::TerminateIO()
 }
 
 void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
-                                         indexes indexNew,
-                                         QVector<double> XValues,
-                                         QVector<double> YValues,
-                                         QString backend)
+                                                 indexes indexNew,
+                                                 QVector<double> XValues,
+                                                 QVector<double> YValues,
+                                                 QString backend)
 {
     // We have to make sure that we are synchronized with the archiverCommon
     QMutexLocker locker(m_archiverCommon->globalMutex());
