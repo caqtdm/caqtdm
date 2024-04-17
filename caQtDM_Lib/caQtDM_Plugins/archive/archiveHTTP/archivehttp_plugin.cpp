@@ -410,7 +410,6 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
-    qDebug() << "updateInterface" << QThread::currentThread();
     QMutexLocker mutexLocker(&m_globalMutex);
     if (m_IsSuspended) {
         return;

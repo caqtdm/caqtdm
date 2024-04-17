@@ -67,7 +67,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     MutexKnobData *mutexKnobDataP,
                     QSharedPointer<HttpPerformanceData> httpPerformanceData)
 {
-    qDebug() << "Current Time is: " << QTime::currentTime();
     QMutexLocker locker(&m_globalMutex);
     Q_UNUSED(w);
     struct timeb now;
