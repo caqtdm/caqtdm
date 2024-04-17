@@ -52,6 +52,7 @@ void ArchiverCommon::stopUpdateInterface()
 
 QMutex* ArchiverCommon::globalMutex()
 {
+    // This mutex is used for other parts of caQtDM which asynchronously want to process data that is also update in here
     return &m_globalMutex;
 }
 
@@ -344,13 +345,11 @@ int ArchiverCommon::pvClearMonitor(knobData *kData)
     if (kData->index == -1) {
         return true;
     }
-    //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "clearmonitor" << kData->index << kData->pv;
+    QMutexLocker locker(&m_globalMutex);
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) kData->dispW)) {
-        Q_UNUSED(w);
-        char asc[CHAR_ARRAY_LENGTH];
-        sprintf(asc, "%d_%s_%p", kData->specData[0], kData->pv, kData->dispW);
-        QString key = QString(asc);
+        // generate key used to distinguish knobDatas with the same pv but different widgets / curves
+        QString key = QString("%1_%2_%3").arg(kData->specData[0]).arg(kData->pv).arg(reinterpret_cast<quintptr>(kData->dispW), sizeof(void*) * 2, 16, QChar('0'));
         QString possibleXKeyForMinY = QString(key).replace(".minY", "");
         QString possibleXKeyForMaxY = QString(key).replace(".maxY", "");
         key = key.replace(".X", "");
@@ -386,12 +385,13 @@ int ArchiverCommon::pvClearMonitor(knobData *kData)
 
     pvFreeAllocatedData(kData);
     kData->index = -1;
-
     return true;
 }
 
 int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
 {
+    // Lock the data mutex first, so we don't free data that is still in use
+    mutexknobdataP->DataLock(kData);
     if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
         kData->edata.info = (void *) Q_NULLPTR;
@@ -400,6 +400,7 @@ int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
         free(kData->edata.dataB);
         kData->edata.dataB = (void *) Q_NULLPTR;
     }
+    mutexknobdataP->DataUnlock(kData);
     return true;
 }
 

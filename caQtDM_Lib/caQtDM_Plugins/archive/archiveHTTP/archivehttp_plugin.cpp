@@ -225,8 +225,7 @@ void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
                                          QString backend)
 {
     // We have to make sure that we are synchronized with the archiverCommon
-    QMutex *archiverCommonMutex = m_archiverCommon->globalMutex();
-    QMutexLocker locker(archiverCommonMutex);
+    QMutexLocker locker(m_archiverCommon->globalMutex());
 
     if (numberOfValues > 0) {
         // Check for a valid index
@@ -411,12 +410,13 @@ void ArchiveHTTP_Plugin::handleResults(
 // however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
+    qDebug() << "updateInterface" << QThread::currentThread();
     QMutexLocker mutexLocker(&m_globalMutex);
     if (m_IsSuspended) {
         return;
     }
 
-    // Index name (url)
+    // Index name (url), will later be redefined if dynamic property or environment variable is set
     QString index_name = "https://data-api.psi.ch/";
 
     // remove the curve index that seperates indexes from different curve,
@@ -511,9 +511,14 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             }
 
             // first look if an environment variable is set for the url
+            // The dynamic property is also set/override if we get a redirect
+            // Therefore, dynamic property comes first, then environment variable, then predefined url
             QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
+            // Do this if dynamic property is set
+            // Also do this if no environment variable is defined
             if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
                 var = w->property("archiverIndex");
+                // Do this if dynamic property is set
                 if (!var.isNull()) {
                     QString indexName = var.toString();
                     index_name = qasc(indexName);
@@ -525,19 +530,19 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                             m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                         }
                     }
-                } else if (indexNew.init) {
+                } else if (indexNew.init) { // In this case nothing is set, use predefined url
                     QString mess(
-                        "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERSF_URL "
+                        "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERHTTP_URL "
                         "set and no archiverIndex defined as dynamic property in widget "
                         + w->objectName() + ", defaulting to " + index_name);
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
-            } else {
+            } else { // Environment variable is set but no dynamic property exists
                 if (indexNew.init) {
                     QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
-                                 + " from environment variable CAQTDM_ARCHIVERSF_URL");
+                                 + " from environment variable CAQTDM_ARCHIVERHTTP_URL");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
