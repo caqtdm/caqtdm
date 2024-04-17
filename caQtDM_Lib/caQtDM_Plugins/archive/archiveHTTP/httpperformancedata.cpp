@@ -24,6 +24,7 @@
  */
 
 #include "httpperformancedata.h"
+#include <QVariant>
 
 HttpPerformanceData::HttpPerformanceData()
 {

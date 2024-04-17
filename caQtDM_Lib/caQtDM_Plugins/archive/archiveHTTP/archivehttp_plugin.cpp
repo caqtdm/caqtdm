@@ -29,6 +29,7 @@
 
 #include "archivehttp_plugin.h"
 #include "archiverCommon.h"
+#include <QMetaType>
 
 #define qasc(x) x.toLatin1().constData()
 
@@ -40,6 +41,7 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     m_IsSuspended = false;
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
+    qRegisterMetaType<QSharedPointer<HttpPerformanceData> >("QSharedPointer<HttpPerformanceData>");
     m_archiverCommon = new ArchiverCommon();
 
     connect(m_archiverCommon,
