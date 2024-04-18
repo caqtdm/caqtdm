@@ -36,7 +36,14 @@ class Q_DECL_EXPORT WorkerHttpThread : public QThread
 public:
     WorkerHttpThread(WorkerHTTP *worker);
     ~WorkerHttpThread();
+
+    /*
+     * Returns a pointer to the httpRetrieval currently associated with the workerHttp in this thread.
+     * If no httpRetrieval is currently associated, it returns a Q_NULLPTR.
+     * Due to multithreading, this function is dangerous and should only be used with extreme caution
+     * */
     HttpRetrieval *getHttpRetrieval();
+
     const bool isActive();
     void setIsActive(const bool &newIsActive);
 

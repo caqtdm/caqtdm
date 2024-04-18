@@ -50,15 +50,16 @@ QString HttpPerformanceData::generateReport() {
             report = "Request has finished with errors. <br>";
         }
     }
+    // The spacing seems weird but when displayed, the all should align.
     report += "Last update queried data since:  " + m_beginTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
-              + "Data has been retrieved until:      " + m_lastRetrievedTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
-              + "API server response took:             " + QString::number(m_responseTimeinMs) + "ms<br>"
-              + "Response had size:                         " + QString::number(m_responseBytes / 1000) + "kb<br>"
-              + "Http response code was:              " + QString::number(m_httpStatusCode) + "<br>"
-              + "Request received continueAt:      " + QVariant(m_receivedContinueAt).toString() + "<br>"
-              + "Data is binned:                   " + QVariant(m_isBinned).toString() + "<br>";
+              + "Data has been retrieved until:     " + m_lastRetrievedTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
+              + "API server response took:            " + QString::number(m_responseTimeinMs) + "ms<br>"
+              + "Response had size:                       " + QString::number(m_responseBytes / 1000) + "kb<br>"
+              + "Http response code was:             " + QString::number(m_httpStatusCode) + "<br>"
+              + "Request received continueAt:     " + QVariant(m_receivedContinueAt).toString() + "<br>"
+              + "Data is binned:                              " + QVariant(m_isBinned).toString() + "<br>";
     if (m_isBinned) {
-        report += "Number of bins:                  " + QString::number(m_isBinned) + "<br>";
+        report += "Number of bins:                            " + QString::number(m_isBinned) + "<br>";
     }
 
     return report;

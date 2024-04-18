@@ -62,9 +62,24 @@ public:
     int initCommunicationLayer(MutexKnobData *data,
                                MessageWindow *messageWindow,
                                QMap<QString, QString> options);
+    /*
+     * Makes the plugin start updating this knobData.
+     * */
     int pvAddMonitor(int index, knobData *kData, int rate, int skip);
+
+    /*
+     * Makes the plugin stop updating this knobData.
+     * */
     int pvClearMonitor(knobData *kData);
+
+    /*
+     *  Frees knobData pointers allocated by the plugin.
+     * */
     int pvFreeAllocatedData(knobData *kData);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvSetValue(char *pv,
                    double rdata,
                    int32_t idata,
@@ -72,6 +87,10 @@ public:
                    char *object,
                    char *errmess,
                    int forceType);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvSetWave(char *pv,
                   float *fdata,
                   double *ddata,
@@ -81,17 +100,45 @@ public:
                   int nelm,
                   char *object,
                   char *errmess);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvGetTimeStamp(char *pv, char *timestamp);
+
+    /*
+     * Fills the description to the pv containing performance data from the last request.
+     * */
     int pvGetDescription(char *pv, char *description);
-    int pvClearEvent(void *ptr);
-    int pvAddEvent(void *ptr);
+
+    int pvClearEvent(void *keyPtr);
+    int pvAddEvent(void *keyPtr);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvReconnect(knobData *kData);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvDisconnect(knobData *kData);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int FlushIO();
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int TerminateIO();
 
     // From hereon downwards everything is new, so not available through ControlsInterface (without cast)
 public slots:
+    /*
+     * Processes received data, updates the cartesianPlot and destroys the worker & workerThread, if isFinalIteration is true.
+     * */
     void handleResults(indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration);
 
 signals:
@@ -99,16 +146,33 @@ signals:
     void Signal_StopUpdateInterface();
 
 private slots:
+    /*
+     * This routine is called everytime new knobData entries are to be updated.
+     * For each entry, it makes sure no redundant data is requested, and creates a new worker & workerThread to retrieve the data.
+     * */
     void Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes);
+
+    /*
+     * Tells all currently processing requests and soon to be processed requests to return early and abort.
+     * */
     void Callback_AbortOutstandingRequests(QString key);
+
+    /*
+     * Stops any more update from being triggered.
+     * */
     void closeEvent();
 
 private:
+    /*
+     * Updates the cartesianPlot by adding the new values to the already existing values.
+     * This also removes any old values that are outdated and not used anymore.
+     * */
     void updateCartesianAppended(int numberOfValues,
                          indexes indexNew,
                          QVector<double> XValues,
                          QVector<double> YValues,
                          QString backend);
+
     QMutex m_globalMutex;
     MutexKnobData *m_mutexKnobDataP;
     MessageWindow *m_messageWindowP;

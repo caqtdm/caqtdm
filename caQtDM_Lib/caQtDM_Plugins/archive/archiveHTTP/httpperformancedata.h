@@ -36,8 +36,20 @@ class HttpPerformanceData
 public:
     HttpPerformanceData();
     ~HttpPerformanceData();
+
+    /*
+     * Generates a HTML 4 report containing performance data for the last request.
+     * */
     QString generateReport();
+
+    /*
+     * Adds a new request and automatically starts the timer to track response time.
+     * */
     void addNewRequest(UrlHandlerHttp *urlHandler);
+
+    /*
+     * Adds a response to the latest request and automatically stops the timer to track response time.
+     * */
     void addNewResponse(quint64 responseBytes, int httpStatusCode, bool receivedContinueAt, QDateTime continueAtTime);
 
 private:

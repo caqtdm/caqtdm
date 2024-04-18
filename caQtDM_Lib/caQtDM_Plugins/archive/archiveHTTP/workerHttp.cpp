@@ -40,7 +40,7 @@ WorkerHTTP::WorkerHTTP()
 {
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
-    m_httpRetrieval = (HttpRetrieval *) 0;
+    m_httpRetrieval = Q_NULLPTR;
     m_receivedContinueAt = false;
     m_vecX.clear();
     m_vecY.clear();
@@ -84,6 +84,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         isBinned = false;
     }
 
+    // Calculate the number of bins per second to be able to maintain the initial bin density if we receive a continueAt
     double timeDifference = indexNew.secondsPast;
     double nrOfBinsPerSecond = indexNew.nrOfBins / timeDifference;
 
@@ -95,13 +96,14 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         double maxXMSecs = 1000 * (endSeconds + timeBuffer);
 
         // Now, invoke the function to set the Scale unsing a lamda function,
-        // we have to do this as the widget lives in another thread and this function is NOT thread safe.
+        // We have to do this as the widget lives in another thread and this function is NOT thread safe.
         // This calls the function in the widgets thread itself, that being our main GUI thread.
         QMetaObject::invokeMethod(w, [minXMSecs, maxXMSecs, w]() {
             w->setScaleX(minXMSecs, maxXMSecs);
         });
     }
 
+    // Initialize urlhandler with parameters
     UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
     urlHandler->setUrl(index_name);
     urlHandler->setBackend(indexNew.backend);
@@ -138,8 +140,8 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         // Set bin count according to initial density, so the density is consitent across multiple succeeding requests
         timeDifference = endSeconds - startSeconds;
         urlHandler->setBinCount(int(timeDifference * nrOfBinsPerSecond));
-        // When the bin count is less than two, then not enough time has passed to make another request
-        bool binCountLessThanTwo = urlHandler->binCount() < 2;
+        // When the bin count is less than one, then not enough time has passed to make another request
+        bool binCountLessThanOne = urlHandler->binCount() < 1;
 
         // Set Begin Time within loop to modify it if we get a continueAt
         urlHandler->setBeginTime(QDateTime::fromSecsSinceEpoch(startSeconds));
@@ -165,7 +167,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         bool readdata_ok;
         // If the previous retrieval aborted, don't even request.
         // If the bin Count is less than one and we have binned data, don't even request.
-        if (!previousHttpRetrievalAborted && !(binCountLessThanTwo && isBinned)) {
+        if (!previousHttpRetrievalAborted && !(binCountLessThanOne && isBinned)) {
             httpPerformanceData->addNewRequest(urlHandler);
             readdata_ok = m_httpRetrieval->requestUrl(urlHandler->assembleUrl(),
                                                            urlHandler->backend(),
@@ -207,14 +209,18 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     // Get the data
                     m_httpRetrieval->getBinnedDataAppended(m_vecX, m_vecY, m_vecMinY, m_vecMaxY);
                     // Because we have binned data the latest point is faulty as it does not contain as much data as the others
-                    // Due to this, there might be unproportional spikes, so remove the last point.
-                    m_vecX.removeLast();
-                    m_vecY.removeLast();
-                    m_vecMinY.removeLast();
-                    m_vecMaxY.removeLast();
+                    // Due to this, there might be unproportional spikes, so remove the last point if there are more than one.
+                    // Also only do this if there is no continueAt, because if there is the last received point isn't actually the latest one and therefore not affected by this problem.
+                    if (!m_httpRetrieval->hasContinueAt() && m_httpRetrieval->getCount() > 1) {
+                        m_vecX.removeLast();
+                        m_vecY.removeLast();
+                        m_vecMinY.removeLast();
+                        m_vecMaxY.removeLast();
+                    }
                 } else {
                     m_vecX.clear();
                     m_vecY.clear();
+                    // Get the data
                     m_httpRetrieval->getDataAppended(m_vecX, m_vecY);
                 }
             }
@@ -245,7 +251,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             // If we intentionally did not send out a request because the bin count was too low, don't generate an error
             // If the request was redirected, an error has already been displayed but the request is not aborted, so don't generate an error
-            if (!(binCountLessThanTwo && isBinned) && !m_httpRetrieval->is_Redirected()) {
+            if (!(binCountLessThanOne && isBinned) && !m_httpRetrieval->is_Redirected()) {
                 if (messageWindow != (MessageWindow *) Q_NULLPTR) {
                     QString mess("ArchiveHTTP plugin -- lastError: ");
                     if (previousHttpRetrievalAborted) {

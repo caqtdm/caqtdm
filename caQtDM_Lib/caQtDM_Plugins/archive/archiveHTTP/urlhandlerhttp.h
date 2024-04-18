@@ -34,18 +34,40 @@ class Q_DECL_EXPORT UrlHandlerHttp : public QObject
 {
     Q_OBJECT
 public:
+    /*
+     * Besides creating an instance of this class, it also sets the api path.
+     * If the environment variable "CAQTDM_ARCHIVEHTTP_API_PATH" is set, it uses that value,
+     * else is initializes it with the default value "/api/4".
+     * By default allowLargeResult is also set to true.
+     * */
     UrlHandlerHttp();
     ~UrlHandlerHttp();
 
+    /*
+     * Assembles the url using all previously provided and modified parameters.
+     * */
     QUrl assembleUrl() const;
 
+    /*
+     * Returns the base url in the format example.com
+    * */
     QUrl baseUrl() const;
+    /*
+     * Sets the url and parses & saves all known parameters it can find.
+     * The input can be anything from just the base url up to a previously fully assembled url.
+     * */
     void setUrl(const QUrl &newBaseUrl);
 
-    bool https() const;
-    void setHttps(const bool &newHttps);
+    bool usesHttps() const;
+    void setUsesHttps(const bool &newHttps);
 
+    /*
+     * Returns whether or not the url is configured to request binned data.
+     * */
     bool binned() const;
+    /*
+     * Sets whether the url should request binned data.
+     * */
     void setBinned(const bool &newBinned);
 
     int binCount() const;
@@ -54,7 +76,13 @@ public:
     QString backend() const;
     void setBackend(const QString &newBackend);
 
+    /*
+     * Returns the channel name without the suffix (.X/.Y/.minX/.minY).
+     * */
     QString channelName() const;
+    /*
+     * Sets the channel name with the given name but removes the suffix first (.X/.Y/.minX/.minY)-
+     * */
     void setChannelName(const QString &newChannelName);
 
     QDateTime beginTime() const;
@@ -64,6 +92,9 @@ public:
     void setEndTime(const QDateTime &newEndTime);
 
     QString apiPath() const;
+    /*
+     * Sets the api path, input should be like QString("/path/to/endpoint") .
+     * */
     void setApiPath(const QString &newApiPath);
 
     bool allowLargeResult() const;
@@ -84,7 +115,7 @@ private:
     bool m_allowLargeResult;
 
     QUrl m_baseUrl;
-    bool m_https;
+    bool m_usesHttps;
     bool m_binned;
     int m_binCount;
     QString m_backend;

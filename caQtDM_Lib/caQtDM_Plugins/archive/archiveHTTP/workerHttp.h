@@ -39,8 +39,21 @@ public:
     ~WorkerHTTP();
 
 public slots:
+    /*
+     * This function is used to delete the worker when the thread finishes.
+     * */
     void workerFinish();
+
+    /*
+     * Returns the httpRetrieval currently associated to the worker
+     * This function is dangerous and should only be used with extreme caution
+     * */
     HttpRetrieval *getArchive();
+
+    /*
+     * Starts a network request to the given index_name and emits the signal resultReady when new data has arrived.
+     * As long as the response contains a continueAt, this function keeps requesting additional data until all initially requested data is received.
+     * */
     void getFromArchive(QWidget *w,
                         indexes indexNew,
                         QString index_name,

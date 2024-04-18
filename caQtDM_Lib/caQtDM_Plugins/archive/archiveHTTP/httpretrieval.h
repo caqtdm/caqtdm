@@ -60,7 +60,12 @@ public:
     HttpRetrieval();
     ~HttpRetrieval();
     const QString lastError();
+
+    /*
+     * Returns how many points were parsed and saved successfully per array.
+     * */
     int getCount();
+
     void getDataAppended(QVector<double> &x, QVector<double> &y);
     void getBinnedDataAppended(QVector<double> &x, QVector<double> &avgY, QVector<double> &minY, QVector<double> &maxY);
     const QString getBackend();
@@ -68,14 +73,16 @@ public:
     bool is_Redirected() const;
     bool hasContinueAt() const;
     QDateTime continueAt() const;
+
+    /*
+     * Starts a network request to the specified downloadUrl and returns true if the reply was received and parsed successfully, and otherwise false.
+     * If the retrieval was successful, the data can be accessed using getDataAppended and getBinnedDataAppended.
+     * */
     bool requestUrl(const QUrl downloadUrl, const QString backend, const int secondsPast, const bool binned, const bool timeAxis, const QString key);
 
     bool isAborted() const;
-
     int httpStatusCode() const;
-
     quint64 requestSizeKB() const;
-
     long retryAfter() const;
 
 signals:
@@ -83,15 +90,37 @@ signals:
     void requestFinished();
 
 protected slots:
+    /*
+     * Parses the reply and saves the data
+     * */
     void finishReply(QNetworkReply*);
-    const QString parseError(QNetworkReply::NetworkError error);
+
+    /*
+     * Stops the eventloop and returns whether the download was finished successfully
+     * */
     int downloadFinished();
-    void timeoutL();
+
+    /*
+     * Slot to cancel the download once the timeout has elapsed.
+     * */
+    void timeoutRequest();
+
+    /*
+     * Cancels the download and makes other functions currently processing a request return early.
+     * */
     void cancelDownload();
 
 private:
-    bool getDoubleFromString(QString input, double &value);
+    /*
+     * Returns a QString with the name of the network error.
+     * */
+    const QString parseError(QNetworkReply::NetworkError error);
+
+    /*
+     * gzip uncompress function from https://stackoverflow.com/a/7351507
+     * */
     QByteArray gUncompress(const QByteArray &data);
+
     QTimer *m_timeoutHelper;
     QNetworkAccessManager *m_networkManager;
     QNetworkReply *m_networkReply;

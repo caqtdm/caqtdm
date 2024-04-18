@@ -33,9 +33,6 @@
 
 #define qasc(x) x.toLatin1().constData()
 
-// =======================================================================================================================================================
-//  public:
-
 ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
 {
     m_IsSuspended = false;
@@ -75,16 +72,15 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
     return m_archiverCommon->initCommunicationLayer(data, messageWindow, options);
 }
 
-// define data to be called
 int ArchiveHTTP_Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 {
     return m_archiverCommon->pvAddMonitor(index, kData, rate, skip);
 }
 
-// clear routines
 int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
 {
-    // Get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant, resulting in none actually being updated.
+    // Get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant,
+    // resulting in none actually being updated.
     QString keyInCheck = kData->pv;
     keyInCheck.replace(".X", "", Qt::CaseInsensitive);
     keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
@@ -131,6 +127,7 @@ int ArchiveHTTP_Plugin::pvSetValue(
     Q_UNUSED(forceType);
     return true;
 }
+
 int ArchiveHTTP_Plugin::pvSetWave(char *pv,
                                   float *fdata,
                                   double *ddata,
@@ -152,12 +149,14 @@ int ArchiveHTTP_Plugin::pvSetWave(char *pv,
     Q_UNUSED(errmess);
     return true;
 }
+
 int ArchiveHTTP_Plugin::pvGetTimeStamp(char *pv, char *timestamp)
 {
     Q_UNUSED(pv);
     Q_UNUSED(timestamp);
     return true;
 }
+
 int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
 {
     QString report = "<br>Performance data for last request to this pv: <br>";
@@ -192,6 +191,7 @@ int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
     qstrncpy(description, report.toUtf8().constData(), MAX_STRING_LENGTH);
     return true;
 }
+
 int ArchiveHTTP_Plugin::pvClearEvent(void *ptr)
 {
     return m_archiverCommon->pvClearEvent(ptr);
@@ -217,7 +217,7 @@ int ArchiveHTTP_Plugin::FlushIO()
 
 int ArchiveHTTP_Plugin::TerminateIO()
 {
-    return m_archiverCommon->TerminateIO();
+    return true;
 }
 
 void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
@@ -324,9 +324,6 @@ void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
     }
 }
 
-// =======================================================================================================================================================
-//  public slots:
-
 void ArchiveHTTP_Plugin::handleResults(
     indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration)
 {
@@ -405,11 +402,6 @@ void ArchiveHTTP_Plugin::handleResults(
     }
 }
 
-// =======================================================================================================================================================
-//  private slots:
-
-// this routine will be called now every 10 seconds to update the cartesianplot
-// however with much data it may take much longer, then  suppress any new request
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
     QMutexLocker mutexLocker(&m_globalMutex);
@@ -583,8 +575,9 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
     QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = m_listOfThreads.find(key);
     if (listOfThreadsEntry != m_listOfThreads.end()) {
         listOfThreadsEntry.value()->setIsActive(false);
-        //listOfThreadsEntry.value()->getHttpRetrieval()->cancelDownload();
-        QMetaObject::invokeMethod(listOfThreadsEntry.value()->getHttpRetrieval(), "cancelDownload");
+        if (listOfThreadsEntry.value()->getHttpRetrieval() != Q_NULLPTR) {
+            QMetaObject::invokeMethod(listOfThreadsEntry.value()->getHttpRetrieval(), "cancelDownload");
+        }
     }
 
     m_IsSuspended = false;
@@ -594,5 +587,3 @@ void ArchiveHTTP_Plugin::closeEvent()
 {
     emit Signal_StopUpdateInterface();
 }
-// =======================================================================================================================================================
-

@@ -26,9 +26,6 @@
 #include "urlhandlerhttp.h"
 #include "qurlquery.h"
 
-// =======================================================================================================================================================
-//  public:
-
 UrlHandlerHttp::UrlHandlerHttp()
 {
     QString customApiPath = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_API_PATH");
@@ -48,7 +45,7 @@ QUrl UrlHandlerHttp::assembleUrl() const
 {
     QUrl assembledUrl;
 
-    if (m_https) {
+    if (m_usesHttps) {
         assembledUrl = QUrl(QString(QString("https://") + m_baseUrl.toString()));
     } else {
         assembledUrl = QUrl(QString(QString("http://") + m_baseUrl.toString()));
@@ -108,9 +105,9 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
         m_binned = false;
     }
     if (newUrl.toString().toLower().startsWith("https")) {
-        m_https = true;
+        m_usesHttps = true;
     } else {
-        m_https = false;
+        m_usesHttps = false;
     }
 
     // Remove path and query parameters to save base url.
@@ -122,14 +119,14 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
     }
 }
 
-bool UrlHandlerHttp::https() const
+bool UrlHandlerHttp::usesHttps() const
 {
-    return m_https;
+    return m_usesHttps;
 }
 
-void UrlHandlerHttp::setHttps(const bool &newHttps)
+void UrlHandlerHttp::setUsesHttps(const bool &newHttps)
 {
-    m_https = newHttps;
+    m_usesHttps = newHttps;
 }
 
 bool UrlHandlerHttp::binned() const
@@ -170,6 +167,8 @@ QString UrlHandlerHttp::channelName() const
 void UrlHandlerHttp::setChannelName(const QString &newChannelName)
 {
     m_channelName = newChannelName;
+    m_channelName.remove(".X", Qt::CaseInsensitive);
+    m_channelName.remove(".Y", Qt::CaseInsensitive);
     m_channelName.remove(".minY", Qt::CaseInsensitive);
     m_channelName.remove(".maxY", Qt::CaseInsensitive);
 }
