@@ -111,7 +111,14 @@ public:
      * */
     int pvGetDescription(char *pv, char *description);
 
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvClearEvent(void *keyPtr);
+
+    /*
+     * Not implemented by this plugin. Returns true.
+     * */
     int pvAddEvent(void *keyPtr);
 
     /*

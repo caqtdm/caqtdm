@@ -194,11 +194,13 @@ int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
 
 int ArchiveHTTP_Plugin::pvClearEvent(void *ptr)
 {
-    return m_archiverCommon->pvClearEvent(ptr);
+    Q_UNUSED(ptr);
+    return true;
 }
 int ArchiveHTTP_Plugin::pvAddEvent(void *ptr)
 {
-    return m_archiverCommon->pvAddEvent(ptr);
+    Q_UNUSED(ptr);
+    return true;
 }
 int ArchiveHTTP_Plugin::pvReconnect(knobData *kData)
 {
