@@ -1251,7 +1251,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     searchFile *s = new searchFile(FileName);
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
-        QString message = QString(FileName);
+        QString message = inputFile;
         message.append(" does not exist");
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
         m->show();
