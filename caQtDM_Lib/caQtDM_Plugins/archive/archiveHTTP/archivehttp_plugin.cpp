@@ -412,7 +412,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
     }
 
     // Index name (url), will later be redefined if dynamic property or environment variable is set
-    QString index_name = "https://data-api.psi.ch/";
+    QString index_name = "data-api.psi.ch";
 
     // remove the curve index that seperates indexes from different curve,
     // so we can avoid requesting the same index multiple times.

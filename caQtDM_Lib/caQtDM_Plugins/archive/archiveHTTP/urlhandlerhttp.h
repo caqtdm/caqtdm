@@ -35,10 +35,10 @@ class Q_DECL_EXPORT UrlHandlerHttp : public QObject
     Q_OBJECT
 public:
     /*
-     * Besides creating an instance of this class, it also sets the api path.
-     * If the environment variable "CAQTDM_ARCHIVEHTTP_API_PATH" is set, it uses that value,
-     * else is initializes it with the default value "/api/4".
-     * By default allowLargeResult is also set to true.
+     * Besides creating an instance of this class, it also sets the api path and a few default values.
+     * If they exist, the environment variables "CAQTDM_ARCHIVEHTTP_APIPATH_BINNED" and "CAQTDM_ARCHIVEHTTP_APIPATH_RAW"
+     * are used to set the according paths, otherwise they have the default value "/api/4/binned" and "/api/4/events".
+     * Also, allowLargeResult is set to the default value <true> and usesHttps is set to the default value <false>.
      * */
     UrlHandlerHttp();
     ~UrlHandlerHttp();
@@ -49,14 +49,34 @@ public:
     QUrl assembleUrl() const;
 
     /*
-     * Returns the base url in the format example.com
-    * */
-    QUrl baseUrl() const;
-    /*
-     * Sets the url and parses & saves all known parameters it can find.
-     * The input can be anything from just the base url up to a previously fully assembled url.
+     * Sets the url by parsing & saving all known parameters it can find, including https, domain name, path and GET parameters.
+     * The input can be anything from just the domain name up to a previously fully assembled url.
      * */
-    void setUrl(const QUrl &newBaseUrl);
+    void setUrl(const QUrl &newUrl);
+
+    QString apiPathBinned() const;
+    /*
+     * Sets the api path for binned data, input should be like QString("/path/to/binned").
+     * */
+    void setApiPathBinned(const QString &newApiPathBinned);
+
+    QString apiPathRaw() const;
+    /*
+     * Sets the api path for raw (non binned) data, input should be like QString("/path/to/raw").
+     * */
+    void setApiPathRaw(const QString &newApiPathRaw);
+
+    bool allowLargeResult() const;
+    void setAllowLargeResult(const bool &newAllowLargeResults);
+
+    /*
+     * Returns the domain name in the format example.com
+     * */
+    QUrl domainName() const;
+    /*
+     * Sets the domain name. Input must be in the format example.com.
+     * */
+    void setDomainName(const QUrl &newBaseUrl);
 
     bool usesHttps() const;
     void setUsesHttps(const bool &newHttps);
@@ -91,15 +111,6 @@ public:
     QDateTime endTime() const;
     void setEndTime(const QDateTime &newEndTime);
 
-    QString apiPath() const;
-    /*
-     * Sets the api path, input should be like QString("/path/to/endpoint") .
-     * */
-    void setApiPath(const QString &newApiPath);
-
-    bool allowLargeResult() const;
-    void setAllowLargeResult(const bool &newAllowLargeResults);
-
 private:
     const QString m_binCountKey = "binCount";
     const QString m_backendKey = "backend";
@@ -108,13 +119,10 @@ private:
     const QString m_endTimeKey = "endDate";
     const QString m_allowLargeResultKey = "allowLargeResult";
 
-    const QString m_endpointBinned = "/binned";
-    const QString m_endpointRaw = "/events";
-
-    QString m_apiPath;
+    QString m_apiPathBinned;
+    QString m_apiPathRaw;
     bool m_allowLargeResult;
-
-    QUrl m_baseUrl;
+    QUrl m_domainName;
     bool m_usesHttps;
     bool m_binned;
     int m_binCount;

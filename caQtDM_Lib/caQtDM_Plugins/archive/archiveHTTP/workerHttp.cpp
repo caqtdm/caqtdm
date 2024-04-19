@@ -105,7 +105,20 @@ void WorkerHTTP::getFromArchive(QWidget *w,
 
     // Initialize urlhandler with parameters
     UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
-    urlHandler->setUrl(index_name);
+
+    // Check whether the provided api name is only the hostname or if it is the whole url and set the according parameters.
+    // It could be the whole url if we were redirected previously. We check this by looking if it starts with "http",
+    // because then it cannot simply be the hostname.
+    if (index_name.startsWith("http")) {
+        // It's a full url, so parse it as such
+        urlHandler->setUrl(QUrl(index_name));
+    } else {
+        // It's only the domain name
+        urlHandler->setDomainName(index_name);
+    }
+
+    // Set other parameters
+    urlHandler->setUsesHttps(false);
     urlHandler->setBackend(indexNew.backend);
     urlHandler->setChannelName(indexNew.pv);
     urlHandler->setBinned(isBinned);
@@ -186,6 +199,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                     mess.append(url.toString());
                     messageWindow->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
                 }
+
                 // Set a dynamic property containing the new url so the next update doesnt run into the same error again
                 indexNew.w->setProperty("archiverIndex", QVariant(url.toString()));
                 // Update the url for the next request

@@ -125,6 +125,9 @@ bool HttpRetrieval::requestUrl(
     request.setRawHeader("Accept-Encoding", "gzip, deflate");
     request.setRawHeader("Accept", "*/*");
 
+    // We want manual redirects to be able to save the redirected address.
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
+
     m_isFinished = false;
 
     if (!m_isAborted) {
@@ -221,12 +224,13 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     QVariant status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     m_httpStatusCode = status.toInt();
 
+    // Handle redirects
     if (status.toInt() == 301 || status.toInt() == 302 || status.toInt() == 303
         || status.toInt() == 307 || status.toInt() == 308) {
         m_errorString
             = QString("Temporary Redirect status code %1 [%2] from %3")
                   .arg(status.toString(), reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), m_downloadUrl.toString());
-        QByteArray header = reply->rawHeader("location");
+        QByteArray header = reply->rawHeader("Location");
         m_isFinished = true;
         m_isRedirected = true;
         m_redirectedUrl = header;
@@ -236,6 +240,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         return;
     }
 
+    // Handle 'too many requests'
     if (status.toInt() == 429) {
         m_errorString
             = QString("Too many requests status code %1 [%2] from %3")

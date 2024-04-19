@@ -28,13 +28,29 @@
 
 UrlHandlerHttp::UrlHandlerHttp()
 {
-    QString customApiPath = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_API_PATH");
-    if (!customApiPath.isEmpty() && !customApiPath.isNull()) {
-        m_apiPath = customApiPath;
+    // Set some values using environmnent variables if they are set, and otherwise initialize them with a default value.
+
+    // Set the api path for binned data.
+    QString customApiPathBinned = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_APIPATH_BINNED");
+    if (!customApiPathBinned.isEmpty() && !customApiPathBinned.isNull()) {
+        m_apiPathBinned = customApiPathBinned;
     } else {
-        m_apiPath = "/api/4";
+        m_apiPathBinned = "/api/4/binned";
     }
+
+    // Set the api path for raw (unbinned) data.
+    QString customApiPathRaw = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_APIPATH_RAW");
+    if (!customApiPathRaw.isEmpty() && !customApiPathRaw.isNull()) {
+        m_apiPathRaw = customApiPathRaw;
+    } else {
+        m_apiPathRaw = "/api/4/events";
+    }
+
+    // Set this to true by default as we are not a browser and can handle large results.
     m_allowLargeResult = true;
+
+    // Set this to false by default as we don't need https for our archiver data, if needed the archiver can redirect us.
+    m_usesHttps = false;
 }
 
 UrlHandlerHttp::~UrlHandlerHttp()
@@ -45,18 +61,21 @@ QUrl UrlHandlerHttp::assembleUrl() const
 {
     QUrl assembledUrl;
 
+    // Set first part of the url, including http or https.
     if (m_usesHttps) {
-        assembledUrl = QUrl(QString(QString("https://") + m_baseUrl.toString()));
+        assembledUrl = QUrl(QString(QString("https://") + m_domainName.toString()));
     } else {
-        assembledUrl = QUrl(QString(QString("http://") + m_baseUrl.toString()));
+        assembledUrl = QUrl(QString(QString("http://") + m_domainName.toString()));
     }
 
+    // Add the needed api path.
     if (m_binned) {
-        assembledUrl.setPath("/api/4/binned");
+        assembledUrl.setPath(m_apiPathBinned);
     } else {
-        assembledUrl.setPath("/api/4/events");
+        assembledUrl.setPath(m_apiPathRaw);
     }
 
+    // Construct a QUrlQuery to generate a GET query.
     QUrlQuery query;
     query.addQueryItem(m_backendKey, m_backend);
     query.addQueryItem(m_channelNameKey, m_channelName);
@@ -71,14 +90,10 @@ QUrl UrlHandlerHttp::assembleUrl() const
         query.addQueryItem(m_allowLargeResultKey, "true");
     }
 
+    // Lastly, append this query to the url.
     assembledUrl.setQuery(query);
 
     return assembledUrl;
-}
-
-QUrl UrlHandlerHttp::baseUrl() const
-{
-    return m_baseUrl;
 }
 
 void UrlHandlerHttp::setUrl(const QUrl &newUrl)
@@ -101,8 +116,12 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
     if (query.hasQueryItem(m_binCountKey)){
         m_binCount = query.queryItemValue(m_binCountKey).toInt();
         m_binned = true;
+        // In this case we request binned data so set the binned path.
+        m_apiPathBinned = newUrl.path();
     } else {
         m_binned = false;
+        // In this case we request raw data so set the raw path.
+        m_apiPathRaw = newUrl.path();
     }
     if (newUrl.toString().toLower().startsWith("https")) {
         m_usesHttps = true;
@@ -110,13 +129,57 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
         m_usesHttps = false;
     }
 
-    // Remove path and query parameters to save base url.
+    // Split URL into '/' separated parts so we can save the base url
     QStringList urlParts = newUrl.toString().split("/");
+
+    // Check if url starts with http (e.g. http(s)://example.com), or not (e.g. example.com).
     if (newUrl.toString().toLower().startsWith("http")) {
-        m_baseUrl = urlParts[2];
+        // If it starts with http, the domain name is the third part.
+        m_domainName = urlParts[2];
     } else {
-        m_baseUrl = urlParts[0];
+        // Otherwise the domain name is the first part.
+        m_domainName = urlParts[0];
     }
+}
+
+QString UrlHandlerHttp::apiPathBinned() const
+{
+    return m_apiPathBinned;
+}
+
+void UrlHandlerHttp::setApiPathBinned(const QString &newApiPathBinned)
+{
+    m_apiPathBinned = newApiPathBinned;
+}
+
+QString UrlHandlerHttp::apiPathRaw() const
+{
+    return m_apiPathRaw;
+}
+
+void UrlHandlerHttp::setApiPathRaw(const QString &newApiPathRaw)
+{
+    m_apiPathRaw = newApiPathRaw;
+}
+
+bool UrlHandlerHttp::allowLargeResult() const
+{
+    return m_allowLargeResult;
+}
+
+void UrlHandlerHttp::setAllowLargeResult(const bool &newAllowLargeResults)
+{
+    m_allowLargeResult = newAllowLargeResults;
+}
+
+void UrlHandlerHttp::setDomainName(const QUrl &newDomainName)
+{
+    m_domainName = newDomainName;
+}
+
+QUrl UrlHandlerHttp::domainName() const
+{
+    return m_domainName;
 }
 
 bool UrlHandlerHttp::usesHttps() const
@@ -191,24 +254,4 @@ QDateTime UrlHandlerHttp::endTime() const
 void UrlHandlerHttp::setEndTime(const QDateTime &newEndTime)
 {
     m_endTime = newEndTime;
-}
-
-bool UrlHandlerHttp::allowLargeResult() const
-{
-    return m_allowLargeResult;
-}
-
-void UrlHandlerHttp::setAllowLargeResult(const bool &newAllowLargeResults)
-{
-    m_allowLargeResult = newAllowLargeResults;
-}
-
-QString UrlHandlerHttp::apiPath() const
-{
-    return m_apiPath;
-}
-
-void UrlHandlerHttp::setApiPath(const QString &newApiPath)
-{
-    m_apiPath = newApiPath;
 }
