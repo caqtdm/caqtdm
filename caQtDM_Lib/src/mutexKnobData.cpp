@@ -144,7 +144,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
                 } else if (decOk) {
                     unitKey += QString(parsedValueDez);
                 } else {
-                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string: " << QString(*unitPartsIterator);
+                    //qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string: " << QString(*unitPartsIterator);
                     unitKey += QString(*unitPartsIterator);
                 }
             }
@@ -158,7 +158,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
                 } else if (decOk) {
                     unitValue += QString(parsedValueDez);
                 } else {
-                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(*unitPartsIterator);
+                    //qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(*unitPartsIterator);
                     unitValue += QString(*unitPartsIterator);
                 }
             }
