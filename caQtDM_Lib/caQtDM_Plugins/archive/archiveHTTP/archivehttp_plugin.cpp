@@ -505,9 +505,10 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 }
             }
 
-            // first look if an environment variable is set for the url
-            // The dynamic property is also set/override if we get a redirect
-            // Therefore, dynamic property comes first, then environment variable, then predefined url
+            // If we previously got a redirect, the dynamic property should now be set
+            // with the redirection target, so take that if it exists. Else, if the user defined an environment variable,
+            // take that. If neither a dynamic property or an environment variable is set, we use the hardcoded default value.
+            // Therefore, dynamic property comes first, then environment variable, then predefined url.
             QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
             // Do this if dynamic property is set
             // Also do this if no environment variable is defined
