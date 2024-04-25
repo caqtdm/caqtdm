@@ -914,7 +914,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     char *asc;
     bool willprint = printexit;
     QString suppressUpdates = qgetenv("CAQTDM_SUPPRESS_UPDATES_ONLOAD");
-    if (suppressUpdates.toLower() != "false") {
+    if (suppressUpdates.toLower() == "true") {
         mutexKnobData->suppressTimerEvent = true;
     }
     QElapsedTimer timer;
