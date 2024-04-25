@@ -521,10 +521,9 @@ void caLineDraw::setValue(double value, const QString& units)
     if(qIsNaN(value)){
       snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
-
     if(m_UnitMode) {
         strcat(asc, " ");
-        strcat(asc, qasc(units));
+        strcat(asc, units.toUtf8().constData());
     }
     setText(asc);
     emit textChanged(QString(asc));

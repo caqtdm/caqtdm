@@ -257,7 +257,7 @@ QString caMeter::setLabel(double value, const QString& units)
 
     if(thisUnitMode) {
         strcat(asc, " ");
-        strcat(asc, qasc(units));
+        strcat(asc, units.toUtf8().constData());
     }
 
     label = QString::fromLatin1(asc);

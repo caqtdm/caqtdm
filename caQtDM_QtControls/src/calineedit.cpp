@@ -462,10 +462,10 @@ void caLineEdit::setValue(double value, const QString& units)
             datastring=datastring+units;
 
             unitsLast = units;
-            setTextLine( qasc(datastring));
+            setTextLine( datastring.toUtf8().constData());
 
         } else {
-            strcat(asc, qasc(specialUnitsString));
+            strcat(asc, specialUnitsString.toUtf8().constData());
             unitsLast = specialUnitsString;
             setTextLine(asc);
         }
