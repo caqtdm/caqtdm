@@ -659,6 +659,9 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
+    if (suppressTimerEvent) {
+        return;
+    }
     double diff=0.2, repRate=5.0;
     char units[40];
     char fec[40];

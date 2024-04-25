@@ -912,7 +912,16 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 {
     char *asc;
     bool willprint = printexit;
+    QString suppressUpdates = qgetenv("CAQTDM_SUPPRESS_UPDATES_ONLOAD");
+    if (suppressUpdates.toLower() != "false") {
+        mutexKnobData->suppressTimerEvent = true;
+    }
+    QElapsedTimer timer;
+    timer.start();
     CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, Q_NULLPTR, OptionList);
+    QString message = "Loading of window took: " + QString::number(timer.elapsed()) + " milliseconds";
+    messageWindow->postMsgEvent(QtInfoMsg, (char*)qasc(message));
+    mutexKnobData->suppressTimerEvent = false;
 
     // prc files are not allowed to be resized, or when resizing is prohibited by the command line
     if (fileS.contains("prc")) {

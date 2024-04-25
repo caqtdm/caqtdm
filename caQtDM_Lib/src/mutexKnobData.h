@@ -52,6 +52,7 @@ class CAQTDM_LIBSHARED_EXPORT MutexKnobData: public QObject {
     Q_OBJECT
 
 public:
+    bool suppressTimerEvent;
 
     enum UpdateType {UpdateTimed=0, UpdateDirect};
 
