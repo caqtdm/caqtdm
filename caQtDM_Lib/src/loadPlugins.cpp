@@ -80,7 +80,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
         QStringList filesInPluginFolder = pluginsDir.entryList(QDir::Files);
         QStringList possiblePlugins;
 #ifdef linux
-        // Only check .lib files, otherwise we get unneccessary errors
+        // Only check .so files, otherwise we get unneccessary errors
         for (const QString& filename : filesInPluginFolder) {
             if (filename.endsWith(".so", Qt::CaseInsensitive)) {
                 possiblePlugins.append(filename);
