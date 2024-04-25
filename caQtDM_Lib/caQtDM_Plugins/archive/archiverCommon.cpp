@@ -203,7 +203,7 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     } else {
         QString mess("archivedata can only be used in a cartesianplot");
-        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
     }
 
     return true;

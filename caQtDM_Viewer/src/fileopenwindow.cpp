@@ -507,11 +507,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // Inform user about CAQTDM_REPLACE_UNITS replacements.
     if(messageWindow != (MessageWindow *) Q_NULLPTR) {
     bool doDefaultUnitReplacements = !(qgetenv("CAQTDM_DEFAULT_UNIT_REPLACEMENTS").toLower().replace("\"","") == "false");
-        if (doDefaultUnitReplacements)  messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Default unit replacements are taking place, you can disable them by setting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" to false.")));
-        else messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Default unit replacements are disabled by user, you can enable them by unsetting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" or setting it to true.")));
+        if (doDefaultUnitReplacements)  messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Default unit replacements are taking place, you can disable them by setting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" to false.")));
+        else messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Default unit replacements are disabled by user, you can enable them by unsetting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" or setting it to true.")));
         QString replaceUnits = QString(qgetenv("CAQTDM_CUSTOM_UNIT_REPLACEMENTS"));
-        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is defined.")));
-        else messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" to replace characters within or whole units.")));
+        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is defined.")));
+        else messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" to replace characters within or whole units.")));
     }
 
     // load the control plugins (must be done after setting the environment)
@@ -525,7 +525,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
                 char asc[MAX_STRING_LENGTH];
                 i.next();
                 snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
-                messageWindow->postMsgEvent(QtWarningMsg, asc);
+                messageWindow->postMsgEvent(QtInfoMsg, asc);
             }
         }
     }
@@ -705,7 +705,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
             //messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(envString));
         } else if(line.size() > 0) {
             snprintf(asc, MAX_STRING_LENGTH, "environment variable could not be set from %s", qasc(line));
-            messageWindow->postMsgEvent(QtDebugMsg, asc);
+            messageWindow->postMsgEvent(QtWarningMsg, asc);
         }
     }
     //Replacement for standard writable directory
@@ -1261,7 +1261,7 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
-    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(filefunction.lastInfo()));
     if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
     // open file
@@ -1399,7 +1399,7 @@ void FileOpenWindow::reload(QWidget *w)
         QFileInfo fi(FileName);
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fi.fileName());
-        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(filefunction.lastInfo()));
         if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
         // we were loading here before a new instance of caQtDM_Lib,; however the deferred delete of the previous instance

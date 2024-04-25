@@ -1375,7 +1375,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                      // try to download the file
                      filefunction.checkFileAndDownload(fileName, Url);
                      if(messageWindowP != (MessageWindow *) Q_NULLPTR) {
-                         if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+                         if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtInfoMsg, (char*) qasc(filefunction.lastInfo()));
                          if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
                      }
                      searchFile *s = new searchFile(fileName);
@@ -8722,7 +8722,6 @@ QRect CaQtDM_Lib::widgetResize(QWidget* w,double factX, double factY){
         if(height < 1.0) height = 1.0;
         return QRect(qRound(x), qRound(y), qRound(width), qRound(height));
     }else{
-      qDebug()<<"widgetResize Problem :"<< w;
       return w->rect();
     }
 }
@@ -9031,8 +9030,6 @@ void CaQtDM_Lib::send_delayed_popup_signal(){
         }
     }
 }
-
-
 
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
@@ -9863,7 +9860,7 @@ extern "C"  {
                     char asc[MAX_STRING_LENGTH];
                     i.next();
                     snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
-                    messageWindow->postMsgEvent(QtWarningMsg, asc);
+                    messageWindow->postMsgEvent(QtInfoMsg, asc);
                 }
             }
         }
