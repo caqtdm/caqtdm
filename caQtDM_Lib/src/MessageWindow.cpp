@@ -32,6 +32,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <QFile>
+#include <QDebug>
+#include <QTextStream>
 #ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
 #else

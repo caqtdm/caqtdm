@@ -82,21 +82,24 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
 #ifdef linux
         // Only check .lib files, otherwise we get unneccessary errors
         for (const QString& filename : filesInPluginFolder) {
-            qDebug() << filename;
-            if (filename.endsWith(".lib", Qt::CaseInsensitive)) {
+            if (filename.endsWith(".so", Qt::CaseInsensitive)) {
                 possiblePlugins.append(filename);
             }
         }
-#else
-#ifdef _WIN32
+#elif defined(_WIN32)
         // Only check windows .dll files, otherwise we get unneccessary errors
         for (const QString& filename : filesInPluginFolder) {
-            qDebug() << filename;
             if (filename.endsWith(".dll", Qt::CaseInsensitive)) {
                 possiblePlugins.append(filename);
             }
         }
-#endif
+#elif defined(__OSX__)
+        // Only check .dylib files, otherwise we get unneccessary errors
+        for (const QString& filename : filesInPluginFolder) {
+            if (filename.endsWith(".dylib", Qt::CaseInsensitive)) {
+                possiblePlugins.append(filename);
+            }
+        }
 #endif
 
 

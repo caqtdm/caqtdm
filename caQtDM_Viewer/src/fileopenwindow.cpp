@@ -46,6 +46,7 @@ bool HTTPCONFIGURATOR = false;
 #endif
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <QFileDialog>
