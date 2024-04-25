@@ -77,13 +77,35 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
         QDir pluginsDir(path);
         qDebug() << "caQtDM -- Controlsystem plugins: attempt to load from" << pluginsDir.absolutePath();
 
-        // seems are plugins are located here
-        if( pluginsDir.entryList(QDir::Files).length() > 0) {
+        QStringList filesInPluginFolder = pluginsDir.entryList(QDir::Files);
+        QStringList possiblePlugins;
+#ifdef linux
+        // Only check .lib files, otherwise we get unneccessary errors
+        for (const QString& filename : filesInPluginFolder) {
+            qDebug() << filename;
+            if (filename.endsWith(".lib", Qt::CaseInsensitive)) {
+                possiblePlugins.append(filename);
+            }
+        }
+#else
+#ifdef _WIN32
+        // Only check windows .dll files, otherwise we get unneccessary errors
+        for (const QString& filename : filesInPluginFolder) {
+            qDebug() << filename;
+            if (filename.endsWith(".dll", Qt::CaseInsensitive)) {
+                possiblePlugins.append(filename);
+            }
+        }
+#endif
+#endif
+
+
+        // seems our plugins are located here
+        if(possiblePlugins.length() > 0) {
             QString currentPath = pluginsDir.absolutePath();
             snprintf(asc, MAX_STRING_LENGTH, "Controlsystem plugins: attempt to load from %s", qasc(currentPath));
-            if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtWarningMsg, asc);
-
-            foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+            if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtInfoMsg, asc);
+            foreach (QString fileName, possiblePlugins) {
                 //qDebug() << "load " << pluginsDir.absoluteFilePath(fileName);
                 QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
                 QObject *plugin = pluginLoader.instance();
