@@ -1473,6 +1473,23 @@ bool FileOpenWindow::sendMessage(const QString &message)
     return true;
 }
 
+QString FileOpenWindow::getStatusBarContents()
+{
+    QString statusBarContents = statusBar()->currentMessage();
+
+    return statusBarContents;
+}
+
+QString FileOpenWindow::getLogFilePath()
+{
+    QString logFilePath;
+    if (messageWindow != Q_NULLPTR) {
+        logFilePath = messageWindow->getLogFilePath();
+    }
+
+    return logFilePath;
+}
+
 /**
  * slot for unconnected channels button
  */

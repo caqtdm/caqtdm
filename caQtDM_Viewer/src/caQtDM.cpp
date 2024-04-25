@@ -403,5 +403,44 @@ int main(int argc, char *argv[])
 
     QObject::connect(&app, SIGNAL(aboutToQuit()), &window, SLOT(doSomething()));
 
-    return app.exec();
+    int exitCode = 0;
+    QString errorMessage;
+
+    // Put this into a try catch statement to catch all error
+    // Note: This won't work always, as some exeptions, such as segfaults cannot be caught.
+    try {
+        exitCode = app.exec();
+    } catch (const std::exception& e) {
+        exitCode = EXIT_FAILURE;
+        errorMessage = e.what();
+    }
+
+    // If it was successfull, delete the temporary logfile, if it exists.
+    // If it was not successfull but the logfile is still writable, try to add some more information post-mortem
+    QString logFilePath = window.getLogFilePath();
+    if (!logFilePath.isEmpty()) {
+        if (exitCode != 0) { // Append the current content of the statusbar to the logFile.
+            // Create the file
+            QFile crashLogFile(logFilePath);
+            if (crashLogFile.open(QIODevice::Append | QIODevice::Text)) {
+                QTextStream textStream(&crashLogFile);
+                // Write information to the file that might help identify the cause of the crash
+                textStream << "\nThis logfile was not deleted automatically because caQtDM encountered a fatal error and exited with:\n"
+                           << "    Exit Code: " << exitCode << "\n"
+                           << "    Error Message: " << errorMessage << "\n"
+                           << "Crash occured on (local time): " << QDateTime::currentDateTime().toLocalTime().toString() << "\n"
+                           << "Content of the statusbar when the crash occurred:\n\n"
+                           << window.getStatusBarContents();
+
+                // Close the file
+                crashLogFile.close();
+            }
+        } else {
+            QFile logFile(logFilePath);
+            logFile.remove();
+        }
+    }
+
+
+    return exitCode;
 }
