@@ -596,6 +596,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     if (availableMemory < 300000) {
         messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Available system memory is less than 300MB, this could lead to a crash during operation or while opening new panels.")));
     }
+    // Print out available memory in all cases
+    messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Available system memory: " + QString::number(availableMemory / 1000) + "MB")));
 }
 
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
@@ -787,9 +789,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         if(caQtDM_TimeOutEnabled) {
             char asc1[50];
             if (caQtDM_TimeLeft<0.02){
-                sprintf(asc1, "T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
+                sprintf(asc1, ", T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
             }else{
-                sprintf(asc1, "T/O=%.2lfh ", caQtDM_TimeLeft);
+                sprintf(asc1, ", T/O=%.2lfh ", caQtDM_TimeLeft);
             }
             strcat(asc, asc1);
         }
