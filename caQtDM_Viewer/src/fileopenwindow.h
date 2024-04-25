@@ -265,11 +265,12 @@ signals:
    void messageAvailable(QString message);
 
 private:
-
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();
      void TerminateAllInterfaces();
      void reload(QWidget *w);
+     long long getAvailableMemory();
+
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry, lastResizing;
      Ui::MainWindow ui;

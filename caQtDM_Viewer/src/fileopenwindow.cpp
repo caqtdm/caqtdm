@@ -585,7 +585,15 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
     } else {
         QString displayTimeOut="environment variable CAQTDM_TIMEOUT_HOURS could be set for quitting caQtDM automatically after some time";
-        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
+        messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(displayTimeOut));
+    }
+
+    // available memory in KiB
+    long long availableMemory = getAvailableMemory();
+
+    // Check for available memory and warn the user if memory is not sufficient
+    if (availableMemory < 300000) {
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Available system memory is less than 300MB, this could lead to a crash during operation or while opening new panels.")));
     }
 }
 
@@ -752,9 +760,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS_EX procmem;
     if (GetProcessMemoryInfo(GetCurrentProcess(),(PPROCESS_MEMORY_COUNTERS)&procmem,sizeof(procmem))) {
-      snprintf(asc, MAX_STRING_LENGTH,"memory: %ld kB,", (procmem.PrivateUsage / (1024)));
+      snprintf(asc, MAX_STRING_LENGTH,"memory: %ld kB", (procmem.PrivateUsage / (1024)));
     } else {
-      snprintf(asc, MAX_STRING_LENGTH, "memory: no RAM,");
+      snprintf(asc, MAX_STRING_LENGTH, "memory: no RAM");
     }
 #endif
 
@@ -1397,6 +1405,37 @@ void FileOpenWindow::reload(QWidget *w)
         reloadList.append(row);
         s->deleteLater();
     }
+}
+
+/// Provides the available RAM memory in Kibibytes (1 KiB = 1024 B)
+long long FileOpenWindow::getAvailableMemory()
+{
+    long long memAvailable = -1;
+
+#ifdef linux // From https://stackoverflow.com/a/70766868
+    std::ifstream meminfo("/proc/meminfo");
+    std::string line;
+    while (std::getline(meminfo, line))
+    {
+        if (line.find("MemAvailable:") != std::string::npos)
+        {
+            const std::size_t firstWhiteSpacePos = line.find_first_of(' ');
+            const std::size_t firstNonWhiteSpaceChar = line.find_first_not_of(' ', firstWhiteSpacePos);
+            const std::size_t nextWhiteSpace = line.find_first_of(' ', firstNonWhiteSpaceChar);
+            const std::size_t numChars = nextWhiteSpace - firstNonWhiteSpaceChar;
+            const std::string memAvailableStr = line.substr(firstNonWhiteSpaceChar, numChars);
+            memAvailable = std::stoll(memAvailableStr);
+            break;
+        }
+    }
+#elif defined(_MSC_VER)
+    MEMORYSTATUSEX status;
+    status.dwLength = sizeof(status);
+    if (GlobalMemoryStatusEx(&status)) {
+        memAvailable = status.ullAvailPhys / 1024; // Value returned is in Bytes, convert to KiB
+    }
+#endif
+    return memAvailable;
 }
 
 void FileOpenWindow::Callback_ActionReload()
