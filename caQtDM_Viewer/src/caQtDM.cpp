@@ -355,13 +355,13 @@ int main(int argc, char *argv[])
 
     QString X_Server_Check=ServerVendor(QX11Info::display());
     if (X_Server_Check.contains("Colin Harrison")){ //Xming Server on Windows, yes this is a quickfix!
-       window.move(10,30);// 0,0 is outside the visible areas on the taget
+       fileOpenWindow.move(10,30);// 0,0 is outside the visible areas on the taget
     }else{
-       window.move(0,0);
+       fileOpenWindow.move(0,0);
     }
     #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
         }else{
-            window.move(0,0);
+            fileOpenWindow.move(0,0);
         }
     #endif
 #else
