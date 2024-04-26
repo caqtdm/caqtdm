@@ -620,7 +620,9 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
 
         kData->edata.displayCount = kData->edata.monitorCount;
         locker.unlock();
+        if (!suppressTimerEvent) {
         UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+        }
         kData->edata.lastTime = now;
         kData->edata.initialize = false;
         displayCount++;
