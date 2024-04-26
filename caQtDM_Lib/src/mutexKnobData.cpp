@@ -63,6 +63,7 @@ MutexKnobData::MutexKnobData()
     highestIndexPV = 0;
     highestCountPerSecond = 0;
 
+    suppressTimerEvent = false;
     ftime(&last);
     ftime(&monitorTiming);
 
@@ -205,6 +206,16 @@ QString MutexKnobData::SoftPV_Name(QString pv, QWidget *w)
     //printf("%s_%p\n", qasc(pv),  w);
     //fflush(stdout);
     return QString("%1_%2").arg(pv).arg((quintptr)w,QT_POINTER_SIZE * 2, 16, QChar('0'));
+}
+
+bool MutexKnobData::getSuppressTimerEvent() const
+{
+    return suppressTimerEvent;
+}
+
+void MutexKnobData::setSuppressTimerEvent(bool newSuppressTimerEvent)
+{
+    suppressTimerEvent = newSuppressTimerEvent;
 }
 
 /**
