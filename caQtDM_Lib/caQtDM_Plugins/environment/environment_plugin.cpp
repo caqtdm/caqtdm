@@ -84,6 +84,7 @@ void environmentPlugin::updateValues()
 // initialize our communicationlayer with everything you need
 int environmentPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow,QMap<QString, QString> options)
 {
+    qDebug() << "environmentPlugin: InitCommunicationLayer with options" << options;
 
     mutexknobdataP = data;
     messagewindowP = messageWindow;
