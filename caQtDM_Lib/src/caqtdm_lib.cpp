@@ -1375,7 +1375,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                      // try to download the file
                      filefunction.checkFileAndDownload(fileName, Url);
                      if(messageWindowP != (MessageWindow *) Q_NULLPTR) {
-                         if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+                         if(filefunction.lastInfo().length() > 0) messageWindowP->postMsgEvent(QtInfoMsg, (char*) qasc(filefunction.lastInfo()));
                          if(filefunction.lastError().length() > 0)  messageWindowP->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
                      }
                      searchFile *s = new searchFile(fileName);
@@ -2344,11 +2344,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         includeWidget->setProperty("Taken", true);
 
         // define the file to use
-        QString fileName = includeWidget->getFileName().trimmed();
+        QString providedFileName = includeWidget->getFileName().trimmed();
         if (level>0){
-          fileName = cainclude_path + fileName;
+          providedFileName = cainclude_path + providedFileName;
         }
-        reaffectText(map, &fileName, w1);
+        reaffectText(map, &providedFileName, w1);
+        QString fileName = providedFileName;
 
         QString openFile = "";
         int found = fileName.lastIndexOf(".");
@@ -2488,10 +2489,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     file->open(QFile::ReadOnly);
                     //symtomatic AFS check
                     if (!file->isOpen()){
-                        postMessage(QtDebugMsg, (char*) qasc(tr("can't open file %1 ").arg(fileName)));
+                        postMessage(QtDebugMsg, (char*) qasc(tr("can't open file %1 ").arg(providedFileName)));
                     }else{
                         if (file->size()==0){
-                            postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(fileName)));
+                            postMessage(QtDebugMsg, (char*) qasc(tr("file %1 has size zero ").arg(providedFileName)));
                         }else{
                             if (level<CAQTDM_MAX_INCLUDE_LEVEL-1){
                                 QBuffer *buffer = new QBuffer();
@@ -2666,12 +2667,12 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         fileName=fileName.replace(".ui",".edl");
                         postMessage(QtDebugMsg, (char*) qasc(tr("error EDL file conversion")));
                     }
-                    postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
-                    qDebug() << "sorry, file" << fileName << " does not exist";
+                    postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(providedFileName)));
+                    qDebug() << "sorry, file" << providedFileName << " does not exist";
                     break;
                 #else
-                    postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(fileName)));
-                    qDebug() << "sorry, file" << fileName << " does not exist";
+                    postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(providedFileName)));
+                    qDebug() << "sorry, file" << providedFileName << " does not exist";
                     break;
                 #endif
             }
@@ -8722,7 +8723,6 @@ QRect CaQtDM_Lib::widgetResize(QWidget* w,double factX, double factY){
         if(height < 1.0) height = 1.0;
         return QRect(qRound(x), qRound(y), qRound(width), qRound(height));
     }else{
-      qDebug()<<"widgetResize Problem :"<< w;
       return w->rect();
     }
 }
@@ -9031,8 +9031,6 @@ void CaQtDM_Lib::send_delayed_popup_signal(){
         }
     }
 }
-
-
 
 bool CaQtDM_Lib::eventFilter(QObject *obj, QEvent *event)
 {
@@ -9863,7 +9861,7 @@ extern "C"  {
                     char asc[MAX_STRING_LENGTH];
                     i.next();
                     snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
-                    messageWindow->postMsgEvent(QtWarningMsg, asc);
+                    messageWindow->postMsgEvent(QtInfoMsg, asc);
                 }
             }
         }

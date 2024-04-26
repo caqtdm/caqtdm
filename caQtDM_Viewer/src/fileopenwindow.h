@@ -115,6 +115,10 @@
      void saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
 
 
+     QString getStatusBarContents();
+     QString getLogFilePath();
+
+
      void MSQ_getPtrs(int &front, int &rear) {
              if (!sharedMemory.isAttached()) return;
              int *ptr1 = (int*) sharedMemory.data();
@@ -261,11 +265,12 @@ signals:
    void messageAvailable(QString message);
 
 private:
-
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();
      void TerminateAllInterfaces();
      void reload(QWidget *w);
+     long long getAvailableMemory();
+
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry, lastResizing;
      Ui::MainWindow ui;

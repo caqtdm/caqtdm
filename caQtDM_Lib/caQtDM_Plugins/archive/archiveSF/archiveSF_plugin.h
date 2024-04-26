@@ -127,7 +127,7 @@ public slots:
           mess.append(key);
           mess.append(" to ");
           mess.append(url.toString());
-          messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(mess));
+          messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
           indexNew.w->setProperty("archiverIndex",QVariant(url.toString()));
           //qDebug()<< "archiv PV"<<indexNew.pv;
           fromArchive->deleteLater();

@@ -106,7 +106,7 @@ void ArchiveCA_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                     index_name = qasc(indexName);
                 } else if(indexNew.init){
                     QString mess("ArchiveCA plugin -- no archiverIndex defined as dynamic property in widget "  + w->objectName() + ", defaulting to /gfa/archiver-data/archive_PRO_ST/index");
-                    if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                    if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
                 }
             }
 

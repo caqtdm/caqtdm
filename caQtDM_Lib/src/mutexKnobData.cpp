@@ -659,6 +659,9 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
+    if (suppressTimerEvent) {
+        return;
+    }
     double diff=0.2, repRate=5.0;
     char units[40];
     char fec[40];
@@ -864,27 +867,46 @@ QString getBufferAsHexStr(char* buf, int buffsize) {
 }
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
-    QString StringUnits = QString::fromLatin1(units);
-    if(StringUnits.size() > 0) {
+    QString unitsString;
+
+    // Check whether this is specifically accessing the .EGU epics field
+    bool isEguField = QString(knb.pv).endsWith(".EGU");
+    if (isEguField) {
+        // If it is, the unit is stored in the dataString
+        unitsString = QString::fromLatin1(dataString);
+    } else {
+        // If not, it is stored in the units string
+        unitsString = QString::fromLatin1(units);
+    }
+
+
+    // Replace known sequences of characters which are meant to represent special characters
+    if(unitsString.size() > 0) {
         // iterator for both loops
         QList<QPair<QString, QString> >::iterator i;
 
         if (doDefaultUnitReplacements){
             // replace default QStrings
             for (i = defaultReplaceUnitsPairList.begin(); i != defaultReplaceUnitsPairList.end(); ++i){
-                StringUnits.replace(i->first, i->second);
+                unitsString.replace(i->first, i->second);
             }
         }
 
         // replace QStrings defined in CAQTDM_REPLACE_UNITS
         for (i = replaceUnitsPairList.begin(); i != replaceUnitsPairList.end(); ++i){
-            StringUnits.replace(i->first, i->second);
+            unitsString.replace(i->first, i->second);
         }
-
     }
 
-    // send data to main thread
-    emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
+    // This just reinterprets it as utf8
+    unitsString = QString::fromUtf8(qasc(unitsString));
+
+    // Send updated data to main thread
+    if (isEguField) {
+        emit Signal_UpdateWidget(index, w, units, fec, unitsString, knb);
+    } else {
+        emit Signal_UpdateWidget(index, w, unitsString, fec, dataString, knb);
+    }
 }
 void MutexKnobData::UpdateTextLine(char *message, char *name)
 {
