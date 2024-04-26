@@ -172,10 +172,12 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
     }
 
     switch (type) {
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
     case QtInfoMsg:
         qmsg.prepend("<FONT color=\"#000000\">");
         qmsg.append("</FONT>");
         break;
+#endif
     case QtDebugMsg:
         qmsg.prepend("<FONT color=\"#0000FF\">");
         qmsg.append("</FONT>");
