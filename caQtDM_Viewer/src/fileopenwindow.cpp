@@ -878,12 +878,6 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
            loadMainWindow(position, fileS, macroS, resizeS, false, true, false);
         }
         reloadList.clear();
-        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
-        if (this->ui.directAction->isChecked()) {
-           mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
-           qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
-           QTimer::singleShot(10000, this, SLOT(setDirectUpdateTypeOnRestart()));
-        }
     }
 
     // any open windows ?
@@ -902,9 +896,17 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
  * Slot to reset the UpdateType back to direct after resetting it to timed for the startup
  * Should not be called for any other purpose  --> is a private slot
  */
-void FileOpenWindow::setDirectUpdateTypeOnRestart(){
+void FileOpenWindow::setDirectUpdateTypeOnRestart(const QDateTime reloadTime){
+
+    if (reloadTime < lastReloadTime) {
+        // In that case the received signal is not up to date and another timer has been started in the meantime, which has priority.
+        return;
+    }
     mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
     qDebug() << "UpdateType reset to direct";
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("UpdateType reset to direct")));
+    }
 }
 
 /**
@@ -917,7 +919,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     bool willprint = printexit;
     QString suppressUpdates = qgetenv("CAQTDM_SUPPRESS_UPDATES_ONLOAD");
     if (suppressUpdates.toLower() == "true") {
-        mutexKnobData->setSuppressTimerEvent(true);
+        mutexKnobData->setSuppressUpdates(true);
     }
     QElapsedTimer timer;
     timer.start();
@@ -1035,7 +1037,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     } else {
       sprintf(asc, "last file: %s", qasc(fileS));
     }
-    mutexKnobData->setSuppressTimerEvent(false);
+    mutexKnobData->setSuppressUpdates(false);
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     free(asc);
     return mainWindow;
@@ -1415,6 +1417,20 @@ void FileOpenWindow::reload(QWidget *w)
         row.macro = macroS;
         row.resize = resizeS;
         reloadList.append(row);
+        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
+        if (this->ui.directAction->isChecked()) {
+            mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
+            qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
+            if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+                messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct")));
+            }
+            // Make sure that if the timer triggers while another reload is taking place, the updateType is not reset in that case.
+            // This is done by saving the last reloadTime in a member variable and making the timer pass a copy of the reloadTime when it was triggered to the slot that resets the update type.
+            // The slot can then check if the received signal is the up to date, because if another timer has been triggered in the meantime, the member variable holds another time than the signal passed.
+            // If the signal is not up to date it is simply ignored as not to reset the updateType while a widget is currently reloading, this might happen e.g. when the user reloads multiple panels after each other.
+            lastReloadTime = QDateTime::currentDateTime();
+            QTimer::singleShot(10000, this, [this, timeOfReload = lastReloadTime]() mutable { setDirectUpdateTypeOnRestart(timeOfReload); });
+        }
         s->deleteLater();
     }
 }
@@ -1457,7 +1473,7 @@ void FileOpenWindow::Callback_ActionReload()
 
     Callback_ActionTimed();
     // block processing during reload
-    mutexKnobData->BlockProcessing(true);
+    mutexKnobData->setSuppressUpdates(true);
 
     // go through all windows, close them and reload them from files
     QList<QWidget *> all = this->findChildren<QWidget *>();
@@ -1467,7 +1483,7 @@ void FileOpenWindow::Callback_ActionReload()
         }
     }
 
-    mutexKnobData->BlockProcessing(false);
+    mutexKnobData->setSuppressUpdates(false);
 
     this->ui.reloadAction->blockSignals(false);
 }
