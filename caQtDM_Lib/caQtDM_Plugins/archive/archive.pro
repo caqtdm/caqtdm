@@ -22,5 +22,10 @@ archiveSF: {
   }
 }
 
-SUBDIRS += \
-    archiveHTTP
+# Only build archiveHTTP for Qt 5.15 and upwards
+greaterThan(QT_MAJOR_VERSION, 4) {
+    greaterThan(QT_MINOR_VERSION, 14) {
+	    SUBDIRS += archiveHTTP
+		}
+}
+
