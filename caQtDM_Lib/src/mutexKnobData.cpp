@@ -669,7 +669,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
-    if (suppressTimerEvent) {
+    if (suppressUpdates) {
         return;
     }
     double diff=0.2, repRate=5.0;
