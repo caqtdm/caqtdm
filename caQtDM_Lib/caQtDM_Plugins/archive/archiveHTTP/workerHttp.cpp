@@ -32,7 +32,7 @@
 #include <QTimer>
 #include <qwt.h>
 
-#include "archiverCommon.h"
+#include "archiverGeneral.h"
 #include "httpretrieval.h"
 #include "urlhandlerhttp.h"
 

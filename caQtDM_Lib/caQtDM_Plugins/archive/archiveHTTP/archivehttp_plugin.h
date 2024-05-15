@@ -41,7 +41,7 @@
 #include <qwt/qwt.h>
 #endif
 
-#include "archiverCommon.h"
+#include "archiverGeneral.h"
 #include "controlsinterface.h"
 #include "workerHttpThread.h"
 
@@ -183,7 +183,7 @@ private:
     QMutex m_globalMutex;
     MutexKnobData *m_mutexKnobDataP;
     MessageWindow *m_messageWindowP;
-    ArchiverCommon *m_archiverCommon;
+    ArchiverGeneral *m_archiverGeneral;
     QMap<QString, WorkerHttpThread*> m_listOfThreads;
     QMap<QString, indexes> m_IndexesToUpdate;
     QRegularExpression m_regexStr;

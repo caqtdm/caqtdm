@@ -28,7 +28,7 @@
 #include <QThreadPool>
 
 #include "archivehttp_plugin.h"
-#include "archiverCommon.h"
+#include "archiverGeneral.h"
 #include <QMetaType>
 
 #define qasc(x) x.toLatin1().constData()
@@ -39,23 +39,23 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
     qRegisterMetaType<QSharedPointer<HttpPerformanceData> >("QSharedPointer<HttpPerformanceData>");
-    m_archiverCommon = new ArchiverCommon();
+    m_archiverGeneral = new ArchiverGeneral();
 
-    connect(m_archiverCommon,
+    connect(m_archiverGeneral,
             SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)),
             this,
             SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
-    connect(m_archiverCommon,
+    connect(m_archiverGeneral,
             SIGNAL(Signal_AbortOutstandingRequests(QString)),
             this,
             SLOT(Callback_AbortOutstandingRequests(QString)));
-    connect(this, SIGNAL(Signal_StopUpdateInterface()), m_archiverCommon, SLOT(stopUpdateInterface()));
+    connect(this, SIGNAL(Signal_StopUpdateInterface()), m_archiverGeneral, SLOT(stopUpdateInterface()));
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
 }
 
 ArchiveHTTP_Plugin::~ArchiveHTTP_Plugin()
 {
-    delete m_archiverCommon;
+    delete m_archiverGeneral;
 }
 
 QString ArchiveHTTP_Plugin::pluginName()
@@ -69,12 +69,12 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 {
     m_mutexKnobDataP = data;
     m_messageWindowP = messageWindow;
-    return m_archiverCommon->initCommunicationLayer(data, messageWindow, options);
+    return m_archiverGeneral->initCommunicationLayer(data, messageWindow, options);
 }
 
 int ArchiveHTTP_Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 {
-    return m_archiverCommon->pvAddMonitor(index, kData, rate, skip);
+    return m_archiverGeneral->pvAddMonitor(index, kData, rate, skip);
 }
 
 int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
@@ -107,12 +107,12 @@ int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
     }
 
     // now just let archiverCommon do the usual stuff
-    return m_archiverCommon->pvClearMonitor(kData);
+    return m_archiverGeneral->pvClearMonitor(kData);
 }
 
 int ArchiveHTTP_Plugin::pvFreeAllocatedData(knobData *kData)
 {
-    return m_archiverCommon->pvFreeAllocatedData(kData);
+    return m_archiverGeneral->pvFreeAllocatedData(kData);
 }
 
 int ArchiveHTTP_Plugin::pvSetValue(
@@ -229,7 +229,7 @@ void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
                                                  QString backend)
 {
     // We have to make sure that we are synchronized with the archiverCommon
-    QMutexLocker locker(m_archiverCommon->globalMutex());
+    QMutexLocker locker(m_archiverGeneral->globalMutex());
 
     if (numberOfValues > 0) {
         // Check for a valid index
@@ -392,7 +392,7 @@ void ArchiveHTTP_Plugin::handleResults(
             keyStored.replace(".maxY", "");
             if (keyStored == indexInCheck.key) {
                 if (!isActive) {
-                    m_archiverCommon->updateSecondsPast(indexesToUpdateIterator.value(), valueCount != 0);
+                    m_archiverGeneral->updateSecondsPast(indexesToUpdateIterator.value(), valueCount != 0);
                 }
                 removeKeys.append(indexesToUpdateIterator.key());;
             }

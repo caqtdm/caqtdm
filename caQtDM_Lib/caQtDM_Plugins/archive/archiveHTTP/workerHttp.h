@@ -26,7 +26,7 @@
 #ifndef WORKERHTTP_H
 #define WORKERHTTP_H
 
-#include "archiverCommon.h"
+#include "archiverGeneral.h"
 #include "httpperformancedata.h"
 #include "httpretrieval.h"
 
