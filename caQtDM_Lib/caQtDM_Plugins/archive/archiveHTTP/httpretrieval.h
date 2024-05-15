@@ -83,7 +83,7 @@ public:
     bool isAborted() const;
     int httpStatusCode() const;
     quint64 requestSizeKB() const;
-    long retryAfter() const;
+    int retryAfter() const;
 
 signals:
     void networkError(const QString);
@@ -142,7 +142,7 @@ private:
     QMutex m_globalMutex;
     int m_httpStatusCode;
     quint64 m_requestSizeKB;
-    long m_retryAfter;
+    int m_retryAfter;
 };
 
 #endif

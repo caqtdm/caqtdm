@@ -80,7 +80,7 @@ private:
     HttpRetrieval *m_httpRetrieval;
     bool m_receivedContinueAt;
     QMutex m_globalMutex;
-    long m_retryAfter;
+    int m_retryAfter;
 };
 
 #endif // WORKERHTTP_H

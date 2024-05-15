@@ -243,15 +243,14 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 if (endSeconds - m_httpRetrieval->continueAt().toSecsSinceEpoch() > 30) {
                     startSeconds = m_httpRetrieval->continueAt().toSecsSinceEpoch();
                     m_receivedContinueAt = true;
-                }
-                if (m_httpRetrieval->retryAfter() != 0) {
-                    // If the API told us how long to wait, follow that instruction
-                    m_retryAfter = m_httpRetrieval->retryAfter();
 
-                    if (m_httpRetrieval->retryAfter() > 5) {
-                        // No, we are not waiting this long...
-                        // Just say we didn't receive a continueAt so this is the last request in this series.
-                        m_receivedContinueAt = false;
+                    if (m_httpRetrieval->retryAfter() != 0) {
+                        // If the API told us how long to wait, follow that instruction
+                        m_retryAfter = m_httpRetrieval->retryAfter();
+                        if (m_retryAfter > 5) {
+                            // We are not stalling for more than 5 seconds, and as long as we get a valid response, the server isn't fully at capacity, yet, so request again in 5 secs. :)
+                            m_retryAfter = 5;
+                        }
                     }
                 }
             }
@@ -286,16 +285,18 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             m_vecMaxY.clear();
             nbVal = 0;
 
-            // If the server is temporarily at capacity, try again
-            if (m_httpRetrieval->retryAfter() != 0) {
-                // Set this to indicate we are trying again.
-                // A retry after is basically a continueAt, just that the server coulnd't give ANY data, instead of not all.
-                m_receivedContinueAt = true;
-                m_retryAfter = m_httpRetrieval->retryAfter();
-
-                if (m_httpRetrieval->retryAfter() > 5) {
-                    // No, we are not waiting this long...
-                    m_receivedContinueAt = false;
+            // If the server is temporarily at capacity, try again, but only if the request wasn't aborted.
+            if (!previousHttpRetrievalAborted) {
+                if (m_httpRetrieval->retryAfter() != 0) {
+                    qDebug() << m_httpRetrieval->retryAfter();
+                    // Set this to indicate we are trying again.
+                    // A retry after is basically a continueAt, just that the server couldn't give ANY data, instead of not all.
+                    m_receivedContinueAt = true;
+                    m_retryAfter = m_httpRetrieval->retryAfter();
+                    if (m_httpRetrieval->retryAfter() > 5) {
+                        // Nope, we are not waiting this long... Just finish so it is requested again on the next update iteration, being at least 10 secs from now
+                        m_receivedContinueAt = false;
+                    }
                 }
             }
         }

@@ -248,7 +248,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
         if (reply->hasRawHeader("Retry-After")) {
             QByteArray retryAfterRawValue = reply->rawHeader("Retry-After");
             bool conversionOk = false;
-            long retryAfterValue = retryAfterRawValue.toLong(&conversionOk);
+            int retryAfterValue = retryAfterRawValue.toInt(&conversionOk);
             if (conversionOk) {
                 m_retryAfter = retryAfterValue;
                 m_errorString.append(QString("Response contains Retry-After Header with value: \"%1\"").arg(retryAfterValue));
@@ -306,7 +306,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                      << "Response is empty, aborting request.";
             emit requestFinished();
             reply->deleteLater();
-            m_errorString += "\n HTTP response was empty \n";
+            m_errorString += "HTTP response was empty";
             return;
         }
     }
@@ -338,13 +338,12 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     // If we got a valid reponse but a retry-after statement is present, save that
-    if (rootObject.contains("retryAfter")) {
-        bool conversionOk = false;
-        long retryAfterValue = rootObject.value("retryAfter").toString().toLong(&conversionOk);
-        if (conversionOk) {
-            m_retryAfter = retryAfterValue;
-        }
-        // If it isn't convertible to a long, we also cannot wait for that amount...
+    QByteArray retryAfterRawValue = reply->rawHeader("Retry-After");
+    conversionOk = false;
+    int retryAfterValue = retryAfterRawValue.toInt(&conversionOk);
+    if (conversionOk) {
+        m_retryAfter = retryAfterValue;
+        // If it isn't convertible to an integer, we also cannot wait for that amount...
     }
 
     // set count to zero, it will be incremented according to values
@@ -570,7 +569,7 @@ QByteArray HttpRetrieval::gUncompress(const QByteArray &data)
     return result;
 }
 
-long HttpRetrieval::retryAfter() const
+int HttpRetrieval::retryAfter() const
 {
     return m_retryAfter;
 }
