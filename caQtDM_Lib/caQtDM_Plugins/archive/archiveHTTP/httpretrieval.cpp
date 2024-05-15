@@ -214,7 +214,7 @@ bool HttpRetrieval::is_Redirected() const
 void HttpRetrieval::finishReply(QNetworkReply *reply)
 {
     if (m_isAborted) {
-        m_errorString += "\n Retrieval was aborted \n";
+        m_errorString = "Retrieval was aborted";
         return;
     }
     int count = 0;
@@ -228,7 +228,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     if (status.toInt() == 301 || status.toInt() == 302 || status.toInt() == 303
         || status.toInt() == 307 || status.toInt() == 308) {
         m_errorString
-            = QString("Temporary Redirect status code %1 [%2] from %3")
+            = QString("Got redirected with status code: \"%1\" [\"%2\"] from: \"%3\"")
                   .arg(status.toString(), reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), m_downloadUrl.toString());
         QByteArray header = reply->rawHeader("Location");
         m_isFinished = true;
@@ -243,7 +243,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     // Handle 'too many requests'
     if (status.toInt() == 429) {
         m_errorString
-            = QString("Too many requests status code %1 [%2] from %3")
+            = QString("Received status code: \"%1\" [\"%2\"], indicating too many requests to the server from: \"%3\"")
                   .arg(status.toString(), reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), m_downloadUrl.toString());
         if (reply->hasRawHeader("Retry-After")) {
             QByteArray retryAfterRawValue = reply->rawHeader("Retry-After");
@@ -251,7 +251,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             long retryAfterValue = retryAfterRawValue.toLong(&conversionOk);
             if (conversionOk) {
                 m_retryAfter = retryAfterValue;
-                m_errorString.append(QString("\n Response has Retry-After Header with value %1").arg(retryAfterValue));
+                m_errorString.append(QString("Response contains Retry-After Header with value: \"%1\"").arg(retryAfterValue));
             }
         }
         // Set this to false so requestUrl returns false and the worker knows the request failed
@@ -262,20 +262,30 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
     }
 
     if (status.toInt() != 200) {
-        m_errorString
-            = QString("unexpected http status code %1 [%2] from %3")
-                  .arg(status.toString(), reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), m_downloadUrl.toString());
+        if (status.toInt() > 0) {
+            m_errorString
+                = QString("Received unexpected HTTP status code: \"%1\" [\"%2\"] from: \"%3\"")
+                      .arg(status.toString(), reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString(), m_downloadUrl.toString());
+            emit requestFinished();
+            reply->deleteLater();
+            return;
+        } else if (reply->error() == QNetworkReply::HostNotFoundError) {
+            m_errorString
+                = QString("Hostname: \"%1\" could not be resolved, check dynamic property and environment variables.")
+                      .arg(m_downloadUrl.host());
+            emit requestFinished();
+            reply->deleteLater();
+            return;
+        }
+    }
+
+    if (reply->error()) {
+        m_errorString = QString("Received error: \"%1\" for URL: \"%2\"").arg(parseError(reply->error()), m_downloadUrl.toString());
         emit requestFinished();
         reply->deleteLater();
         return;
     }
 
-    if (reply->error()) {
-        m_errorString = QString("%1: %2").arg(parseError(reply->error()), m_downloadUrl.toString());
-        emit requestFinished();
-        reply->deleteLater();
-        return;
-    }
     m_requestSizeKB = reply->size();
     QByteArray outCompressed = reply->readAll();
     QByteArray out;
