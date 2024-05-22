@@ -955,18 +955,18 @@ void caStripPlot::TimeOutThread()
             if(valueMax < 1e-20) valueMax=1e-20;
         }
 
-        QwtInterval tmpr;
-        tmpr.setMaxValue( valueMax);
-        tmpr.setMinValue( valueMin);
+        QwtInterval newInterval;
+        newInterval.setMaxValue( valueMax);
+        newInterval.setMinValue( valueMin);
 
-        QwtInterval tmprRaw;
-        tmprRaw.setMaxValue(valueMaxRaw);
-        tmprRaw.setMinValue(valueMinRaw);
+        QwtInterval newIntervalRaw;
+        newIntervalRaw.setMaxValue(valueMaxRaw);
+        newIntervalRaw.setMinValue(valueMinRaw);
 
-        rangeData[c][0] = QwtIntervalSample( timeData, tmpr);
-        rangeDataRaw[c][0] = QwtIntervalSample( timeData, tmprRaw);
+        rangeData[c][0] = QwtIntervalSample( timeData, newInterval);
+        rangeDataRaw[c][0] = QwtIntervalSample( timeData, newIntervalRaw);
         if(thisXaxisType == ValueScale) {
-            base[0] = QwtIntervalSample(timeData, tmpr);
+            base[0] = QwtIntervalSample(timeData, newInterval);
         }
         if(thisStyle[c] == FillUnder) {
             fillData[c][0] = QPointF(timeData, (valueMax+valueMin)/2);

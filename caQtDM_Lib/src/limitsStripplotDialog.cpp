@@ -219,11 +219,15 @@ void limitsStripplotDialog::applyClicked()
             double minY = text.toDouble(&ok);
             if(ok) {
                 if(indx == 1) { // user
-                        StripPlot->setYaxisLimitsMin(i, minY);
-                        StripPlot->setYscalingMin(i, caStripPlot::User);
+                    // Check if curve is set to logarithmic, if yes, minimum can be at least 1e-20.
+                    if (YaxisType->currentIndex() == 1) {
+                        minY = qMax(minY, 1e-20);
+                    }
+                    StripPlot->setYaxisLimitsMin(i, minY);
+                    StripPlot->setYscalingMin(i, caStripPlot::User);
                 } else {
-                        StripPlot->setYscalingMin(i, caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMin(i, ptr->edata.lower_disp_limit);
+                    StripPlot->setYscalingMin(i, caStripPlot::Channel);
+                    StripPlot->setYaxisLimitsMin(i, ptr->edata.lower_disp_limit);
                 }
             }
 
@@ -232,12 +236,12 @@ void limitsStripplotDialog::applyClicked()
             double maxY = text.toDouble(&ok);
             if(ok) {
                 if(indx == 1) { // user
-                        StripPlot->setYaxisLimitsMax(i, maxY);
-                        StripPlot->setYscalingMax(i, caStripPlot::User);
+                    StripPlot->setYaxisLimitsMax(i, maxY);
+                    StripPlot->setYscalingMax(i, caStripPlot::User);
 
                 } else {
-                        StripPlot->setYscalingMax(i, caStripPlot::Channel);
-                        StripPlot->setYaxisLimitsMax(i, ptr->edata.upper_disp_limit);
+                    StripPlot->setYscalingMax(i, caStripPlot::Channel);
+                    StripPlot->setYaxisLimitsMax(i, ptr->edata.upper_disp_limit);
                 }
             }
             if(StripPlot->getYaxisLimitsMin(i) == StripPlot->getYaxisLimitsMax(i)) {
@@ -251,6 +255,14 @@ void limitsStripplotDialog::applyClicked()
             }
 
             sAutoScaleSelected[i]->isChecked() ? StripPlot->setSelectiveAutoScaleCurves(i, true) : StripPlot->setSelectiveAutoScaleCurves(i, false);
+
+            // In case the values have been adjusted by the stripplot, update them.
+            double actualMinY = StripPlot->getYaxisLimitsMin(i);
+            double actualMaxY = StripPlot->getYaxisLimitsMax(i);
+            text.setNum(actualMinY);
+            minLineEdit[i]->setText(text);
+            text.setNum(actualMaxY);
+            maxLineEdit[i]->setText(text);
         }
     }
     int indx = YaxisType->currentIndex();
