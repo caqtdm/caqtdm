@@ -26,6 +26,7 @@
 #ifndef caStripPlot_H
 #define caStripPlot_H
 
+#include "plotHelperClasses.h"
 #ifndef MOBILE_ANDROID
   #include <sys/timeb.h>
 #else
@@ -540,7 +541,7 @@ private:
     QVector<QwtIntervalSample> rangeDataRaw[MAXCURVES];
     QVector<QPointF> fillDataRaw[MAXCURVES];
 
-    QwtPlotPicker * plotPicker;
+    DynamicPlotPicker * plotPicker;
 
     double timeData;
     int dataCount;

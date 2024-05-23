@@ -104,6 +104,12 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 
     setUsageCPU(Medium);
 
+    // plotpicker
+    plotPicker = new DynamicPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
+    QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
+    plotPicker->setStateMachine(pickerMachine);
+    connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
+
     // define a grid
     plotGrid = new QwtPlotGrid();
     plotGrid->attach(this);
@@ -192,11 +198,6 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     timerThread->setPriority(QThread::HighPriority);
     connect(this, SIGNAL(timerThreadStop()), timerThread, SLOT(runStop()));
     connect(timerThread, SIGNAL(update()), this, SLOT(TimeOutThread()),  Qt::DirectConnection);
-
-    plotPicker = new DynamicPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
-    QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
-    plotPicker->setStateMachine(pickerMachine);
-    connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 }
 
 
@@ -399,6 +400,7 @@ void caStripPlot::setXaxis(double interval, double period)
     if(thisXticks < 1) nbTicks = 1; else nbTicks =  thisXticks;
 
     if(thisXaxisType != ValueScale) {
+        plotPicker->setIsXAxisAlreadyCorrect(false);
         QDateTime timeNow= QDateTime::currentDateTime();
         timeNow = timeNow.addSecs((int) -interval);
         setAxisScale(QwtPlot::xBottom, 0, interval, interval/nbTicks);
@@ -413,10 +415,10 @@ void caStripPlot::setXaxis(double interval, double period)
         }
 
     } else {
+        plotPicker->setIsXAxisAlreadyCorrect(true);
         setAxisScale(QwtPlot::xBottom, -period, 0, period/nbTicks);
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     }
-
 }
 
 void caStripPlot::setTicksResizeFactor(float factX, float factY)

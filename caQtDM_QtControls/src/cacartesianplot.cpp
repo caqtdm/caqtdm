@@ -102,7 +102,9 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
         const QColor c(Qt::red);
    zoomer->setRubberBandPen(c);
-   zoomer->setTrackerPen(c);
+   zoomer->setTrackerMode(QwtPicker::AlwaysOff);
+   plotPicker = new DynamicPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
+   plotPicker->setTrackerMode(QwtPicker::AlwaysOn);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect2,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect3,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect4,Qt:: NoButton);
@@ -1000,7 +1002,13 @@ void caCartesianPlot::setScaleY(double minY, double maxY)
 void caCartesianPlot::setXaxisType(axisType s)
 {
     thisXtype = s;
+    // Assume value scale
+    plotPicker->setIsXAxisAlreadyCorrect(true);
+    plotPicker->setIsXAxisTimeSinceEpoch(false);
     if(s == time) {
+        // If it is time, then overwrite it to calculate time from epoch.
+        plotPicker->setIsXAxisAlreadyCorrect(false);
+        plotPicker->setIsXAxisTimeSinceEpoch(true);
 // in qwt6.0 no date/time scale possible
 #if QWT_VERSION >= 0x060100
         // gives an axe for milliseconds since epoch

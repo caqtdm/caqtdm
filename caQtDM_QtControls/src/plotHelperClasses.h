@@ -276,7 +276,8 @@ public:
         _MinNew = 1e-20;
         _MaxNew = 100;
         _IsLinear = true;
-
+        _IsXAxisTimeSinceEpoch = false;
+        _IsXAxisAlreadyCorrect = false;
     }
 
     void setConversion(double MinOld, double MaxOld, double MinNew, double MaxNew, bool IsLinear)
@@ -294,6 +295,27 @@ public:
         _Period = period;
     }
 
+
+    bool IsXAxisTimeSinceEpoch() const
+    {
+        return _IsXAxisTimeSinceEpoch;
+    }
+
+    void setIsXAxisTimeSinceEpoch(bool newIsXAxisTimeSinceEpoch)
+    {
+        _IsXAxisTimeSinceEpoch = newIsXAxisTimeSinceEpoch;
+    }
+
+    bool IsXAxisAlreadyCorrect() const
+    {
+        return _IsXAxisAlreadyCorrect;
+    }
+
+    void setIsXAxisAlreadyCorrect(bool newIsXAxisAlreadyCorrect)
+    {
+        _IsXAxisAlreadyCorrect = newIsXAxisAlreadyCorrect;
+    }
+
 protected:
     QwtText trackerText( const QPoint& pos ) const
     {
@@ -306,7 +328,12 @@ protected:
         QPointF coordinates = invTransform(pos);
 
         // get time in the plot where mouse is
-        QDateTime timeOnHover = _StartTime.addMSecs((coordinates.x() - _Period)*1000);
+        QDateTime timeOnHover;
+        if (_IsXAxisTimeSinceEpoch) {
+            timeOnHover = QDateTime::fromMSecsSinceEpoch(coordinates.x());
+        } else {
+            timeOnHover = _StartTime.addMSecs((coordinates.x() - _Period)*1000);
+        }
 
         // convert value to match the current limits
         if (_IsLinear) {
@@ -316,7 +343,12 @@ protected:
         }
 
         // create new QwtText --> Did not use QString.setNum() because then fixed precision would destroy logarithmic values
-        QwtText newText = (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
+        QwtText newText;
+        if (_IsXAxisAlreadyCorrect) {
+            newText = (QString("%1 | %2").arg(coordinates.x()).arg(coordinates.y()));
+        } else {
+            newText = (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
+        }
         newText.setBackgroundBrush(Qt::white);
         newText.setBorderRadius(1);
 
@@ -328,6 +360,8 @@ private:
     double _MinNew;
     double _MaxNew;
     bool _IsLinear;
+    bool _IsXAxisTimeSinceEpoch;
+    bool _IsXAxisAlreadyCorrect;
     QDateTime _StartTime;
     double _Period;
 };

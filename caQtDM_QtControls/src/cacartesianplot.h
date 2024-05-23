@@ -25,6 +25,7 @@
 
 #ifndef CACARTESIANPLOT_H
 #define CACARTESIANPLOT_H
+#include "plotHelperClasses.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -488,6 +489,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
 
     QwtPlotZoomer* zoomer;
+    DynamicPlotPicker *plotPicker;
 
     bool thisTriggerNow;
 
