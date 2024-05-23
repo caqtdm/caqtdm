@@ -91,7 +91,7 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     else if(CartesianPlot->getXscaling() == caCartesianPlot::Channel) xComboBox->setCurrentIndex(1);
     else if(CartesianPlot->getXscaling() == caCartesianPlot::User) xComboBox->setCurrentIndex(2);
 
-    QLabel *xaxisPresent = new QLabel("axe visible");
+    QLabel *xaxisPresent = new QLabel("axis visible");
 
     xCheckBox= new QCheckBox();
     xCheckBox->setChecked(CartesianPlot->getXaxisEnabled());
@@ -138,7 +138,7 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     else if(CartesianPlot->getYscaling() == caCartesianPlot::Channel) yComboBox->setCurrentIndex(1);
     else if(CartesianPlot->getYscaling() == caCartesianPlot::User) yComboBox->setCurrentIndex(2);
 
-    QLabel *yaxisPresent = new QLabel("axe visible");
+    QLabel *yaxisPresent = new QLabel("axis visible");
 
     yCheckBox = new QCheckBox();
     yCheckBox->setChecked(CartesianPlot->getYaxisEnabled());
