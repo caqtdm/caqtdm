@@ -111,6 +111,9 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
    zoomer->setMousePattern(QwtEventPattern::MouseSelect5,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect6,Qt:: NoButton);
 
+   connect(zoomer, SIGNAL(zoomed(const QRectF&)), this, SLOT(handleZoomedRect(const QRectF&)));
+
+
     // curves
     for(int i=0; i < curveCount; i++) {
         thisPV[i]=QStringList();
@@ -210,6 +213,29 @@ void caCartesianPlot::resetZoom() {
     if(thisYscaling == Auto) setAxisAutoScale(yLeft, true);
     if(thisXscaling == Auto) setAxisAutoScale(xBottom, true);
     replot();
+
+    emit zoomHasReset();
+}
+
+void caCartesianPlot::setZoom(const QRectF &newZoomRect)
+{
+    zoomer->zoom(newZoomRect);
+}
+
+void caCartesianPlot::zoomOnXAxis(const double &newXLeftValue, const double &newXDistance)
+{
+    QRectF zoomRect = zoomer->zoomRect();
+    zoomRect.setX(newXLeftValue);
+    zoomRect.setWidth(newXDistance);
+    zoomer->zoom(zoomRect);
+}
+
+void caCartesianPlot::handleZoomedRect(const QRectF &zoomedRect)
+{
+    const double xLeftValue = zoomedRect.x();
+    const double xDistance = zoomedRect.width();
+    emit zoomedOnXAxis(xLeftValue, xDistance);
+    emit zoomedToRect(zoomedRect);
 }
 
 void caCartesianPlot::setTriggerPV(QString const &newPV)  {

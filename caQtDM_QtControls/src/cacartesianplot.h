@@ -430,8 +430,11 @@ public slots:
        setYscaling(Auto);
     }
     void resetZoom();
+    void setZoom(const QRectF& newZoomRect);
+    void zoomOnXAxis(const double &newXLeftValue, const double &newXDistance);
 
-
+private slots:
+    void handleZoomedRect(const QRectF& zoomedRect);
 
 signals:
     void ShowContextMenu(const QPoint&);
@@ -439,7 +442,9 @@ signals:
     void getAutoScaleXMax(double xmax);
     void getAutoScaleYMin(double ymin);
     void getAutoScaleYMax(double ymax);
-
+    void zoomedToRect(const QRectF& zoomedRect);
+    void zoomedOnXAxis(const double &newXLeftValue, const double &newXDistance);
+    void zoomHasReset();
 
 protected:
 
