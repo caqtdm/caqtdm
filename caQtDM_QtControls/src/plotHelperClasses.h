@@ -29,8 +29,11 @@
 #include "qwt_plot.h"
 #include "qwt_date_scale_draw.h"
 #include "qwt_interval.h"
+#include "qwt_plot_canvas.h"
 #include "qwt_plot_picker.h"
+#include "qwt_plot_zoomer.h"
 #include "qwt_scale_engine.h"
+#include "qwt_date_scale_engine.h"
 #include "qwt_text.h"
 
 class PlotDateScaleDraw: public QwtDateScaleDraw
@@ -50,6 +53,40 @@ private:
     QDateTime baseTime;
 
 };
+
+#if QWT_VERSION >= 0x060100
+class PlotDateScaleEngine: public QwtDateScaleEngine
+{
+public:
+
+    PlotDateScaleEngine(const int &nb, Qt::TimeSpec time): QwtDateScaleEngine(time)
+    {
+        nbTicks = nb;
+    }
+
+    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
+    {
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
+
+        if (interval.width() <= 0 ) return QwtScaleDiv();
+
+        QwtScaleDiv scaleDiv;
+
+        for (int i=0; i<nbTicks+1; i++) {
+            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
+        }
+
+        scaleDiv = QwtScaleDiv(interval, Ticks);
+        if ( x1 > x2 ) scaleDiv.invert();
+
+        return scaleDiv;
+    }
+
+private:
+    int nbTicks;
+};
+#endif
 
 #ifdef QWT_USE_OPENGL
 class GLCanvas: public QwtPlotGLCanvas
@@ -89,18 +126,17 @@ public:
 
     virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
     {
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
+        double stepSize = (x2-x1) / nbTicks;
+        int maxMinorSteps = 10;
 
-        if (interval.width() <= 0 ) return QwtScaleDiv();
+        QwtInterval interval = QwtInterval(x1, x2 ).normalized();
+        if ( interval.width() <= 0 ) return QwtScaleDiv();
 
         QwtScaleDiv scaleDiv;
+        QList<double> Ticks[QwtScaleDiv::NTickTypes];
+        buildTicks(interval, stepSize, maxMinorSteps, Ticks);
+        scaleDiv = QwtScaleDiv( interval, Ticks );
 
-        for (int i=0; i<nbTicks+1; i++) {
-            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
-        }
-
-        scaleDiv = QwtScaleDiv(interval, Ticks);
         if ( x1 > x2 ) scaleDiv.invert();
 
         return scaleDiv;
@@ -294,6 +330,26 @@ private:
     bool _IsLinear;
     QDateTime _StartTime;
     double _Period;
+};
+
+class PlotZoomer: public QwtPlotZoomer
+{
+public:
+    PlotZoomer(QwtPlotCanvas *canvas):
+        QwtPlotZoomer(canvas)
+    {
+        setTrackerMode(AlwaysOn);
+    }
+
+    virtual QwtText trackerTextF(const QPointF &pos) const
+    {
+        QColor bg(Qt::white);
+        bg.setAlpha(200);
+
+        QwtText text("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ") ");
+        text.setBackgroundBrush( QBrush( bg ));
+        return text;
+    }
 };
 
 #endif // PLOTHELPERCLASSES_H

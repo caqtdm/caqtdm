@@ -99,8 +99,10 @@ limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKn
     XaxisType = new QComboBox;
     XaxisType->addItem("linear");
     XaxisType->addItem("log10");
-    if(CartesianPlot->getXaxisType() == caCartesianPlot::log10) XaxisType->setCurrentIndex(1);
-    else XaxisType->setCurrentIndex(0);
+    XaxisType->addItem("time");
+    if(CartesianPlot->getXaxisType() == caCartesianPlot::linear) XaxisType->setCurrentIndex(0);
+    else if(CartesianPlot->getXaxisType() == caCartesianPlot::log10) XaxisType->setCurrentIndex(1);
+    else XaxisType->setCurrentIndex(2);
 
     // add all to layout
     Layout->addWidget(xLabel,    0, 0);
@@ -217,6 +219,7 @@ void limitsCartesianplotDialog::applyClicked()
     int indx = XaxisType->currentIndex();
     if(indx == 0) CartesianPlot->setXaxisType(caCartesianPlot::linear);
     else if(indx == 1) CartesianPlot->setXaxisType(caCartesianPlot::log10);
+    else if(indx == 2) CartesianPlot->setXaxisType(caCartesianPlot::time);
 
     int indy = YaxisType->currentIndex();
     if(indy == 0) CartesianPlot->setYaxisType(caCartesianPlot::linear);
