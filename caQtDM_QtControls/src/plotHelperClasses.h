@@ -35,6 +35,7 @@
 #include "qwt_scale_engine.h"
 #include "qwt_date_scale_engine.h"
 #include "qwt_text.h"
+#include <cmath>
 
 class PlotDateScaleDraw: public QwtDateScaleDraw
 {
