@@ -58,6 +58,7 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
     checkSignal_value_double=0.0;
     changeValue_value_double=0.0;
     checkSignal_value_QRect=QRect();
+    checkSignal_value_QRectF=QRectF();
     for (int i=0;i<4;i++){
         value_QRectF_const[i]=0;
         value_QRect_is_const[i]=false;
@@ -233,6 +234,7 @@ void caCalc::setValue(int value)
     double data=(int) value;
     QRect empty;
     setValue(empty);
+    setValue(QRectF(empty));
     setValue(data);
 }
 
@@ -240,6 +242,7 @@ void caCalc::setValue(bool value)
 {
     QRect empty;
     setValue(empty);
+    setValue(QRectF(empty));
     int data=(int) value;
     setValue((double) data);
 }
