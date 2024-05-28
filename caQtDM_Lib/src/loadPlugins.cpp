@@ -23,6 +23,7 @@
  *    anton.mezger@psi.ch
  */
 
+#include <QDebug>
 #include "loadPlugins.h"
 #include "qtdefinitions.h"
 #include "pathdefinitions.h"
