@@ -30,6 +30,12 @@
 
 #define qasc(x) x.toLatin1().constData()
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+// Because QtInfoMsg doesnt exist there.
+#define QtInfoMsg QtWarningMsg
+#endif
+
+
 // gives the plugin name back
 QString ArchiveSF_Plugin::pluginName()
 {

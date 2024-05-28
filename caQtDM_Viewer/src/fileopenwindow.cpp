@@ -54,6 +54,12 @@ bool HTTPCONFIGURATOR = false;
 #include "messagebox.h"
 #include "configDialog.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+// Because QtInfoMsg doesnt exist there.
+#define QtInfoMsg QtWarningMsg
+#endif
+
+
 #ifdef linux
 #include <sys/resource.h>
 #include <sys/time.h>

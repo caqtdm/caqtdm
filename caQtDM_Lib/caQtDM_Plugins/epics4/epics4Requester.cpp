@@ -25,6 +25,12 @@
 
 #include "epics4Requester.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+// Because QtInfoMsg doesnt exist there.
+#define QtInfoMsg QtWarningMsg
+#endif
+
+
 namespace epics { namespace caqtdm { namespace epics4 {
 
 void Epics4Requester::message(std::string const & message,epics::pvData::MessageType messageType)
