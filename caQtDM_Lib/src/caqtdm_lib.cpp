@@ -55,6 +55,12 @@
 #include <postfix.h>
 #include <epicsVersion.h>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+// Because QtInfoMsg doesnt exist there.
+#define QtInfoMsg QtWarningMsg
+#endif
+
+
 #ifdef MOBILE_ANDROID
 #  include <unistd.h>
 #endif
