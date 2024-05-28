@@ -431,7 +431,7 @@ public slots:
     }
     void resetZoom();
     void setZoom(const QRectF& newZoomRect);
-    void zoomOnXAxis(const double &newXLeftValue, const double &newXDistance);
+    void zoomOnXAxis(const QRectF& newZoomRect);
 
 private slots:
     void handleZoomedRect(const QRectF& zoomedRect);
@@ -443,7 +443,6 @@ signals:
     void getAutoScaleYMin(double ymin);
     void getAutoScaleYMax(double ymax);
     void zoomedToRect(const QRectF& zoomedRect);
-    void zoomedOnXAxis(const double &newXLeftValue, const double &newXDistance);
     void zoomHasReset();
 
 protected:
