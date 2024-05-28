@@ -153,6 +153,7 @@ public slots:
 public slots:
     void setValue(double value);
     void setValue(QRect value);
+    void setValue(QRectF value);
     void setValue(int value);
     void setValue(bool value);
 signals:
@@ -175,7 +176,8 @@ private:
     double checkSignal_value_double;
     double changeValue_value_double;
     QRect checkSignal_value_QRect;
-    int value_QRect_const[MAX_QRECT_PARAMS];
+    QRectF checkSignal_value_QRectF;
+    double value_QRectF_const[MAX_QRECT_PARAMS];
     bool value_QRect_is_const[MAX_QRECT_PARAMS];
     bool is_a_pure_constant;
 
