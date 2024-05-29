@@ -15,12 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Copyright (c) 2010 - 2014
+ *  Copyright (c) 2010 - 2024
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Anton Mezger, Erik Schwarz
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    erik.schwarz@psi.ch
  */
 
 #if defined(_MSC_VER)
@@ -39,6 +39,7 @@
 #include <cmath>
 #include <qwt_picker_machine.h>
 #include <qelapsedtimer.h>
+#include <plotHelperClasses.h>
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 12, 0)
 #if !defined(NAN)
@@ -49,8 +50,6 @@
 #endif
 #endif
 
-
-
 #if defined(_MSC_VER)
     #ifndef snprintf
      #define snprintf _snprintf
@@ -60,269 +59,6 @@
 // increase the array size given by the canvas width to be sure that the whole range is covered
 #define MAXIMUMSIZE 5000
 #define SOMEMORE 500
-
-class StripplotDateScaleDraw: public QwtDateScaleDraw
-{
-public:
-
-    StripplotDateScaleDraw(const QDateTime &base): baseTime(base)
-    {
-    }
-    virtual QwtText label(double v) const
-    {
-        QDateTime upTime = baseTime.addSecs((int) v);
-        return upTime.toString("hh:mm:ss");
-    }
-
-private:
-    QDateTime baseTime;
-
-};
-
-#ifdef QWT_USE_OPENGL
-class GLCanvas: public QwtPlotGLCanvas
-{
-public:
-    GLCanvas( QwtPlot *parent = NULL ):
-        QwtPlotGLCanvas( parent )
-    {
-        setContentsMargins( 1, 1, 1, 1 );
-    }
-
-protected:
-    virtual void paintEvent( QPaintEvent *event )
-    {
-        QPainter painter( this );
-        painter.setClipRegion( event->region() );
-
-        QwtPlot *plot = qobject_cast< QwtPlot *>( parent() );
-        if ( plot )
-            plot->drawCanvas( &painter );
-
-        painter.setPen( palette().foreground().color() );
-        painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
-    }
-
-};
-#endif
-
-class PlotScaleEngine: public QwtLinearScaleEngine
-{
-public:
-
-    PlotScaleEngine(const int &nb): QwtLinearScaleEngine()
-    {
-        nbTicks = nb;
-    }
-
-    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
-    {
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
-
-        if (interval.width() <= 0 ) return QwtScaleDiv();
-
-        QwtScaleDiv scaleDiv;
-
-        for (int i=0; i<nbTicks+1; i++) {
-            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
-        }
-
-        scaleDiv = QwtScaleDiv(interval, Ticks);
-        if ( x1 > x2 ) scaleDiv.invert();
-
-        return scaleDiv;
-    }
-
-private:
-    int nbTicks;
-};
-
-/* Class for creating a linear ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
- * have the correct spacing.
- * */
-class StripplotLinearScaleEngine: public QwtLinearScaleEngine {
-public:
-    StripplotLinearScaleEngine(double MinOld = 10, double MaxOld = 100, double MinNew = 10, double MaxNew = 100) : QwtLinearScaleEngine(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew)
-    {
-    }
-
-    QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
-        x1 = ((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(x1-_MinOld)+_MinNew;
-        x2 = ((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(x2-_MinOld)+_MinNew;
-
-        stepSize *= ((_MaxNew - _MinNew) / (_MaxOld - _MinOld));
-
-        QwtScaleDiv Div = QwtLinearScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
-
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-
-        Ticks[QwtScaleDiv::MajorTick] = Div.ticks(QwtScaleDiv::MajorTick);
-        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MajorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MajorTick][i] = ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(Ticks[QwtScaleDiv::MajorTick][i]-_MinNew)+_MinOld;
-        }
-        Ticks[QwtScaleDiv::MediumTick] = Div.ticks(QwtScaleDiv::MediumTick);
-        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MediumTick].count(); i++) {
-            Ticks[QwtScaleDiv::MediumTick][i] = ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(Ticks[QwtScaleDiv::MediumTick][i]-_MinNew)+_MinOld;
-        }
-        Ticks[QwtScaleDiv::MinorTick] = Div.ticks(QwtScaleDiv::MinorTick);
-        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MinorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MinorTick][i] = ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(Ticks[QwtScaleDiv::MinorTick][i]-_MinNew)+_MinOld;
-        }
-        return QwtScaleDiv(QwtInterval(((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(x1-_MinNew)+_MinOld, ((_MaxOld - _MinOld) / (_MaxNew - _MinNew))*(x2-_MinNew)+_MinOld), Ticks);
-    }
-protected:
-    double _MinOld;
-    double _MaxOld;
-    double _MinNew;
-    double _MaxNew;
-};
-
-/* Class for creating a logarithmic ScaleEngine that has a modified divideScale, such that the Labels to be drawn by the ScaleDraw
- * have the correct spacing.
- * */
-class StripplotLog10ScaleEngine: public QwtLogScaleEngine {
-public:
-    StripplotLog10ScaleEngine(double MinOld = 10, double MaxOld = 100, double MinNew = 10, double MaxNew = 100) : QwtLogScaleEngine(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew)
-    {
-    }
-
-    QwtScaleDiv divideScale(double x1, double x2, int numMajorSteps, int numMinorSteps, double stepSize = 0.0) const{
-        x1 = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(x1/_MinOld)/std::log10(_MaxOld/_MinOld))));
-        x2 = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(x2/_MinOld)/std::log10(_MaxOld/_MinOld))));
-        stepSize *= std::log10(_MaxNew/_MinNew) / std::log10(_MaxOld/_MinOld);
-
-        QwtScaleDiv Div = QwtLogScaleEngine::divideScale(x1, x2, numMajorSteps, numMinorSteps, stepSize);
-
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-
-        Ticks[QwtScaleDiv::MajorTick] = Div.ticks(QwtScaleDiv::MajorTick);
-        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MajorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MajorTick][i] = _MinOld*(pow((_MaxOld/_MinOld),(std::log10(Ticks[QwtScaleDiv::MajorTick][i]/_MinNew)/std::log10(_MaxNew/_MinNew))));
-        }
-        Ticks[QwtScaleDiv::MediumTick] = Div.ticks(QwtScaleDiv::MediumTick);
-        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MediumTick].count(); i++) {
-            Ticks[QwtScaleDiv::MediumTick][i] = _MinOld*(pow((_MaxOld/_MinOld),(std::log10(Ticks[QwtScaleDiv::MediumTick][i]/_MinNew)/std::log10(_MaxNew/_MinNew))));
-        }
-        Ticks[QwtScaleDiv::MinorTick] = Div.ticks(QwtScaleDiv::MinorTick);
-        for (unsigned int i = 0; i < Ticks[QwtScaleDiv::MinorTick].count(); i++) {
-            Ticks[QwtScaleDiv::MinorTick][i] = _MinOld*(pow((_MaxOld/_MinOld),(std::log10(Ticks[QwtScaleDiv::MinorTick][i]/_MinNew)/std::log10(_MaxNew/_MinNew))));
-        }
-        return QwtScaleDiv(QwtInterval(_MinOld*(pow((_MaxOld/_MinOld),(std::log10(x1/_MinNew)/std::log10(_MaxNew/_MinNew)))), _MinOld*(pow((_MaxOld/_MinOld),(std::log10(x2/_MinNew)/std::log10(_MaxNew/_MinNew))))), Ticks);
-    }
-protected:
-    double _MinOld;
-    double _MaxOld;
-    double _MinNew;
-    double _MaxNew;
-};
-
-/* Class for creating a  ScaleDraw that modifies the value to show different Scales
- * than the one currently drawn. Doesn't modify the actuals curves.
- * Depending on the axistype (linear, log10) the values will be modified accordingly.
- * */
-class StripplotScaleDraw: public QwtScaleDraw
-{
-public:
-    // Default Limits are the same for new and old ones to not have any convertion of values.
-    // Default minimum is 1e-20 to ensure proper precision.
-    StripplotScaleDraw(double MinOld = 1e-20, double MaxOld = 100.0, double MinNew = 1e-20, double MaxNew = 100.0, bool IsLinear = true): QwtScaleDraw(), _MinOld(MinOld), _MaxOld(MaxOld), _MinNew(MinNew), _MaxNew(MaxNew), _IsLinear(IsLinear)
-    {
-    }
-
-    void setConversion(double MinOld, double MaxOld, double MinNew, double MaxNew, bool IsLinear)
-    {
-        _MinOld = MinOld;
-        _MaxOld = MaxOld;
-        _MinNew = MinNew;
-        _MaxNew = MaxNew;
-        _IsLinear = IsLinear;
-    }
-
-    QwtText label(double v) const
-    {
-        double newLabel;
-        if (_IsLinear) {
-            newLabel = ((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(v-_MinOld)+_MinNew;
-        } else {
-            newLabel = _MinNew*(pow((_MaxNew/_MinNew),(std::log10(v/_MinOld)/std::log10(_MaxOld/_MinOld))));
-        }
-        return QwtScaleDraw::label(newLabel);
-    }
-
-private:
-    double _MinOld;
-    double _MaxOld;
-    double _MinNew;
-    double _MaxNew;
-    bool _IsLinear;
-};
-
-class StripplotPlotPicker : public QwtPlotPicker
-{
-public:
-    StripplotPlotPicker(QwtPlot::Axis xAxisId, QwtPlot::Axis yAxisId, QwtPicker::RubberBand  rubberBand, QwtPicker::DisplayMode trackerMode, QWidget * widget) : QwtPlotPicker( xAxisId,  yAxisId,  rubberBand,  trackerMode, widget)
-    {
-	_MinOld = 1e-20;
-	_MaxOld = 100;
-	_MinNew = 1e-20;
-	_MaxNew = 100;
-	_IsLinear = true;
-
-    }
-
-    void setConversion(double MinOld, double MaxOld, double MinNew, double MaxNew, bool IsLinear)
-    {
-        _MinOld = MinOld;
-        _MaxOld = MaxOld;
-        _MinNew = MinNew;
-        _MaxNew = MaxNew;
-        _IsLinear = IsLinear;
-    }
-
-    void setStartTime(long long startTime, double period)
-    {
-        _StartTime = QDateTime::fromMSecsSinceEpoch(startTime*1000);
-        _Period = period;
-    }
-
-protected:
-    QwtText trackerText( const QPoint& pos ) const
-    {
-        // default exemption handling by QwtPlotPicker
-        if ( plot() == NULL ) {
-            return QwtText();
-        }
-
-        // get values from pixels
-        QPointF coordinates = invTransform(pos);
-
-        // get time in the plot where mouse is
-        QDateTime timeOnHover = _StartTime.addMSecs((coordinates.x() - _Period)*1000);
-
-        // convert value to match the current limits
-        if (_IsLinear) {
-            coordinates.setY(((_MaxNew - _MinNew) / (_MaxOld - _MinOld))*(coordinates.y()-_MinOld)+_MinNew);
-        } else {
-            coordinates.setY(_MinNew*(pow((_MaxNew/_MinNew),(std::log10(coordinates.y()/_MinOld)/std::log10(_MaxOld/_MinOld)))));
-        }
-
-        // create new QwtText --> Did not use QString.setNum() because then fixed precision would destroy logarithmic values
-        QwtText newText = (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
-        newText.setBackgroundBrush(Qt::white);
-        newText.setBorderRadius(1);
-
-        return newText;
-    }
-private:
-    double _MinOld;
-    double _MaxOld;
-    double _MinNew;
-    double _MaxNew;
-    bool _IsLinear;
-    QDateTime _StartTime;
-    double _Period;
-};
 
 caStripPlot::~caStripPlot() {
 
@@ -367,6 +103,12 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 #endif
 
     setUsageCPU(Medium);
+
+    // plotpicker
+    plotPicker = new DynamicPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
+    QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
+    plotPicker->setStateMachine(pickerMachine);
+    connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 
     // define a grid
     plotGrid = new QwtPlotGrid();
@@ -456,11 +198,6 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     timerThread->setPriority(QThread::HighPriority);
     connect(this, SIGNAL(timerThreadStop()), timerThread, SLOT(runStop()));
     connect(timerThread, SIGNAL(update()), this, SLOT(TimeOutThread()),  Qt::DirectConnection);
-
-    plotPicker = new StripplotPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
-    QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
-    plotPicker->setStateMachine(pickerMachine);
-    connect(plotPicker, SIGNAL(selected(const QPointF&)), this, SLOT(onSelected(const QPointF&)));
 }
 
 
@@ -557,7 +294,7 @@ void caStripPlot::setPlotPickerMode(int mode)
 void caStripPlot::onSelected(const QPointF& point)
 {
     if (thisYaxisScaling != fixedScale || NumberOfCurves == 1 || !thisSelectableCurves) return;
-    const double scaledTolerance = (thisYaxisLimitsMax[int(YAxisIndex)] - thisYaxisLimitsMin[int(YAxisIndex)]) * 0.01;
+    const double yAxisTolerance = (thisYaxisLimitsMax[0] - thisYaxisLimitsMin[0]) * 0.01;
     const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
     qint8 lIndex = -1;
@@ -569,7 +306,7 @@ void caStripPlot::onSelected(const QPointF& point)
         }
         double lCurveDist = 100000000000;
         double lTmpDist;
-        // loop over all samples, could be more clever by only looking at sample at x position
+        // loop over all samples that are somewhere around the selected point
         for (quint32 j = 0; rangeData[curvIndex][j].value > (rangeData[curvIndex][0].value - thisPeriod) && rangeData[curvIndex][j].interval.isValid() && rangeData[curvIndex][j].value != 0; j++) {
             if (rangeData[curvIndex][j].value > (point.x() + xAxisTolerance) || rangeData[curvIndex][j].value < (point.x() - xAxisTolerance)) {
                 continue;
@@ -584,8 +321,9 @@ void caStripPlot::onSelected(const QPointF& point)
             lIndex = curvIndex;
         }
     }
+
     // check if mouse position is within tolerance
-    if ( lDist > scaledTolerance || lIndex == -1) return;
+    if ( lDist > yAxisTolerance || lIndex == -1) return;
     selectYAxis(lIndex);
     return;
 }
@@ -620,15 +358,15 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
         newYAxisMax = qMax(newYAxisMax, 1e-19);
     }
 
-    //qDebug() << "going from" << oldYAxisMin << "-" <<oldYAxisMax << "to" << newYAxisMin << "-" << newYAxisMax;
+    qDebug() << "going from" << oldYAxisMin << "-" <<oldYAxisMax << "to" << newYAxisMin << "-" << newYAxisMax;
 
     bool isLinear = (thisYaxisType == linear);
-    static_cast<StripplotScaleDraw*>(axisScaleDraw(yLeft))->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
-    static_cast<StripplotPlotPicker*>(plotPicker)->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
+    static_cast<PlotScaleDraw*>(axisScaleDraw(yLeft))->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
+    static_cast<DynamicPlotPicker*>(plotPicker)->setConversion(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax, isLinear);
     if (isLinear) {
-        setAxisScaleEngine(yLeft, new StripplotLinearScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
+        setAxisScaleEngine(yLeft, new PlotLinearScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
     } else {
-        setAxisScaleEngine(yLeft, new StripplotLog10ScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
+        setAxisScaleEngine(yLeft, new PlotLog10ScaleEngine(oldYAxisMin, oldYAxisMax, newYAxisMin, newYAxisMax));
     }
 
 
@@ -662,10 +400,11 @@ void caStripPlot::setXaxis(double interval, double period)
     if(thisXticks < 1) nbTicks = 1; else nbTicks =  thisXticks;
 
     if(thisXaxisType != ValueScale) {
+        plotPicker->setIsXAxisAlreadyCorrect(false);
         QDateTime timeNow= QDateTime::currentDateTime();
         timeNow = timeNow.addSecs((int) -interval);
         setAxisScale(QwtPlot::xBottom, 0, interval, interval/nbTicks);
-        setAxisScaleDraw(QwtPlot::xBottom, new StripplotDateScaleDraw(timeNow) );
+        setAxisScaleDraw(QwtPlot::xBottom, new PlotDateScaleDraw(timeNow) );
 
         if(thisXaxisType == TimeScaleFix) {
               PlotScaleEngine *scaleEngine = new PlotScaleEngine(nbTicks);
@@ -676,10 +415,10 @@ void caStripPlot::setXaxis(double interval, double period)
         }
 
     } else {
+        plotPicker->setIsXAxisAlreadyCorrect(true);
         setAxisScale(QwtPlot::xBottom, -period, 0, period/nbTicks);
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     }
-
 }
 
 void caStripPlot::setTicksResizeFactor(float factX, float factY)
@@ -694,14 +433,14 @@ void caStripPlot::setYaxisType(yAxisType s)
     if(s == log10) {
 #if QWT_VERSION < 0x060100
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
-        setAxisScaleDraw(QwtPlot::yLeft, new StripplotScaleDraw());
+        setAxisScaleDraw(QwtPlot::yLeft, new PlotScaleDraw());
 #else
         // Leaves default parameter IsLinear = true, doesn't matter though because we don't want any conversion so far.
-        setAxisScaleDraw(QwtPlot::yLeft, new StripplotScaleDraw());
+        setAxisScaleDraw(QwtPlot::yLeft, new PlotScaleDraw());
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine());
 #endif
     } else {
-        setAxisScaleDraw(QwtPlot::yLeft, new StripplotScaleDraw());
+        setAxisScaleDraw(QwtPlot::yLeft, new PlotScaleDraw());
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
     }
 
@@ -1116,7 +855,7 @@ void caStripPlot::TimeOutThread()
     // we need an exact time scale
     if(RestartPlot1) {
         ftime(&timeStart);
-        static_cast<StripplotPlotPicker*>(plotPicker)->setStartTime(timeStart.time, thisPeriod);
+        static_cast<DynamicPlotPicker*>(plotPicker)->setStartTime(timeStart.time, thisPeriod);
         RestartPlot1 = false;
         RestartPlot2 = true;
     }
@@ -1218,18 +957,18 @@ void caStripPlot::TimeOutThread()
             if(valueMax < 1e-20) valueMax=1e-20;
         }
 
-        QwtInterval tmpr;
-        tmpr.setMaxValue( valueMax);
-        tmpr.setMinValue( valueMin);
+        QwtInterval newInterval;
+        newInterval.setMaxValue( valueMax);
+        newInterval.setMinValue( valueMin);
 
-        QwtInterval tmprRaw;
-        tmprRaw.setMaxValue(valueMaxRaw);
-        tmprRaw.setMinValue(valueMinRaw);
+        QwtInterval newIntervalRaw;
+        newIntervalRaw.setMaxValue(valueMaxRaw);
+        newIntervalRaw.setMinValue(valueMinRaw);
 
-        rangeData[c][0] = QwtIntervalSample( timeData, tmpr);
-        rangeDataRaw[c][0] = QwtIntervalSample( timeData, tmprRaw);
+        rangeData[c][0] = QwtIntervalSample( timeData, newInterval);
+        rangeDataRaw[c][0] = QwtIntervalSample( timeData, newIntervalRaw);
         if(thisXaxisType == ValueScale) {
-            base[0] = QwtIntervalSample(timeData, tmpr);
+            base[0] = QwtIntervalSample(timeData, newInterval);
         }
         if(thisStyle[c] == FillUnder) {
             fillData[c][0] = QPointF(timeData, (valueMax+valueMin)/2);
@@ -1353,11 +1092,11 @@ void caStripPlot::TimeOut()
             }
             QDateTime dateTimeNow= QDateTime::currentDateTime();
             dateTimeNow = dateTimeNow.addSecs((int) -INTERVAL);
-            setAxisScaleDraw (QwtPlot::xBottom, new StripplotDateScaleDraw(dateTimeNow));
+            setAxisScaleDraw (QwtPlot::xBottom, new PlotDateScaleDraw(dateTimeNow));
         }
         if(thisYaxisType == linear){
-            setAxisScaleEngine(yLeft, new StripplotLinearScaleEngine());
-            setAxisScaleDraw(yLeft, new StripplotScaleDraw);
+            setAxisScaleEngine(yLeft, new PlotLinearScaleEngine());
+            setAxisScaleDraw(yLeft, new PlotScaleDraw);
         }
     }
 

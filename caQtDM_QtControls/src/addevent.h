@@ -36,6 +36,7 @@ signals:
     void emitSignal(int);
     void emitSignal(double);
     void emitSignal(QRect);
+    void emitSignal(QRectF);
     void emitSignal(bool);
 
 private:
