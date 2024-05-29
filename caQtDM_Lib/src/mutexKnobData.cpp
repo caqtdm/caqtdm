@@ -63,7 +63,7 @@ MutexKnobData::MutexKnobData()
     highestIndexPV = 0;
     highestCountPerSecond = 0;
 
-    suppressTimerEvent = false;
+    suppressUpdates = false;
     ftime(&last);
     ftime(&monitorTiming);
 
@@ -72,8 +72,6 @@ MutexKnobData::MutexKnobData()
     timerId = startTimer(1000/DEFAULTRATE);
 
     myUpdateType = UpdateTimed;
-
-    BlockProcessing(false);
 
     // Initialize doDefaultUnitReplacements with env. var CAQTDM_DEFAULT_UNIT_REPLACEMENTS
     doDefaultUnitReplacements = true;
@@ -208,14 +206,14 @@ QString MutexKnobData::SoftPV_Name(QString pv, QWidget *w)
     return QString("%1_%2").arg(pv).arg((quintptr)w,QT_POINTER_SIZE * 2, 16, QChar('0'));
 }
 
-bool MutexKnobData::getSuppressTimerEvent() const
+bool MutexKnobData::getSuppressUpdates() const
 {
-    return suppressTimerEvent;
+    return suppressUpdates;
 }
 
-void MutexKnobData::setSuppressTimerEvent(bool newSuppressTimerEvent)
+void MutexKnobData::setSuppressUpdates(bool newSuppressUpdates)
 {
-    suppressTimerEvent = newSuppressTimerEvent;
+    suppressUpdates = newSuppressUpdates;
 }
 
 /**
@@ -602,30 +600,29 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     // direct update without timing
 
     if(myUpdateType == UpdateDirect) {
-        QWidget *dispW = (QWidget*) kData->dispW;
-        dataString[0] = '\0';
-        qstrncpy(units, kData->edata.units,caqtdm_string_t_length);
-        qstrncpy(fec, kData->edata.fec,caqtdm_string_t_length);
-        int caFieldType= kData->edata.fieldtype;
-
-        if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
-            if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
-                memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
-                dataString[kData->edata.dataSize] = '\0';
-            } else {
-                memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
-                dataString[STRING_EXCHANGE_SIZE-1] = '\0';
+        if (!suppressUpdates ) {
+            QWidget *dispW = (QWidget*) kData->dispW;
+            dataString[0] = '\0';
+            qstrncpy(units, kData->edata.units,caqtdm_string_t_length);
+            qstrncpy(fec, kData->edata.fec,caqtdm_string_t_length);
+            int caFieldType= kData->edata.fieldtype;
+            if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
+                if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
+                    memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
+                    dataString[kData->edata.dataSize] = '\0';
+                } else {
+                    memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
+                    dataString[STRING_EXCHANGE_SIZE-1] = '\0';
+                }
             }
-        }
 
-        kData->edata.displayCount = kData->edata.monitorCount;
-        locker.unlock();
-        if (!suppressTimerEvent) {
-        UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+            kData->edata.displayCount = kData->edata.monitorCount;
+            locker.unlock();
+            UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+            kData->edata.lastTime = now;
+            kData->edata.initialize = false;
+            displayCount++;
         }
-        kData->edata.lastTime = now;
-        kData->edata.initialize = false;
-        displayCount++;
     }
 }
 
@@ -672,7 +669,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
-    if (suppressTimerEvent) {
+    if (suppressUpdates) {
         return;
     }
     double diff=0.2, repRate=5.0;
@@ -681,8 +678,6 @@ void MutexKnobData::timerEvent(QTimerEvent *)
     char dataString[STRING_EXCHANGE_SIZE];
     struct timeb now;
     int repetitionRate = DEFAULTRATE;
-
-    if(blockProcess) return;
 
     ftime(&now);
 

@@ -24,6 +24,7 @@
  */
 
 #include "epics4Requester.h"
+#include "caQtDM_Lib_global.h"
 
 namespace epics { namespace caqtdm { namespace epics4 {
 

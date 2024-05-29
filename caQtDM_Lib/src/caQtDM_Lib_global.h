@@ -55,6 +55,9 @@
 #endif
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+// Because QtInfoMsg doesnt exist there.
+#define QtInfoMsg QtWarningMsg
+
 #ifndef Q_NULLPTR
 #if __cplusplus >= 201103L
     #define Q_NULLPTR nullptr

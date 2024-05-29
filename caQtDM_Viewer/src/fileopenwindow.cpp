@@ -53,6 +53,7 @@ bool HTTPCONFIGURATOR = false;
 #include <QString>
 #include "messagebox.h"
 #include "configDialog.h"
+#include "caQtDM_Lib_global.h"
 
 #ifdef linux
 #include <sys/resource.h>
@@ -878,12 +879,6 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
            loadMainWindow(position, fileS, macroS, resizeS, false, true, false);
         }
         reloadList.clear();
-        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
-        if (this->ui.directAction->isChecked()) {
-           mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
-           qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
-           QTimer::singleShot(10000, this, SLOT(setDirectUpdateTypeOnRestart()));
-        }
     }
 
     // any open windows ?
@@ -899,12 +894,31 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 }
 
 /**
+ * Functin to reset the UpdateType back to direct after resetting it to timed for the startup
+ * Is called via no argument slot because the needed lambda isn't supported under Qt4.
+ */
+void FileOpenWindow::setDirectUpdateTypeOnRestart(const QDateTime reloadTime){
+
+    if (reloadTime < lastReloadTime) {
+        // In that case the received signal is not up to date and another timer has been started in the meantime, which has priority.
+        return;
+    }
+    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
+    qDebug() << "UpdateType reset to direct";
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("UpdateType reset to direct")));
+    }
+}
+
+/**
  * Slot to reset the UpdateType back to direct after resetting it to timed for the startup
  * Should not be called for any other purpose  --> is a private slot
  */
-void FileOpenWindow::setDirectUpdateTypeOnRestart(){
-    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
-    qDebug() << "UpdateType reset to direct";
+void FileOpenWindow::onReloadTimeout()
+{
+    // Get time when the timeout started, this doesn't need to be exact because we compare using less than.
+    QDateTime startTime = QDateTime::currentDateTime().addSecs(-10);
+    setDirectUpdateTypeOnRestart(startTime);
 }
 
 /**
@@ -917,7 +931,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     bool willprint = printexit;
     QString suppressUpdates = qgetenv("CAQTDM_SUPPRESS_UPDATES_ONLOAD");
     if (suppressUpdates.toLower() == "true") {
-        mutexKnobData->setSuppressTimerEvent(true);
+        mutexKnobData->setSuppressUpdates(true);
     }
     QElapsedTimer timer;
     timer.start();
@@ -1035,7 +1049,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     } else {
       sprintf(asc, "last file: %s", qasc(fileS));
     }
-    mutexKnobData->setSuppressTimerEvent(false);
+    mutexKnobData->setSuppressUpdates(false);
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     free(asc);
     return mainWindow;
@@ -1415,6 +1429,20 @@ void FileOpenWindow::reload(QWidget *w)
         row.macro = macroS;
         row.resize = resizeS;
         reloadList.append(row);
+        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
+        if (this->ui.directAction->isChecked()) {
+            mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
+            qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
+            if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+                messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct")));
+            }
+            // Make sure that if the timer triggers while another reload is taking place, the updateType is not reset in that case.
+            // This is done by saving the last reloadTime in a member variable and making the slot that handles the timer compare the last reload time and the time the timer was started at.
+            // The slot can then check if the received signal is the up to date because if another timer has been triggered in the meantime, the member variable holds a later time than when the timer was triggered.
+            // If the signal is not up to date it is simply ignored as not to reset the updateType while a widget is currently reloading, this might happen e.g. when the user reloads multiple panels after each other.
+            lastReloadTime = QDateTime::currentDateTime();
+            QTimer::singleShot(10000, this, SLOT(onReloadTimeout()));
+        }
         s->deleteLater();
     }
 }
@@ -1435,8 +1463,9 @@ long long FileOpenWindow::getAvailableMemory()
             const std::size_t firstNonWhiteSpaceChar = line.find_first_not_of(' ', firstWhiteSpacePos);
             const std::size_t nextWhiteSpace = line.find_first_of(' ', firstNonWhiteSpaceChar);
             const std::size_t numChars = nextWhiteSpace - firstNonWhiteSpaceChar;
-            const std::string memAvailableStr = line.substr(firstNonWhiteSpaceChar, numChars);
-            memAvailable = std::stoll(memAvailableStr);
+            std::string memAvailableStdStr = line.substr(firstNonWhiteSpaceChar, numChars);
+            QString memAvailableStr = QString::fromStdString(memAvailableStdStr);
+            memAvailable = memAvailableStr.toLongLong();
             break;
         }
     }
@@ -1457,7 +1486,7 @@ void FileOpenWindow::Callback_ActionReload()
 
     Callback_ActionTimed();
     // block processing during reload
-    mutexKnobData->BlockProcessing(true);
+    mutexKnobData->setSuppressUpdates(true);
 
     // go through all windows, close them and reload them from files
     QList<QWidget *> all = this->findChildren<QWidget *>();
@@ -1467,7 +1496,7 @@ void FileOpenWindow::Callback_ActionReload()
         }
     }
 
-    mutexKnobData->BlockProcessing(false);
+    mutexKnobData->setSuppressUpdates(false);
 
     this->ui.reloadAction->blockSignals(false);
 }

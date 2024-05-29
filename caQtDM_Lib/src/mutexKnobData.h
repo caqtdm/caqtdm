@@ -53,7 +53,6 @@ class CAQTDM_LIBSHARED_EXPORT MutexKnobData: public QObject {
 
 public:
 
-
     enum UpdateType {UpdateTimed=0, UpdateDirect};
 
     MutexKnobData();
@@ -93,10 +92,9 @@ public:
 
     void UpdateMechanism(UpdateType Type);
     QString SoftPV_Name(QString pv, QWidget *w);
-    void BlockProcessing(bool block) { blockProcess= block;}
 
-    bool getSuppressTimerEvent() const;
-    void setSuppressTimerEvent(bool newSuppressTimerEvent);
+    bool getSuppressUpdates() const;
+    void setSuppressUpdates(bool newSuppressUpdates);
 
 signals:
 
@@ -126,8 +124,7 @@ private:
     int nbDisplayCountPerSecond, displayCount;
     struct timeb last;
 
-    bool blockProcess;
-    bool suppressTimerEvent;
+    bool suppressUpdates;
     UpdateType myUpdateType;
 
     bool doDefaultUnitReplacements;

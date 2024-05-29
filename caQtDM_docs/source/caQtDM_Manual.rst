@@ -2844,7 +2844,7 @@ The menu bar has the following items:
 +------------+-----------+-------------------------------------------+
 | PV         |           | will display a list of unconnected PV's   |
 +------------+-----------+-------------------------------------------+
-| UpdataType | Direct    | When caQtDM is in this mode, all the      |
+| UpdateType | Direct    | When caQtDM is in this mode, all the      |
 |            |           | monitors will be displayed as soon as     |
 |            |           | they come                                 |
 +------------+-----------+-------------------------------------------+
