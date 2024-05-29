@@ -1457,7 +1457,8 @@ long long FileOpenWindow::getAvailableMemory()
             const std::size_t firstNonWhiteSpaceChar = line.find_first_not_of(' ', firstWhiteSpacePos);
             const std::size_t nextWhiteSpace = line.find_first_of(' ', firstNonWhiteSpaceChar);
             const std::size_t numChars = nextWhiteSpace - firstNonWhiteSpaceChar;
-            const QString memAvailableStr = line.substr(firstNonWhiteSpaceChar, numChars);
+            std::string memAvailableStdStr = line.substr(firstNonWhiteSpaceChar, numChars);
+            QString memAvailableStr = QString::fromStdString(memAvailableStdStr);
             memAvailable = memAvailableStr.toLongLong();
             break;
         }
