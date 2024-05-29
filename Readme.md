@@ -85,7 +85,7 @@ Following environment variables can be used to configure caqtdm:
 - __BSREAD_ZMQ_CONNECTION_TYPE__ - control the connection type of the bsread plugin 
 - __BSREAD_ZMQ_ADDR_LIST__ - point the bsread plugin static sources 
 
-- __CAQTDM_OPTIMIZE_EPICS3CONNECTIONS__ - Disable Epics3 connections when tabwidget is not active, set to "TRUE" to activate                                 |
+- __CAQTDM_OPTIMIZE_EPICS3CONNECTIONS__ - Disable Epics3 connections when tabwidget is not active, set to "TRUE" to activate
 - __CAQTDM_MODBUS_DATABASE__ - Database to use for the modbus plugin 
 
 - __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend 
@@ -101,6 +101,6 @@ Following environment variables can be used to configure caqtdm:
 - __CAQTDM_CUSTOM_UNIT_REPLACEMENTS__ - define custom unit replacements. They are replaced after default replacements took place, if enabled. You can use unicode characters or hexadecimal / decimal utf-8 character codes, seperated by (,) , (=) and (;).
 Examples: "0xba,C=55,abc,0xb0;cd=23;0x43=0x44" , "°=0xba"
 
-- __CAQTDM_SUPPRESS_UPDATES_ONLOAD__ - Disables widgets from being updated while a file is being opened. This can reduce load times of big panels by more than 50. Values: "TRUE", "FALSE" , without quotes 
-- __CAQTDM_CREATE_LOGFILE__ - If set to "TRUE", caQtDM will create a logfile containing all of the input from the message window. If caQtDM exits successfully, this file gets deleted after termination.          |
+- __CAQTDM_SUPPRESS_UPDATES_ONLOAD__ - Disables widgets from being updated while a file is being opened. This can reduce load times of big panels by more than 50. Values: "TRUE", "FALSE" , without quotes
+- __CAQTDM_CREATE_LOGFILE__ - If set to "TRUE", caQtDM will create a logfile containing all of the input from the message window. If caQtDM exits successfully, this file gets deleted after termination.
 - __CAQTDM_LOGFILE_PATH__ - This specifies the path where the logfile, if logging is active, will be stored.
