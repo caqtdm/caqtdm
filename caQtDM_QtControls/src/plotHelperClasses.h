@@ -267,6 +267,10 @@ private:
     bool _IsLinear;
 };
 
+/*
+ * Plotpicker class that can adjust the displayed values for conversions
+ * and render the text according to whether the X-Axis is a time or value scale
+ * */
 class DynamicPlotPicker : public QwtPlotPicker
 {
 public:
@@ -290,18 +294,25 @@ public:
         _IsLinear = IsLinear;
     }
 
-    void setStartTime(long long startTime, double period)
+    /*
+     * Sets the start time which is used as the offset in milliseconds to add to the X-values to calculate the time represented by it.
+     * Also takes the period as the value to subtract from the x-value to account for the fact that the y-values are displaced by the period.
+     * */
+    void setStartTime(long long startTimeInSeconds, double period)
     {
-        _StartTime = QDateTime::fromMSecsSinceEpoch(startTime*1000);
+        _StartTime = QDateTime::fromMSecsSinceEpoch(startTimeInSeconds*1000);
         _Period = period;
     }
-
 
     bool IsXAxisTimeSinceEpoch() const
     {
         return _IsXAxisTimeSinceEpoch;
     }
 
+    /*
+     * Defines whether the X-values are to be interpreted as a time since epoch in milliseconds.
+     * If not set to true, the X-values are recalculated using the values given with setStartTime.
+     * */
     void setIsXAxisTimeSinceEpoch(bool newIsXAxisTimeSinceEpoch)
     {
         _IsXAxisTimeSinceEpoch = newIsXAxisTimeSinceEpoch;
@@ -312,6 +323,9 @@ public:
         return _IsXAxisAlreadyCorrect;
     }
 
+    /*
+     * Defines whether the X-values are to be taken literally, for example with a value scale as X.
+     * */
     void setIsXAxisAlreadyCorrect(bool newIsXAxisAlreadyCorrect)
     {
         _IsXAxisAlreadyCorrect = newIsXAxisAlreadyCorrect;
@@ -367,6 +381,9 @@ private:
     double _Period;
 };
 
+/*
+ * Simple plot zoomer class
+ * */
 class PlotZoomer: public QwtPlotZoomer
 {
 public:
