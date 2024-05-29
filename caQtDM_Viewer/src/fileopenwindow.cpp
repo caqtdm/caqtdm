@@ -899,8 +899,8 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 }
 
 /**
- * Slot to reset the UpdateType back to direct after resetting it to timed for the startup
- * Should not be called for any other purpose  --> is a private slot
+ * Functin to reset the UpdateType back to direct after resetting it to timed for the startup
+ * Is called via no argument slot because the needed lambda isn't supported under Qt4.
  */
 void FileOpenWindow::setDirectUpdateTypeOnRestart(const QDateTime reloadTime){
 
@@ -913,6 +913,17 @@ void FileOpenWindow::setDirectUpdateTypeOnRestart(const QDateTime reloadTime){
     if(messageWindow != (MessageWindow *) Q_NULLPTR) {
         messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("UpdateType reset to direct")));
     }
+}
+
+/**
+ * Slot to reset the UpdateType back to direct after resetting it to timed for the startup
+ * Should not be called for any other purpose  --> is a private slot
+ */
+void FileOpenWindow::onReloadTimeout()
+{
+    // Get time when the timeout started, this doesn't need to be exact because we compare using less than.
+    QDateTime startTime = QDateTime::currentDateTime().addSecs(-10);
+    setDirectUpdateTypeOnRestart(startTime);
 }
 
 /**
@@ -1431,11 +1442,11 @@ void FileOpenWindow::reload(QWidget *w)
                 messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct")));
             }
             // Make sure that if the timer triggers while another reload is taking place, the updateType is not reset in that case.
-            // This is done by saving the last reloadTime in a member variable and making the timer pass a copy of the reloadTime when it was triggered to the slot that resets the update type.
-            // The slot can then check if the received signal is the up to date, because if another timer has been triggered in the meantime, the member variable holds another time than the signal passed.
+            // This is done by saving the last reloadTime in a member variable and making the slot that handles the timer compare the last reload time and the time the timer was started at.
+            // The slot can then check if the received signal is the up to date because if another timer has been triggered in the meantime, the member variable holds a later time than when the timer was triggered.
             // If the signal is not up to date it is simply ignored as not to reset the updateType while a widget is currently reloading, this might happen e.g. when the user reloads multiple panels after each other.
             lastReloadTime = QDateTime::currentDateTime();
-            QTimer::singleShot(10000, this, [this, timeOfReload = lastReloadTime]() mutable { setDirectUpdateTypeOnRestart(timeOfReload); });
+            QTimer::singleShot(10000, this, SLOT(onReloadTimeout()));
         }
         s->deleteLater();
     }
