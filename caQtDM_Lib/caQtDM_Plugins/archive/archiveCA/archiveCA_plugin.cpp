@@ -27,6 +27,7 @@
 #include <QThread>
 #include "archiveCA_plugin.h"
 #include "archiverCommon.h"
+#include "caQtDM_Lib_global.h"
 
 #define qasc(x) x.toLatin1().constData()
 
