@@ -177,8 +177,12 @@ private:
     double changeValue_value_double;
     QRect checkSignal_value_QRect;
     QRectF checkSignal_value_QRectF;
-    double value_QRectF_const[MAX_QRECT_PARAMS];
-    bool value_QRect_is_const[MAX_QRECT_PARAMS];
+
+    // Array to store parameters of QRect or QRectF as doubles.
+    double value_QRect_F_const[MAX_QRECT_PARAMS];
+
+    // Array to store whether a specific parameter of a QRect or a QRectF is const.
+    bool value_QRect_F_is_const[MAX_QRECT_PARAMS];
     bool is_a_pure_constant;
 
 };
