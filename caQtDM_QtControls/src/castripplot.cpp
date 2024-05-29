@@ -294,7 +294,7 @@ void caStripPlot::setPlotPickerMode(int mode)
 void caStripPlot::onSelected(const QPointF& point)
 {
     if (thisYaxisScaling != fixedScale || NumberOfCurves == 1 || !thisSelectableCurves) return;
-    const double yAxisTolerance = (thisYaxisLimitsMax[1] - thisYaxisLimitsMin[1]) * 0.01;
+    const double yAxisTolerance = (thisYaxisLimitsMax[0] - thisYaxisLimitsMin[0]) * 0.01;
     const double xAxisTolerance = thisPeriod * xAxisToleranceFactor;
     double lDist = 100000000000;
     qint8 lIndex = -1;
