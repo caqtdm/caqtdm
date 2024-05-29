@@ -27,12 +27,7 @@
 #include <QThread>
 #include "archiveCA_plugin.h"
 #include "archiverCommon.h"
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-// Because QtInfoMsg doesnt exist there.
-#define QtInfoMsg QtWarningMsg
-#endif
-
+#include "caQtDM_Lib_global.h"
 
 #define qasc(x) x.toLatin1().constData()
 
