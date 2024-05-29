@@ -219,12 +219,19 @@ void caCartesianPlot::resetZoom() {
 
 void caCartesianPlot::setZoom(const QRectF &newZoomRect)
 {
+    QRectF zoomRect = zoomer->zoomRect();
+    if (zoomRect == newZoomRect) {
+        return;
+    }
     zoomer->zoom(newZoomRect);
 }
 
 void caCartesianPlot::zoomOnXAxis(const QRectF& newZoomRect)
 {
     QRectF zoomRect = zoomer->zoomRect();
+    if (zoomRect == newZoomRect) {
+        return;
+    }
     zoomRect.setX(newZoomRect.x());
     zoomRect.setWidth(newZoomRect.width());
     zoomer->zoom(zoomRect);
