@@ -47,7 +47,6 @@ WorkerHttpThread::~WorkerHttpThread()
 HttpRetrieval* WorkerHttpThread::getHttpRetrieval()
 {
     if (m_worker != (WorkerHTTP *) Q_NULLPTR) {
-        qDebug() << "returning archive" << m_worker->getArchive();
         return m_worker->getArchive();
     } else {
         return (HttpRetrieval *) Q_NULLPTR;

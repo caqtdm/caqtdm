@@ -289,7 +289,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             // If the server is temporarily at capacity, try again, but only if the request wasn't aborted.
             if (!previousHttpRetrievalAborted) {
                 if (m_httpRetrieval->retryAfter() != 0) {
-                    qDebug() << m_httpRetrieval->retryAfter();
                     // Set this to indicate we are trying again.
                     // A retry after is basically a continueAt, just that the server couldn't give ANY data, instead of not all.
                     m_receivedContinueAt = true;
@@ -308,7 +307,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             // set data count to 0 to clarify this data is not needed.
             nbVal = 0;
         }
-        qDebug() << "emitting in thread" << QThread::currentThread();
         emit resultReady(indexNew, nbVal, m_vecX, m_vecY, m_vecMinY, m_vecMaxY, m_httpRetrieval->getBackend(), !m_receivedContinueAt);
     } while (m_receivedContinueAt);
     m_vecX.clear();

@@ -150,7 +150,6 @@ int ArchiverGeneral::pvAddMonitor(int index, knobData *kData, int rate, int skip
 
         // Generate key to distinguish curves with the same pv but from different curves or plots.
         QString key = QString("%1_%2_%3").arg(kData->specData[0]).arg(kData->pv).arg(reinterpret_cast<quintptr>(kData->dispW), sizeof(void*) * 2, 16, QChar('0'));
-        qDebug() << "adding:" << key;
         // We need to construct new, temporary QString objects, else we modify the actual string, which is unintended
         QString possibleXKeyForMinY = QString(key).replace(".minY", "");
         QString possibleXKeyForMaxY = QString(key).replace(".maxY", "");
@@ -255,7 +254,6 @@ int ArchiverGeneral::pvAddMonitor(int index, knobData *kData, int rate, int skip
                         indexNew.key = key;
                     }
                     listOfIndexes.insert(key, indexNew);
-                    qDebug() << "inserted:" << key;
                     // This list is only used to find all indexes that have to be removed again upon reload
                     alreadyProcessedIndexes.insert(key, indexNew);
                     break;
@@ -387,7 +385,6 @@ int ArchiverGeneral::pvClearMonitor(knobData *kData)
                 listOfIndexes.remove(removeKeys.at(i));
                 alreadyProcessedIndexes.remove(removeKeys.at(i));
             }
-            qDebug() << "aborting req:" << key;
             emit Signal_AbortOutstandingRequests(key);
         }
     }

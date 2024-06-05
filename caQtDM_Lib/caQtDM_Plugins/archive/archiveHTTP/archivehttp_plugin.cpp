@@ -78,13 +78,11 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 
 int ArchiveHTTP_Plugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 {
-    qDebug() << "add:" << kData->pv;
     return m_archiverGeneral->pvAddMonitor(index, kData, rate, skip);
 }
 
 int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
 {
-    qDebug() << "clear:" << kData->pv;
     // Get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant,
     // resulting in none actually being updated.
     QString keyInCheck = kData->pv;
@@ -109,7 +107,6 @@ int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
     // Remove all found indexes. This is done after to not mess up our iterator.
     for (int i = 0; i < removeKeys.count(); i++) {
         // Remove entry for updating the data
-        qDebug() << "removed:"<< removeKeys[i];
         m_IndexesToUpdate.remove(removeKeys[i]);
         // Also remove the perfomance data
         if (m_retrievalPerformancePerPV.contains(removeKeys[i])) {
@@ -417,7 +414,6 @@ void ArchiveHTTP_Plugin::handleResults(
 
 void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfIndexes)
 {
-    qDebug() << "update";
     QMutexLocker mutexLocker(&m_globalMutex);
     if (m_IsSuspended) {
         return;
@@ -439,7 +435,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         // Account for .minY and .maxY
         keyInCheck.replace(".minY", "");
         keyInCheck.replace(".maxY", "");
-        qDebug() << "keyInCheck:" << keyInCheck;
         bool keyAlreadyPresent = false;
         for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
              tempI != m_IndexesToUpdate.constEnd();
@@ -449,7 +444,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             keyStored.replace(m_regexStr, "");
             keyStored.replace(".minY", "");
             keyStored.replace(".maxY", "");
-            qDebug() << "keyStored:" << keyStored;
 
             if (keyStored == keyInCheck) {
                 m_IndexesToUpdate.insert(i.key(), i.value());
@@ -462,8 +456,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             continue;
         }
         m_IndexesToUpdate.insert(i.key(), i.value());
-
-        qDebug() << "in";
 
         // If it doesn't already exist, create an Object to measure performance
         if (!m_retrievalPerformancePerPV.contains(i.key())) {
@@ -592,13 +584,10 @@ void ArchiveHTTP_Plugin::Callback_AbortOutstandingRequests(QString key)
     m_IsSuspended = true;
 
     QMap<QString, WorkerHttpThread*>::iterator listOfThreadsEntry = m_listOfThreads.find(key);
-    qDebug() << "threadcount:"<< m_listOfThreads.count();
     if (listOfThreadsEntry != m_listOfThreads.end()) {
         listOfThreadsEntry.value()->setIsActive(false);
-        qDebug() << "killing thread:"<<listOfThreadsEntry.key();
         HttpRetrieval *retrieval = listOfThreadsEntry.value()->getHttpRetrieval();
         if (retrieval != Q_NULLPTR) {
-            qDebug() << "invoking cancelDownload";
             retrieval->cancelDownload();
         }
     }
