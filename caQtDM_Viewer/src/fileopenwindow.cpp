@@ -46,12 +46,14 @@ bool HTTPCONFIGURATOR = false;
 #endif
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <QFileDialog>
 #include <QString>
 #include "messagebox.h"
 #include "configDialog.h"
+#include "caQtDM_Lib_global.h"
 
 #ifdef linux
 #include <sys/resource.h>
@@ -506,11 +508,11 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     // Inform user about CAQTDM_REPLACE_UNITS replacements.
     if(messageWindow != (MessageWindow *) Q_NULLPTR) {
     bool doDefaultUnitReplacements = !(qgetenv("CAQTDM_DEFAULT_UNIT_REPLACEMENTS").toLower().replace("\"","") == "false");
-        if (doDefaultUnitReplacements)  messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Default unit replacements are taking place, you can disable them by setting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" to false.")));
-        else messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Default unit replacements are disabled by user, you can enable them by unsetting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" or setting it to true.")));
+        if (doDefaultUnitReplacements)  messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Default unit replacements are taking place, you can disable them by setting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" to false.")));
+        else messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Default unit replacements are disabled by user, you can enable them by unsetting the environment variable \"CAQTDM_DEFAULT_UNIT_REPLACEMENTS\" or setting it to true.")));
         QString replaceUnits = QString(qgetenv("CAQTDM_CUSTOM_UNIT_REPLACEMENTS"));
-        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is defined.")));
-        else messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" to replace characters within or whole units.")));
+        if(replaceUnits.trimmed().length() > 0) messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is defined.")));
+        else messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Info: Environment variable \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" is not defined, standard unit replacements are taking place. You can define \"CAQTDM_CUSTOM_UNIT_REPLACEMENTS\" to replace characters within or whole units.")));
     }
 
     // load the control plugins (must be done after setting the environment)
@@ -524,7 +526,7 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
                 char asc[MAX_STRING_LENGTH];
                 i.next();
                 snprintf(asc, MAX_STRING_LENGTH, "Info: plugin %s loaded", qasc(i.key()));
-                messageWindow->postMsgEvent(QtWarningMsg, asc);
+                messageWindow->postMsgEvent(QtInfoMsg, asc);
             }
         }
     }
@@ -584,8 +586,18 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
         messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
     } else {
         QString displayTimeOut="environment variable CAQTDM_TIMEOUT_HOURS could be set for quitting caQtDM automatically after some time";
-        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(displayTimeOut));
+        messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(displayTimeOut));
     }
+
+    // available memory in KiB
+    long long availableMemory = getAvailableMemory();
+
+    // Check for available memory and warn the user if memory is not sufficient
+    if (availableMemory < 300000) {
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Available system memory is less than 300MB, this could lead to a crash during operation or while opening new panels.")));
+    }
+    // Print out available memory in all cases
+    messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Available system memory: " + QString::number(availableMemory / 1000) + "MB")));
 }
 
 FileOpenWindow::~FileOpenWindow() {
@@ -700,7 +712,7 @@ void FileOpenWindow::setAllEnvironmentVariables(const QString &fileName)
             //messageWindow->postMsgEvent(QtDebugMsg, (char*) qasc(envString));
         } else if(line.size() > 0) {
             snprintf(asc, MAX_STRING_LENGTH, "environment variable could not be set from %s", qasc(line));
-            messageWindow->postMsgEvent(QtDebugMsg, asc);
+            messageWindow->postMsgEvent(QtWarningMsg, asc);
         }
     }
     //Replacement for standard writable directory
@@ -755,9 +767,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS_EX procmem;
     if (GetProcessMemoryInfo(GetCurrentProcess(),(PPROCESS_MEMORY_COUNTERS)&procmem,sizeof(procmem))) {
-      snprintf(asc, MAX_STRING_LENGTH,"memory: %ld kB,", (procmem.PrivateUsage / (1024)));
+      snprintf(asc, MAX_STRING_LENGTH,"memory: %ld kB", (procmem.PrivateUsage / (1024)));
     } else {
-      snprintf(asc, MAX_STRING_LENGTH, "memory: no RAM,");
+      snprintf(asc, MAX_STRING_LENGTH, "memory: no RAM");
     }
 #endif
 
@@ -781,9 +793,9 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
         if(caQtDM_TimeOutEnabled) {
             char asc1[50];
             if (caQtDM_TimeLeft<0.02){
-                sprintf(asc1, "T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
+                sprintf(asc1, ", T/O=%.0fsec ", caQtDM_TimeLeft*60*60);
             }else{
-                sprintf(asc1, "T/O=%.2lfh ", caQtDM_TimeLeft);
+                sprintf(asc1, ", T/O=%.2lfh ", caQtDM_TimeLeft);
             }
             strcat(asc, asc1);
         }
@@ -870,12 +882,6 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
            loadMainWindow(position, fileS, macroS, resizeS, false, true, false);
         }
         reloadList.clear();
-        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
-        if (this->ui.directAction->isChecked()) {
-           mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
-           qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
-           QTimer::singleShot(10000, this, SLOT(setDirectUpdateTypeOnRestart()));
-        }
     }
 
     // any open windows ?
@@ -891,12 +897,31 @@ void FileOpenWindow::timerEvent(QTimerEvent *event)
 }
 
 /**
+ * Functin to reset the UpdateType back to direct after resetting it to timed for the startup
+ * Is called via no argument slot because the needed lambda isn't supported under Qt4.
+ */
+void FileOpenWindow::setDirectUpdateTypeOnRestart(const QDateTime reloadTime){
+
+    if (reloadTime < lastReloadTime) {
+        // In that case the received signal is not up to date and another timer has been started in the meantime, which has priority.
+        return;
+    }
+    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
+    qDebug() << "UpdateType reset to direct";
+    if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+        messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("UpdateType reset to direct")));
+    }
+}
+
+/**
  * Slot to reset the UpdateType back to direct after resetting it to timed for the startup
  * Should not be called for any other purpose  --> is a private slot
  */
-void FileOpenWindow::setDirectUpdateTypeOnRestart(){
-    mutexKnobData->UpdateMechanism(MutexKnobData::UpdateDirect);
-    qDebug() << "UpdateType reset to direct";
+void FileOpenWindow::onReloadTimeout()
+{
+    // Get time when the timeout started, this doesn't need to be exact because we compare using less than.
+    QDateTime startTime = QDateTime::currentDateTime().addSecs(-10);
+    setDirectUpdateTypeOnRestart(startTime);
 }
 
 /**
@@ -907,7 +932,15 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 {
     char *asc;
     bool willprint = printexit;
+    QString suppressUpdates = qgetenv("CAQTDM_SUPPRESS_UPDATES_ONLOAD");
+    if (suppressUpdates.toLower() == "true") {
+        mutexKnobData->setSuppressUpdates(true);
+    }
+    QElapsedTimer timer;
+    timer.start();
     CaQtDM_Lib *newWindow =  new CaQtDM_Lib(this, fileS, macroS, mutexKnobData, interfaces, messageWindow, willprint, Q_NULLPTR, OptionList);
+    QString message = "Loading of window took: " + QString::number(timer.elapsed()) + " milliseconds";
+    messageWindow->postMsgEvent(QtInfoMsg, (char*)qasc(message));
 
     // prc files are not allowed to be resized, or when resizing is prohibited by the command line
     if (fileS.contains("prc")) {
@@ -1019,6 +1052,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     } else {
       sprintf(asc, "last file: %s", qasc(fileS));
     }
+    mutexKnobData->setSuppressUpdates(false);
     messageWindow->postMsgEvent(QtDebugMsg, asc);
     free(asc);
     return mainWindow;
@@ -1247,14 +1281,14 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
     // this will check for file existence and when an url is defined, download the file from a http server
     fileFunctions filefunction;
     filefunction.checkFileAndDownload(FileName);
-    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+    if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(filefunction.lastInfo()));
     if(filefunction.lastError().length() > 0)  messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
     // open file
     searchFile *s = new searchFile(FileName);
     QString fileNameFound = s->findFile();
     if(fileNameFound.isNull()) {
-        QString message = QString(FileName);
+        QString message = inputFile;
         message.append(" does not exist");
         QTDMMessageBox *m = new QTDMMessageBox(QMessageBox::Warning, "file open error", message, ":/caQtDM-logos.png", QMessageBox::Close, this, Qt::Dialog| Qt::Popup, true);
         m->show();
@@ -1385,7 +1419,7 @@ void FileOpenWindow::reload(QWidget *w)
         QFileInfo fi(FileName);
         fileFunctions filefunction;
         filefunction.checkFileAndDownload(fi.fileName());
-        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(filefunction.lastInfo()));
+        if(filefunction.lastInfo().length() > 0) messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(filefunction.lastInfo()));
         if(filefunction.lastError().length() > 0) messageWindow->postMsgEvent(QtCriticalMsg, (char*) qasc(filefunction.lastError()));
 
         // we were loading here before a new instance of caQtDM_Lib,; however the deferred delete of the previous instance
@@ -1398,8 +1432,54 @@ void FileOpenWindow::reload(QWidget *w)
         row.macro = macroS;
         row.resize = resizeS;
         reloadList.append(row);
+        // When reloading a file, set UpdateType to timed, else caQtDM might crash if too much data is processed in the beginning.
+        if (this->ui.directAction->isChecked()) {
+            mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
+            qDebug() << "Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct";
+            if(messageWindow != (MessageWindow *) Q_NULLPTR) {
+                messageWindow->postMsgEvent(QtWarningMsg, (char*) qasc(QString("Setting UpdateType to timed for 10 Seconds, can't start up with UpdateType = direct")));
+            }
+            // Make sure that if the timer triggers while another reload is taking place, the updateType is not reset in that case.
+            // This is done by saving the last reloadTime in a member variable and making the slot that handles the timer compare the last reload time and the time the timer was started at.
+            // The slot can then check if the received signal is the up to date because if another timer has been triggered in the meantime, the member variable holds a later time than when the timer was triggered.
+            // If the signal is not up to date it is simply ignored as not to reset the updateType while a widget is currently reloading, this might happen e.g. when the user reloads multiple panels after each other.
+            lastReloadTime = QDateTime::currentDateTime();
+            QTimer::singleShot(10000, this, SLOT(onReloadTimeout()));
+        }
         s->deleteLater();
     }
+}
+
+/// Provides the available RAM memory in Kibibytes (1 KiB = 1024 B)
+long long FileOpenWindow::getAvailableMemory()
+{
+    long long memAvailable = -1;
+
+#ifdef linux // From https://stackoverflow.com/a/70766868
+    std::ifstream meminfo("/proc/meminfo");
+    std::string line;
+    while (std::getline(meminfo, line))
+    {
+        if (line.find("MemAvailable:") != std::string::npos)
+        {
+            const std::size_t firstWhiteSpacePos = line.find_first_of(' ');
+            const std::size_t firstNonWhiteSpaceChar = line.find_first_not_of(' ', firstWhiteSpacePos);
+            const std::size_t nextWhiteSpace = line.find_first_of(' ', firstNonWhiteSpaceChar);
+            const std::size_t numChars = nextWhiteSpace - firstNonWhiteSpaceChar;
+            std::string memAvailableStdStr = line.substr(firstNonWhiteSpaceChar, numChars);
+            QString memAvailableStr = QString::fromStdString(memAvailableStdStr);
+            memAvailable = memAvailableStr.toLongLong();
+            break;
+        }
+    }
+#elif defined(_MSC_VER)
+    MEMORYSTATUSEX status;
+    status.dwLength = sizeof(status);
+    if (GlobalMemoryStatusEx(&status)) {
+        memAvailable = status.ullAvailPhys / 1024; // Value returned is in Bytes, convert to KiB
+    }
+#endif
+    return memAvailable;
 }
 
 void FileOpenWindow::Callback_ActionReload()
@@ -1409,7 +1489,7 @@ void FileOpenWindow::Callback_ActionReload()
 
     Callback_ActionTimed();
     // block processing during reload
-    mutexKnobData->BlockProcessing(true);
+    mutexKnobData->setSuppressUpdates(true);
 
     // go through all windows, close them and reload them from files
     QList<QWidget *> all = this->findChildren<QWidget *>();
@@ -1419,7 +1499,7 @@ void FileOpenWindow::Callback_ActionReload()
         }
     }
 
-    mutexKnobData->BlockProcessing(false);
+    mutexKnobData->setSuppressUpdates(false);
 
     this->ui.reloadAction->blockSignals(false);
 }
@@ -1474,6 +1554,23 @@ bool FileOpenWindow::sendMessage(const QString &message)
     MSQ_enQueue(element);
     sharedMemory.unlock();
     return true;
+}
+
+QString FileOpenWindow::getStatusBarContents()
+{
+    QString statusBarContents = statusBar()->currentMessage();
+
+    return statusBarContents;
+}
+
+QString FileOpenWindow::getLogFilePath()
+{
+    QString logFilePath;
+    if (messageWindow != Q_NULLPTR) {
+        logFilePath = messageWindow->getLogFilePath();
+    }
+
+    return logFilePath;
 }
 
 /**

@@ -176,7 +176,7 @@ void Exceptionhandler(struct exception_handler_args args)
     } else {
         pName = "?";
     }
-    C_postMsgEvent(messageWindowPtr, 1, vaPrintf("Channel Access Exception %s on %s (op=%ld data_type=%s count=%ld)\n",
+    C_postMsgEvent(messageWindowPtr, 2, vaPrintf("Channel Access Exception %s on %s (op=%ld data_type=%s count=%ld)\n",
                                             args.ctx, pName, args.op, dbr_type_to_text(args.type), args.count));
 }
 
@@ -450,7 +450,7 @@ static void dataCallback(struct event_handler_args args)
         break;
 
             default:
-                C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (%d) in datacallback\n", ca_field_type(args.chid)));
+                C_postMsgEvent(messageWindowPtr, 2, vaPrintf("unhandled epics type (%d) in datacallback\n", ca_field_type(args.chid)));
 
         } // end switch
 
@@ -619,7 +619,7 @@ static void displayCallback(struct event_handler_args args) {
         break;
 
             default:
-                C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (d) in displaycallback %d\n", ca_field_type(args.chid)));
+                C_postMsgEvent(messageWindowPtr, 2, vaPrintf("unhandled epics type (d) in displaycallback %d\n", ca_field_type(args.chid)));
 
         } // end switch
 
@@ -1072,7 +1072,7 @@ int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char 
         break;
 
         default:
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
+            C_postMsgEvent(messageWindowPtr, 2, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
 
     }
 
@@ -1159,7 +1159,7 @@ int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char 
         break;
 
         default:
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
+            C_postMsgEvent(messageWindowPtr, 2, vaPrintf("unhandled epics type (%d) in epicssetvalue\n", chType));
     }
 
     return ECA_NORMAL;
@@ -1253,7 +1253,7 @@ int EpicsSetWave_Connected(chid ch,char *pv, float *fdata, double *ddata, int16_
         break;
 
         default:
-            C_postMsgEvent(messageWindowPtr, 1, vaPrintf("unhandled epics type (%d) in epicssetwave\n", chType));
+            C_postMsgEvent(messageWindowPtr, 2, vaPrintf("unhandled epics type (%d) in epicssetwave\n", chType));
     }
 
     status = ca_pend_io(CA_TIMEOUT);

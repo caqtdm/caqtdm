@@ -26,10 +26,14 @@
 
 #include "MessageWindow.h"
 #include "messageWindowWrapper.h"
+#include "qdatetime.h"
 #include <QCoreApplication>
 #include <QMutexLocker>
 #include <stdio.h>
 #include <time.h>
+#include <QFile>
+#include <QDebug>
+#include <QTextStream>
 #ifndef MOBILE_ANDROID
 #include <sys/timeb.h>
 #else
@@ -61,6 +65,19 @@ MessageWindow::MessageWindow(QWidget* parent) : QDockWidget(parent)
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowMinMaxButtonsHint);
     setContextMenuPolicy(Qt::CustomContextMenu);
     show();
+
+    QString createLogFile = qgetenv("CAQTDM_CREATE_LOGFILE");
+    if (createLogFile.toLower() == "true") {
+        QDateTime currentTime = QDateTime::currentDateTime();
+        QString logFileName = QString("caQtDM_Logfile_%1.txt").arg(currentTime.toLocalTime().toString("yyyy-dd-M--HH-mm-ss-zzz"));
+        QString logFilePath = qgetenv("CAQTDM_LOGFILE_PATH");
+        if (!logFilePath.isEmpty()) {
+            logFilePath += "/" + logFileName;
+            m_logFilePath = logFilePath;
+        } else {
+            m_logFilePath = logFileName;
+        }
+    }
 
     move(x(), 0);
 }
@@ -124,21 +141,49 @@ void MessageWindow::customEvent(QEvent* event)
         }
 }
 
-void  MessageWindow::clearText()
+void MessageWindow::clearText()
 {
     msgTextEdit.setPlainText("");
+}
+
+QString MessageWindow::getMessageBoxContents() {
+    return msgTextEdit.toPlainText();
+}
+
+QString MessageWindow::getLogFilePath()
+{
+    return m_logFilePath;
 }
 
 void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
 {
     QString qmsg = MessageWindow::QtMsgToQString(type, msg);
+
+    // Also write the message to a temporary logfile that gets permanent if the progam crashes.
+    if (!m_logFilePath.isEmpty()) {
+            QFile logFile(m_logFilePath);
+        if (logFile.open(QIODevice::Append | QIODevice::Text)) {
+            QTextStream textStream(&logFile);
+            textStream << qmsg.append("\n");
+            logFile.close();
+        } else {
+            qWarning() << "Failed to write to logfile";
+        }
+    }
+
     switch (type) {
-    case QtDebugMsg:
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+    case QtInfoMsg:
         qmsg.prepend("<FONT color=\"#000000\">");
         qmsg.append("</FONT>");
         break;
-    case QtWarningMsg:
+#endif
+    case QtDebugMsg:
         qmsg.prepend("<FONT color=\"#0000FF\">");
+        qmsg.append("</FONT>");
+        break;
+    case QtWarningMsg:
+        qmsg.prepend("<FONT color=\"#FF8C00\">");
         qmsg.append("</FONT>");
         break;
     case QtCriticalMsg:
@@ -147,7 +192,7 @@ void MessageWindow::postMsgEvent(QtMsgType type, char* msg)
         qmsg.append("</FONT></B>");
         break;
     default:
-        qmsg.prepend("<FONT color=\"#0000FF\">");
+        qmsg.prepend("<FONT color=\"#000000\">");
         qmsg.append("</FONT>");
         break;
     }

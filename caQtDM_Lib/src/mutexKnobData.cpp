@@ -63,6 +63,7 @@ MutexKnobData::MutexKnobData()
     highestIndexPV = 0;
     highestCountPerSecond = 0;
 
+    suppressUpdates = false;
     ftime(&last);
     ftime(&monitorTiming);
 
@@ -71,8 +72,6 @@ MutexKnobData::MutexKnobData()
     timerId = startTimer(1000/DEFAULTRATE);
 
     myUpdateType = UpdateTimed;
-
-    BlockProcessing(false);
 
     // Initialize doDefaultUnitReplacements with env. var CAQTDM_DEFAULT_UNIT_REPLACEMENTS
     doDefaultUnitReplacements = true;
@@ -144,7 +143,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
                 } else if (decOk) {
                     unitKey += QString(parsedValueDez);
                 } else {
-                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string: " << QString(*unitPartsIterator);
+                    //qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string: " << QString(*unitPartsIterator);
                     unitKey += QString(*unitPartsIterator);
                 }
             }
@@ -158,7 +157,7 @@ QList<QPair<QString, QString> > MutexKnobData::createUnitReplacementPairList(QSt
                 } else if (decOk) {
                     unitValue += QString(parsedValueDez);
                 } else {
-                    qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(*unitPartsIterator);
+                    //qDebug() << "Argument from CAQTDM_CUSTOM_UNIT_REPLACEMENTS cannot be converted to UTF-8 Code, will be treated as string:  " << QString(*unitPartsIterator);
                     unitValue += QString(*unitPartsIterator);
                 }
             }
@@ -205,6 +204,16 @@ QString MutexKnobData::SoftPV_Name(QString pv, QWidget *w)
     //printf("%s_%p\n", qasc(pv),  w);
     //fflush(stdout);
     return QString("%1_%2").arg(pv).arg((quintptr)w,QT_POINTER_SIZE * 2, 16, QChar('0'));
+}
+
+bool MutexKnobData::getSuppressUpdates() const
+{
+    return suppressUpdates;
+}
+
+void MutexKnobData::setSuppressUpdates(bool newSuppressUpdates)
+{
+    suppressUpdates = newSuppressUpdates;
 }
 
 /**
@@ -591,28 +600,29 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     // direct update without timing
 
     if(myUpdateType == UpdateDirect) {
-        QWidget *dispW = (QWidget*) kData->dispW;
-        dataString[0] = '\0';
-        strcpy(units, kData->edata.units);
-        strcpy(fec, kData->edata.fec);
-        int caFieldType= kData->edata.fieldtype;
-
-        if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
-            if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
-                memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
-                dataString[kData->edata.dataSize] = '\0';
-            } else {
-                memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
-                dataString[STRING_EXCHANGE_SIZE-1] = '\0';
+        if (!suppressUpdates ) {
+            QWidget *dispW = (QWidget*) kData->dispW;
+            dataString[0] = '\0';
+            qstrncpy(units, kData->edata.units,caqtdm_string_t_length);
+            qstrncpy(fec, kData->edata.fec,caqtdm_string_t_length);
+            int caFieldType= kData->edata.fieldtype;
+            if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
+                if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
+                    memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
+                    dataString[kData->edata.dataSize] = '\0';
+                } else {
+                    memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
+                    dataString[STRING_EXCHANGE_SIZE-1] = '\0';
+                }
             }
-        }
 
-        kData->edata.displayCount = kData->edata.monitorCount;
-        locker.unlock();
-        UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
-        kData->edata.lastTime = now;
-        kData->edata.initialize = false;
-        displayCount++;
+            kData->edata.displayCount = kData->edata.monitorCount;
+            locker.unlock();
+            UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+            kData->edata.lastTime = now;
+            kData->edata.initialize = false;
+            displayCount++;
+        }
     }
 }
 
@@ -659,14 +669,15 @@ extern "C" MutexKnobData* C_SetMutexKnobDataReceived(MutexKnobData* p, knobData 
   */
 void MutexKnobData::timerEvent(QTimerEvent *)
 {
+    if (suppressUpdates) {
+        return;
+    }
     double diff=0.2, repRate=5.0;
     char units[40];
     char fec[40];
     char dataString[STRING_EXCHANGE_SIZE];
     struct timeb now;
     int repetitionRate = DEFAULTRATE;
-
-    if(blockProcess) return;
 
     ftime(&now);
 
@@ -776,8 +787,8 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 int index = kPtr->index;
                 QWidget *dispW = (QWidget*) kPtr->dispW;
                 dataString[0] = '\0';
-                strcpy(units, kPtr->edata.units);
-                strcpy(fec, kPtr->edata.fec);
+                qstrncpy(units, kPtr->edata.units,caqtdm_string_t_length);
+                qstrncpy(fec, kPtr->edata.fec,caqtdm_string_t_length);
                 int caFieldType= kPtr->edata.fieldtype;
 
                 if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) Q_NULLPTR) {
@@ -864,27 +875,46 @@ QString getBufferAsHexStr(char* buf, int buffsize) {
 }
 void MutexKnobData::UpdateWidget(int index, QWidget* w, char *units, char *fec, char *dataString, knobData knb)
 {
-    QString StringUnits = QString::fromLatin1(units);
-    if(StringUnits.size() > 0) {
+    QString unitsString;
+
+    // Check whether this is specifically accessing the .EGU epics field
+    bool isEguField = QString(knb.pv).endsWith(".EGU");
+    if (isEguField) {
+        // If it is, the unit is stored in the dataString
+        unitsString = QString::fromLatin1(dataString);
+    } else {
+        // If not, it is stored in the units string
+        unitsString = QString::fromLatin1(units);
+    }
+
+
+    // Replace known sequences of characters which are meant to represent special characters
+    if(unitsString.size() > 0) {
         // iterator for both loops
         QList<QPair<QString, QString> >::iterator i;
 
         if (doDefaultUnitReplacements){
             // replace default QStrings
             for (i = defaultReplaceUnitsPairList.begin(); i != defaultReplaceUnitsPairList.end(); ++i){
-                StringUnits.replace(i->first, i->second);
+                unitsString.replace(i->first, i->second);
             }
         }
 
         // replace QStrings defined in CAQTDM_REPLACE_UNITS
         for (i = replaceUnitsPairList.begin(); i != replaceUnitsPairList.end(); ++i){
-            StringUnits.replace(i->first, i->second);
+            unitsString.replace(i->first, i->second);
         }
-
     }
 
-    // send data to main thread
-    emit Signal_UpdateWidget(index, w, StringUnits, fec, dataString, knb);
+    // This just reinterprets it as utf8
+    unitsString = QString::fromUtf8(qasc(unitsString));
+
+    // Send updated data to main thread
+    if (isEguField) {
+        emit Signal_UpdateWidget(index, w, units, fec, unitsString, knb);
+    } else {
+        emit Signal_UpdateWidget(index, w, unitsString, fec, dataString, knb);
+    }
 }
 void MutexKnobData::UpdateTextLine(char *message, char *name)
 {

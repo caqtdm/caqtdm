@@ -116,6 +116,10 @@
      void saveConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files);
 
 
+     QString getStatusBarContents();
+     QString getLogFilePath();
+
+
      void MSQ_getPtrs(int &front, int &rear) {
              if (!sharedMemory.isAttached()) return;
              int *ptr1 = (int*) sharedMemory.data();
@@ -227,7 +231,7 @@
      void Callback_EmptyCache();
      void Callback_OpenNewFile(const QString&, const QString&, const QString&, const QString&);
      void checkForMessage();
-     void setDirectUpdateTypeOnRestart();
+     void onReloadTimeout();
      void Callback_PVwindowExit();
 
 #if QT_VERSION > 0x050000
@@ -262,11 +266,13 @@ signals:
    void messageAvailable(QString message);
 
 private:
-
+   void setDirectUpdateTypeOnRestart(const QDateTime);
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();
      void TerminateAllInterfaces();
      void reload(QWidget *w);
+     long long getAvailableMemory();
+
      QMainWindow *lastWindow;
      QString lastMacro, lastFile, lastGeometry, lastResizing;
      Ui::MainWindow ui;
@@ -305,6 +311,8 @@ private:
      int front;
      int rear;
      _blop empty;
+
+     QDateTime lastReloadTime;
  };
 
  #endif

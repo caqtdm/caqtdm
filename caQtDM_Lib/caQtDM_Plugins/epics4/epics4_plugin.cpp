@@ -1045,7 +1045,7 @@ void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
     kData.edata.lower_ctrl_limit = controlLow;
     kData.edata.precision = precision;
 
-    strcpy(kData.edata.fec, pvaChannel->getChannel()->getRemoteAddress().c_str());
+    qstrncpy(kData.edata.fec, pvaChannel->getChannel()->getRemoteAddress().c_str(),caqtdm_string_t_length);
     AccessRights accessr = pvaChannel->getChannel()->getAccessRights(pvField);
     kData.edata.accessR = 1;
     kData.edata.accessW = 1;

@@ -65,34 +65,9 @@
         #include <X11/Xatom.h>
 #endif //CAQTDM_X11
 
-/*
-class MyApplication: public QApplication
-{
-
-public:
-    MyApplication (int &argc, char ** argv ): QApplication ( argc, argv ) {}
-    ~MyApplication() {}
-
-private:
-    virtual bool notify(QObject* receiver, QEvent* e)  {
-
-        try {
-            //qDebug() << "## trying to notify application..";
-            return QApplication::notify(receiver, e);
-        } catch (std::exception& e) {
-            qDebug() << "## !!FATAL!! Exception thrown: " << e.what();
-        }
-
-        return false;
-    }
-};
-*/
-
 static void unixSignalHandler(int signum) {
 
     Q_UNUSED(signum);
-
-    //qDebug("DBG: main.cpp::unixSignalHandler(). signal = %s\n", strsignal(signum));
 
     /*
      * Make sure your Qt application gracefully quits.
@@ -204,7 +179,7 @@ int main(int argc, char *argv[])
             printf("caQtDM -- macro <%s>\n", argv[in]);
             macroString = QString(argv[in]);
         } else if ( strcmp (argv[in], "-attach" ) == 0 ) {
-            printf("caQtDM -- will attach to another caQtDM if running\n");
+            printf("caQtDM -- will attach to another caQtDM instance if running\n");
             attach = true;
         } else if ( strcmp (argv[in], "-noMsg" ) == 0 ) {
             printf("caQtDM -- will minimize its main windows\n");
@@ -225,20 +200,20 @@ int main(int argc, char *argv[])
              in++;
                  printf("Usage:\n"
                    "  caQtDM[X options]\n"
-                   "  [-help | -h | -?]\n"
-                   "  [-x]\n"
-                   "  [-attach]\n"
-                   "  [-noMsg]\n"
+                   "  [-help | -h | -?] describe the options\n"
+                   "  [-x] has no effect (MEDM’s execute-only mode)\n"
+                   "  [-attach] attach to a running caQtDM instance\n"
+                   "  [-noMsg] iconize the main window\n"
                    "  [-stylefile filename] will replace the default stylesheet with the specified file (works only when not attaching)\n"
-                   "  [-macro \"xxx=aaa,yyy=bbb, ...\"]\n"
+                   "  [-macro \"xxx=aaa,yyy=bbb, ...\"] apply macro substitution to replace occurrences of $(xxx) with value aaa\n"
                    "  [-macrodefs filename] will load macro definitions from file\n"
-                   "  [-dg [<width>x<height>][+<xoffset>-<yoffset>]\n"
+                   "  [-dg [<width>x<height>][+<xoffset>-<yoffset>] specifies the geometry (location and size) of the synoptic display\n"
                    "  [-httpconfig] will display a network configuration screen at startup\n"
                    "  [-print] will print file and exit\n"
                    "  [-savetoimage] will save image file and exit\n"
                    "  [-noResize] will prevent resizing\n"
-                   "  [-cs defaultcontrolsystempluginname]\n"
-                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] options for cs plugins,\n"
+                   "  [-cs defaultcontrolsystempluginname] will override the default epics3 datasource\n"
+                   "  [-option \"xxx=aaa,yyy=bbb, ...\"] various options,\n"
                    "  \t e.g. -option \"updatetype=direct\" will set the updatetype to Direct\n"
                    "  \t options for bsread:\n "
                    "  \t\t bsmodulo,bsoffset,\n"
@@ -247,7 +222,7 @@ int main(int argc, char *argv[])
                    "  \t\t bsstrategy(complete-all|complete-latest)\n"
                    "  [-url url] will look for files on the specified url and download them to a local directory\n"
                    "  [-emptycache] will empty the local cache used for downloading"
-                   "  [file]\n"
+                   "  [file] UI file to open\n"
                    "  [&]\n"
                    "\n"
                    "  -x -displayFont -display are ignored !\n\n"
@@ -373,10 +348,10 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    FileOpenWindow window (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
-    window.setWindowIcon (QIcon(":/caQtDM.ico"));
-    if (savetoimage) window.setProperty("savetoimage", true);
-    window.show();
+    FileOpenWindow fileOpenWindow (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
+    fileOpenWindow.setWindowIcon (QIcon(":/caQtDM.ico"));
+    if (savetoimage) fileOpenWindow.setProperty("savetoimage", true);
+    fileOpenWindow.show();
 #ifdef CAQTDM_X11
     #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
         if (qApp->platformName()== QLatin1String("xcb")){
@@ -384,17 +359,17 @@ int main(int argc, char *argv[])
 
     QString X_Server_Check=ServerVendor(QX11Info::display());
     if (X_Server_Check.contains("Colin Harrison")){ //Xming Server on Windows, yes this is a quickfix!
-       window.move(10,30);// 0,0 is outside the visible areas on the taget
+       fileOpenWindow.move(10,30);// 0,0 is outside the visible areas on the taget
     }else{
-       window.move(0,0);
+       fileOpenWindow.move(0,0);
     }
     #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
         }else{
-            window.move(0,0);
+            fileOpenWindow.move(0,0);
         }
     #endif
 #else
-    window.move(0,0);
+    fileOpenWindow.move(0,0);
 #endif
 
 
@@ -405,7 +380,47 @@ int main(int argc, char *argv[])
         qFatal("ERR - %s(%d): An error occurred while setting a signal handler.\n", __FILE__,__LINE__);
     }
 
-    QObject::connect(&app, SIGNAL(aboutToQuit()), &window, SLOT(doSomething()));
+    QObject::connect(&app, SIGNAL(aboutToQuit()), &fileOpenWindow, SLOT(doSomething()));
 
-    return app.exec();
+    int exitCode = 0;
+    QString errorMessage;
+
+    // Put this into a try catch statement to catch all errors
+    // Note: This won't work always, as some exeptions, such as segfaults, cannot be caught.
+    try {
+        exitCode = app.exec();
+    } catch (const std::exception& e) {
+        exitCode = EXIT_FAILURE;
+        errorMessage = e.what();
+    }
+
+    // If it was successful, delete the temporary logfile, if it exists.
+    // If it was not successful but the logfile is still writable, try to add some more information post-mortem
+    QString logFilePath = fileOpenWindow.getLogFilePath();
+    if (!logFilePath.isEmpty()) {
+        if (exitCode != 0) { // Append the current content of the statusbar to the logFile.
+            // Create the file
+            QFile crashLogFile(logFilePath);
+            if (crashLogFile.open(QIODevice::Append | QIODevice::Text)) {
+                QTextStream textStream(&crashLogFile);
+                // Write information to the file that might help identify the cause of the crash
+                textStream << "\nThis logfile was not deleted automatically because caQtDM encountered a fatal error and exited with:\n"
+                           << "    Exit Code: " << exitCode << "\n"
+                           << "    Error Message: " << errorMessage << "\n"
+                           << "Crash occured on (local time): " << QDateTime::currentDateTime().toLocalTime().toString() << "\n"
+                           << "Content of the statusbar when the crash occurred:\n\n"
+                           << fileOpenWindow.getStatusBarContents();
+
+                // Close the file
+                crashLogFile.close();
+            }
+        } else {
+            // Delete the logfile, as the reason for the exit is not an error
+            QFile logFile(logFilePath);
+            logFile.remove();
+        }
+    }
+
+
+    return exitCode;
 }

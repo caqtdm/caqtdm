@@ -531,24 +531,24 @@ void caThermo::setFormat(int prec)
     switch (thisFormatType) {
     case decimal:
         if(precision >= 0) {
-            sprintf(thisFormat, "%s.%dlf", "%", precision);
+            snprintf(thisFormat,SMALL_STRING_LENGTH, "%s.%dlf", "%", precision);
         } else {
-            sprintf(thisFormat, "%s.%dle", "%", -precision);
+            snprintf(thisFormat,SMALL_STRING_LENGTH, "%s.%dle", "%", -precision);
         }
         break;
     case compact:
-        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
-        sprintf(thisFormatC, "%s.%dlf", "%", qAbs(precision));
+        snprintf(thisFormat,SMALL_STRING_LENGTH, "%s.%dle", "%", qAbs(precision));
+        snprintf(thisFormatC,SMALL_STRING_LENGTH, "%s.%dlf", "%", qAbs(precision));
         break;
     case exponential:
     case engr_notation:
-        sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
+        snprintf(thisFormat,SMALL_STRING_LENGTH, "%s.%dle", "%", qAbs(precision));
         break;
     case truncated:
-        strcpy(thisFormat, "%d");
+        qstrncpy(thisFormat, "%d",SMALL_STRING_LENGTH);
         break;
     default:
-        sprintf(thisFormat, "%s.%dlf", "%", precision);
+        snprintf(thisFormat,SMALL_STRING_LENGTH, "%s.%dlf", "%", precision);
     }
 
 }

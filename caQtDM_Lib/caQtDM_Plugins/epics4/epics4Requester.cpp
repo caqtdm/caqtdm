@@ -24,6 +24,7 @@
  */
 
 #include "epics4Requester.h"
+#include "caQtDM_Lib_global.h"
 
 namespace epics { namespace caqtdm { namespace epics4 {
 
@@ -36,7 +37,7 @@ void Epics4Requester::message(std::string const & message,epics::pvData::Message
 
     switch (messageType) {
     case epics::pvData::infoMessage:
-          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtDebugMsg, mes);
+          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtInfoMsg, mes);
           break;
     case epics::pvData::warningMessage:
           if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtWarningMsg, mes);
@@ -45,7 +46,7 @@ void Epics4Requester::message(std::string const & message,epics::pvData::Message
           if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtCriticalMsg, mes);
           break;
     case epics::pvData::fatalErrorMessage:
-          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtCriticalMsg, mes);
+          if(messageWindow != (MessageWindow *) Q_NULLPTR) messageWindow->postMsgEvent(QtFatalMsg, mes);
           break;
     }
 }

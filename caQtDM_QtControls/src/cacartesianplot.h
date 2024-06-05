@@ -25,6 +25,7 @@
 
 #ifndef CACARTESIANPLOT_H
 #define CACARTESIANPLOT_H
+#include "plotHelperClasses.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -429,8 +430,11 @@ public slots:
        setYscaling(Auto);
     }
     void resetZoom();
+    void setZoom(const QRectF& newZoomRect);
+    void zoomOnXAxis(const QRectF& newZoomRect);
 
-
+private slots:
+    void handleZoomedRect(const QRectF& zoomedRect);
 
 signals:
     void ShowContextMenu(const QPoint&);
@@ -438,7 +442,8 @@ signals:
     void getAutoScaleXMax(double xmax);
     void getAutoScaleYMin(double ymin);
     void getAutoScaleYMax(double ymax);
-
+    void zoomedToRect(const QRectF& zoomedRect);
+    void zoomHasReset();
 
 protected:
 
@@ -488,6 +493,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
 
     QwtPlotZoomer* zoomer;
+    DynamicPlotPicker *plotPicker;
 
     bool thisTriggerNow;
 

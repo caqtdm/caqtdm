@@ -227,7 +227,7 @@ void caMeter::setFormat(int prec)
         sprintf(thisFormat, "%s.%dle", "%", qAbs(precision));
         break;
     case truncated:
-        strcpy(thisFormat, "%d");
+        qstrncpy(thisFormat, "%d",SMALL_STRING_LENGTH);
         break;
     default:
         sprintf(thisFormat, "%s.%dlf", "%", precision);
@@ -257,7 +257,7 @@ QString caMeter::setLabel(double value, const QString& units)
 
     if(thisUnitMode) {
         strcat(asc, " ");
-        strcat(asc, qasc(units));
+        strcat(asc, units.toUtf8().constData());
     }
 
     label = QString::fromLatin1(asc);

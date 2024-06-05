@@ -92,7 +92,9 @@ public:
 
     void UpdateMechanism(UpdateType Type);
     QString SoftPV_Name(QString pv, QWidget *w);
-    void BlockProcessing(bool block) { blockProcess= block;}
+
+    bool getSuppressUpdates() const;
+    void setSuppressUpdates(bool newSuppressUpdates);
 
 signals:
 
@@ -122,8 +124,7 @@ private:
     int nbDisplayCountPerSecond, displayCount;
     struct timeb last;
 
-    bool blockProcess;
-
+    bool suppressUpdates;
     UpdateType myUpdateType;
 
     bool doDefaultUnitReplacements;

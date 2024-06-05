@@ -73,7 +73,7 @@ class CAQTDM_LIBSHARED_EXPORT MessageWindow: public QDockWidget
 
 private:
     static QString QtMsgToQString(QtMsgType type, const char *msg);
-
+    QString m_logFilePath;
 protected:
 
     virtual void customEvent(QEvent* event);
@@ -85,6 +85,8 @@ public:
     static void AppendMsgWrapper(QtMsgType type, char *msg);
     void postMsgEvent(QtMsgType type, char *msg);
     void clearText();
+    QString getMessageBoxContents();
+    QString getLogFilePath();
 };
 
 class CAQTDM_LIBSHARED_EXPORT MessageEvent: public QEvent

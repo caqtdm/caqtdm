@@ -2844,7 +2844,7 @@ The menu bar has the following items:
 +------------+-----------+-------------------------------------------+
 | PV         |           | will display a list of unconnected PV's   |
 +------------+-----------+-------------------------------------------+
-| UpdataType | Direct    | When caQtDM is in this mode, all the      |
+| UpdateType | Direct    | When caQtDM is in this mode, all the      |
 |            |           | monitors will be displayed as soon as     |
 |            |           | they come                                 |
 +------------+-----------+-------------------------------------------+
@@ -2934,14 +2934,20 @@ By pressing the right mouse button on the background of your synoptic
 display you can get a context menu with the item "Print". Normally you
 should get a print dialog.
 
-.. _env.var:
+Environment Plugin
+~~~~~~~~~~~~~~~~~~
+
+There is an environment plugin which allows to get environment variables just like PVs.
+To use this plugin, the value of "channel" in the designer has to be set to "environment://yourEnvironmentVar"
+Then caQtDM will get the environment variable after "environment://", in this case "yourEnvironmentVar" and return it just like any other PV.
 
 Unit Replacements
 ~~~~~~~~~~~~~~~~~
 
 When displaying values with units, it can happen that some characters cannot be drawn correctly,
-thus generating faulty units. It can also be that special display settings or configuration on the
+thus generating faulty units. This can be due to special display settings or configuration on the
 client, like a special linux build or manual font settings, leading to characters being drawn incorrectly.
+There could also be limitations to which characters can be handled by EPICS.
 To address this issue, unit replacements can be done by the user. This means, all unit strings will be
 scanned for the given source characters ( or -sequences) and every occurrence will be replaced by the
 given replacement characters ( or -sequence). Unit replacements do not affect the UI file or EPICS data
@@ -2970,6 +2976,7 @@ CAQTDM_DEFAULT_UNIT_REPLACEMENTS
 It is not recommended to disable them, as they are tested on all common systems and should be working with most clients, however disabling might help
 in some edge cases.
 
+.. _env.var:
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -3003,7 +3010,7 @@ caQtDM uses the following environment variables:
 |                                      | the :ref:`context.menu.customization` for     |
 |                                      | the format.                                   |
 +--------------------------------------+-----------------------------------------------+
-| ``MEDM_EXEC_LIST``                   | for backwards......                           |
+| ``MEDM_EXEC_LIST``                   | for backwards compatability                   |
 +--------------------------------------+-----------------------------------------------+
 | ``CAQTDM_LAUNCHFILE``                | Enviroment file for Mobile devices            |
 +--------------------------------------+-----------------------------------------------+
@@ -3028,16 +3035,38 @@ caQtDM uses the following environment variables:
 |                                      | character codes, seperated by (,) , (=)       |
 |                                      | and (;).                                      |
 +--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_SCREENSHOT_NAME``           | If caQtDM was started with -print this will   |
+|                                      | specify the name of the screenshot file       |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_SUPPRESS_UPDATES_ONLOAD``   | Disables widgets from being updated while a   |
+|                                      | file is being opened. This can reduce load    |
+|                                      | times of big panels by more than 50%.         |
+|                                      | Values: "TRUE", "FALSE" , without quotes      |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_CREATE_LOGFILE``            | If set to "TRUE", caQtDM will create a logfile|
+|                                      | containing all of the input from the message  |
+|                                      | window. If caQtDM exits successfully, this    |
+|                                      | file gets deleted after termination.          |
++--------------------------------------+-----------------------------------------------+
+| ``CAQTDM_LOGFILE_PATH``              | This specifies the path where the logfile, if |
+|                                      | logging is active, will be stored.            |
++--------------------------------------+-----------------------------------------------+
 
 **from plugins:**
 
-+----------------------------------+-----------------------------------------------------------+
-| ``BSREAD_DISPATCHER``            | point the bsread plugin to the dispatcher                 |
-+----------------------------------+-----------------------------------------------------------+
-| ``BSREAD_ZMQ_CONNECTION_TYPE``   | control the connection type of the bsread plugin          |
-+----------------------------------+-----------------------------------------------------------+
-| ``BSREAD_ZMQ_ADDR_LIST``         | point the bsread plugin static sources                    |
-+----------------------------------+-----------------------------------------------------------+
-| ``CAQTDM_ARCHIVERSF_URL``        | point the archiver plugin to a different archiver backend |
-+----------------------------------+-----------------------------------------------------------+
++---------------------------------------+-----------------------------------------------------------+
+| ``BSREAD_DISPATCHER``                 | point the bsread plugin to the dispatcher                 |
++---------------------------------------+-----------------------------------------------------------+
+| ``BSREAD_ZMQ_CONNECTION_TYPE``        | control the connection type of the bsread plugin          |
+|                                       | Can be set to "pub_sub", else default "push_pull" is used |
++---------------------------------------+-----------------------------------------------------------+
+| ``BSREAD_ZMQ_ADDR_LIST``              | point the bsread plugin to static sources                 |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVERSF_URL``             | point the archiver plugin to a different archiver backend |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_OPTIMIZE_EPICS3CONNECTIONS`` | Disable Epics3 connections when tabwidget is not active   |
+|                                       | Set to "TRUE" to activate                                 |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_MODBUS_DATABASE``            | Database to use for the modbus plugin                     |
++---------------------------------------+-----------------------------------------------------------+
 

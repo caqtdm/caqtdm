@@ -27,6 +27,7 @@
 
 #include "archiveSF_plugin.h"
 #include "archiverCommon.h"
+#include "caQtDM_Lib_global.h"
 
 #define qasc(x) x.toLatin1().constData()
 
@@ -137,7 +138,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                     if(!ok) indexNew.nrOfBins = -1;
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no nrOfBins defined as dynamic property in widget "  + w->objectName() + ", defaulting to maximum number of points");
-                    if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                    if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
                 }
 
                 var = w->property("backend");
@@ -150,7 +151,7 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                     } else {
                         QString mess("ArchiveSF plugin -- backend defined as dynamic property in widget but not known (use sf-archiverappliance or sf-databuffer) in widget "  + w->objectName());
                         indexNew.backend = var.toString();
-                        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtFatalMsg, (char*) qasc(mess));
                     }
                 } else if(indexNew.init){
                     QString mess("ArchiveSF plugin -- no backend defined as dynamic property in widget "  + w->objectName() + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
@@ -167,16 +168,16 @@ void ArchiveSF_Plugin::Callback_UpdateInterface( QMap<QString, indexes> listOfIn
                         index_name = qasc(indexName);
                         if(indexNew.init) {
                             QString mess("ArchiveSF plugin -- archiverIndex defined as dynamic property in widget "  + w->objectName() + ", set to " + index_name);
-                            if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                            if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
                         }
                     } else  if(indexNew.init) {
                         QString mess("ArchiveSF plugin -- no environment variable CAQTDM_ARCHIVERSF_URL set and no archiverIndex defined as dynamic property in widget "  + w->objectName() + ", defaulting to " + index_name);
-                        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
                     }
                 } else {
                     if(indexNew.init) {
                         QString mess("ArchiveSF plugin -- archiver URL defined as " + url + " from environment variable CAQTDM_ARCHIVERSF_URL");
-                        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, (char*) qasc(mess));
+                        if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtInfoMsg, (char*) qasc(mess));
                     }
                     index_name = url;
                 }

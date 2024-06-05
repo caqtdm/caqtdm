@@ -41,16 +41,11 @@ QString environmentPlugin::pluginName()
 // constructor
 environmentPlugin::environmentPlugin()
 {
-    qDebug() << "environmentPlugin: Create";
-
     mutexknobdataP = Q_NULLPTR;
     connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(closeEvent()));
-
 }
 environmentPlugin:: ~environmentPlugin()
 {
-
-
 }
 
 // in this demo we update our interface here; normally you should update in from your controlsystem
@@ -74,23 +69,6 @@ void environmentPlugin::updateInterface()
                 newValue = i.value();
                 break;
             }
-            // update some data
-
-
-
-
-
-
-/*
-
-            kData->edata.rvalue = 0;
-            kData->edata.fieldtype = caCHAR;
-            kData->edata.connected = true;
-            kData->edata.accessR = kData->edata.accessW = true;
-            kData->edata.monitorCount++;
-            mutexknobdataP->SetMutexKnobData(kData->index, *kData);
-            mutexknobdataP->SetMutexKnobDataReceived(kData);
-            */
         }
     }
 }
@@ -111,11 +89,6 @@ int environmentPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow
     mutexknobdataP = data;
     messagewindowP = messageWindow;
 
-
-
-
-
-
     return true;
 }
 
@@ -127,7 +100,6 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
 
     int dataSize;
     QMutexLocker locker(&mutex);
-    qDebug() << "environmentPlugin:pvAddMonitor" << kData->pv << kData->index << kData;
 
     //remove EPICS addjustment parameter
     QString datapv=kData->pv;
@@ -147,9 +119,7 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
             kData->edata.dataSize = dataSize;
         }
 
-
-
-        strcpy((char*)kData->edata.dataB, (char*)qasc(value));
+        qstrncpy((char*)kData->edata.dataB, (char*)qasc(value),(size_t)kData->edata.dataSize);
 
         kData->edata.fieldtype = caSTRING;
         kData->edata.connected = true;
@@ -159,9 +129,6 @@ int environmentPlugin::pvAddMonitor(int index, knobData *kData, int rate, int sk
         mutexknobdataP->SetMutexKnobDataReceived(kData);
 
     }
-
-
-
 
     return 0;
 }
@@ -223,14 +190,12 @@ int environmentPlugin::pvSetWave(char *pv, float *fdata, double *ddata, int16_t 
     Q_UNUSED(errmess);
 
     QMutexLocker locker(&mutex);
-    qDebug() << "environmentPlugin:pvSetWave";
     return false;
 }
 
 // caQtDM_Lib will call this routine for getting a description of the monitor
 int environmentPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
     Q_UNUSED(pv);
-    qDebug() << "environmentPlugin:pvgetTimeStamp";
     strcpy(timestamp, "timestamp in epics format");
     return true;
 }
@@ -238,7 +203,6 @@ int environmentPlugin::pvGetTimeStamp(char *pv, char *timestamp) {
 // caQtDM_Lib will call this routine for getting the timestamp for this monitor
 int environmentPlugin::pvGetDescription(char *pv, char *description) {
     Q_UNUSED(pv);
-    qDebug() << "environmentPlugin:pvGetDescription";
     strcpy(description, "no Description available Environment data transfer");
     return true;
 }
@@ -246,26 +210,22 @@ int environmentPlugin::pvGetDescription(char *pv, char *description) {
 // next routines are used to stop and restart the dataacquisition (used in case of tabWidgets in the display)
 int environmentPlugin::pvClearEvent(void * ptr) {
     Q_UNUSED(ptr);
-    qDebug() << "environmentPlugin:pvClearEvent";
     return true;
 }
 
 int environmentPlugin::pvAddEvent(void * ptr) {
     Q_UNUSED(ptr);
-    qDebug() << "environmentPlugin:pvAddEvent";
     return true;
 }
 
 // next routines are used to Connect and disconnect monitors
 int environmentPlugin::pvReconnect(knobData *kData) {
      Q_UNUSED(kData);
-    qDebug() << "environmentPlugin:pvReconnect";
     return true;
 }
 
 int environmentPlugin::pvDisconnect(knobData *kData) {
     Q_UNUSED(kData);
-    qDebug() << "environmentPlugin:pvDisconnect";
     return true;
 }
 

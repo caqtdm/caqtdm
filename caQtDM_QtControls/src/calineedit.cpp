@@ -397,20 +397,20 @@ void caLineEdit::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "%lld");
-        else strcpy(thisFormat, "%d");
+        if(thisDatatype == caDOUBLE) qstrncpy(thisFormat, "%lld",MAX_STRING_LENGTH);
+        else qstrncpy(thisFormat, "%d",MAX_STRING_LENGTH);
         break;
     case utruncated:
-        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "%llu");
-        else strcpy(thisFormat, "%u");
+        if(thisDatatype == caDOUBLE) qstrncpy(thisFormat, "%llu",MAX_STRING_LENGTH);
+        else qstrncpy(thisFormat, "%u",MAX_STRING_LENGTH);
         break;
     case hexadecimal:
-        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "0x%llx");
-        else strcpy(thisFormat, "0x%x");
+        if(thisDatatype == caDOUBLE) qstrncpy(thisFormat, "0x%llx",MAX_STRING_LENGTH);
+        else qstrncpy(thisFormat, "0x%x",MAX_STRING_LENGTH);
         break;
     case octal:
-        if(thisDatatype == caDOUBLE) strcpy(thisFormat, "O%llo");
-        else strcpy(thisFormat, "O%o");
+        if(thisDatatype == caDOUBLE) qstrncpy(thisFormat, "O%llo",MAX_STRING_LENGTH);
+        else qstrncpy(thisFormat, "O%o",MAX_STRING_LENGTH);
         break;
     case sexagesimal:
     case sexagesimal_hms:
@@ -462,10 +462,10 @@ void caLineEdit::setValue(double value, const QString& units)
             datastring=datastring+units;
 
             unitsLast = units;
-            setTextLine( qasc(datastring));
+            setTextLine( datastring.toUtf8().constData());
 
         } else {
-            strcat(asc, qasc(specialUnitsString));
+            strcat(asc, specialUnitsString.toUtf8().constData());
             unitsLast = specialUnitsString;
             setTextLine(asc);
         }

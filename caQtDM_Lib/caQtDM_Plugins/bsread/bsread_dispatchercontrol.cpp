@@ -457,7 +457,7 @@ int bsread_dispatchercontrol::filldispatcherchannels2(bsread_internalchannel *ch
              }
 
 
-             strcpy(kData->edata.fec,"localhost");
+             qstrncpy(kData->edata.fec,"localhost",caqtdm_string_t_length);
              kData->edata.severity=0;
              kData->edata.connected = true;
              kData->edata.accessR = true;
@@ -635,7 +635,7 @@ int bsread_dispatchercontrol::set_Channel(char *pv, double rdata, int32_t idata,
            //qDebug() << "Ping:" << d;
            switch (bsreadPV->getType()){
                case bsread_internalchannel::in_string:{
-                 qstrncpy((char *)kData->edata.dataB, sdata, kData->edata.dataSize);
+                 qstrncpy((char *)kData->edata.dataB, sdata,(size_t)kData->edata.dataSize);
                  break;
                }
                case bsread_internalchannel::in_enum:{
