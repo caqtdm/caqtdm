@@ -31,6 +31,8 @@
 #include "archiverGeneral.h"
 #include <QMetaType>
 
+#define CURVE_IDENTIFIER "\\b[0-7]_"
+
 #define qasc(x) x.toLatin1().constData()
 
 ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
@@ -41,10 +43,12 @@ ArchiveHTTP_Plugin::ArchiveHTTP_Plugin()
     qRegisterMetaType<QSharedPointer<HttpPerformanceData> >("QSharedPointer<HttpPerformanceData>");
     m_archiverGeneral = new ArchiverGeneral();
 
+    // This signal is used to update the specified channels, it is triggered regularly for all channels.
     connect(m_archiverGeneral,
             SIGNAL(Signal_UpdateInterface(QMap<QString, indexes>)),
             this,
             SLOT(Callback_UpdateInterface(QMap<QString, indexes>)));
+    // This signal is used to abort all channels currently being requested, usually by a reload of the widget.
     connect(m_archiverGeneral,
             SIGNAL(Signal_AbortOutstandingRequests(QString)),
             this,
@@ -84,33 +88,36 @@ int ArchiveHTTP_Plugin::pvClearMonitor(knobData *kData)
     // Get rid of data to track redundancy, is needed for reload, because otherwise all channels (which are re-added on reload) will be seen as redundant,
     // resulting in none actually being updated.
     QString keyInCheck = kData->pv;
+    // Remove extension
     keyInCheck.replace(".X", "", Qt::CaseInsensitive);
     keyInCheck.replace(".Y", "", Qt::CaseInsensitive);
     // We need that address, because it was added to the key in order to prevent mix ups from different widgets...
     keyInCheck += QString("_%1").arg(reinterpret_cast<quintptr>(kData->dispW), sizeof(void*) * 2, 16, QChar('0'));
     QList<QString> removeKeys;
+    // Make sure all corresponding indexes are added to a list which we will remove.
     for (QMap<QString, indexes>::const_iterator tempI = m_IndexesToUpdate.constBegin();
          tempI != m_IndexesToUpdate.constEnd();
          tempI++) {
         QString keyStored = tempI.key();
-        m_regexStr.setPattern("\\b[0-7]_");
+        m_regexStr.setPattern(CURVE_IDENTIFIER);
         keyStored.replace(m_regexStr, "");
         if (keyStored == keyInCheck) {
             removeKeys.append(tempI.key());
         }
     }
 
+    // Remove all found indexes. This is done after to not mess up our iterator.
     for (int i = 0; i < removeKeys.count(); i++) {
         // Remove entry for updating the data
         qDebug() << "removed:"<< removeKeys[i];
         m_IndexesToUpdate.remove(removeKeys[i]);
-        // Also remove the  perfomance data
+        // Also remove the perfomance data
         if (m_retrievalPerformancePerPV.contains(removeKeys[i])) {
             m_retrievalPerformancePerPV.remove(removeKeys[i]);
         }
     }
 
-    // now just let archiverCommon do the usual stuff
+    // Now just let archiverCommon do it's part.
     return m_archiverGeneral->pvClearMonitor(kData);
 }
 
@@ -171,7 +178,7 @@ int ArchiveHTTP_Plugin::pvGetDescription(char *pv, char *description)
     keyInCheck.replace(".minY", "", Qt::CaseInsensitive);
     keyInCheck.replace(".maxY", "", Qt::CaseInsensitive);
     // Get rid of curve number
-    m_regexStr.setPattern("\\b[0-7]_");
+    m_regexStr.setPattern(CURVE_IDENTIFIER);
     keyInCheck.replace(m_regexStr, "");
 
     // Now, the only thing remaining besides the pv name is the plot identifier, which we need, as different plots have different performance data.
@@ -250,7 +257,7 @@ void ArchiveHTTP_Plugin::updateCartesianAppended(int numberOfValues,
         double endSeconds = (double) now.time + (double) now.millitm / (double) 1000;
         double startSeconds = endSeconds - indexNew.secondsPast;
 
-        // Lock both indexes so the correspond
+        // Lock both indexes so the corresponding data isn't updated while we process it.
         m_mutexKnobDataP->DataLock(&kDataX);
         m_mutexKnobDataP->DataLock(&kDataY);
 
@@ -344,9 +351,9 @@ void ArchiveHTTP_Plugin::handleResults(
     XVals.resize(valueCount);
     YVals.resize(valueCount);
 
-    // set data for other indexes with same channel (& widget because different widgets might have different time spans etc.)
+    // set data for other indexes with same channel (& same widget because different widgets might have different time spans etc.)
     indexes indexInCheck = indexNew;
-    m_regexStr.setPattern("\\b[0-7]_");
+    m_regexStr.setPattern(CURVE_IDENTIFIER);
     indexInCheck.key.replace(m_regexStr, "");
     indexInCheck.key.replace(m_regexStr, "");
     indexInCheck.key.replace(".minY", "");
@@ -385,7 +392,7 @@ void ArchiveHTTP_Plugin::handleResults(
         m_listOfThreads.remove(indexNew.key);
 
         QList<QString> removeKeys;
-        m_regexStr.setPattern("\\b[0-7]_");
+        m_regexStr.setPattern(CURVE_IDENTIFIER);
         for (QMap<QString, indexes>::const_iterator indexesToUpdateIterator = m_IndexesToUpdate.constBegin();
              indexesToUpdateIterator != m_IndexesToUpdate.constEnd();
              indexesToUpdateIterator++) {
@@ -421,7 +428,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
 
     // remove the curve index that seperates indexes from different curve,
     // so we can avoid requesting the same index multiple times.
-    m_regexStr.setPattern("\\b[0-7]_");
+    m_regexStr.setPattern(CURVE_IDENTIFIER);
     QMap<QString, indexes>::const_iterator i = listOfIndexes.constBegin();
     while (i != listOfIndexes.constEnd()) {
         // Don't retrieve data twice

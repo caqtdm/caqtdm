@@ -37,7 +37,6 @@
 #define SECONDSSLEEP 3600   // 1 hour
 #define SECONDSTIMEOUT 60.5 // 1 minute
 
-// constructor
 ArchiverGeneral::ArchiverGeneral()
 {
     //QDebug() << "ArchivePlugin: Create";
@@ -222,8 +221,11 @@ int ArchiverGeneral::pvAddMonitor(int index, knobData *kData, int rate, int skip
             }
         }
         if (!alreadyProcessedIndexes.contains(key) && !alreadyProcessedIndexes.contains(possibleXKeyForMinY) && !alreadyProcessedIndexes.contains(possibleXKeyForMaxY)) {
+            // The first time a channel for a curve is added, it will be stored here
             alreadyProcessedIndexes.insert(key, index);
         } else if (!listOfIndexes.contains(key) && !listOfIndexes.contains(possibleXKeyForMinY) && !listOfIndexes.contains(possibleXKeyForMaxY)) {
+            // The second time a channel for a curve is added, it will be inserted to the channels to process here.
+            // This is done because Channels contain .X and .Y extensions but are essentially the same channels, so treat them as one / only treat one and then set the data from the other through it.
             QMap<QString, indexes>::iterator i;
             QVector<QMap<QString, indexes>::iterator > listOfIterators;
             listOfIterators.append(alreadyProcessedIndexes.find(key));
