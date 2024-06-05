@@ -23,9 +23,9 @@ archiveSF: {
 }
 
 # Only build archiveHTTP for Qt 5.15 and upwards
-greaterThan(QT_VERSION, "5.14.9") {
+greaterThan(QT_VERSION, "5 14 9") {
     SUBDIRS += archiveHTTP
 	message("Building ArchiveHTTP")
 } else {
-    message("QT_Version is less than Qt 5.15, plugin archiveHTTP will NOT be built.")
+    message("Qt version $${QT_VERSION} is less than Qt 5.15, plugin archiveHTTP will NOT be built.")
 }
