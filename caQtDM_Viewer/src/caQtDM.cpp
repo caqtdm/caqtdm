@@ -298,6 +298,8 @@ int main(int argc, char *argv[])
 #endif
 
      if(fileNameStylesheet.length() > 0) {
+        // delete s before reusing
+        delete s;
         s = new searchFile(fileNameStylesheet);
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {
@@ -314,6 +316,8 @@ int main(int argc, char *argv[])
 
     // load macro definitions from file (located in this directory or in the caQTDM_DISPLAY_PATH)
     if(macroFile.length() > 0) {
+        // delete s before reusing
+        delete s;
         s = new searchFile(macroFile);
         fileNameFound = s->findFile();
         if(fileNameFound.isNull()) {

@@ -15,14 +15,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Copyright (c) 2010 - 2014
+ *  Copyright (c) 2010 - 2024
  *
  *  Author:
- *    Anton Mezger
+ *    Erik Schwarz
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    erik.schwarz@psi.ch
  */
-#include "archiverCommon.h"
+
+/*
+ * This file is the successor of archvierCommon.cpp and used to implement new features in build with Qt 5.15 and upwards,
+ * while keeping backwards compatibility until the old archivers are retired.
+ */
+
+#include "archiverGeneral.h"
+#include "QtWidgets/qapplication.h"
 #include <QApplication>
 #include <QDebug>
 #include <QThread>
@@ -30,32 +37,31 @@
 #define SECONDSSLEEP 3600   // 1 hour
 #define SECONDSTIMEOUT 60.5 // 1 minute
 
-// constructor
-ArchiverCommon::ArchiverCommon()
+ArchiverGeneral::ArchiverGeneral()
 {
     //QDebug() << "ArchivePlugin: Create";
     mutexP = new QMutex;
 }
 
-ArchiverCommon::~ArchiverCommon(){
+ArchiverGeneral::~ArchiverGeneral(){
     delete mutexP;
     delete timer;
 }
 
-void ArchiverCommon::stopUpdateInterface()
+void ArchiverGeneral::stopUpdateInterface()
 {
     timer->stop();
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "timer stop";
     QApplication::processEvents();
 }
 
-QMutex* ArchiverCommon::globalMutex()
+QMutex* ArchiverGeneral::globalMutex()
 {
     // This mutex is used for other parts of caQtDM which asynchronously want to process data that is also update in here
     return &m_globalMutex;
 }
 
-void ArchiverCommon::updateInterface()
+void ArchiverGeneral::updateInterface()
 {
     double diff;
     struct timeb now;
@@ -109,7 +115,7 @@ void ArchiverCommon::updateInterface()
 }
 
 // initialize our communicationlayer with everything you need
-int ArchiverCommon::initCommunicationLayer(MutexKnobData *data,
+int ArchiverGeneral::initCommunicationLayer(MutexKnobData *data,
                                            MessageWindow *messageWindow,
                                            QMap<QString, QString> options)
 {
@@ -129,7 +135,7 @@ int ArchiverCommon::initCommunicationLayer(MutexKnobData *data,
 }
 
 // caQtDM_Lib will call this routine for defining a monitor
-int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
+int ArchiverGeneral::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 {
     Q_UNUSED(index);
     Q_UNUSED(rate);
@@ -144,7 +150,6 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
         // Generate key to distinguish curves with the same pv but from different curves or plots.
         QString key = QString("%1_%2_%3").arg(kData->specData[0]).arg(kData->pv).arg(reinterpret_cast<quintptr>(kData->dispW), sizeof(void*) * 2, 16, QChar('0'));
-
         // We need to construct new, temporary QString objects, else we modify the actual string, which is unintended
         QString possibleXKeyForMinY = QString(key).replace(".minY", "");
         QString possibleXKeyForMaxY = QString(key).replace(".maxY", "");
@@ -215,8 +220,11 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             }
         }
         if (!alreadyProcessedIndexes.contains(key) && !alreadyProcessedIndexes.contains(possibleXKeyForMinY) && !alreadyProcessedIndexes.contains(possibleXKeyForMaxY)) {
+            // The first time a channel for a curve is added, it will be stored here
             alreadyProcessedIndexes.insert(key, index);
         } else if (!listOfIndexes.contains(key) && !listOfIndexes.contains(possibleXKeyForMinY) && !listOfIndexes.contains(possibleXKeyForMaxY)) {
+            // The second time a channel for a curve is added, it will be inserted to the channels to process here.
+            // This is done because Channels contain .X and .Y extensions but are essentially the same channels, so treat them as one / only treat one and then set the data from the other through it.
             QMap<QString, indexes>::iterator i;
             QVector<QMap<QString, indexes>::iterator > listOfIterators;
             listOfIterators.append(alreadyProcessedIndexes.find(key));
@@ -256,13 +264,13 @@ int ArchiverCommon::pvAddMonitor(int index, knobData *kData, int rate, int skip)
     } else {
         QString mess("archivedata can only be used in a cartesianplot");
         if (messagewindowP != (MessageWindow *) Q_NULLPTR) {
-            messagewindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
+            messagewindowP->postMsgEvent(QtDebugMsg, (char *) qasc(mess));
         }
     }
     return true;
 }
 
-void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
+void ArchiverGeneral::updateSecondsPast(indexes indexNew, bool original)
 {
     QMutexLocker locker(&m_globalMutex);
     QString key = indexNew.key;
@@ -285,11 +293,10 @@ void ArchiverCommon::updateSecondsPast(indexes indexNew, bool original)
     }
 }
 
-void ArchiverCommon::updateCartesian(
+void ArchiverGeneral::updateCartesian(
     int nbVal, indexes indexNew, QVector<double> XValsN, QVector<double> YValsN, QString backend)
 {
     QMutexLocker locker(&m_globalMutex);
-    //qDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "ArchiverCommon::updateCartesian";
     if (nbVal > 0) {
         knobData kData = mutexknobdataP->GetMutexKnobData(indexNew.indexX);
         if (kData.index == -1) {
@@ -339,7 +346,7 @@ void ArchiverCommon::updateCartesian(
 }
 
 // caQtDM_Lib will call this routine for getting rid of a monitor
-int ArchiverCommon::pvClearMonitor(knobData *kData)
+int ArchiverGeneral::pvClearMonitor(knobData *kData)
 {
     if (kData->index == -1) {
         return true;
@@ -387,7 +394,7 @@ int ArchiverCommon::pvClearMonitor(knobData *kData)
     return true;
 }
 
-int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
+int ArchiverGeneral::pvFreeAllocatedData(knobData *kData)
 {
     // Lock the data mutex first, so we don't free data that is still in use
     mutexknobdataP->DataLock(kData);
@@ -403,7 +410,7 @@ int ArchiverCommon::pvFreeAllocatedData(knobData *kData)
     return true;
 }
 
-int ArchiverCommon::pvClearEvent(void *ptr)
+int ArchiverGeneral::pvClearEvent(void *ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "clear event" << ptr;
@@ -417,7 +424,6 @@ int ArchiverCommon::pvClearEvent(void *ptr)
     while (i != listOfIndexes.end() && i.key() == key) {
         indexes indexNew = i.value();
         if (indexNew.updateSeconds != SECONDSSLEEP) {
-            //QDebug() << "archiverCommon.cpp:354 " << "update" << indexNew.pv << "to " << SECONDSSLEEP << "seconds";
             indexNew.updateSeconds = SECONDSSLEEP;
             ftime(&indexNew.lastUpdateTime);
             listOfIndexes.insert(key, indexNew);
@@ -428,7 +434,7 @@ int ArchiverCommon::pvClearEvent(void *ptr)
     return true;
 }
 
-int ArchiverCommon::pvAddEvent(void *ptr)
+int ArchiverGeneral::pvAddEvent(void *ptr)
 {
     char asc[CHAR_ARRAY_LENGTH];
     //QDebug() << (__FILE__) << ":" << (__LINE__) << "|" << "add event" << ptr;
@@ -451,3 +457,4 @@ int ArchiverCommon::pvAddEvent(void *ptr)
     }
     return true;
 }
+

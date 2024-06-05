@@ -70,7 +70,6 @@ int modbusPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *mes
     QStringList modbus_database_files;
 
     QString url = (QString)  qgetenv("CAQTDM_URL_DISPLAY_PATH");
-    qDebug() <<"url " << url;
     QString database_file = (QString)  qgetenv("CAQTDM_MODBUS_DATABASE");
 
     modbus_database_files.append(database_file.split(","));

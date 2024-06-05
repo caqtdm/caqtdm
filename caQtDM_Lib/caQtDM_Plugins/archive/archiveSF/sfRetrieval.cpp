@@ -210,6 +210,7 @@ void sfRetrieval::finishReply(QNetworkReply *reply)
     }
 
     QString out = QString(reply->readAll());
+    //qDebug() << "received Data in archiveSF";
     reply->deleteLater();
 
     errorString = "";
