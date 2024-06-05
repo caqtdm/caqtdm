@@ -50,7 +50,7 @@ QString HttpPerformanceData::generateReport() {
             report = "Request has finished with errors. <br>";
         }
     }
-    // The spacing seems weird but when displayed, the all should align.
+    // The spacing seems weird but when displayed, then everything should align.
     report += "Last update queried data since:  " + m_beginTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
               + "Data has been retrieved until:     " + m_lastRetrievedTime.toLocalTime().toString("HH:mm:ss yyyy-MM-dd") + "<br>"
               + "API server response took:            " + QString::number(m_responseTimeinMs) + "ms<br>"
@@ -88,7 +88,7 @@ void HttpPerformanceData::addNewResponse(quint64 responseBytes, int httpStatusCo
     m_responseBytes = responseBytes;
     m_httpStatusCode = httpStatusCode;
     if (receivedContinueAt) {
-        // Only set it to true, if it is false, leave it as is, maybe it was true before so it still received a continueAt, just not this time.
+        // Only set it to true, if it is false then leave it as is, maybe it was true before so it still received a continueAt, just not this time.
         m_receivedContinueAt = true;
         m_lastRetrievedTime = continueAtTime;
     } else if (httpStatusCode == 200) {
