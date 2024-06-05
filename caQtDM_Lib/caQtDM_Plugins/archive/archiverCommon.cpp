@@ -23,7 +23,6 @@
  *    anton.mezger@psi.ch
  */
 #include "archiverCommon.h"
-#include "QtWidgets/qapplication.h"
 #include <QApplication>
 #include <QDebug>
 #include <QThread>
