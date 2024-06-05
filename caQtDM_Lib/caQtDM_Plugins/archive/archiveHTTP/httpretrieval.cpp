@@ -183,6 +183,7 @@ const QString HttpRetrieval::getBackend()
 
 void HttpRetrieval::cancelDownload()
 {
+    qDebug() << "cancelling in thread" << QThread::currentThread();
     // Make sure we don't try to cancel the download while it is being prepared.
     m_globalMutex.lock();
     m_totalNumberOfPoints = 0;
@@ -215,6 +216,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
 {
     if (m_isAborted) {
         m_errorString = "Retrieval was aborted";
+        emit requestFinished();
         return;
     }
     int count = 0;

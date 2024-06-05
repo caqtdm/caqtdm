@@ -47,6 +47,7 @@ WorkerHttpThread::~WorkerHttpThread()
 HttpRetrieval* WorkerHttpThread::getHttpRetrieval()
 {
     if (m_worker != (WorkerHTTP *) Q_NULLPTR) {
+        qDebug() << "returning archive" << m_worker->getArchive();
         return m_worker->getArchive();
     } else {
         return (HttpRetrieval *) Q_NULLPTR;
@@ -62,5 +63,8 @@ void WorkerHttpThread::setIsActive(const bool &newIsActive)
 {
     m_mutex.lock();
     m_isActive = newIsActive;
+    if (m_worker) {
+        m_worker->setIsActive(newIsActive);
+    }
     m_mutex.unlock();
 }

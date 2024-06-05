@@ -105,6 +105,8 @@ protected slots:
      * */
     void timeoutRequest();
 
+public slots:
+
     /*
      * Cancels the download and makes other functions currently processing a request return early.
      * */

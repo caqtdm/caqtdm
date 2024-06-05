@@ -38,6 +38,9 @@ public:
     WorkerHTTP();
     ~WorkerHTTP();
 
+    bool isActive() const;
+    void setIsActive(bool newIsActive);
+
 public slots:
     /*
      * This function is used to delete the worker when the thread finishes.
@@ -81,6 +84,7 @@ private:
     bool m_receivedContinueAt;
     QMutex m_globalMutex;
     int m_retryAfter;
+    bool m_isActive;
 };
 
 #endif // WORKERHTTP_H

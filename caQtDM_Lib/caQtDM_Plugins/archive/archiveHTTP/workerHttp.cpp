@@ -44,6 +44,7 @@ WorkerHTTP::WorkerHTTP()
     m_receivedContinueAt = false;
     m_vecX.clear();
     m_vecY.clear();
+    m_isActive = true;
 }
 
 WorkerHTTP::~WorkerHTTP()
@@ -300,10 +301,28 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 }
             }
         }
+        // Check if the thread was marked as inactive to cancel everything if needed.
+        if (!m_isActive) {
+            // Set receivedContinueAt to false because we don't want any more updates.
+            m_receivedContinueAt = false;
+            // set data count to 0 to clarify this data is not needed.
+            nbVal = 0;
+        }
+        qDebug() << "emitting in thread" << QThread::currentThread();
         emit resultReady(indexNew, nbVal, m_vecX, m_vecY, m_vecMinY, m_vecMaxY, m_httpRetrieval->getBackend(), !m_receivedContinueAt);
     } while (m_receivedContinueAt);
     m_vecX.clear();
     m_vecY.clear();
     urlHandler->deleteLater();
     m_httpRetrieval->deleteLater();
+}
+
+bool WorkerHTTP::isActive() const
+{
+    return m_isActive;
+}
+
+void WorkerHTTP::setIsActive(bool newIsActive)
+{
+    m_isActive = newIsActive;
 }
