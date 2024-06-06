@@ -90,18 +90,21 @@ void WorkerHTTP::getFromArchive(QWidget *w,
     double nrOfBinsPerSecond = indexNew.nrOfBins / timeDifference;
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) indexNew.w)) {
-        // Create a Buffer for the X axis of 5%
-        double timeBuffer = timeDifference * 0.05;
-        // Set the limits for the X axis of the cartesian plot
-        double minXMSecs = 1000 * (startSeconds - timeBuffer);
-        double maxXMSecs = 1000 * (endSeconds + timeBuffer);
+        // This only works on a time scale, if its absolute or whatever, dont touch it.
+        if (w->getXaxisType() == caCartesianPlot::time) {
+            // Create a Buffer for the X axis of 5%
+            double timeBuffer = timeDifference * 0.05;
+            // Set the limits for the X axis of the cartesian plot
+            double minXMSecs = 1000 * (startSeconds - timeBuffer);
+            double maxXMSecs = 1000 * (endSeconds + timeBuffer);
 
-        // Now, invoke the function to set the Scale unsing a lamda function,
-        // We have to do this as the widget lives in another thread and this function is NOT thread safe.
-        // This calls the function in the widgets thread itself, that being our main GUI thread.
-        QMetaObject::invokeMethod(w, [minXMSecs, maxXMSecs, w]() {
-            w->setScaleX(minXMSecs, maxXMSecs);
-        });
+            // Now, invoke the function to set the Scale unsing a lamda function,
+            // We have to do this as the widget lives in another thread and this function is NOT thread safe.
+            // This calls the function in the widgets thread itself, that being our main GUI thread.
+            QMetaObject::invokeMethod(w, [minXMSecs, maxXMSecs, w]() {
+                w->setScaleX(minXMSecs, maxXMSecs);
+            });
+        }
     }
 
     // Initialize urlhandler with parameters
