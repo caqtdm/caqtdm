@@ -24,11 +24,12 @@
  */
 #ifndef CONTROLSINTERFACE_H
 #define CONTROLSINTERFACE_H
+#include <stdint.h>
+#include "mutexKnobData.h"
+#include "MessageWindow.h"
 #include <QString>
 #include <QtPlugin>
-#include "MessageWindow.h"
-#include "mutexKnobData.h"
-#include <stdint.h>
+
 
 class ControlsInterface
 
@@ -36,90 +37,38 @@ class ControlsInterface
 public:
     virtual ~ControlsInterface() {}
     virtual QString pluginName() = 0;
-    virtual int initCommunicationLayer(MutexKnobData *data,
-                                       MessageWindow *messageWindow,
-                                       QMap<QString, QString> options)
-        = 0;
-    virtual int pvAddMonitor(int index, knobData *kData, int rate, int skip) = 0; // skip is not used
+    virtual int initCommunicationLayer(MutexKnobData *data, MessageWindow *messageWindow, QMap<QString, QString> options) = 0;
+    virtual int pvAddMonitor(int index, knobData *kData, int rate, int skip) = 0;  // skip is not used
     virtual int pvClearMonitor(knobData *kData) = 0;
     virtual int pvFreeAllocatedData(knobData *kData) = 0;
 
-    virtual int pvSetValue(char *pv,
-                           double rdata,
-                           int32_t idata,
-                           char *sdata,
-                           char *object,
-                           char *errmess,
-                           int forceType)
-        = 0;
-    virtual bool pvSetValue(knobData *kData,
-                            double rdata,
-                            int32_t idata,
-                            char *sdata,
-                            char *object,
-                            char *errmess,
-                            int forceType)
-    {
-        Q_UNUSED(kData);
-        Q_UNUSED(rdata);
-        Q_UNUSED(idata);
-        Q_UNUSED(sdata);
-        Q_UNUSED(object);
-        Q_UNUSED(errmess);
-        Q_UNUSED(forceType);
+    virtual int  pvSetValue(char *pv, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) = 0;
+    virtual bool pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType) {
+        Q_UNUSED(kData); Q_UNUSED(rdata); Q_UNUSED(idata); Q_UNUSED(sdata); Q_UNUSED(object);  Q_UNUSED(errmess); Q_UNUSED(forceType);
         return false;
     }
 
-    virtual int pvSetWave(char *pv,
-                          float *fdata,
-                          double *ddata,
-                          int16_t *data16,
-                          int32_t *data32,
-                          char *sdata,
-                          int nelm,
-                          char *object,
-                          char *errmess)
-        = 0;
-    virtual bool pvSetWave(knobData *kData,
-                           float *fdata,
-                           double *ddata,
-                           int16_t *data16,
-                           int32_t *data32,
-                           char *sdata,
-                           int nelm,
-                           char *object,
-                           char *errmess)
-    {
-        Q_UNUSED(kData);
-        Q_UNUSED(fdata);
-        Q_UNUSED(ddata);
-        Q_UNUSED(data16);
-        Q_UNUSED(data32);
-        Q_UNUSED(sdata);
-        Q_UNUSED(nelm);
-        Q_UNUSED(object);
-        Q_UNUSED(errmess);
+    virtual int  pvSetWave(char *pv, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) = 0;
+    virtual bool pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess) {
+        Q_UNUSED(kData); Q_UNUSED(fdata); Q_UNUSED(ddata); Q_UNUSED(data16); Q_UNUSED(data32);
+        Q_UNUSED(sdata); Q_UNUSED(nelm); Q_UNUSED(object); Q_UNUSED(errmess);
         return false;
     }
 
-    virtual int pvGetTimeStamp(char *pv, char *timestamp) = 0;
-    virtual bool pvGetTimeStamp(knobData *kData, char *timestamp)
-    {
-        Q_UNUSED(kData);
-        Q_UNUSED(timestamp);
+    virtual int  pvGetTimeStamp(char *pv, char *timestamp) = 0;
+    virtual bool pvGetTimeStamp(knobData *kData, char *timestamp) {
+        Q_UNUSED(kData); Q_UNUSED(timestamp);
         return false;
     }
 
-    virtual int pvGetDescription(char *pv, char *description) = 0;
-    virtual bool pvGetDescription(knobData *kData, char *description)
-    {
-        Q_UNUSED(kData);
-        Q_UNUSED(description);
+    virtual int  pvGetDescription(char *pv, char *description) = 0;
+    virtual bool pvGetDescription(knobData *kData, char *description) {
+        Q_UNUSED(kData); Q_UNUSED(description);
         return false;
     }
 
-    virtual int pvClearEvent(void *ptr) = 0;
-    virtual int pvAddEvent(void *ptr) = 0;
+    virtual int pvClearEvent(void * ptr) = 0;
+    virtual int pvAddEvent(void * ptr) = 0;
     virtual int pvReconnect(knobData *kData) = 0;
     virtual int pvDisconnect(knobData *kData) = 0;
     virtual int FlushIO() = 0;
