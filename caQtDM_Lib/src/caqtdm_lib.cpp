@@ -9749,8 +9749,7 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     drag->setHotSpot(hotSpotNew);
     drag->setPixmap(pixmap);
 
-    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
-    if (dropAction == Qt::MoveAction)w->close();
+    drag->exec(Qt::CopyAction);
 }
 
 
