@@ -9749,9 +9749,8 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     drag->setHotSpot(hotSpotNew);
     drag->setPixmap(pixmap);
 
-    drag->exec(Qt::CopyAction);
+    drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
 }
-
 
 ControlsInterface * CaQtDM_Lib::getPluginInterface(QWidget *w)
 {
