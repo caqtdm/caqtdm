@@ -30,7 +30,7 @@
 #include <QObject>
 #include <QThread>
 #include <QTimer>
-#include <qwt.h>
+
 
 #include "httpretrieval.h"
 #include "workerHttp.h"
