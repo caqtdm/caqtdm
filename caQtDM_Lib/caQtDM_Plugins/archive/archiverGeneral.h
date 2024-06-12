@@ -15,15 +15,21 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Copyright (c) 2010 - 2014
+ *  Copyright (c) 2010 - 2024
  *
  *  Author:
- *    Anton Mezger
+ *    Erik Schwarz
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    erik.schwarz@psi.ch
  */
-#ifndef ArchiverCommon_H
-#define ArchiverCommon_H
+
+/*
+ * This file is the successor of archvierCommon.h and used to implement new features in build with Qt 5.15 and upwards,
+ * while keeping backwards compatibility until the old archivers are retired.
+ */
+
+#ifndef ARCHIVERGENERAL_H
+#define ARCHIVERGENERAL_H
 
 #include <QList>
 #include <QMap>
@@ -55,13 +61,13 @@ struct indexes
 };
 #define CHAR_ARRAY_LENGTH 200
 
-class Q_DECL_EXPORT ArchiverCommon : public QObject
+class Q_DECL_EXPORT ArchiverGeneral : public QObject
 {
     Q_OBJECT
 
 public:
-    ArchiverCommon();
-    ~ArchiverCommon();
+    ArchiverGeneral();
+    ~ArchiverGeneral();
 
     int initCommunicationLayer(MutexKnobData *data,
                                MessageWindow *messageWindow,

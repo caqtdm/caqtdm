@@ -15,12 +15,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Copyright (c) 2010 - 2014
+ *  Copyright (c) 2010 - 2024
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Anton Mezger, Erik Schwarz
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    erik.schwarz@psi.ch
  */
 
 #if defined(_MSC_VER)
@@ -30,137 +30,8 @@
 #endif
 
 #include "cacartesianplot.h"
+#include "plotHelperClasses.h"
 #include <QtCore>
-
-#if QWT_VERSION >= 0x060100
-class PlotScaleDateEngine: public QwtDateScaleEngine
-{
-public:
-
-    PlotScaleDateEngine(const int &nb, Qt::TimeSpec time): QwtDateScaleEngine(time)
-    {
-        nbTicks = nb;
-    }
-
-    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
-    {
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
-
-        if (interval.width() <= 0 ) return QwtScaleDiv();
-
-        QwtScaleDiv scaleDiv;
-
-        for (int i=0; i<nbTicks+1; i++) {
-            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
-        }
-
-        scaleDiv = QwtScaleDiv(interval, Ticks);
-        if ( x1 > x2 ) scaleDiv.invert();
-
-        return scaleDiv;
-    }
-
-private:
-    int nbTicks;
-};
-#endif
-
-class PlotScaleEngine: public QwtLinearScaleEngine
-{
-public:
-
-    PlotScaleEngine(const int &nb): QwtLinearScaleEngine()
-    {
-        nbTicks = nb;
-    }
-
-    virtual QwtScaleDiv divideScale( double x1, double x2, int , int , double) const
-    {
-        /*
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-        const QwtInterval interval = QwtInterval( x1, x2 ).normalized();
-
-        if (interval.width() <= 0 ) return QwtScaleDiv();
-
-        QwtScaleDiv scaleDiv;
-
-        for (int i=0; i<nbTicks+1; i++) {
-            Ticks[QwtScaleDiv::MajorTick] << x1 + ((x2-x1)*i / nbTicks);
-        }
-
-        scaleDiv = QwtScaleDiv(interval, Ticks);
-        if ( x1 > x2 ) scaleDiv.invert();
-
-        return scaleDiv;
-        */
-
-        double stepSize = (x2-x1) / nbTicks;
-        int maxMinorSteps = 10;
-
-        QwtInterval interval = QwtInterval(x1, x2 ).normalized();
-        if ( interval.width() <= 0 ) return QwtScaleDiv();
-
-        QwtScaleDiv scaleDiv;
-        QList<double> Ticks[QwtScaleDiv::NTickTypes];
-        buildTicks(interval, stepSize, maxMinorSteps, Ticks);
-        scaleDiv = QwtScaleDiv( interval, Ticks );
-
-        if ( x1 > x2 ) scaleDiv.invert();
-
-        return scaleDiv;
-    }
-
-private:
-    int nbTicks;
-};
-
-class MyZoomer: public QwtPlotZoomer
-{
-public:
-    MyZoomer(QwtPlotCanvas *canvas):
-        QwtPlotZoomer(canvas)
-    {
-        setTrackerMode(AlwaysOn);
-    }
-
-    virtual QwtText trackerTextF(const QPointF &pos) const
-    {
-        QColor bg(Qt::white);
-        bg.setAlpha(200);
-
-        QwtText text("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ") ");
-        text.setBackgroundBrush( QBrush( bg ));
-        return text;
-    }
-};
-
-#ifdef QWT_USE_OPENGL
-class GLCanvas: public QwtPlotGLCanvas
-{
-public:
-    GLCanvas( QwtPlot *parent = NULL ):
-        QwtPlotGLCanvas( parent )
-    {
-        setContentsMargins( 1, 1, 1, 1 );
-    }
-
-protected:
-    virtual void paintEvent( QPaintEvent *event )
-    {
-        QPainter painter( this );
-        painter.setClipRegion( event->region() );
-
-        QwtPlot *plot = qobject_cast< QwtPlot *>( parent() );
-        if ( plot )
-            plot->drawCanvas( &painter );
-
-        painter.setPen( palette().foreground().color() );
-        painter.drawRect( rect().adjusted( 0, 0, -1, -1 ) );
-    }
-
-};
-#endif
 
 caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 {
@@ -168,7 +39,6 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
            "You can zoom in using the left mouse button.\n"
            "You can pan by dragging with the middle mouse button.\n"
            "Choose reset zoom in the context menu for original scale.\n ";
-
 
     lgd = new QwtLegend;
 
@@ -203,7 +73,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     // canvas
 
 #if QWT_VERSION < 0x060100
-    zoomer = new MyZoomer(canvas());
+    zoomer = new PlotZoomer(canvas());
     QwtPlotPanner *panner = new QwtPlotPanner(canvas());
 #else
 #ifdef QWT_USE_OPENGL
@@ -211,10 +81,10 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     GLCanvas *canvas = new GLCanvas();
     canvas->setPalette( QColor( "khaki" ) );
     setCanvas(canvas);
-    zoomer = new MyZoomer( (QwtPlotCanvas *) canvas);
+    zoomer = new PlotZoomer( (QwtPlotCanvas *) canvas);
 #else
     QwtPlotCanvas *canvas =  (QwtPlotCanvas *) this->canvas();
-    zoomer = new MyZoomer( (QwtPlotCanvas *) canvas);
+    zoomer = new PlotZoomer( (QwtPlotCanvas *) canvas);
 #endif
     QwtPlotPanner *panner = new QwtPlotPanner(canvas);
 #endif
@@ -232,12 +102,17 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
         const QColor c(Qt::red);
    zoomer->setRubberBandPen(c);
-   zoomer->setTrackerPen(c);
+   zoomer->setTrackerMode(QwtPicker::AlwaysOff);
+   plotPicker = new DynamicPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
+   plotPicker->setTrackerMode(QwtPicker::AlwaysOn);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect2,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect3,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect4,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect5,Qt:: NoButton);
    zoomer->setMousePattern(QwtEventPattern::MouseSelect6,Qt:: NoButton);
+
+   connect(zoomer, SIGNAL(zoomed(const QRectF&)), this, SLOT(handleZoomedRect(const QRectF&)));
+
 
     // curves
     for(int i=0; i < curveCount; i++) {
@@ -338,6 +213,33 @@ void caCartesianPlot::resetZoom() {
     if(thisYscaling == Auto) setAxisAutoScale(yLeft, true);
     if(thisXscaling == Auto) setAxisAutoScale(xBottom, true);
     replot();
+
+    emit zoomHasReset();
+}
+
+void caCartesianPlot::setZoom(const QRectF &newZoomRect)
+{
+    QRectF zoomRect = zoomer->zoomRect();
+    if (zoomRect == newZoomRect) {
+        return;
+    }
+    zoomer->zoom(newZoomRect);
+}
+
+void caCartesianPlot::zoomOnXAxis(const QRectF& newZoomRect)
+{
+    QRectF zoomRect = zoomer->zoomRect();
+    if (zoomRect == newZoomRect) {
+        return;
+    }
+    zoomRect.setX(newZoomRect.x());
+    zoomRect.setWidth(newZoomRect.width());
+    zoomer->zoom(zoomRect);
+}
+
+void caCartesianPlot::handleZoomedRect(const QRectF &zoomedRect)
+{
+    emit zoomedToRect(zoomedRect);
 }
 
 void caCartesianPlot::setTriggerPV(QString const &newPV)  {
@@ -512,7 +414,7 @@ void caCartesianPlot::displayData(int curvIndex, int curvType)
         // x scalar, y vector
         } else if(X[curvIndex].size() == 1 && Y[curvIndex].size() > 1) {
             //printf("x scalar, y vector\n" );
-            int nbPoints = Y[curvIndex].size(); 
+            int nbPoints = Y[curvIndex].size();
 #if QT_VERSION < 0x040700
             double aux = X[curvIndex][0];
 #else
@@ -1130,11 +1032,17 @@ void caCartesianPlot::setScaleY(double minY, double maxY)
 void caCartesianPlot::setXaxisType(axisType s)
 {
     thisXtype = s;
+    // Assume value scale
+    plotPicker->setIsXAxisAlreadyCorrect(true);
+    plotPicker->setIsXAxisTimeSinceEpoch(false);
     if(s == time) {
+        // If it is time, then overwrite it to calculate time from epoch.
+        plotPicker->setIsXAxisAlreadyCorrect(false);
+        plotPicker->setIsXAxisTimeSinceEpoch(true);
 // in qwt6.0 no date/time scale possible
 #if QWT_VERSION >= 0x060100
         // gives an axe for milliseconds since epoch
-        PlotScaleDateEngine *scaleEngine = new PlotScaleDateEngine(thisXticks, Qt::LocalTime); // in number of milliseconds from epoch
+        PlotDateScaleEngine *scaleEngine = new PlotDateScaleEngine(thisXticks, Qt::LocalTime); // in number of milliseconds from epoch
         setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
 
         QwtDateScaleDraw * scaleDraw = new QwtDateScaleDraw();

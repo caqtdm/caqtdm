@@ -15,32 +15,42 @@
  *  You should have received a copy of the GNU General Public License
  *  along with the caQtDM Framework.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Copyright (c) 2010 - 2014
+ *  Copyright (c) 2010 - 2024
  *
  *  Author:
- *    Anton Mezger
+ *    Erik Schwarz
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    erik.schwarz@psi.ch
  */
 
-#include <QRect>
-    Q_PROPERTY(eventsignal eventSignal READ getEventSignal WRITE setEventSignal)
-    Q_ENUMS(eventsignal)
+#ifndef WORKERHTTPTHREAD_H
+#define WORKERHTTPTHREAD_H
+
+#include "httpretrieval.h"
+#include "workerHttp.h"
+
+class Q_DECL_EXPORT WorkerHttpThread : public QThread
+{
+    Q_OBJECT
 
 public:
-    enum eventsignal {Never = 0, onFirstChange, onAnyChange, TriggerZeroToOne, TriggerOneToZero};
-    eventsignal getEventSignal() const {return thisEventSignal;}
-    void setEventSignal(eventsignal signl) {thisEventSignal = signl;}
+    WorkerHttpThread(WorkerHTTP *worker);
+    ~WorkerHttpThread();
 
-signals:
-    void emitSignal(int);
-    void emitSignal(double);
-    void emitSignal(QRect);
-    void emitSignal(QRectF);
-    void emitSignal(bool);
+    /*
+     * Returns a pointer to the httpRetrieval currently associated with the workerHttp in this thread.
+     * If no httpRetrieval is currently associated, it returns a Q_NULLPTR.
+     * Due to multithreading, this function is dangerous and should only be used with extreme caution
+     * */
+    HttpRetrieval *getHttpRetrieval();
+
+    const bool isActive();
+    void setIsActive(const bool &newIsActive);
 
 private:
-    eventsignal thisEventSignal;
-    bool eventFired;
+    WorkerHTTP *m_worker;
+    bool m_isActive;
+    QMutex m_mutex;
+};
 
-
+#endif // WORKERHTTPTHREAD_H

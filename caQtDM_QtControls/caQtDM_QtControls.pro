@@ -164,6 +164,7 @@ XDR_HACK {
 QT += network
 HEADERS += src/networkaccess.h src/fileFunctions.h \
     src/calinedraw.h \
+    src/plotHelperClasses.h \
     src/wmsignalpropagator.h \
     src/replacemacro.h \
     src/JSON.h \

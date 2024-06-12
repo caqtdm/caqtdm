@@ -58,9 +58,10 @@ caCalc::caCalc( QWidget *parent ) :  ESimpleLabel(parent)
     checkSignal_value_double=0.0;
     changeValue_value_double=0.0;
     checkSignal_value_QRect=QRect();
+    checkSignal_value_QRectF=QRectF();
     for (int i=0;i<4;i++){
-        value_QRect_const[i]=0;
-        value_QRect_is_const[i]=false;
+        value_QRect_F_const[i]=0;
+        value_QRect_F_is_const[i]=false;
     }
     is_a_pure_constant=false;
 }
@@ -137,22 +138,22 @@ void caCalc::setValue(QString value)
 void caCalc::setValue(QRect value)
 {
     for (int i=0;i<4;i++){
-      if (value_QRect_is_const[i]){
+      if (value_QRect_F_is_const[i]){
         switch(i){
             case 0:{
-               value.setX(value_QRect_const[i]);
+            value.setX(static_cast<int>(value_QRect_F_const[i]));
                break;
             }
             case 1:{
-               value.setY(value_QRect_const[i]);
+               value.setY(static_cast<int>(value_QRect_F_const[i]));
                break;
             }
             case 2:{
-               value.setWidth(value_QRect_const[i]);
+               value.setWidth(static_cast<int>(value_QRect_F_const[i]));
                break;
             }
             case 3:{
-               value.setHeight(value_QRect_const[i]);
+               value.setHeight(static_cast<int>(value_QRect_F_const[i]));
                break;
             }
         }
@@ -179,12 +180,61 @@ void caCalc::setValue(QRect value)
     }
 }
 
+void caCalc::setValue(QRectF value)
+{
+    qDebug() << "setValue with:" << value;
+    for (int i=0;i<4;i++){
+        if (value_QRect_F_is_const[i]){
+            switch(i){
+            case 0:{
+               value.setX(value_QRect_F_const[i]);
+               break;
+            }
+            case 1:{
+               value.setY(value_QRect_F_const[i]);
+               break;
+            }
+            case 2:{
+               value.setWidth(value_QRect_F_const[i]);
+               break;
+            }
+            case 3:{
+               value.setHeight(value_QRect_F_const[i]);
+               break;
+            }
+            }
+        }
+    }
+    if (is_a_pure_constant)
+        setTextLine("QRectF=const");
+    else
+        setTextLine("QRectF=ok");
+
+    // emit signal when requested
+    if(thisEventSignal == onFirstChange) {
+        if(!eventFired) {
+            qDebug() << "emmitting: " << value;
+            emit emitSignal(value);
+        }
+        eventFired = true;
+    } else if(thisEventSignal == onAnyChange) {
+        if (is_a_pure_constant||(!eventFired)||(checkSignal_value_QRect!= value)){
+            qDebug() << "emmitting: " << value;
+            emit emitSignal(value);
+            checkSignal_value_QRectF=value;
+        }
+        eventFired = true;
+        thisValue =0;
+    }
+}
+
 void caCalc::setValue(int value)
 {
     Q_UNUSED(value)
     double data=(int) value;
     QRect empty;
     setValue(empty);
+    setValue(QRectF(empty));
     setValue(data);
 }
 
@@ -192,6 +242,7 @@ void caCalc::setValue(bool value)
 {
     QRect empty;
     setValue(empty);
+    setValue(QRectF(empty));
     int data=(int) value;
     setValue((double) data);
 }
@@ -217,28 +268,28 @@ void caCalc::setBackground(QColor c)
 void caCalc::setQRectParam(int x, double param)
 {
     if (x<MAX_QRECT_PARAMS){
-        value_QRect_const[x]=(int)param;
+        value_QRect_F_const[x]=param;
         switch(x){
             case 0:{
-               value_QRect_is_const[x]=thisChannelA.isEmpty();
+               value_QRect_F_is_const[x]=thisChannelA.isEmpty();
                break;
             }
             case 1:{
-               value_QRect_is_const[x]=thisChannelB.isEmpty();
+               value_QRect_F_is_const[x]=thisChannelB.isEmpty();
                break;
             }
             case 2:{
-               value_QRect_is_const[x]=thisChannelC.isEmpty();
+               value_QRect_F_is_const[x]=thisChannelC.isEmpty();
                break;
             }
             case 3:{
-               value_QRect_is_const[x]=thisChannelD.isEmpty();
+               value_QRect_F_is_const[x]=thisChannelD.isEmpty();
                break;
             }
         }
         is_a_pure_constant=true;
         for (int i=0;i<4;i++){
-            is_a_pure_constant&=value_QRect_is_const[i];
+            is_a_pure_constant&=value_QRect_F_is_const[i];
         }
     }
 

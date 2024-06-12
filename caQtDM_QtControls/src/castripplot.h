@@ -17,15 +17,16 @@
  *
  *  Copyright (c) 2010 - 2014
  *
- *  Author:
- *    Anton Mezger
+ *  Authors:
+ *    Anton Mezger, Erik Schwarz
  *  Contact details:
- *    anton.mezger@psi.ch
+ *    erik.schwarz@psi.ch
  */
 
 #ifndef caStripPlot_H
 #define caStripPlot_H
 
+#include "plotHelperClasses.h"
 #ifndef MOBILE_ANDROID
   #include <sys/timeb.h>
 #else
@@ -540,7 +541,7 @@ private:
     QVector<QwtIntervalSample> rangeDataRaw[MAXCURVES];
     QVector<QPointF> fillDataRaw[MAXCURVES];
 
-    QwtPlotPicker * plotPicker;
+    DynamicPlotPicker * plotPicker;
 
     double timeData;
     int dataCount;
