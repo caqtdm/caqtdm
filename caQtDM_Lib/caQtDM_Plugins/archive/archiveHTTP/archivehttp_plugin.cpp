@@ -534,7 +534,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 if (!var.toString().isEmpty()) {
                     indexNew.backend = var.toString();
                 } else { // In this case nothing is set, use default backend
-                    indexNew.backend = "sf-arcdhiver";
+                    indexNew.backend = "sf-archiver";
                     if (indexNew.init) {
                         QString mess(
                             "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERHTTP_BACKEND "
@@ -566,7 +566,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                         mess.append(" " + backend + ",");
                     }
                     // Remove the last comma character ","
-                    mess.removeLast();
+                    mess.chop(1);
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
                     }

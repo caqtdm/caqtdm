@@ -34,6 +34,7 @@
 #include "MessageWindow.h"
 #include "cacartesianplot.h"
 #include "mutexKnobData.h"
+#include <qwt.h>
 
 struct indexes
 {
