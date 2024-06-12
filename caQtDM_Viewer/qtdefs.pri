@@ -153,13 +153,9 @@ isEmpty(_CAQTDM_GPS) {
 message("GPS Plugin will not be build")
 }
 else {
-greaterThan(QT_VER_MAJ, 4) {
-  greaterThan(QT_VER_MIN, 10){
-        CONFIG += gps
-        gps {
-           message( "Configuring build for GPS plugin" )
-        }
-      }
+    CONFIG += gps
+    gps {
+      message( "Configuring build for GPS plugin" )
     }
 }
 

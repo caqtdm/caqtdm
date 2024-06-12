@@ -41,6 +41,7 @@
 #include "cacartesianplot.h"
 #include "mutexKnobData.h"
 
+
 struct indexes
 {
     QString key;

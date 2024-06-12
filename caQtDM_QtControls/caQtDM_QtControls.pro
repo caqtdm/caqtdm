@@ -64,7 +64,7 @@ PRE_TARGETDEPS += \
      moc/moc_cameter.cpp \
      moc/moc_caclock.cpp
 
-contains(QWT_VER_MIN, 1) {
+contains(QWT_VER_MIN, 1)|contains(QWT_VER_MIN, 2) {
   PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
 }
 
@@ -177,7 +177,7 @@ contains(QWT_VER_MIN, 0) {
    HEADERS	+= src/qwt_thermo_marker.h
    SOURCES	+= src/qwt_thermo_marker.cpp
 }
-contains(QWT_VER_MIN, 1) {
+contains(QWT_VER_MIN, 1)|contains(QWT_VER_MIN, 2) {
    HEADERS	+= src/qwt_thermo_marker_61.h
    SOURCES	+= src/qwt_thermo_marker_61.cpp
 }

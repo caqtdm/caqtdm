@@ -32,7 +32,6 @@
 #include <QObject>
 #include <QThread>
 #include <QTimer>
-
 #include "archiverGeneral.h"
 #include "controlsinterface.h"
 #include "workerHttpThread.h"

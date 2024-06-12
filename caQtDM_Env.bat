@@ -10,7 +10,7 @@ IF "%1"=="4" GOTO SELECT4
 echo =============================================================================================
 echo Select Build Environment
 echo 1) QT 4.8.5  QWT6.1.3 32 Bit VS2010  
-echo 2) QT 6.5.1  QWT6.2.0 64 Bit VS2019  
+echo 2) QT 6.7.1  QWT6.2.0 64 Bit VS2019  
 echo 3) QT 5.15.0 QWT6.1.5 64 Bit VS2019
 set /P SELCTION=Select: 
 echo =============================================================================================
@@ -71,15 +71,17 @@ REM ============================================================================
   call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
   d:	
  
-  set QTHOME=D:/qt/build/Qt-6.5.1_VS19_64bit
+  set QTHOME=D:/qt/build/Qt-6.7.1_VS19_64bit
   
-  set QWTHOME=D:/qt/qwt-6.2.0_Qt6.5.1_64bit
-  set QWTINCLUDE=D:/qt/qwt-6.2.0_Qt6.5.1_64bit/src
+  set QWTHOME=D:/qt/qwt-6.2.0_Qt6.7.1_64bit
+  set QWTINCLUDE=D:/qt/qwt-6.2.0_Qt6.7.1_64bit/src
   set QWTLIB=%QWTHOME%/lib
   set QWTLIBNAME=qwt
   set QWTVERSION=6.2
   set CAQTDMQTVER=QT6
-
+  set CAQTDM_GPS=1
+  
+  
   set GITPATH=C:\Users\brands\AppData\Local\Atlassian\SourceTree\git_local\bin\
     
   set EPICS_BASE=D:\epics\Package\base
