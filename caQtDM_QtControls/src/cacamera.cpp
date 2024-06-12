@@ -1912,13 +1912,14 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             data2=data2+4;
             decompressedData.resize(expectedSize);
             ZLIB_ULONG newsize=expectedSize;
-            uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
+            int error=uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
 
             //decompressedData=qUncompress((uchar*)data, datasize);
             //datasize=decompressedData->size();
 
             data=(char*)decompressedData.constData();
             savedData = data;
+            //printf("datasize=%d:%d (%i)\n",datasize,decompressedData.size(),error);
             datasize=(int)newsize;//decompressedData.size();
         }else{
             datasize=0;

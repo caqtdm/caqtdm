@@ -259,7 +259,8 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 #endif
 
     // message window used by library and here
-    messageWindow = new MessageWindow();
+    QWidget *widget =new QWidget();
+    messageWindow = new MessageWindow(widget);
 
     // create a class for exchanging data
     mutexKnobData = new MutexKnobData();
@@ -598,10 +599,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     }
     // Print out available memory in all cases
     messageWindow->postMsgEvent(QtInfoMsg, (char*) qasc(QString("Available system memory: " + QString::number(availableMemory / 1000) + "MB")));
-}
-
-FileOpenWindow::~FileOpenWindow() {
-    delete messageWindow;
 }
 
 void FileOpenWindow::parseConfigFile(const QString &filename, QList<QString> &urls, QList<QString> &files)
