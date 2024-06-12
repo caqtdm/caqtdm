@@ -535,6 +535,20 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 // Do this if dynamic property is set
                 if (!var.toString().isEmpty()) {
                     indexNew.backend = var.toString();
+                    // Because archiveSF (the ancestor of this plugin) has used "sf-archiverappliance"
+                    // to define the backend we now know as "sf-archiver", replace it for compatibility with older panels.
+                    if (indexNew.backend == "sf-archiverappliance") {
+                        indexNew.backend = "sf-archiver";
+
+                        // This replacement is really unintuitive, so warn the user
+                        QString mess(
+                            "ArchiveHTTP plugin -- the dynamic property \"backend\" is set "
+                            "to \"sf-archiverappliance\" in widget " + w->objectName()
+                            + ", which is no supported by ArchiveHTTP, so it was replaced with \"sf-archiver\".");
+                        if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                            m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        }
+                    }
                 } else { // In this case nothing is set, use default backend
                     indexNew.backend = DEFAULT_BACKEND;
                     if (indexNew.init) {
