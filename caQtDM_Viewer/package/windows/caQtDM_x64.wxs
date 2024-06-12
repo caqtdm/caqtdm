@@ -40,7 +40,7 @@
                             <?else?>
                             <?include $(sys.SOURCEFILEPATH)\..\caQtDM_Qt5_x64.wxi ?>
                             <?endif?>
-                            <Component Id="Epics_7.0.6.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
+                            <Component Id="Epics_7.0.7.1" Guid="B7D7E8AE-F448-43F8-A68A-A35895605B8C" Win64="yes">
                                 <File Id="CAREPEATER.EXE" Name="caRepeater.exe" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\caRepeater.exe" />
                                 <File Id="CA.DLL" Name="ca.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\ca.dll" />
                                 <File Id="COM.DLL" Name="Com.dll" Source="$(env.EPICS_BASE)\bin\$(env.EPICS_HOST_ARCH)\Com.dll" />
@@ -53,7 +53,7 @@
                             <Component Id="ZMQ" Guid="6F1967A1-84CA-4BE4-85DC-8D1B75338BB7" Win64="yes">
                                 <File Id="LIBZMQ.DLL" Name="libzmq.dll" Source="$(env.ZMQLIB)\libzmq.dll" />
                             </Component>
-                            <Component Id="qwt_6.1.5" Guid="80321EF0-DC70-4D0A-8E0C-269502A0EACB" Win64="yes">
+                            <Component Id="qwt_6.2.0" Guid="80321EF0-DC70-4D0A-8E0C-269502A0EACB" Win64="yes">
                                 <File Id="QWT.DLL" Name="qwt.dll" Source="$(env.QWTHOME)\lib\qwt.dll" />
                             </Component>
                             <Component Id="CaQtDM" Guid="ECDE0227-4100-43B8-B817-88D6BCD7FF49" Win64="yes">
@@ -83,7 +83,8 @@
                                 <File Id="EPICS4_PLUGIN.DLL" Name="epics4_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\epics4_plugin.dll" />
                                 <File Id="BSREAD_PLUGIN.DLL" Name="bsread_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\bsread_plugin.dll" />
                                 <File Id="MODBUS_PLUGIN.DLL" Name="modbus_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\modbus_plugin.dll" />
-                                <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" />
+                                <File Id="ARCHIVESF_PLUGIN.DLL" Name="archiveSF_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveSF_plugin.dll" ShortName="aSF.dll"/>
+                                <File Id="ARCHIVEHTTP_PLUGIN.DLL" Name="archiveHTTP_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\archiveHTTP_plugin.dll" ShortName="aHTTP.dll"/>
                                 <File Id="ENVIRONMENT_PLUGIN.DLL" Name="environment_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\environment_plugin.dll" />
                                 <!---File Id="GPS_PLUGIN.DLL" Name="gps_plugin.dll" Source="$(env.CAQTDM_COLLECT)\controlsystems\gps_plugin.dll" -->
                             </Component>
@@ -172,8 +173,8 @@
             <?else?>
             <ComponentRef Id="Qt_5.15.0" />
             <?endif?>
-            <ComponentRef Id="Epics_7.0.6.1" />
-            <ComponentRef Id="qwt_6.1.5" />
+            <ComponentRef Id="Epics_7.0.7.1" />
+            <ComponentRef Id="qwt_6.2.0" />
             <ComponentRef Id="CaQtDM" />
             <ComponentRef Id="designer" />
             <ComponentRef Id="Stylesheet" />
