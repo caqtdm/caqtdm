@@ -149,10 +149,10 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    searchFile *s = new searchFile("caQtDM_stylesheet.qss");
-    QString fileNameFound = s->findFile();
+    searchFile *searchDefaultStyleSheet = new searchFile("caQtDM_stylesheet.qss");
+    QString fileNameFound = searchDefaultStyleSheet->findFile();
     if(fileNameFound.isNull()) {
-        printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(s->displayPath()));
+        printf("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(searchDefaultStyleSheet->displayPath()));
     } else {
         QFile file(fileNameFound);
         file.open(QFile::ReadOnly);
@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
         app.setStyleSheet(StyleSheet);
         file.close();
     }
+    delete searchDefaultStyleSheet;
 
     int	in, numargs;
     bool attach = false;
@@ -298,33 +299,36 @@ int main(int argc, char *argv[])
 #endif
 
      if(fileNameStylesheet.length() > 0) {
-        s = new searchFile(fileNameStylesheet);
-        fileNameFound = s->findFile();
+        searchFile *searchCustomStyleSheet = new searchFile(fileNameStylesheet);
+        fileNameFound = searchCustomStyleSheet->findFile();
         if(fileNameFound.isNull()) {
-            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(s->displayPath()));
+            printf("caQtDM -- custom stylesheet file <%s> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(fileNameStylesheet) , qasc(searchCustomStyleSheet->displayPath()));
         } else {
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
             QString StyleSheet = QLatin1String(file.readAll());
-            printf("caQtDM -- file <%s> replaced the default stylesheet\n", qasc(fileNameStylesheet));
+            printf("caQtDM -- custom stylesheet file <%s> replaced the default stylesheet\n", qasc(fileNameStylesheet));
             app.setStyleSheet(StyleSheet);
             file.close();
         }
+        delete searchCustomStyleSheet;
     }
 
     // load macro definitions from file (located in this directory or in the caQTDM_DISPLAY_PATH)
     if(macroFile.length() > 0) {
-        s = new searchFile(macroFile);
-        fileNameFound = s->findFile();
+        searchFile *searchMacroFile = new searchFile(macroFile);
+        fileNameFound = searchMacroFile->findFile();
         if(fileNameFound.isNull()) {
-            printf("caQtDM -- file <stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(s->displayPath()));
+            printf("caQtDM -- custom macro file <%s> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%s> defined?\n", qasc(macroFile) , qasc(searchMacroFile->displayPath()));
         } else {
             QFile file(fileNameFound);
             file.open(QFile::ReadOnly);
+            printf("caQtDM -- macro definitions were read from custom macro file <%s>\n", qasc(macroFile));
             macroString = QLatin1String(file.readAll());
             macroString = macroString.simplified().trimmed();
             file.close();
         }
+        delete searchMacroFile;
     }
 
 #ifdef IO_OPTIMIZED_FOR_TABWIDGETS

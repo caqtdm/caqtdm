@@ -1912,7 +1912,10 @@ QImage *caCamera::showImageCalc(int datasize, char *data, short datatype)
             data2=data2+4;
             decompressedData.resize(expectedSize);
             ZLIB_ULONG newsize=expectedSize;
-            int error=uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
+            int error = uncompress((ZLIB_BYTE *)decompressedData.constData(),&newsize,(ZLIB_BYTE *)data2,datasize-4);
+            if (error != Z_OK) {
+                qDebug() << "caCamera: error uncompressing image data, code:" << error;
+            }
 
             //decompressedData=qUncompress((uchar*)data, datasize);
             //datasize=decompressedData->size();
