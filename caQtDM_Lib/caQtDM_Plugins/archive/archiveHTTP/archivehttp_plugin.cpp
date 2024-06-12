@@ -32,6 +32,8 @@
 #include <QMetaType>
 
 #define CURVE_IDENTIFIER "\\b[0-7]_"
+#define DEFAULT_BACKEND "sf-archiver"
+#define DEFAULT_HOSTNAME "data-api.psi.ch"
 
 #define qasc(x) x.toLatin1().constData()
 
@@ -76,8 +78,8 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 
     // Send a request to query available backends
     QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QNetworkReply* reply = manager->get(QNetworkRequest(QUrl("https://data-api.psi.ch/api/4/backend/list")));
-    connect(reply, &QNetworkReply::finished, [reply, manager, this]() {
+    QNetworkReply* reply = manager->get(QNetworkRequest(QUrl("https://" DEFAULT_HOSTNAME "/api/4/backend/list")));
+    connect(reply, &QNetworkReply::finished, this, [reply, manager, this]() {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray responseData = reply->readAll();
             QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
@@ -457,7 +459,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
     }
 
     // Index name (url), will later be redefined if dynamic property or environment variable is set
-    QString index_name = "data-api.psi.ch";
+    QString index_name = DEFAULT_HOSTNAME;
 
     // remove the curve index that seperates indexes from different curve,
     // so we can avoid requesting the same index multiple times.
@@ -527,17 +529,17 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             // Else, if the user defined an environment variable, take that.
             // If neither a dynamic property or an environment variable is set, we use the hardcoded default value.
             // Therefore, dynamic property comes first, then environment variable, then predefined url.
-            QString backendEnvironmentVariable = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_BACKEND");
+            QString backendEnvironmentVariable = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_BACKEND");
             var = w->property("backend");
             if (backendEnvironmentVariable.isEmpty() || (!var.toString().isEmpty())) {
                 // Do this if dynamic property is set
                 if (!var.toString().isEmpty()) {
                     indexNew.backend = var.toString();
                 } else { // In this case nothing is set, use default backend
-                    indexNew.backend = "sf-archiver";
+                    indexNew.backend = DEFAULT_BACKEND;
                     if (indexNew.init) {
                         QString mess(
-                            "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERHTTP_BACKEND "
+                            "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVEHTTP_BACKEND "
                             "set and no backend defined as dynamic property in widget "
                             + w->objectName() + ", defaulting to " + indexNew.backend);
                         if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
@@ -549,7 +551,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 if (indexNew.init) {
                     indexNew.backend = backendEnvironmentVariable;
                     QString mess("ArchiveHTTP plugin -- archiver backend defined as " + indexNew.backend
-                                 + " from environment variable CAQTDM_ARCHIVERHTTP_BACKEND");
+                                 + " from environment variable CAQTDM_ARCHIVEHTTP_BACKEND");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
@@ -577,7 +579,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             // with the redirection target, so take that if it exists. Else, if the user defined an environment variable,
             // take that. If neither a dynamic property or an environment variable is set, we use the hardcoded default value.
             // Therefore, dynamic property comes first, then environment variable, then predefined url.
-            QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
+            QString url = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_URL");
             // Do this if dynamic property is set
             // Also do this if no environment variable is defined
             if (url.isEmpty() || (!w->property("archiverIndex").toString().isEmpty())) {
@@ -596,7 +598,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     }
                 } else if (indexNew.init) { // In this case nothing is set, use predefined url
                     QString mess(
-                        "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERHTTP_URL "
+                        "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVEHTTP_URL "
                         "set and no archiverIndex defined as dynamic property in widget "
                         + w->objectName() + ", defaulting to " + index_name);
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
@@ -606,7 +608,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             } else { // Environment variable is set but no dynamic property exists
                 if (indexNew.init) {
                     QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
-                                 + " from environment variable CAQTDM_ARCHIVERHTTP_URL");
+                                 + " from environment variable CAQTDM_ARCHIVEHTTP_URL");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }

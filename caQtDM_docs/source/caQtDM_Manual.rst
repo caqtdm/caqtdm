@@ -3062,7 +3062,18 @@ caQtDM uses the following environment variables:
 +---------------------------------------+-----------------------------------------------------------+
 | ``BSREAD_ZMQ_ADDR_LIST``              | point the bsread plugin to static sources                 |
 +---------------------------------------+-----------------------------------------------------------+
-| ``CAQTDM_ARCHIVERSF_URL``             | point the archiver plugin to a different archiver backend |
+| ``CAQTDM_ARCHIVERSF_URL``             | point the archiveSF plugin to a different archiver backend|
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVEHTTP_URL``            | point the archiveHTTP plugin to a different backend       |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVEHTTP_BACKEND``        | Specify the "backend" parameter for archiver api queries. |
+|                                       | This can be overwritten by the dynamic property "backend".|
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVEHTTP_APIPATH_BINNED`` | Overwrite the default api path for binned data.           |
+|                                       | Needs to be in the format: /path/to/binned                |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVEHTTP_APIPATH_RAW``    | Overwrite the default api path for raw data (events).     |
+|                                       | Needs to be in the format: /path/to/events                |
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_OPTIMIZE_EPICS3CONNECTIONS`` | Disable Epics3 connections when tabwidget is not active   |
 |                                       | Set to "TRUE" to activate                                 |
