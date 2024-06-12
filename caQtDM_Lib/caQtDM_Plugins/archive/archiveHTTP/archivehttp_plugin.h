@@ -181,6 +181,7 @@ private:
     QRegularExpression m_regexStr;
     bool m_IsSuspended;
     QMap<QString, QSharedPointer<HttpPerformanceData> > m_retrievalPerformancePerPV;
+    QStringList availableBackends;
 };
 
 #endif

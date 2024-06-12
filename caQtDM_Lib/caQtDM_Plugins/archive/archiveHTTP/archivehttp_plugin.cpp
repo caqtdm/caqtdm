@@ -73,6 +73,43 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 {
     m_mutexKnobDataP = data;
     m_messageWindowP = messageWindow;
+
+    // Send a request to query available backends
+    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+    QNetworkReply* reply = manager->get(QNetworkRequest(QUrl("https://data-api.psi.ch/api/4/backend/list")));
+    connect(reply, &QNetworkReply::finished, [reply, manager, this]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            QByteArray responseData = reply->readAll();
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+            if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+                QJsonObject jsonObj = jsonDoc.object();
+                if (jsonObj.contains("backends_available") && jsonObj["backends_available"].isArray()) {
+                    QJsonArray backendsArray = jsonObj["backends_available"].toArray();
+                    QStringList backendNames;
+                    foreach (const QJsonValue& value, backendsArray) {
+                        if (value.isObject()) {
+                            QJsonObject backendObj = value.toObject();
+                            if (backendObj.contains("name") && backendObj["name"].isString()) {
+                                backendNames.append(backendObj["name"].toString());
+                            }
+                        }
+                    }
+                    availableBackends = backendNames;
+                }
+            }
+        } else {
+            QString mess(
+                "ArchiveHTTP plugin -- failed to retrieve available backends from: "
+                + reply->url().toString() + ", Error: " + reply->errorString());
+            if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
+            }
+        }
+        reply->deleteLater();
+        manager->deleteLater();
+    });
+
+    // Also initialize archiverGeneral
     return m_archiverGeneral->initCommunicationLayer(data, messageWindow, options);
 }
 
@@ -486,30 +523,53 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 }
             }
 
+            // If the user set a dynamic property then that has priority, so take that if it exists.
+            // Else, if the user defined an environment variable, take that.
+            // If neither a dynamic property or an environment variable is set, we use the hardcoded default value.
+            // Therefore, dynamic property comes first, then environment variable, then predefined url.
+            QString backendEnvironmentVariable = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_BACKEND");
             var = w->property("backend");
-            if (!var.isNull()) {
-                QString backend = var.toString().trimmed().toLower();
-                if (QString::compare(backend, "sf-archiverappliance") == 0) {
+            if (backendEnvironmentVariable.isEmpty() || (!var.toString().isEmpty())) {
+                // Do this if dynamic property is set
+                if (!var.toString().isEmpty()) {
                     indexNew.backend = var.toString();
-                } else if (QString::compare(backend, "sf-databuffer") == 0) {
-                    indexNew.backend = var.toString();
-                } else {
-                    QString mess(
-                        "ArchiveHTTP plugin -- backend defined as dynamic property in widget "
-                        "but not known (use sf-archiverappliance or sf-databuffer) in widget "
-                        + w->objectName());
-                    indexNew.backend = var.toString();
+                } else { // In this case nothing is set, use default backend
+                    indexNew.backend = "sf-arcdhiver";
+                    if (indexNew.init) {
+                        QString mess(
+                            "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVERHTTP_BACKEND "
+                            "set and no backend defined as dynamic property in widget "
+                            + w->objectName() + ", defaulting to " + indexNew.backend);
+                        if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                            m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                        }
+                    }
+                }
+            } else { // Environment variable is set but no dynamic property exists
+                if (indexNew.init) {
+                    indexNew.backend = backendEnvironmentVariable;
+                    QString mess("ArchiveHTTP plugin -- archiver backend defined as " + indexNew.backend
+                                 + " from environment variable CAQTDM_ARCHIVERHTTP_BACKEND");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
-            } else if (indexNew.init) {
-                QString mess(
-                    "ArchiveHTTP plugin -- no backend defined as dynamic property in widget "
-                    + w->objectName()
-                    + ", it is defined by the server e.g.(sf-archiverappliance,sf-databuffer)");
-                if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
-                    m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+            }
+
+            // If we have already gotten a result from the backend confirming the available backends,
+            // we can check if the backend is available and warn the user if not.
+            if (indexNew.init && !availableBackends.isEmpty()) {
+                if (!availableBackends.contains(indexNew.backend)) {
+                    QString mess("ArchiveHTTP plugin -- specified backend: " + indexNew.backend
+                                 + " is not available in API. Available backends are:");
+                    foreach(QString backend, availableBackends) {
+                        mess.append(" " + backend + ",");
+                    }
+                    // Remove the last comma character ","
+                    mess.removeLast();
+                    if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                        m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
+                    }
                 }
             }
 
@@ -520,7 +580,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             QString url = (QString) qgetenv("CAQTDM_ARCHIVERHTTP_URL");
             // Do this if dynamic property is set
             // Also do this if no environment variable is defined
-            if (url.size() == 0 || (!w->property("archiverIndex").toString().isEmpty())) {
+            if (url.isEmpty() || (!w->property("archiverIndex").toString().isEmpty())) {
                 var = w->property("archiverIndex");
                 // Do this if dynamic property is set
                 if (!var.isNull()) {
