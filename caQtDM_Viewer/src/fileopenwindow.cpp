@@ -97,6 +97,15 @@ int setenv(const char *name, const char *value, int overwrite)
 
 #endif
 
+#if defined(__OSX__)|| defined(__APPLE__)
+  #include <mach/mach.h>
+  #include <mach/host_info.h>
+  #include <mach/mach_init.h>
+  #include <mach/vm_statistics.h>
+#endif
+
+
+
 
 #if QT_VERSION > 0x050000
 void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
@@ -1479,6 +1488,21 @@ long long FileOpenWindow::getAvailableMemory()
     if (GlobalMemoryStatusEx(&status)) {
         memAvailable = status.ullAvailPhys / 1024; // Value returned is in Bytes, convert to KiB
     }
+#elif defined(__OSX__)|| defined(__APPLE__)
+    mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
+    mach_port_t host_port = mach_host_self();
+    vm_statistics64_data_t vm_stat;
+    vm_size_t page_size;
+    host_page_size(host_port, &page_size);
+
+    if(KERN_SUCCESS != host_statistics64(host_port, HOST_VM_INFO, (host_info64_t)&vm_stat, &count)) {
+        // An error occurred
+        memAvailable = -1;
+    }else{
+        memAvailable = vm_stat.free_count * page_size / 1024;
+    }
+
+
 #endif
     return memAvailable;
 }
