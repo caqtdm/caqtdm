@@ -88,7 +88,12 @@ Following environment variables can be used to configure caqtdm:
 - __CAQTDM_OPTIMIZE_EPICS3CONNECTIONS__ - Disable Epics3 connections when tabwidget is not active, set to "TRUE" to activate
 - __CAQTDM_MODBUS_DATABASE__ - Database to use for the modbus plugin 
 
-- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend 
+- __CAQTDM_ARCHIVERSF_URL__ - point the archiver plugin to a different archiver backend
+
+- __CAQTDM_ARCHIVEHTTP_URL__ - point the archiveHTTP plugin to a different archiver backend
+- __CAQTDM_ARCHIVEHTTP_BACKEND__ - Specify the "backend" parameter for archiver API queries. This can be overwritten by the dynamic property "backend".
+- __CAQTDM_ARCHIVEHTTP_APIPATH_BINNED__ - Overwrite the default API path for binned data. Needs to be in the format: /path/to/binned
+- __CAQTDM_ARCHIVEHTTP_APIPATH_RAW__ - Overwrite the default API path for raw data (events). Needs to be in the format: /path/to/events
 
 - __CAQTDM_FINDRECORD_SRV__ - for autocompletion, the request URL
 - __CAQTDM_FINDRECORD_FACILITY__ - search limitation for a facility  
