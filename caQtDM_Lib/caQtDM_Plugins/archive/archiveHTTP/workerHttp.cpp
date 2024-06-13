@@ -91,7 +91,8 @@ void WorkerHTTP::getFromArchive(QWidget *w,
 
     if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) indexNew.w)) {
         // This only works on a time scale, if its absolute or whatever, dont touch it.
-        if (w->getXaxisType() == caCartesianPlot::time) {
+        // Also only do this if the X axis is scaled automatically, otherwise dont touch it.
+        if ((w->getXaxisType() == caCartesianPlot::time) && (w->getXscaling() == caCartesianPlot::Auto)) {
             // Create a Buffer for the X axis of 5%
             double timeBuffer = timeDifference * 0.05;
             // Set the limits for the X axis of the cartesian plot
