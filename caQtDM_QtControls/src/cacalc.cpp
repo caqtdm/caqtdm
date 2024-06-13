@@ -182,7 +182,6 @@ void caCalc::setValue(QRect value)
 
 void caCalc::setValue(QRectF value)
 {
-    qDebug() << "setValue with:" << value;
     for (int i=0;i<4;i++){
         if (value_QRect_F_is_const[i]){
             switch(i){
@@ -213,13 +212,11 @@ void caCalc::setValue(QRectF value)
     // emit signal when requested
     if(thisEventSignal == onFirstChange) {
         if(!eventFired) {
-            qDebug() << "emmitting: " << value;
             emit emitSignal(value);
         }
         eventFired = true;
     } else if(thisEventSignal == onAnyChange) {
         if (is_a_pure_constant||(!eventFired)||(checkSignal_value_QRect!= value)){
-            qDebug() << "emmitting: " << value;
             emit emitSignal(value);
             checkSignal_value_QRectF=value;
         }
