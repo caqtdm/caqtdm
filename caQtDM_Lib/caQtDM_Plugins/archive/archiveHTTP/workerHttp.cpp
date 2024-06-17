@@ -142,6 +142,13 @@ void WorkerHTTP::getFromArchive(QWidget *w,
     mutexKnobDataP->DataUnlock(&kData);
 
     do {
+        // Clear data
+        m_vecX.clear();
+        m_vecY.clear();
+        m_vecMinY.clear();
+        m_vecMaxY.clear();
+        nbVal = 0;
+
         // If member is set, then this isn't the first iteration, so wait a bit before stressing the backend again
         if (m_receivedContinueAt) {
             if (m_retryAfter != 0) {
@@ -221,10 +228,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             if (m_httpRetrieval->getCount() > 0) {
                 if (isBinned) {
-                    m_vecX.clear();
-                    m_vecY.clear();
-                    m_vecMinY.clear();
-                    m_vecMaxY.clear();
                     // Get the data
                     m_httpRetrieval->getBinnedDataAppended(m_vecX, m_vecY, m_vecMinY, m_vecMaxY);
                     // Because we have binned data the latest point is faulty as it does not contain as much data as the others
@@ -237,8 +240,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                         m_vecMaxY.removeLast();
                     }
                 } else {
-                    m_vecX.clear();
-                    m_vecY.clear();
                     // Get the data
                     m_httpRetrieval->getDataAppended(m_vecX, m_vecY);
                 }
@@ -284,12 +285,6 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 }
             }
 
-            m_vecX.clear();
-            m_vecY.clear();
-            m_vecMinY.clear();
-            m_vecMaxY.clear();
-            nbVal = 0;
-
             // If the server is temporarily at capacity, try again, but only if the request wasn't aborted.
             if (!previousHttpRetrievalAborted) {
                 if (m_httpRetrieval->retryAfter() != 0) {
@@ -315,6 +310,8 @@ void WorkerHTTP::getFromArchive(QWidget *w,
     } while (m_receivedContinueAt);
     m_vecX.clear();
     m_vecY.clear();
+    m_vecMinY.clear();
+    m_vecMaxY.clear();
     urlHandler->deleteLater();
     m_httpRetrieval->deleteLater();
 }
