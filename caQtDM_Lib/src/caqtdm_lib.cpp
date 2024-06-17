@@ -2669,11 +2669,11 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                         postMessage(QtDebugMsg, (char*) qasc(tr("error EDL file conversion")));
                     }
                     postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(providedFileName)));
-                    qDebug() << "sorry, file" << providedFileName << " does not exist";
+                    //qDebug() << "sorry, file" << providedFileName << " does not exist";
                     break;
                 #else
                     postMessage(QtDebugMsg, (char*) qasc(tr("sorry, could not load include file %1").arg(providedFileName)));
-                    qDebug() << "sorry, file" << providedFileName << " does not exist";
+                    //qDebug() << "sorry, file" << providedFileName << " does not exist";
                     break;
                 #endif
             }
@@ -3402,41 +3402,103 @@ QString CaQtDM_Lib::handle_single_Macro(QString key, QString value, QString Text
     return Text;
 }
 
-QString CaQtDM_Lib::handle_Macro_withConst(QString key, QString value, QString Text){
-    QString toReplace = "$(" + key + "=";
-    int position=Text.indexOf(toReplace);
-    if (position!=-1){
-        // find a macro in a constant
-        int macro_length=0;
-        int macro_count=0;
-        int nextmacro=Text.indexOf(QString("$("),position+toReplace.length());
-        // find end of the constant
-        int endofconstant=Text.indexOf(QString(")"), position+toReplace.length());
-        if ((nextmacro>=0)&&(nextmacro<endofconstant)){
-            macro_count++;
-            macro_length=nextmacro;
-            while (macro_count>0){
-                nextmacro=Text.indexOf(QString("$("),position+toReplace.length()+macro_length);
-                endofconstant=Text.indexOf(QString(")"), position+toReplace.length()+macro_length);
-                if (nextmacro!=-1){
-                    macro_length=nextmacro;
-                    macro_count++;
-                }
-                if (endofconstant!=-1){
-                    macro_count--;
-                }
-                //qDebug()<< "Positions:"<< nextmacro <<endofconstant <<"macro_count "<< macro_count ;
+#pragma optimize( "", off)
+void parseParentheses(const QString &input) {
+    QStack<int> parenthesesStack;
+    for (int i = 1; i < input.length(); ++i) {
+        if((input[i-1] == '$')&&(input[i] == '(')) {
+            parenthesesStack.push(i);
+        } else if (input[i] == ')') {
+            if (!parenthesesStack.empty()) {
+                int start = parenthesesStack.top();
+                parenthesesStack.pop();
+                QString content = input.mid(start + 1, i - start - 1);
+                qDebug() << "Matched text inside parentheses:" << content;
+            } else {
+                qDebug() << "Unmatched closing parenthesis at position" << i;
             }
         }
-        if (endofconstant!=-1){
-            Text=Text.remove(position+toReplace.length(),endofconstant-(position+toReplace.length())+1);
-        }
+    }
 
-        //qDebug() << "replace in" << Text << toReplace << "with" << value;
-        Text.replace(toReplace, value);
+    while (!parenthesesStack.empty()) {
+        qDebug() << "Unmatched opening parenthesis at position" << parenthesesStack.top();
+        parenthesesStack.pop();
+    }
+}
+#pragma optimize( "", on)
+
+QString CaQtDM_Lib::handle_Macro_withConst(QString key, QString value, QString Text){
+    QStack<int> parenthesesStack;
+    QString pattern=key +"=";
+    qDebug() << "start handle_Macro_withConst2" << key;
+    for (int i = 1; i < Text.length(); ++i) {
+        if((Text[i-1] == '$')&&(Text[i] == '(')) {
+            parenthesesStack.push(i);
+        } else if (Text[i] == ')') {
+            if (!parenthesesStack.empty()) {
+                int start = parenthesesStack.top();
+                parenthesesStack.pop();
+                QString content = Text.mid(start + 1, i - start - 1);
+                //qDebug() << "Matched text inside parentheses(macro with value):" << content;
+                if (content.startsWith(pattern)) {
+                    Text.replace("$("+content+")", value);
+                    //qDebug() << " Replaced:" <<Text;
+                }
+            } else {
+                //qDebug() << "Unmatched closing parenthesis at position" << i;
+//                if (!Text.contains("regex\":")){
+//                    char asc[MAX_STRING_LENGTH];
+//                    QString errorText="Unmatched closing parenthesis: "+Text+"[ POS:+"+QString::number(i)+"]";
+//                    qstrncpy(asc,qasc(errorText),MAX_STRING_LENGTH);
+//                    postMessage(QtCriticalMsg, asc);
+//                }
+            }
+        }
+    }
+
+    while (!parenthesesStack.empty()) {
+//        if (!Text.contains("regex\":")){
+//            char asc[MAX_STRING_LENGTH];
+//            QString errorText="Unmatched opening parenthesis at: "+Text+"[ POS:+"+QString::number(parenthesesStack.top())+"]";
+//            qstrncpy(asc,qasc(errorText),MAX_STRING_LENGTH);
+//            postMessage(QtCriticalMsg, asc);
+//        }
+        parenthesesStack.pop();
     }
     return Text;
 }
+
+QString CaQtDM_Lib::handle_Macro_Constants(QString Text){
+    QStack<int> parenthesesStack;
+    for (int i = 1; i < Text.length(); ++i) {
+        if((Text[i-1] == '$')&&(Text[i] == '(')) {
+            parenthesesStack.push(i);
+        } else if (Text[i] == ')') {
+            if (!parenthesesStack.empty()) {
+                int start = parenthesesStack.top();
+                parenthesesStack.pop();
+                QString content = Text.mid(start + 1, i - start - 1);
+                //qDebug() << "Matched text inside parentheses(macro with const):" << content;
+                QStringList macro_data=content.split("=");
+                if (macro_data.count()>1){
+                    Text.replace("$("+content+")",macro_data.at(1));
+                }
+
+            } else {
+                //qDebug() << "Unmatched closing parenthesis at position" << i;
+            }
+        }
+    }
+
+    while (!parenthesesStack.empty()) {
+        //qDebug() << "Unmatched opening parenthesis at position" << parenthesesStack.top();
+        parenthesesStack.pop();
+    }
+    return Text;
+}
+
+
+
 
 QString CaQtDM_Lib::handle_Macro_Scan(QString Text,QMap<QString, QString> map,macro_parser parse){
 
@@ -3558,34 +3620,21 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
 
             }
             // unresolved macros with a own constant
+            qDebug() << "************************************************************";
+            qDebug() << "unresolved macros with a own constant";
+            qDebug() << "************************************************************";
             if(newText.contains("$(")){
 
                 int recursive_counter=0;
                 bool recursive_continue=true;
                 while (recursive_continue) {
-                    QString newText_Backup=newText;
-                    QString unresMacro = "";
-                    QString tofind = "$(";
-                    int position=newText.indexOf(tofind);
-                    while (position != (-1)){
-                        int constmacro_start=(position-2)+tofind.length();
-                        int constmacro_end  =newText.indexOf(QString("="), constmacro_start);
-                        int constmacro_noConst  =newText.indexOf(QString(")"), constmacro_start);
-                        if (constmacro_end<constmacro_noConst){
-                            if ((constmacro_end!=-1)&&(position >= 0)&&(position < newText.length())){
-                                //qDebug()<<"newText.mid"<<newText.mid(constmacro_start, constmacro_end-constmacro_start+1);
-                                newText=newText.remove(constmacro_start, constmacro_end-constmacro_start+1);
-                                //qDebug()<<"newText"<<newText;
-                                if (newText.indexOf(")")!=-1) newText=newText.remove(newText.indexOf(")"),1);
-                            }
-                        }
-                        position=newText.indexOf(tofind,position+1);
-                    }
-
+                      QString newText_Backup=handle_Macro_Constants(newText);
+                      qDebug()<< newText_Backup<< "<-" << newText;
                     if (newText_Backup.compare(newText)==0){
                         //qDebug() << "finish Loop simple Macro Replace";
                         recursive_continue=false;
                     }
+                    newText=newText_Backup;
                     if(recursive_counter++ > 10) break;
                 }
             }

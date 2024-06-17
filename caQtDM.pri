@@ -12,6 +12,7 @@ archive_plugin {
                 message("archive_plugin configuration macx")
                 LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
                 LIBS += $$(CAQTDM_COLLECT)/libqtcontrols.dylib
+                LIBS += -lz
                 CONFIG += release
         }
 
@@ -477,7 +478,8 @@ caQtDM_Lib {
       		LIBS += ${EPICSLIB}/libCom.dylib
                 DESTDIR = $$(CAQTDM_COLLECT)
       		OBJECTS_DIR = ./obj
-      		CONFIG += Define_Build_Python
+                # removed no standard python under Mac
+                # CONFIG += Define_Build_Python
 
    	}
 
@@ -761,24 +763,33 @@ caQtDM_Viewer {
                          #bitcode_generator.value = bitcode
                          #QMAKE_MAC_XCODE_SETTINGS += bitcode_generator
 
-                         #provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
-                         #provisioning_profile_spec.value = caQtDM Distribution
+                         provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
+                         provisioning_profile_spec.value = caQtDM Distribution
                          #provisioning_profile_spec.value = caQtDM Development
-                         #QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
+                         QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
 
                          #signing_identity.name = CODE_SIGN_IDENTITY
                          #signing_identity.value = $$(CODE_SIGN_IDENTITY)
                          #QMAKE_MAC_XCODE_SETTINGS += signing_identity
 
+                         signing_identity.name = CODE_SIGN_IDENTITY
+                         signing_identity.value = Apple Distribution: Helge Brands (Q6CFPW364S)
+                         QMAKE_MAC_XCODE_SETTINGS += signing_identity
+
+
+
                          #setting.name = DEVELOPMENT_TEAM
                          #setting.value = $$(CERTIFICATNUMBER)
                          #QMAKE_MAC_XCODE_SETTINGS += setting
+                         #setting.name = DEVELOPMENT_TEAM
+                         #setting.value = Q6CFPW364S
+                         #QMAKE_MAC_XCODE_SETTINGS += setting
 
-                         #payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
-                         #payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
-                         #payload_dir.depends = $$OUT_PWD/Release-iphoneos
+                         payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
+                         payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
+                         payload_dir.depends = $$OUT_PWD/Release-iphoneos
 
-                         #QMAKE_EXTRA_TARGETS +=payload_dir
+                         QMAKE_EXTRA_TARGETS +=payload_dir
                     }
                     epics4: {
                                     LIBS += $$OUT_PWD/../caQtDM_Lib/caQtDM_Plugins/epics4/libepics4_plugin.a

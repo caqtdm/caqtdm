@@ -446,6 +446,7 @@ private:
     QString handle_single_Macro(QString key, QString value, QString Text);
     QString handle_Macro_withConst(QString key, QString value, QString Text);
     QString handle_Macro_Scan(QString Text, QMap<QString, QString> map, macro_parser parse);
+    QString handle_Macro_Constants(QString Text);
 private slots:
     void Callback_CaCalc(double value) ;
     void Callback_UndefinedMacrowindowExit();
