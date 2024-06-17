@@ -24,13 +24,13 @@
  */
 
 #include <workerHttp.h>
+
 #include <QList>
 #include <QMap>
 #include <QMutex>
 #include <QObject>
 #include <QThread>
 #include <QTimer>
-
 
 #include "archiverGeneral.h"
 #include "httpretrieval.h"
@@ -41,7 +41,7 @@ WorkerHTTP::WorkerHTTP()
     qRegisterMetaType<indexes>("indexes");
     qRegisterMetaType<QVector<double> >("QVector<double>");
     m_httpRetrieval = Q_NULLPTR;
-    m_receivedContinueAt = false;
+    m_requestAgain = false;
     m_vecX.clear();
     m_vecY.clear();
     m_isActive = true;
@@ -56,90 +56,48 @@ void WorkerHTTP::workerFinish()
     deleteLater();
 }
 
-HttpRetrieval* WorkerHTTP::getArchive()
+HttpRetrieval *WorkerHTTP::getArchive()
 {
     return m_httpRetrieval;
 }
 
-void WorkerHTTP::getFromArchive(QWidget *w,
-                    indexes indexNew,
-                    QString index_name,
-                    MessageWindow *messageWindow,
-                    MutexKnobData *mutexKnobDataP,
-                    QSharedPointer<HttpPerformanceData> httpPerformanceData)
+void WorkerHTTP::getFromArchive(indexes indexNew,
+                                    QString index_name,
+                                    MessageWindow *messageWindow,
+                                    MutexKnobData *mutexKnobDataP,
+                                    QSharedPointer<HttpPerformanceData> httpPerformanceData)
 {
     QMutexLocker locker(&m_globalMutex);
-    Q_UNUSED(w);
-    struct timeb now;
-    bool isBinned;
-
+    m_mutexKnobDataPtr = mutexKnobDataP;
     QString key = indexNew.pv;
     int nbVal = 0;
 
+    struct timeb now;
     ftime(&now);
+
     double endSeconds = (double) now.time + (double) now.millitm / (double) 1000;
     double startSeconds = endSeconds - indexNew.secondsPast;
-    if (indexNew.nrOfBins > 0) {
-        isBinned = true;
-    } else {
-        isBinned = false;
+
+    bool isBinned = (indexNew.nrOfBins > 0);
+
+    // If there is a valid caCartesianPlot associated with this request, update the limits to display the requested range.
+    if (caCartesianPlot *caCartesianWidget = qobject_cast<caCartesianPlot *>((QWidget *) indexNew.w)) {
+        setCartesianLimits(caCartesianWidget, startSeconds, endSeconds);
     }
 
     // Calculate the number of bins per second to be able to maintain the initial bin density if we receive a continueAt
-    double timeDifference = indexNew.secondsPast;
-    double nrOfBinsPerSecond = indexNew.nrOfBins / timeDifference;
+    double nrOfBinsPerSecond = static_cast<double>(indexNew.nrOfBins) / static_cast<double>(indexNew.secondsPast);
 
-    if (caCartesianPlot *w = qobject_cast<caCartesianPlot *>((QWidget *) indexNew.w)) {
-        // This only works on a time scale, if its absolute or whatever, dont touch it.
-        // Also only do this if the X axis is scaled automatically, otherwise dont touch it.
-        if ((w->getXaxisType() == caCartesianPlot::time) && (w->getXscaling() == caCartesianPlot::Auto)) {
-            // Create a Buffer for the X axis of 5%
-            double timeBuffer = timeDifference * 0.05;
-            // Set the limits for the X axis of the cartesian plot
-            double minXMSecs = 1000 * (startSeconds - timeBuffer);
-            double maxXMSecs = 1000 * (endSeconds + timeBuffer);
+    // Initialize urlhandler with all parameters except startSeconds, as this will be changed
+    UrlHandlerHttp *urlHandler = initializeNewUrlHandler(index_name,
+                                                         indexNew,
+                                                         false,
+                                                         isBinned,
+                                                         endSeconds);
 
-            // Now, invoke the function to set the Scale unsing a lamda function,
-            // We have to do this as the widget lives in another thread and this function is NOT thread safe.
-            // This calls the function in the widgets thread itself, that being our main GUI thread.
-            QMetaObject::invokeMethod(w, [minXMSecs, maxXMSecs, w]() {
-                w->setScaleX(minXMSecs, maxXMSecs);
-            });
-        }
-    }
-
-    // Initialize urlhandler with parameters
-    UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
-
-    // Check whether the provided api name is only the hostname or if it is the whole url and set the according parameters.
-    // It could be the whole url if we were redirected previously. We check this by looking if it starts with "http",
-    // because then it cannot simply be the hostname.
-    if (index_name.startsWith("http")) {
-        // It's a full url, so parse it as such
-        urlHandler->setUrl(QUrl(index_name));
-    } else {
-        // It's only the domain name
-        urlHandler->setDomainName(index_name);
-    }
-
-    // Set other parameters
-    urlHandler->setUsesHttps(false);
-    urlHandler->setBackend(indexNew.backend);
-    urlHandler->setChannelName(indexNew.pv);
-    urlHandler->setBinned(isBinned);
-    urlHandler->setBinCount(indexNew.nrOfBins);
-    urlHandler->setEndTime(QDateTime::fromSecsSinceEpoch(endSeconds));
-
-    // Now we collect all already stored data so we can reuse it and minimize network traffic.
-    knobData kData = mutexKnobDataP->GetMutexKnobData(indexNew.indexX);
-    mutexKnobDataP->DataLock(&kData);
-
-    if (kData.edata.valueCount > 0) {
-        // Update the time from which we have to request new data
-        // Data is stored in miliseconds but we want seconds so convert it
-        startSeconds = (reinterpret_cast<double*>(kData.edata.dataB)[kData.edata.valueCount - 1] / 1000);
-    }
-    mutexKnobDataP->DataUnlock(&kData);
+    // Figure out if mutexKnobData already holds data we are about to request.
+    // If it does, make sure to update the startSeconds to when our saved data stops.
+    startSeconds = updateStartSecondsFromMutexKnobData(indexNew.indexX, startSeconds);
 
     do {
         // Clear data
@@ -149,8 +107,8 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         m_vecMaxY.clear();
         nbVal = 0;
 
-        // If member is set, then this isn't the first iteration, so wait a bit before stressing the backend again
-        if (m_receivedContinueAt) {
+        // If requestAgain is set, then this isn't the first iteration, so wait a bit before stressing the backend again
+        if (m_requestAgain) {
             if (m_retryAfter != 0) {
                 // Wait as long as the server requested
                 QThread::sleep(m_retryAfter);
@@ -160,10 +118,10 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             }
         }
         m_retryAfter = 0;
-        m_receivedContinueAt = false;
+        m_requestAgain = false;
 
         // Set bin count according to initial density, so the density is consitent across multiple succeeding requests
-        timeDifference = endSeconds - startSeconds;
+        double timeDifference = endSeconds - startSeconds;
         urlHandler->setBinCount(int(timeDifference * nrOfBinsPerSecond));
         // When the bin count is less than one, then not enough time has passed to make another request
         bool binCountLessThanOne = urlHandler->binCount() < 1;
@@ -195,11 +153,11 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         if (!previousHttpRetrievalAborted && !(binCountLessThanOne && isBinned)) {
             httpPerformanceData->addNewRequest(urlHandler);
             readdata_ok = m_httpRetrieval->requestUrl(urlHandler->assembleUrl(),
-                                                           urlHandler->backend(),
-                                                           timeDifference,
-                                                           isBinned,
-                                                           indexNew.timeAxis,
-                                                           key);
+                                                      urlHandler->backend(),
+                                                      timeDifference,
+                                                      isBinned,
+                                                      indexNew.timeAxis,
+                                                      key);
             if (m_httpRetrieval->is_Redirected()) {
                 QUrl url = QUrl(m_httpRetrieval->getRedirected_Url());
                 // Messages in case of a redirect and set the widget to the correct location
@@ -217,7 +175,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 // Update the url for the next request
                 urlHandler->setUrl(url);
                 // Make sure we do another request
-                m_receivedContinueAt = true;
+                m_requestAgain = true;
                 readdata_ok = false;
             }
         } else {
@@ -225,7 +183,10 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         }
 
         if (readdata_ok) {
-            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
+            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(),
+                                                m_httpRetrieval->httpStatusCode(),
+                                                m_httpRetrieval->hasContinueAt(),
+                                                m_httpRetrieval->continueAt());
             if (m_httpRetrieval->getCount() > 0) {
                 if (isBinned) {
                     // Get the data
@@ -248,7 +209,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 // We don't care if it's only a couple of seconds, might as well be transmission delay
                 if (endSeconds - m_httpRetrieval->continueAt().toSecsSinceEpoch() > 30) {
                     startSeconds = m_httpRetrieval->continueAt().toSecsSinceEpoch();
-                    m_receivedContinueAt = true;
+                    m_requestAgain = true;
 
                     if (m_httpRetrieval->retryAfter() != 0) {
                         // If the API told us how long to wait, follow that instruction
@@ -267,7 +228,10 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 throw;
             }
         } else {
-            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
+            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(),
+                                                m_httpRetrieval->httpStatusCode(),
+                                                m_httpRetrieval->hasContinueAt(),
+                                                m_httpRetrieval->continueAt());
             // If we intentionally did not send out a request because the bin count was too low, don't generate an error
             // If the request was redirected, an error has already been displayed but the request is not aborted, so don't generate an error
             if (!(binCountLessThanOne && isBinned) && !m_httpRetrieval->is_Redirected()) {
@@ -289,25 +253,32 @@ void WorkerHTTP::getFromArchive(QWidget *w,
             if (!previousHttpRetrievalAborted) {
                 if (m_httpRetrieval->retryAfter() != 0) {
                     // Set this to indicate we are trying again.
-                    // A retry after is basically a continueAt, just that the server couldn't give ANY data, instead of not all.
-                    m_receivedContinueAt = true;
+                    m_requestAgain = true;
                     m_retryAfter = m_httpRetrieval->retryAfter();
                     if (m_httpRetrieval->retryAfter() > 5) {
                         // Nope, we are not waiting this long... Just finish so it is requested again on the next update iteration, being at least 10 secs from now
-                        m_receivedContinueAt = false;
+                        m_requestAgain = false;
                     }
                 }
             }
         }
         // Check if the thread was marked as inactive to cancel everything if needed.
         if (!m_isActive) {
-            // Set receivedContinueAt to false because we don't want any more updates.
-            m_receivedContinueAt = false;
+            // Set requestAgain to false because we don't want any more updates.
+            m_requestAgain = false;
             // set data count to 0 to clarify this data is not needed.
             nbVal = 0;
         }
-        emit resultReady(indexNew, nbVal, m_vecX, m_vecY, m_vecMinY, m_vecMaxY, m_httpRetrieval->getBackend(), !m_receivedContinueAt);
-    } while (m_receivedContinueAt);
+        emit resultReady(indexNew,
+                         nbVal,
+                         m_vecX,
+                         m_vecY,
+                         m_vecMinY,
+                         m_vecMaxY,
+                         m_httpRetrieval->getBackend(),
+                         !m_requestAgain);
+    } while (m_requestAgain);
+
     m_vecX.clear();
     m_vecY.clear();
     m_vecMinY.clear();
@@ -324,4 +295,86 @@ bool WorkerHTTP::isActive() const
 void WorkerHTTP::setIsActive(bool newIsActive)
 {
     m_isActive = newIsActive;
+}
+
+void WorkerHTTP::setCartesianLimits(caCartesianPlot *cartesianWidget,
+                                    double startSeconds,
+                                    double endSeconds,
+                                    double timeBuffer)
+{
+    // This only works on a time scale, if its absolute or whatever, dont touch it.
+    // Also, only do this if the X axis is scaled automatically, otherwise dont touch it.
+    if ((cartesianWidget->getXaxisType() == caCartesianPlot::time) && (cartesianWidget->getXscaling() == caCartesianPlot::Auto)) {
+        // If buffer is not given calculate it to be 5%.
+        // Default value is -1
+        if (timeBuffer == -1) {
+            timeBuffer = (endSeconds - startSeconds) * 0.05;
+        }
+
+        // Set the limits for the X axis of the cartesian plot, has to be in miliseconds.
+        double minXMSecs = 1000 * (startSeconds - timeBuffer);
+        double maxXMSecs = 1000 * (endSeconds + timeBuffer);
+
+        // Now, invoke the function to set the Scale unsing a lamda function,
+        // We have to do this as the widget lives in another thread and this function is NOT thread safe.
+        // This calls the function in the widgets thread itself, that being our main GUI thread.
+        QMetaObject::invokeMethod(cartesianWidget, [minXMSecs, maxXMSecs, cartesianWidget]() {
+            cartesianWidget->setScaleX(minXMSecs, maxXMSecs);
+        });
+    }
+}
+
+UrlHandlerHttp *WorkerHTTP::initializeNewUrlHandler(QString url,
+                                                    indexes channelData,
+                                                    bool useHttps,
+                                                    bool isBinned,
+                                                    double endSeconds,
+                                                    double startSeconds)
+{
+    UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
+
+    // Check whether the provided api name is only the hostname or if it is the whole url and set the according parameters.
+    // It could be the whole url if we were redirected previously. We check this by looking if it starts with "http",
+    // because then it cannot simply be the hostname.
+    if (url.startsWith("http")) {
+        // It's a full url, so parse it as such
+        urlHandler->setUrl(QUrl(url));
+    } else {
+        // It's only the domain name
+        urlHandler->setHostName(url);
+    }
+
+    // Set other parameters
+    urlHandler->setUsesHttps(useHttps);
+    urlHandler->setBackend(channelData.backend);
+    urlHandler->setChannelName(channelData.pv);
+    urlHandler->setBinned(isBinned);
+    urlHandler->setBinCount(channelData.nrOfBins);
+    urlHandler->setEndTime(QDateTime::fromSecsSinceEpoch(endSeconds));
+
+    // If startSeconds is given, set it, otherwise leave it uninitialized.
+    // The default argument is 0
+    if (startSeconds != 0) {
+        urlHandler->setBeginTime(QDateTime::fromSecsSinceEpoch(startSeconds));
+    }
+
+    return urlHandler;
+}
+
+quint64 WorkerHTTP::updateStartSecondsFromMutexKnobData(int index, double currentStartSeconds)
+{
+    double newStartSeconds = currentStartSeconds;
+
+    knobData kData = m_mutexKnobDataPtr->GetMutexKnobData(index);
+    m_mutexKnobDataPtr->DataLock(&kData);
+
+    if (kData.edata.valueCount > 0) {
+        // Update the time from which we have to request new data
+        // Data is stored in miliseconds but we want seconds so convert it
+        newStartSeconds = (reinterpret_cast<double *>(kData.edata.dataB)[kData.edata.valueCount - 1]
+                           / 1000);
+    }
+    m_mutexKnobDataPtr->DataUnlock(&kData);
+
+    return newStartSeconds;
 }

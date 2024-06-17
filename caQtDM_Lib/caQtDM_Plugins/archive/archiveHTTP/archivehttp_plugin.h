@@ -140,7 +140,7 @@ public slots:
     void handleResults(indexes indexNew, int valueCount, QVector<double> XVals, QVector<double> YVals, QVector<double> YMinVals, QVector<double> YMaxVals, QString backend, bool isFinalIteration);
 
 signals:
-    void operate(QWidget *, const indexes, const QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>);
+    void operate(const indexes, const QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>);
     void Signal_StopUpdateInterface();
 
 private slots:
