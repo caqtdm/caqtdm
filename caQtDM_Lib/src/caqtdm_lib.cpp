@@ -3402,35 +3402,11 @@ QString CaQtDM_Lib::handle_single_Macro(QString key, QString value, QString Text
     return Text;
 }
 
-#pragma optimize( "", off)
-void parseParentheses(const QString &input) {
-    QStack<int> parenthesesStack;
-    for (int i = 1; i < input.length(); ++i) {
-        if((input[i-1] == '$')&&(input[i] == '(')) {
-            parenthesesStack.push(i);
-        } else if (input[i] == ')') {
-            if (!parenthesesStack.empty()) {
-                int start = parenthesesStack.top();
-                parenthesesStack.pop();
-                QString content = input.mid(start + 1, i - start - 1);
-                qDebug() << "Matched text inside parentheses:" << content;
-            } else {
-                qDebug() << "Unmatched closing parenthesis at position" << i;
-            }
-        }
-    }
-
-    while (!parenthesesStack.empty()) {
-        qDebug() << "Unmatched opening parenthesis at position" << parenthesesStack.top();
-        parenthesesStack.pop();
-    }
-}
-#pragma optimize( "", on)
 
 QString CaQtDM_Lib::handle_Macro_withConst(QString key, QString value, QString Text){
     QStack<int> parenthesesStack;
     QString pattern=key +"=";
-    qDebug() << "start handle_Macro_withConst2" << key;
+    //qDebug() << "start handle_Macro_withConst2" << key;
     for (int i = 1; i < Text.length(); ++i) {
         if((Text[i-1] == '$')&&(Text[i] == '(')) {
             parenthesesStack.push(i);
@@ -3620,16 +3596,16 @@ QString CaQtDM_Lib::treatMacro(QMap<QString, QString> map, const QString& text, 
 
             }
             // unresolved macros with a own constant
-            qDebug() << "************************************************************";
-            qDebug() << "unresolved macros with a own constant";
-            qDebug() << "************************************************************";
+            //qDebug() << "************************************************************";
+            //qDebug() << "unresolved macros with a own constant";
+            //qDebug() << "************************************************************";
             if(newText.contains("$(")){
 
                 int recursive_counter=0;
                 bool recursive_continue=true;
                 while (recursive_continue) {
                       QString newText_Backup=handle_Macro_Constants(newText);
-                      qDebug()<< newText_Backup<< "<-" << newText;
+                      //qDebug()<< newText_Backup<< "<-" << newText;
                     if (newText_Backup.compare(newText)==0){
                         //qDebug() << "finish Loop simple Macro Replace";
                         recursive_continue=false;
