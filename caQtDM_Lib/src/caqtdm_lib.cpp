@@ -2818,6 +2818,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         for(int i=0; i< caCartesianPlot::curveCount; i++) {
             QString pvs ="";
             QStringList thisString = cartesianplotWidget->getPV(i).split(";");
+            // Remove empty channels as they should just be ignored instead of stopping the whole curve from being monitored.
+            thisString.removeAll(QString(""));
 
             cartesianplotWidget->setColor(cartesianplotWidget->getColor(i), i);
             cartesianplotWidget->setStyle(cartesianplotWidget->getStyle(i), i);
@@ -2863,6 +2865,15 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 pvs.append(pv);
                 tooltip.append(pv);
                 tooltip.append("<br>");
+            } else if (thisString.count() > 2) {
+                postMessage(
+                    QtFatalMsg,
+                    (char *) qasc(
+                        tr("caCartesianPlot widget %1 has too many entries (%2) in "
+                           "channelList_%3, has to be 2. The curve is therefore not drawn.")
+                            .arg(cartesianplotWidget->objectName())
+                            .arg(thisString.count())
+                            .arg(i + 1)));
             }
             cartesianplotWidget->setPV(pvs, i);
         }

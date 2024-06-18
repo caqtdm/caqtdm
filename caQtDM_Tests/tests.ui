@@ -3127,8 +3127,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>100</width>
-           <height>30</height>
+           <width>431</width>
+           <height>191</height>
           </rect>
          </property>
          <attribute name="label">
@@ -3363,7 +3363,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_109">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3391,7 +3391,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_108">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3419,7 +3419,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_75">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3447,7 +3447,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_76">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3475,7 +3475,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_85">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3503,7 +3503,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_77">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3531,7 +3531,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_78">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3559,7 +3559,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_79">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3587,7 +3587,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_80">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3615,7 +3615,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_81">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3643,7 +3643,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_86">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3671,7 +3671,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_87">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3699,7 +3699,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_88">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3727,7 +3727,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_90">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3755,7 +3755,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_89">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3783,7 +3783,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_82">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3811,7 +3811,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_83">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3839,7 +3839,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_84">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3867,7 +3867,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_112">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3899,7 +3899,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_110">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3927,7 +3927,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_111">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3955,7 +3955,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_91">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -3983,7 +3983,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_92">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4011,7 +4011,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_93">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4039,7 +4039,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_94">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4067,7 +4067,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_95">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4095,7 +4095,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_96">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4123,7 +4123,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_97">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4151,7 +4151,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_98">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4179,7 +4179,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_99">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4207,7 +4207,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_100">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4235,7 +4235,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_101">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4263,7 +4263,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_102">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4291,7 +4291,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_103">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4319,7 +4319,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_104">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4347,7 +4347,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_105">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4375,7 +4375,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_106">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>8</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4403,7 +4403,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                <widget class="caLabel" name="calabel_113">
                 <property name="font">
                  <font>
-                  <pointsize>16</pointsize>
+                  <pointsize>9</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -4636,7 +4636,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>4</y>
+        <y>0</y>
         <width>1046</width>
         <height>613</height>
        </rect>
@@ -4651,7 +4651,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>5</number>
+       <number>8</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -9801,9 +9801,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <widget class="caCartesianPlot" name="caCartesianPlot_0">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>205</y>
-          <width>980</width>
+          <x>10</x>
+          <y>250</y>
+          <width>511</width>
           <height>315</height>
          </rect>
         </property>
@@ -9823,7 +9823,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <string>uA</string>
         </property>
         <property name="channels_1" stdset="0">
-         <string notr="true">ACM:TEST:DOUBLE_WAVE;ACM:TEST:DOUBLE_WAVE</string>
+         <string notr="true">ACM:TEST:DOUBLE_WAVEX;ACM:TEST:DOUBLE_WAVE</string>
         </property>
         <property name="Style_1">
          <enum>caCartesianPlot::ThinLines</enum>
@@ -9839,16 +9839,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
          </color>
         </property>
         <property name="channels_2" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caCartesianPlot:curve2X;ACM:TEST:DOUBLE_WAVE</string>
         </property>
         <property name="channels_3" stdset="0">
          <string notr="true"/>
         </property>
+        <property name="triggerChannel" stdset="0">
+         <string notr="true">caCartesianPlot:triggerChannel</string>
+        </property>
         <property name="eraseChannel" stdset="0">
-         <string notr="true">ACM:TEST:MBBO</string>
+         <string notr="true">caCartesianPlot:eraseChannel</string>
         </property>
         <property name="eraseMode">
-         <enum>caCartesianPlot::ifzero</enum>
+         <enum>caCartesianPlot::ifnotzero</enum>
         </property>
         <property name="foreground">
          <color>
@@ -9893,43 +9896,525 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <enum>caCartesianPlot::log10</enum>
         </property>
        </widget>
-       <widget class="caChoice" name="caChoice_9">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
+       <widget class="caCalc" name="cacalc_69">
         <property name="geometry">
          <rect>
-          <x>771</x>
-          <y>91</y>
-          <width>96</width>
-          <height>86</height>
+          <x>910</x>
+          <y>100</y>
+          <width>70</width>
+          <height>20</height>
          </rect>
         </property>
-        <property name="channel" stdset="0">
-         <string notr="true">ACM:TEST:MBBO</string>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:eraseChannel</string>
         </property>
-        <property name="foreground">
+        <property name="calc">
+         <string notr="true"/>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onFirstChange</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_70">
+        <property name="geometry">
+         <rect>
+          <x>910</x>
+          <y>60</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:triggerChannel</string>
+        </property>
+        <property name="calc">
+         <string notr="true"/>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onFirstChange</enum>
+        </property>
+       </widget>
+       <widget class="caToggleButton" name="catogglebutton_6">
+        <property name="geometry">
+         <rect>
+          <x>780</x>
+          <y>100</y>
+          <width>121</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>erase channel</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:eraseChannel</string>
+        </property>
+       </widget>
+       <widget class="caToggleButton" name="catogglebutton_7">
+        <property name="geometry">
+         <rect>
+          <x>780</x>
+          <y>60</y>
+          <width>121</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>trigger channel</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:triggerChannel</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_71">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>10</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve1Y</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;9?A+0.1:0.1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve1Y</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_107">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>120</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve1X</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;10?A+0.15:0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve1X</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_72">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>30</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve2Y</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;9?A+0.2:0.1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve2Y</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_73">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>50</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve3Y</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;9?A+0.3:0.1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve3Y</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_74">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>70</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve4Y</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;9?A+0.4:0.1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve4Y</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_108">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>140</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve2X</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;10?A+0.25:0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve2X</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_109">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>160</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve3X</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;10?A+0.35:0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve3X</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_110">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>180</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve4X</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;10?A+0.45:0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve4X</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_75">
+        <property name="geometry">
+         <rect>
+          <x>710</x>
+          <y>20</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curveY</string>
+        </property>
+        <property name="variableType">
+         <enum>caCalc::vector</enum>
+        </property>
+        <property name="channels" stdset="0">
+         <string>caCartesianPlot:curve1Y;caCartesianPlot:curve2Y;caCartesianPlot:curve3Y;caCartesianPlot:curve4Y;caCartesianPlot:curve5Y</string>
+        </property>
+        <property name="calc">
+         <string notr="true"/>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve1Y</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">caCartesianPlot:curve2Y</string>
+        </property>
+        <property name="channelC">
+         <string notr="true">caCartesianPlot:curve3Y</string>
+        </property>
+        <property name="channelD">
+         <string notr="true">caCartesianPlot:curve4Y</string>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::Never</enum>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_111">
+        <property name="geometry">
+         <rect>
+          <x>710</x>
+          <y>170</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curveX</string>
+        </property>
+        <property name="variableType">
+         <enum>caCalc::vector</enum>
+        </property>
+        <property name="channels" stdset="0">
+         <string>caCartesianPlot:curve1X;caCartesianPlot:curve2X;caCartesianPlot:curve3X;caCartesianPlot:curve4X;caCartesianPlot:curve5X</string>
+        </property>
+        <property name="calc">
+         <string notr="true"/>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve1X</string>
+        </property>
+        <property name="channelB">
+         <string notr="true">caCartesianPlot:curve2X</string>
+        </property>
+        <property name="channelC">
+         <string notr="true">caCartesianPlot:curve3X</string>
+        </property>
+        <property name="channelD">
+         <string notr="true">caCartesianPlot:curve4X</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_122">
+        <property name="geometry">
+         <rect>
+          <x>799</x>
+          <y>130</y>
+          <width>101</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>count channel</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_76">
+        <property name="geometry">
+         <rect>
+          <x>910</x>
+          <y>140</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:countChannel</string>
+        </property>
+        <property name="calc">
+         <string notr="true"/>
+        </property>
+        <property name="initialValue">
+         <double>3.000000000000000</double>
+        </property>
+        <property name="precision">
+         <number>1</number>
+        </property>
+        <property name="eventSignal">
+         <enum>caCalc::onFirstChange</enum>
+        </property>
+       </widget>
+       <widget class="caSpinbox" name="caspinbox_8">
+        <property name="geometry">
+         <rect>
+          <x>740</x>
+          <y>130</y>
+          <width>61</width>
+          <height>30</height>
+         </rect>
+        </property>
+        <property name="decimalDigits" stdset="0">
+         <number>0</number>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:countChannel</string>
+        </property>
+        <property name="precisionMode">
+         <enum>caSpinbox::User</enum>
+        </property>
+        <property name="minValue">
+         <double>-10.000000000000000</double>
+        </property>
+       </widget>
+       <widget class="caCartesianPlot" name="caCartesianPlot_6">
+        <property name="geometry">
+         <rect>
+          <x>530</x>
+          <y>250</y>
+          <width>511</width>
+          <height>315</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="Title" stdset="0">
+         <string notr="true">Test Curve</string>
+        </property>
+        <property name="TitleX">
+         <string>[kv]</string>
+        </property>
+        <property name="TitleY">
+         <string>uA</string>
+        </property>
+        <property name="channels_1" stdset="0">
+         <string notr="true">ACM:TEST:DOUBLE_WAVEX;ACM:TEST:DOUBLE_WAVE</string>
+        </property>
+        <property name="Style_1">
+         <enum>caCartesianPlot::ThinLines</enum>
+        </property>
+        <property name="symbol_1">
+         <enum>caCartesianPlot::NoSymbol</enum>
+        </property>
+        <property name="color_1">
          <color>
           <red>0</red>
           <green>0</green>
           <blue>0</blue>
          </color>
         </property>
+        <property name="channels_2" stdset="0">
+         <string notr="true">caCartesianPlot:curveX;caCartesianPlot:curveY</string>
+        </property>
+        <property name="channels_3" stdset="0">
+         <string notr="true"/>
+        </property>
+        <property name="plotMode">
+         <enum>caCartesianPlot::PlotLastNPoints</enum>
+        </property>
+        <property name="countNumOrChannel" stdset="0">
+         <string notr="true">caCartesianPlot:countChannel</string>
+        </property>
+        <property name="triggerChannel" stdset="0">
+         <string notr="true">caCartesianPlot:triggerChannel</string>
+        </property>
+        <property name="eraseChannel" stdset="0">
+         <string notr="true">caCartesianPlot:eraseChannel</string>
+        </property>
+        <property name="eraseMode">
+         <enum>caCartesianPlot::ifnotzero</enum>
+        </property>
+        <property name="foreground">
+         <color>
+          <red>218</red>
+          <green>218</green>
+          <blue>218</blue>
+         </color>
+        </property>
         <property name="background">
          <color>
           <red>255</red>
+          <green>255</green>
+          <blue>255</blue>
+         </color>
+        </property>
+        <property name="scaleColor">
+         <color>
+          <red>0</red>
           <green>0</green>
           <blue>0</blue>
          </color>
         </property>
-        <property name="alignment">
-         <enum>caChoice::center</enum>
+        <property name="XaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
         </property>
-        <property name="colorMode">
-         <enum>caChoice::Static</enum>
+        <property name="YaxisScaling" stdset="0">
+         <enum>caCartesianPlot::User</enum>
         </property>
-        <property name="fontScaleMode" stdset="0">
-         <enum>EPushButton::None</enum>
+        <property name="XaxisLimits">
+         <string>0.0;10</string>
+        </property>
+        <property name="YaxisLimits">
+         <string>0.01;10</string>
+        </property>
+        <property name="LegendEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="XaxisType">
+         <enum>caCartesianPlot::linear</enum>
+        </property>
+        <property name="YAxisType" stdset="0">
+         <enum>caCartesianPlot::log10</enum>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_123">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>210</y>
+          <width>311</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Normal, w. trigger &amp; erase channels</string>
+        </property>
+       </widget>
+       <widget class="caLabel" name="calabel_124">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>210</y>
+          <width>361</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Same, but with PlotLastNPoints controlled by countChannel</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_77">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>90</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve5Y</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;9?A+0.5:0.1</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve5Y</string>
+        </property>
+       </widget>
+       <widget class="caCalc" name="cacalc_112">
+        <property name="geometry">
+         <rect>
+          <x>630</x>
+          <y>200</y>
+          <width>70</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="variable">
+         <string notr="true">caCartesianPlot:curve5X</string>
+        </property>
+        <property name="calc">
+         <string notr="true">A&lt;10?A+0.55:0</string>
+        </property>
+        <property name="channel" stdset="0">
+         <string notr="true">caCartesianPlot:curve5X</string>
         </property>
        </widget>
       </widget>
@@ -15170,7 +15655,7 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 4
          <string notr="true">ACM:TEST:MBBO</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caMenu {background-color: rgba(255, 255, 255, 255); color: rgba(0, 0, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caMenu" name="caMenu_10">
@@ -15230,7 +15715,7 @@ background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(9, 4
          <string>myMask</string>
         </property>
         <property name="styleSheet" stdset="0">
-         <string notr="true"/>
+         <string notr="true">caMenu {background-color: rgba(255, 255, 255, 255); color: rgba(0, 0, 0, 255);}</string>
         </property>
        </widget>
        <widget class="caCalc" name="cacalc_53">

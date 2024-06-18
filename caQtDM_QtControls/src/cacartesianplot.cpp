@@ -209,6 +209,8 @@ void caCartesianPlot::updateLegendsPV() {
 
 void caCartesianPlot::resetZoom() {
     double minX, maxX, minY, maxY;
+    double lowerBoundBefore = axisScaleDiv(xBottom).lowerBound();
+    double upperBoundBefore = axisScaleDiv(xBottom).upperBound();
 
     if(getXLimits(minX, maxX)) setScaleX(minX, maxX);
     if(getYLimits(minY, maxY)) setScaleY(minY, maxY);
@@ -216,6 +218,16 @@ void caCartesianPlot::resetZoom() {
     if(thisXscaling == Auto) setAxisAutoScale(xBottom, true);
     replot();
 
+    double lowerBoundAfter = axisScaleDiv(xBottom).lowerBound();
+    double upperBoundAfter = axisScaleDiv(xBottom).upperBound();
+
+    // To stop widgets that have the reset zoom signal & slots connected to each other from recursively resetting each other,
+    // check whether the bounds have changed in this reset. If not, no need to emit the signal.
+    if ((lowerBoundBefore == lowerBoundAfter) && (upperBoundBefore == upperBoundAfter)) {
+        // In this case the bounds have NOT changed so stop here.
+        return;
+    }
+    // In this case the bounds have changed so emit the reset zoom signal.
     emit zoomHasReset();
 }
 

@@ -70,13 +70,13 @@ public:
     void setAllowLargeResult(const bool &newAllowLargeResults);
 
     /*
-     * Returns the domain name in the format example.com
+     * Returns the hostname in the format example.com
      * */
-    QUrl domainName() const;
+    QUrl hostName() const;
     /*
-     * Sets the domain name. Input must be in the format example.com.
+     * Sets the hostname. Input must be in the format example.com.
      * */
-    void setDomainName(const QUrl &newBaseUrl);
+    void setHostName(const QUrl &newBaseUrl);
 
     bool usesHttps() const;
     void setUsesHttps(const bool &newHttps);
@@ -122,7 +122,7 @@ private:
     QString m_apiPathBinned;
     QString m_apiPathRaw;
     bool m_allowLargeResult;
-    QUrl m_domainName;
+    QUrl m_hostName;
     bool m_usesHttps;
     bool m_binned;
     int m_binCount;

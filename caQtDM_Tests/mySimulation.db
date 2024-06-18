@@ -657,6 +657,12 @@ record(waveform, "ACM:TEST:DOUBLE_WAVE"){
         field(PREC, "2")
 }
 
+record(waveform, "ACM:TEST:DOUBLE_WAVEX"){
+        field(FTVL, "DOUBLE")
+        field(NELM, "100")
+        field(PREC, "2")
+}
+
 record(waveform, "ACM:TEST:LONG_WAVE"){
         field(FTVL, "LONG")
         field(NELM, "100")

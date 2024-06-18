@@ -57,8 +57,7 @@ public slots:
      * Starts a network request to the given index_name and emits the signal resultReady when new data has arrived.
      * As long as the response contains a continueAt, this function keeps requesting additional data until all initially requested data is received.
      * */
-    void getFromArchive(QWidget *w,
-                        indexes indexNew,
+    void getFromArchive(indexes indexNew,
                         QString index_name,
                         MessageWindow *messageWindow,
                         MutexKnobData *mutexKnobDataP,
@@ -75,13 +74,20 @@ signals:
                      bool isFinalIteration);
 
 private:
+    void setCartesianLimits(caCartesianPlot *cartesianWidget, double startSeconds, double endSeconds, double timeBuffer = -1);
+
+    UrlHandlerHttp *initializeNewUrlHandler(QString url, indexes channelData, bool useHttps, bool isBinned, double endSeconds, double startSeconds = 0);
+
+    quint64 updateStartSecondsFromMutexKnobData(int index, double currentStartSeconds);
+
     /* Watch out when working with this element, it might behave entirely different amongst Qt versions.
      * In Qt 5.15 QVector is a distinct Class, whereas since Qt 6.0 it is a mere alias for QList.
      * */
     QVector<double> m_vecX, m_vecY, m_vecMinY, m_vecMaxY;
 
+    MutexKnobData *m_mutexKnobDataPtr;
     HttpRetrieval *m_httpRetrieval;
-    bool m_receivedContinueAt;
+    bool m_requestAgain;
     QMutex m_globalMutex;
     int m_retryAfter;
     bool m_isActive;

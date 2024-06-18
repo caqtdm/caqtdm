@@ -63,9 +63,9 @@ QUrl UrlHandlerHttp::assembleUrl() const
 
     // Set first part of the url, including http or https.
     if (m_usesHttps) {
-        assembledUrl = QUrl(QString(QString("https://") + m_domainName.toString()));
+        assembledUrl = QUrl(QString(QString("https://") + m_hostName.toString()));
     } else {
-        assembledUrl = QUrl(QString(QString("http://") + m_domainName.toString()));
+        assembledUrl = QUrl(QString(QString("http://") + m_hostName.toString()));
     }
 
     // Add the needed api path.
@@ -135,10 +135,10 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
     // Check if url starts with http (e.g. http(s)://example.com), or not (e.g. example.com).
     if (newUrl.toString().toLower().startsWith("http")) {
         // If it starts with http, the domain name is the third part.
-        m_domainName = urlParts[2];
+        m_hostName = urlParts[2];
     } else {
         // Otherwise the domain name is the first part.
-        m_domainName = urlParts[0];
+        m_hostName = urlParts[0];
     }
 }
 
@@ -172,14 +172,14 @@ void UrlHandlerHttp::setAllowLargeResult(const bool &newAllowLargeResults)
     m_allowLargeResult = newAllowLargeResults;
 }
 
-void UrlHandlerHttp::setDomainName(const QUrl &newDomainName)
+void UrlHandlerHttp::setHostName(const QUrl &newHostName)
 {
-    m_domainName = newDomainName;
+    m_hostName = newHostName;
 }
 
-QUrl UrlHandlerHttp::domainName() const
+QUrl UrlHandlerHttp::hostName() const
 {
-    return m_domainName;
+    return m_hostName;
 }
 
 bool UrlHandlerHttp::usesHttps() const

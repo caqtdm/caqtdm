@@ -639,16 +639,16 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
         connect(newWorkerThread, SIGNAL(finished()), newWorker, SLOT(workerFinish()));
         connect(newWorkerThread, SIGNAL(finished()), newWorkerThread, SLOT(deleteLater()));
         connect(this,
-                SIGNAL(operate(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>)),
+                SIGNAL(operate(indexes, QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>)),
                 newWorker,
-                SLOT(getFromArchive(QWidget *, indexes, QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>)));
+                SLOT(getFromArchive(indexes, QString, MessageWindow *, MutexKnobData *, QSharedPointer<HttpPerformanceData>)));
         connect(newWorker,
                 SIGNAL(resultReady(indexes, int, QVector<double>, QVector<double>, QVector<double>, QVector<double>, QString, bool)),
                 this,
                 SLOT(handleResults(indexes, int, QVector<double>, QVector<double>, QVector<double>, QVector<double>, QString, bool)));
         newWorkerThread->start();
 
-        emit operate((QWidget *) m_messageWindowP, indexNew, index_name, m_messageWindowP, m_mutexKnobDataP, m_retrievalPerformancePerPV.value(i.key()));
+        emit operate(indexNew, index_name, m_messageWindowP, m_mutexKnobDataP, m_retrievalPerformancePerPV.value(i.key()));
         disconnect(newWorker);
         ++i;
     }
