@@ -7,7 +7,7 @@ call caQtDM_Env.bat
 
 set PATH=%PATH%;%QTHOME%\bin
 
-echo package will be removed from .\caQtDM_Binaries and all directories will be cleaned up
+echo .\caQtDM_Binaries(_64Bit) will be removed and all directories will be cleaned up
 
 echo Press [Enter] key to start cleanup
 :clean
@@ -15,6 +15,8 @@ echo ========== remove binaries from directories ============
 qmake all.pro
 where /q jom.exe 
 IF %ERRORLEVEL% NEQ 0 (nmake clean) ELSE (jom clean)
+rmdir /S /Q .\caQtDM_Binaries
+rmdir /S /Q .\caQtDM_Binaries_64Bit
 
 
 echo ========== remove makefiles from directories ============
@@ -39,6 +41,7 @@ del .\caQtDM_Lib\caQtDM_Plugins\environment\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\archive\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\archive\archiveSF\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\archive\archiveHIPA\Makefile*
+del .\caQtDM_Lib\caQtDM_Plugins\archive\archiveHTTP\Makefile*
 del .\caQtDM_Lib\caQtDM_Plugins\archive\archivePro\Makefile*
 
 del .\caQtDM_Parsers\Makefile*
@@ -78,6 +81,10 @@ rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics4\release
 rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics4\debug
 rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\epics4\moc
 
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\archive\archiveHTTP\release
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\archive\archiveHTTP\debug
+rmdir /S /Q .\caQtDM_Lib\caQtDM_Plugins\archive\archiveHTTP\moc
+
 rmdir /S /Q .\caQtDM_Parsers\adlParserSharedLib\release
 rmdir /S /Q .\caQtDM_Parsers\adlParserSharedLib\debug
 rmdir /S /Q .\caQtDM_Parsers\adlParserSharedLib\moc
@@ -92,8 +99,6 @@ rmdir /S /Q .\caQtDM_QtControls\moc
 
 rmdir /S /Q .\caQtDM_QtControls\plugins\release
 rmdir /S /Q .\caQtDM_QtControls\plugins\debug
-
-rem rmdir /S /Q .\caQtDM_Binaries
 
 echo =========== remove package files ==================
 
