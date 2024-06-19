@@ -7,7 +7,7 @@ call caQtDM_Env.bat
 
 set PATH=%PATH%;%QTHOME%\bin
 
-echo .\caQtDM_Binaries(_64Bit) will be removed and all directories will be cleaned up
+echo %CAQTDM_COLLECT% will be removed and all directories will be cleaned up
 
 echo Press [Enter] key to start cleanup
 :clean
@@ -15,8 +15,7 @@ echo ========== remove binaries from directories ============
 qmake all.pro
 where /q jom.exe 
 IF %ERRORLEVEL% NEQ 0 (nmake clean) ELSE (jom clean)
-rmdir /S /Q .\caQtDM_Binaries
-rmdir /S /Q .\caQtDM_Binaries_64Bit
+rmdir /S /Q %CAQTDM_COLLECT%
 
 
 echo ========== remove makefiles from directories ============

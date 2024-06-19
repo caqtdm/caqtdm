@@ -2,13 +2,13 @@
 
 source caQtDM_Env
 
-echo caQtDM_Binaries and all directories will be cleaned up
+echo  $CAQTDM_COLLECT will be removed and all directories will be cleaned up
 
 read -p "Press [Enter] key to start cleanup "
 
 echo ========== remove binaries from directories ============
-if [ -d "./caQtDM_Binaries" ]; then
-rm -rf ./caQtDM_Binaries
+if [ -d "$CAQTDM_COLLECT" ]; then
+rm -rf $CAQTDM_COLLECT
 fi
 
 echo ========== remove makefiles from directories ============
