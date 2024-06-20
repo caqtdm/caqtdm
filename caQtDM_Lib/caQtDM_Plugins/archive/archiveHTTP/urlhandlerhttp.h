@@ -97,11 +97,11 @@ public:
     void setBackend(const QString &newBackend);
 
     /*
-     * Returns the channel name without the suffix (.X/.Y/.minX/.minY).
+     * Returns the channel name without the suffix (.X/.Y/.minY/.maxY).
      * */
     QString channelName() const;
     /*
-     * Sets the channel name with the given name but removes the suffix first (.X/.Y/.minX/.minY)-
+     * Sets the channel name with the given name but removes the suffix first (.X/.Y/.minY/.maxY).
      * */
     void setChannelName(const QString &newChannelName);
 

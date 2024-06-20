@@ -117,11 +117,16 @@ void UrlHandlerHttp::setUrl(const QUrl &newUrl)
         m_binCount = query.queryItemValue(m_binCountKey).toInt();
         m_binned = true;
         // In this case we request binned data so set the binned path.
+        // Because this parameter is specified, the path (coming before it) must be specified too.
         m_apiPathBinned = newUrl.path();
     } else {
         m_binned = false;
-        // In this case we request raw data so set the raw path.
-        m_apiPathRaw = newUrl.path();
+        // In this case we request raw data so set the raw path, but only if it is not empty or there are other query items.
+        // Because if there are other query items, then the path has to be specified, but if not it could also only be the hostname,
+        // in which case we must watch out not to overwrite the default api path with an empty value.
+        if (!query.queryItems().isEmpty() || !newUrl.path().isEmpty()) {
+            m_apiPathRaw = newUrl.path();
+        }
     }
     if (newUrl.toString().toLower().startsWith("https")) {
         m_usesHttps = true;
@@ -230,10 +235,11 @@ QString UrlHandlerHttp::channelName() const
 void UrlHandlerHttp::setChannelName(const QString &newChannelName)
 {
     m_channelName = newChannelName;
-    m_channelName.remove(".X", Qt::CaseInsensitive);
-    m_channelName.remove(".Y", Qt::CaseInsensitive);
-    m_channelName.remove(".minY", Qt::CaseInsensitive);
-    m_channelName.remove(".maxY", Qt::CaseInsensitive);
+    if (m_channelName.endsWith(".X") || m_channelName.endsWith(".Y")) {
+        m_channelName.chop(2);
+    } else if (m_channelName.endsWith(".minY") || m_channelName.endsWith(".maxY")) {
+        m_channelName.chop(4);
+    }
 }
 
 QDateTime UrlHandlerHttp::beginTime() const

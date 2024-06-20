@@ -189,8 +189,8 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                                                            isBinned,
                                                            indexNew.timeAxis,
                                                            key);
-            if (m_httpRetrieval->is_Redirected()) {
-                QUrl url = QUrl(m_httpRetrieval->getRedirected_Url());
+            if (m_httpRetrieval->isRedirected()) {
+                QUrl url = QUrl(m_httpRetrieval->getRedirectedUrl());
                 // Messages in case of a redirect and set the widget to the correct location
                 // with a reload of the panel this information get lost.
                 if (messageWindow != (MessageWindow *) Q_NULLPTR) {
@@ -214,7 +214,7 @@ void WorkerHTTP::getFromArchive(QWidget *w,
         }
 
         if (readdata_ok) {
-            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
+            httpPerformanceData->addNewResponse(m_httpRetrieval->responseSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             if (m_httpRetrieval->getCount() > 0) {
                 if (isBinned) {
                     m_vecX.clear();
@@ -262,10 +262,10 @@ void WorkerHTTP::getFromArchive(QWidget *w,
                 throw;
             }
         } else {
-            httpPerformanceData->addNewResponse(m_httpRetrieval->requestSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
+            httpPerformanceData->addNewResponse(m_httpRetrieval->responseSizeKB(), m_httpRetrieval->httpStatusCode(), m_httpRetrieval->hasContinueAt(), m_httpRetrieval->continueAt());
             // If we intentionally did not send out a request because the bin count was too low, don't generate an error
             // If the request was redirected, an error has already been displayed but the request is not aborted, so don't generate an error
-            if (!(binCountLessThanOne && isBinned) && !m_httpRetrieval->is_Redirected()) {
+            if (!(binCountLessThanOne && isBinned) && !m_httpRetrieval->isRedirected()) {
                 if (messageWindow != (MessageWindow *) Q_NULLPTR) {
                     QString mess("ArchiveHTTP plugin -- lastError: ");
                     if (previousHttpRetrievalAborted) {
