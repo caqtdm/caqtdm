@@ -41,15 +41,21 @@ class Q_DECL_EXPORT ArchiveHTTP_Plugin : public QObject, ControlsInterface
     Q_OBJECT
 
     Q_INTERFACES(ControlsInterface)
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-    Q_PLUGIN_METADATA(IID "ch.psi.caqtdm.Plugin.ControlsInterface/1.0.democontrols")
-#endif
+    Q_PLUGIN_METADATA(IID "ch.psi.caqtdm.Plugin.ControlsInterface/1.0.archiveHTTP")
 
     // Everything in public: is present in ControlsInterface
 public:
     ArchiveHTTP_Plugin();
     ~ArchiveHTTP_Plugin();
+
+    /*
+     * Returns the plugin name.
+     * */
     QString pluginName();
+
+    /*
+     * Initializes the communication layer, options are not implemented by this plugin.
+     * */
     int initCommunicationLayer(MutexKnobData *data,
                                MessageWindow *messageWindow,
                                QMap<QString, QString> options);

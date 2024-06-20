@@ -201,12 +201,12 @@ void HttpRetrieval::cancelDownload()
     m_globalMutex.unlock();
 }
 
-QString HttpRetrieval::getRedirected_Url() const
+QString HttpRetrieval::getRedirectedUrl() const
 {
     return m_redirectedUrl;
 }
 
-bool HttpRetrieval::is_Redirected() const
+bool HttpRetrieval::isRedirected() const
 {
     return m_isRedirected;
 }
@@ -575,7 +575,7 @@ int HttpRetrieval::retryAfter() const
     return m_retryAfter;
 }
 
-quint64 HttpRetrieval::requestSizeKB() const
+quint64 HttpRetrieval::responseSizeKB() const
 {
     return m_requestSizeKB;
 }
