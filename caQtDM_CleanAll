@@ -2,13 +2,13 @@
 
 source caQtDM_Env
 
-echo package will be removed from ./caQtDM_Binaries and all directories will be cleaned up
+echo  $CAQTDM_COLLECT will be removed and all directories will be cleaned up
 
 read -p "Press [Enter] key to start cleanup "
 
 echo ========== remove binaries from directories ============
-if [ -d "./caQtDM_Binaries" ]; then
-rm -rf ./caQtDM_Binaries/*
+if [ -d "$CAQTDM_COLLECT" ]; then
+rm -rf $CAQTDM_COLLECT
 fi
 
 echo ========== remove makefiles from directories ============
@@ -38,6 +38,8 @@ rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/Makefile
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHTTP/Makefile.csplugins
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHTTP/Makefile
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Makefile.csplugins
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/Makefile
 rm -f ./caQtDM_QtControls/Makefile
@@ -83,6 +85,8 @@ rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveSF/moc/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHIPA/moc/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHTTP/obj/*
+rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveHTTP/moc/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/obj/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archivePRO/moc/*
 rm -f ./caQtDM_Lib/caQtDM_Plugins/archive/archiveCA/obj/*
