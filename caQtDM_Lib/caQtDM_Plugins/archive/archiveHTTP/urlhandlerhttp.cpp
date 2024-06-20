@@ -235,10 +235,14 @@ QString UrlHandlerHttp::channelName() const
 void UrlHandlerHttp::setChannelName(const QString &newChannelName)
 {
     m_channelName = newChannelName;
-    if (m_channelName.endsWith(".X") || m_channelName.endsWith(".Y")) {
-        m_channelName.chop(2);
-    } else if (m_channelName.endsWith(".minY") || m_channelName.endsWith(".maxY")) {
-        m_channelName.chop(4);
+
+    // Remove possible suffixes because the api only takes the channel name itself.
+    QStringList suffixList = {".X",".Y",".minY",".maxY"};
+    for (const QString &suffix : suffixList) {
+        if (m_channelName.endsWith(suffix)) {
+            m_channelName.chop(suffix.length());
+            break;
+        }
     }
 }
 
