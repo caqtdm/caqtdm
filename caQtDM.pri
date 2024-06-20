@@ -636,6 +636,11 @@ caQtDM_Viewer {
                                     zmqlibrary.files += $$(ZMQLIB)/libzmq.5.dylib
                                     QMAKE_BUNDLE_DATA += zmqlibrary
                                 }
+                archiveHTTP:{
+                                plugins_archiveHTTP.path = Contents/PlugIns/controlsystems
+                                plugins_archiveHTTP.files += $$(CAQTDM_COLLECT)/controlsystems/libarchiveHTTP_plugin.dylib
+                                QMAKE_BUNDLE_DATA += plugins_archiveHTTP
+                            }
                 archiveSF:{
                                     plugins_archiveSF.path = Contents/PlugIns/controlsystems
                                     plugins_archiveSF.files += $$(CAQTDM_COLLECT)/controlsystems/libarchiveSF_plugin.dylib

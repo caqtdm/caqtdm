@@ -97,7 +97,7 @@ bool loadPlugins::loadAll(QMap<QString, ControlsInterface*> &interfaces, MutexKn
                 possiblePlugins.append(filename);
             }
         }
-#elif defined(__OSX__)
+#elif defined(__OSX__)|| defined(__APPLE__)
         // Only check .dylib files, otherwise we get unneccessary errors
         for (int i = 0; i < filesInPluginFolder.size(); ++i) {
             const QString& filename = filesInPluginFolder.at(i);

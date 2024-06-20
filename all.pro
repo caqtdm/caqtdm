@@ -95,6 +95,7 @@ android {
 archiveCA.depends = caQtDM_QtControls caQtDM_Lib
 archivePRO.depends = caQtDM_QtControls caQtDM_Lib
 archiveSF.depends = caQtDM_QtControls caQtDM_Lib
+archiveHTTP.depends = caQtDM_QtControls caQtDM_Lib
 archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
 
 iosArchitectures=armv7
