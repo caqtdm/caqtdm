@@ -38,7 +38,15 @@ public:
     WorkerHTTP();
     ~WorkerHTTP();
 
+    /*
+     * Returns whether or not this worker is still active.
+     * */
     bool isActive() const;
+
+    /*
+     * Marks this worker as active or inactive.
+     * If marked as inactive, the worker will tidy up and finish as soon as possible.
+     * */
     void setIsActive(bool newIsActive);
 
 public slots:
@@ -64,6 +72,9 @@ public slots:
                         QSharedPointer<HttpPerformanceData> httpPerformanceData);
 
 signals:
+    /*
+     * Signal to indicate new result data is ready. It only contains the data from the current iteration, so no old data.
+     * */
     void resultReady(indexes indexNew,
                      int valueCount,
                      QVector<double> XVals,

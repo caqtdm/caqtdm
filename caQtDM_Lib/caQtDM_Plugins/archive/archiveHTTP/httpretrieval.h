@@ -49,9 +49,6 @@
         std::fflush(stdout); \
     } while (0)
 
-
-class QNetworkAccessManager;
-
 class HttpRetrieval:public QObject
 {
     Q_OBJECT
@@ -66,12 +63,39 @@ public:
      * */
     int getCount();
 
+    /*
+     * Appends the parsed raw data to the given vectors.
+     * */
     void getDataAppended(QVector<double> &x, QVector<double> &y);
+
+    /*
+     * Appends the parsed binned data to the given vectors.
+     * */
     void getBinnedDataAppended(QVector<double> &x, QVector<double> &avgY, QVector<double> &minY, QVector<double> &maxY);
+
+    /*
+     * Returns the backend specified in the api call.
+     * */
     const QString getBackend();
-    QString getRedirected_Url() const;
-    bool is_Redirected() const;
+
+    /*
+     * Returns the url the request was redirected to, if it was.
+     * */
+    QString getRedirectedUrl() const;
+
+    /*
+     * Returns whether or not the request has been redirected.
+     * */
+    bool isRedirected() const;
+
+    /*
+     * Returns whether or not the response contained a continueAt time stamp.
+     * */
     bool hasContinueAt() const;
+
+    /*
+     * Returns the continueAt time stamp if one has been sent with the response.
+     * */
     QDateTime continueAt() const;
 
     /*
@@ -80,13 +104,30 @@ public:
      * */
     bool requestUrl(const QUrl downloadUrl, const QString backend, const int secondsPast, const bool binned, const bool timeAxis, const QString key);
 
+    /*
+     * Specifies whether or not the request has been aborted, e.g through parent thread.
+     * */
     bool isAborted() const;
+
+    /*
+     * Returns the HTTP status code of the response.
+     * */
     int httpStatusCode() const;
-    quint64 requestSizeKB() const;
+
+    /*
+     * Returns the size of the response in KB.
+     * */
+    quint64 responseSizeKB() const;
+
+    /*
+     * Returns the cooldown to wait until another request is sent, if suggested by the api in the response, in seconds.
+     * */
     int retryAfter() const;
 
 signals:
-    void networkError(const QString);
+    /*
+     * Signal to indicate the processing of the network request has finished.
+     * */
     void requestFinished();
 
 protected slots:
