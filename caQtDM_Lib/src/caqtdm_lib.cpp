@@ -7017,7 +7017,9 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
         // the widget itsself only knows its pv's, however when same pv's come from different plugins, some confusion will occur
         for(int i=0; i<nbMonitors; i++) {
             knobData *kPtr =  mutexKnobDataP->getMutexKnobDataPV(w, pv[i]);
-            MonitorList.append(kPtr->index);
+            if(kPtr != Q_NULLPTR){
+                MonitorList.append(kPtr->index);
+            }
         }
         MonitorList.insert(0, nbMonitors);
 
