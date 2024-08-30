@@ -1024,7 +1024,12 @@ int EpicsSetValue_Connected(chid ch,char *pv, double rdata, int32_t idata, char 
         return ECA_DISCONN;
     }
     chType = ca_field_type(ch);
+    if (!ca_write_access(ch)){
+        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) no write access\n", pv));
+        return ECA_NOWTACCESS;
+    }
 
+    chType = ca_field_type(ch);
     if(forceType == 1) chType = DBF_DOUBLE;
     else if(forceType == 2) chType = DBF_INT;
 
@@ -1214,6 +1219,10 @@ int EpicsSetWave_Connected(chid ch,char *pv, float *fdata, double *ddata, int16_
     if (ca_state(ch) != cs_conn) {
         C_postMsgEvent(messageWindowPtr, 1, vaPrintf("pv (%s) is not connected\n", pv));
         return status;
+    }
+    if (!ca_write_access(ch)){
+        C_postMsgEvent(messageWindowPtr, 1, vaPrintf("put pv (%s) no write access\n", pv));
+        return ECA_NOWTACCESS;
     }
 
     chType = ca_field_type(ch);
