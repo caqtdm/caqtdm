@@ -356,8 +356,12 @@ int main(int argc, char *argv[])
     #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
         if (qApp->platformName()== QLatin1String("xcb")){
     #endif
-
+    #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     QString X_Server_Check=ServerVendor(QX11Info::display());
+    #else
+        QString X_Server_Check=ServerVendor(QNativeInterface::QX11Application::display());
+    #endif
+
     if (X_Server_Check.contains("Colin Harrison")){ //Xming Server on Windows, yes this is a quickfix!
        fileOpenWindow.move(10,30);// 0,0 is outside the visible areas on the taget
     }else{
