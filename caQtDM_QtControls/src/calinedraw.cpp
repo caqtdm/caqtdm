@@ -25,16 +25,18 @@
 
 #include "calinedraw.h"
 #include "alarmdefs.h"
+#include "qevent.h"
 
+#include <cmath>
+#include <cstdlib>
 #include <QPainter>
 #include <qnumeric.h>
 #include <QDebug>
 #if defined(_MSC_VER)
-    #ifndef snprintf
-     #define snprintf _snprintf
-    #endif
+#ifndef snprintf
+#define snprintf _snprintf
 #endif
-
+#endif
 
 caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
 {
@@ -43,26 +45,29 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     // if this font does not exist then try a next one
     QFontInfo info(font);
     QString family = info.family();
-    //printf("got font %s\n", qasc(family));
-    if(!family.contains("Lucida Sans Typewriter")) {
-        QFont  newfont("Monospace");   // not very nice, while a a dot inside the zero to distinguish from o
+    // printf("got font %s\n", qasc(family));
+    if (!family.contains("Lucida Sans Typewriter"))
+    {
+        QFont newfont("Monospace"); // not very nice, while a a dot inside the zero to distinguish from o
         newfont.setStyleHint(QFont::TypeWriter);
         setFont(newfont);
-    } else {
+    }
+    else
+    {
         setFont(font);
     }
 
     m_Text = "text";
     m_IsShown = false;
-    m_BackColor = QColor(255,255,255,0);
+    m_BackColor = QColor(255, 255, 255, 0);
     m_ForeColor = Qt::black;
     m_BackColorOld = Qt::black;
     m_ForeColorOld = Qt::gray;
-    m_FrameColor=Qt::black;
+    m_FrameColor = Qt::black;
     m_FrameLineWidth = 0;
     m_FramePresent = false;
 
-    m_ColorMode=Default;
+    m_ColorMode = Default;
     m_AlarmHandling = onForeground;
     m_Alignment = Center;
     m_FormatType = decimal;
@@ -86,23 +91,28 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     m_AlarmState = 0;
 
     brush = QBrush(m_BackColor);
-    setText(" ");
+    //setText(" ");
 }
 
-void caLineDraw::setFrame(bool frame) {
+void caLineDraw::setFrame(bool frame)
+{
     m_FramePresent = frame;
-    if(!m_FramePresent) setLinewidth(0);
+    if (!m_FramePresent)
+        setLinewidth(0);
 }
 
-void caLineDraw::setFrameColor(QColor c) {
+void caLineDraw::setFrameColor(QColor c)
+{
     m_FrameColor = c;
     setColors(m_BackColor, m_ForeColor, m_FrameColor);
 }
 
 void caLineDraw::setLinewidth(int width)
 {
-    if(width < 0) m_FrameLineWidth = 0;
-    else m_FrameLineWidth = width;
+    if (width < 0)
+        m_FrameLineWidth = 0;
+    else
+        m_FrameLineWidth = width;
     update();
 }
 
@@ -126,42 +136,57 @@ void caLineDraw::setForeground(QColor c)
 
 void caLineDraw::setColors(QColor bg, QColor fg, QColor frame)
 {
-    if(!m_BackColorDefault.isValid() || !m_ForeColorDefault.isValid()) return;
+    if (!m_BackColorDefault.isValid() || !m_ForeColorDefault.isValid())
+        return;
 
-    if((bg != m_BackColorOld) || (fg != m_ForeColorOld) || (m_ColorMode != m_ColorModeOld) || (frame != m_FrameColorOld)) {
+    if ((bg != m_BackColorOld) || (fg != m_ForeColorOld) || (m_ColorMode != m_ColorModeOld) || (frame != m_FrameColorOld))
+    {
 
         m_FrameColorTop = frame.darker();
         m_FrameColorBottom = frame.lighter();
 
         // default = (colors from stylesheet)
-        if(m_ColorMode == Default) {
+        if (m_ColorMode == Default)
+        {
             m_BackColor = m_BackColorDefault;
             m_ForeColor = m_ForeColorDefault;
 
-        // alarm default = alarm colors on foreground or background (colors from alarms and stylesheet)
-        // when major alarm and background handling take the background from stylesheet (normally would be white)
-        } else if(m_ColorMode == Alarm_Default) {
+            // alarm default = alarm colors on foreground or background (colors from alarms and stylesheet)
+            // when major alarm and background handling take the background from stylesheet (normally would be white)
+        }
+        else if (m_ColorMode == Alarm_Default)
+        {
 
-            if(m_AlarmState == MAJOR_ALARM && m_AlarmHandling == onBackground) {
+            if (m_AlarmState == MAJOR_ALARM && m_AlarmHandling == onBackground)
+            {
                 m_BackColor = bg;
                 m_ForeColor = m_BackColorDefault;
-            } else {
-                if(m_AlarmHandling == onForeground) {
+            }
+            else
+            {
+                if (m_AlarmHandling == onForeground)
+                {
                     m_BackColor = m_BackColorDefault;
                     m_ForeColor = fg;
-                } else {
+                }
+                else
+                {
                     m_BackColor = bg;
                     m_ForeColor = m_ForeColorDefault;
                 }
             }
 
-        // alarm alarm colors on foreground or background (colors from color properties)
-        } else if(m_ColorMode == Alarm_Static) {
+            // alarm alarm colors on foreground or background (colors from color properties)
+        }
+        else if (m_ColorMode == Alarm_Static)
+        {
             m_BackColor = bg;
             m_ForeColor = fg;
 
-        // static (colors from color properties)
-        } else {
+            // static (colors from color properties)
+        }
+        else
+        {
             m_BackColor = bg;
             m_ForeColor = fg;
         }
@@ -193,80 +218,117 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     QColor c;
     m_AlarmState = 0;
 
-    if(status != NOTCONNECTED) {
-        if(m_LimitsMode == Channel) {
+    if (status != NOTCONNECTED)
+    {
+        if (m_LimitsMode == Channel)
+        {
             m_AlarmState = status;
-        } else if(m_LimitsMode == User) {
-            if(value > getMaxValue() || value < getMinValue()) {
+        }
+        else if (m_LimitsMode == User)
+        {
+            if (value > getMaxValue() || value < getMinValue())
+            {
                 m_AlarmState = MAJOR_ALARM;
-            } else {
+            }
+            else
+            {
                 m_AlarmState = NO_ALARM;
             }
-        } else {
-            //return;
         }
-    } else {
+        else
+        {
+            // return;
+        }
+    }
+    else
+    {
         m_AlarmState = status;
     }
 
-    switch (m_AlarmState) {
+    switch (m_AlarmState)
+    {
 
     case NO_ALARM:
-        //qDebug() << "no alarm" << kPtr->pv;
-        if(m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default) {
+        // qDebug() << "no alarm" << kPtr->pv;
+        if (m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default)
+        {
             c = AL_GREEN;
-            if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
-            else setForeAndBackground(fgAtInit, c);
-        } else {
+            if (m_AlarmHandling == onForeground)
+                setForeAndBackground(c, bgAtInit);
+            else
+                setForeAndBackground(fgAtInit, c);
+        }
+        else
+        {
             setForeAndBackground(fgAtInit, bgAtInit);
         }
         break;
 
     case MINOR_ALARM:
-        //qDebug() << "minor alarm";
-        if(m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default) {
+        // qDebug() << "minor alarm";
+        if (m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default)
+        {
             c = AL_YELLOW;
-            if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
-            else setForeAndBackground(fgAtInit, c);
-        } else {
+            if (m_AlarmHandling == onForeground)
+                setForeAndBackground(c, bgAtInit);
+            else
+                setForeAndBackground(fgAtInit, c);
+        }
+        else
+        {
             setForeAndBackground(fgAtInit, bgAtInit);
         }
         break;
 
     case MAJOR_ALARM:
-        //qDebug() << "serious alarm" << kPtr->pv;
-        if(m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default) {
+        // qDebug() << "serious alarm" << kPtr->pv;
+        if (m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default)
+        {
             c = AL_RED;
-            if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
-            else setForeAndBackground(fgAtInit, c);
-        } else {
+            if (m_AlarmHandling == onForeground)
+                setForeAndBackground(c, bgAtInit);
+            else
+                setForeAndBackground(fgAtInit, c);
+        }
+        else
+        {
             setForeAndBackground(fgAtInit, bgAtInit);
         }
         break;
 
     case INVALID_ALARM:
-        //qDebug() << "invalid alarm";
-        if(m_ColorMode == Alarm_Static) {
-            c =AL_WHITE;
-            if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
-            else setForeAndBackground(fgAtInit, c);
-        } else {
+        // qDebug() << "invalid alarm";
+        if (m_ColorMode == Alarm_Static)
+        {
+            c = AL_WHITE;
+            if (m_AlarmHandling == onForeground)
+                setForeAndBackground(c, bgAtInit);
+            else
+                setForeAndBackground(fgAtInit, c);
+        }
+        else
+        {
             setForeAndBackground(fgAtInit, bgAtInit);
         }
         break;
 
     case NOTCONNECTED:
-        //qDebug() << "no connection";
+        // qDebug() << "no connection";
         forceForeAndBackground(AL_WHITE, AL_WHITE);
         break;
 
     default:
-        //qDebug() << "Alarm default" << status;
-        if(m_ColorMode == Alarm_Static) {
+        // qDebug() << "Alarm default" << status;
+        if (m_ColorMode == Alarm_Static)
+        {
             c = AL_DEFAULT;
-            if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
-            else setForeAndBackground(fgAtInit, c);
-        } else {
+            if (m_AlarmHandling == onForeground)
+                setForeAndBackground(c, bgAtInit);
+            else
+                setForeAndBackground(fgAtInit, c);
+        }
+        else
+        {
             setForeAndBackground(fgAtInit, bgAtInit);
         }
 
@@ -279,7 +341,8 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
 void caLineDraw::setDirection(const Direction &direction)
 {
-    switch (direction) {
+    switch (direction)
+    {
     case Horizontal:
         rotateText(0.0);
         setVerticalLabel(false);
@@ -300,12 +363,170 @@ void caLineDraw::setDirection(const Direction &direction)
 
 bool caLineDraw::rotateText(float degrees)
 {
-    if (degrees >=0 && degrees <= 360) {
-        rotation=degrees;
+    if (degrees >= 0 && degrees <= 360)
+    {
+        rotation = degrees;
         update();
         return true;
     }
     return false;
+}
+
+void caLineDraw::mousePressEvent(QMouseEvent *event)
+{
+    QPoint position = event->pos();
+    markedText = "";
+    mouseLocation = QList<QPoint>();
+    markedRects = QList<QRect>();
+    update();
+
+    if (event->button() == Qt::LeftButton)
+    {
+        //handleMarking(position);
+    }else if(event->button() == Qt::RightButton){
+    }
+}
+
+void caLineDraw::mouseMoveEvent(QMouseEvent *event){
+
+    QPoint position = event->pos();
+    mouseLocation << position;
+    handleMarking(position);
+    update();
+
+}
+
+void caLineDraw::handleUnmarking(QPoint position){
+    int mouse_direction =  getDirectionOfMouseMove(position);
+
+    int Idx = markedRects.indexOf(currentRect);
+    //if(Idx )
+    int length = m_Text.length();
+
+    int beforeIdx = Idx - 1;
+   // if(beforeIdx < 0){beforeIdx = 0;}
+    int afterIdx = Idx + 1;
+   // if(afterIdx > m_Text.length()){afterIdx = m_Text.length();}
+
+    qDebug() << "Before: " << beforeIdx << "Curr: " << Idx << "After: " << afterIdx;
+}
+
+void caLineDraw::handleMarking(QPoint position){
+
+        for(int i = 0; i < BoundingRects.size(); i++){
+            QRect r = BoundingRects[i];
+
+            // Harmonise Coordinates in relation to Direction
+            QPoint p = position;
+            if(m_Direction == Up || m_Direction == Down){
+                p = transformCoordinates(position);
+            }
+            // Ignore Y-Axis for Marking
+            p.setY(r.center().y());
+
+            // Mark if Cursor is within Bounds of Letter
+            if(!markedRects.contains(r)){
+                if(r.contains(p)){
+                    markedRects << r;
+                    markedText += m_Text[i] + '-' + QString::number(i) + '|';
+                    currentRect = r;
+                    break;
+                }
+            }else if(markedRects.contains(r)){
+                handleUnmarking(position);
+            }
+        }
+        qDebug() << "\n-------------\nMarked:" << getMarkedText(false);
+}
+
+int caLineDraw::getDirectionOfMouseMove(QPoint mouseMove){
+    if(mouseLocation.size() > 0){
+        int endLocation;
+        int startLocation;
+
+        switch(m_Direction){
+        case Down:
+            startLocation = mouseLocation.last().y();
+            endLocation = mouseMove.y();
+            break;
+        case Up:
+            endLocation = mouseLocation.last().y();
+            startLocation = mouseMove.y();
+            break;
+        case Horizontal:
+            startLocation = mouseLocation.last().x();
+            endLocation = (mouseMove).x();
+            break;
+        }
+
+        int difference = endLocation - startLocation;
+
+        return (difference%2);
+        // positive: right,
+        // negative: left,
+        // equal to zero: vertical
+    }else{
+        return NULL;
+    }
+}
+
+QString caLineDraw::getMarkedText(bool keepOrder){
+    // Seperate String and Index of String within original text
+    QStringList marked = markedText.split("|");
+
+    QString str = "";
+    marked.removeAll(QString(""));
+
+    if(marked.size() > 0)
+    {
+        // Extract index
+        int firstIdx = marked.first().split("-")[1].toInt();
+        int lastIdx =  marked.last().split("-")[1].toInt();
+
+        // Assemble Text
+        for(int i = 0; i < marked.size(); i++){
+            QString s = marked[i];
+            str += s.split("-")[0];
+        }
+
+        // If text is marked backwards, reverse it
+        if(lastIdx < firstIdx && !keepOrder){
+            std::reverse(str.begin(), str.end());
+            qDebug() <<"reversed";
+        }
+    }
+    return str;
+}
+
+QPoint caLineDraw::transformCoordinates(QPoint point){
+    // transforms Coordinates from Horizontal Orientation to Vertical - aligns selected text with mouse when hovering over
+    int x;
+    int y;
+    switch(m_Direction){
+    case Up:
+        x = (-point.y() + m_textRect.right());
+        y = point.x();
+
+        break;
+    case Down:
+        x = point.y();
+        y = (-point.x() + m_textRect.height());
+        break;
+    case Horizontal:
+    default:
+        x = point.x();
+        y = point.y();
+        break;
+    }
+    return QPoint(x, y);
+}
+
+int caLineDraw::getSumOfCoords(QList<int> list) {
+    int sum = 0;
+    for(int i = 0; i < list.size(); i++){
+        sum += list[i];
+    }
+    return sum;
 }
 
 void caLineDraw::paintEvent(QPaintEvent *)
@@ -318,67 +539,147 @@ void caLineDraw::paintEvent(QPaintEvent *)
     painter.save();
     QRect textRect;
 
-    switch (m_Direction) {
+    switch (m_Direction)
+    {
     case Horizontal:
-        //Create a rectangle to draw text in, make it slightly smaller than the container rect and take frame width into account
-        textRect=QRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(width()-1-m_FrameLineWidth,height()-1-m_FrameLineWidth));
+        // Create a rectangle to draw text in, make it slightly smaller than the container rect and take frame width into account
+        textRect = QRect(QPoint(1 + m_FrameLineWidth, 1 + m_FrameLineWidth), QPoint(width() - 1 - m_FrameLineWidth, height() - 1 - m_FrameLineWidth));
         break;
     case Up:
-        //Rectangle is slightly different than for Horizontal, because it needs to be rotated
-        textRect=QRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
-        //Move the coordinate system and rotate it, so the text is displayed upwards
-        painter.translate(QPoint(0,height()));
+        // Rectangle is slightly different than for Horizontal, because it needs to be rotated
+        textRect = QRect(QPoint(1 + m_FrameLineWidth, 1 + m_FrameLineWidth), QPoint(height() - 1 - m_FrameLineWidth, width() - 1 - m_FrameLineWidth));
+        // Move the coordinate system and rotate it, so the text is displayed upwards
+        painter.translate(QPoint(0, height()));
         painter.rotate(rotation);
         break;
     case Down:
-        //Rectangle is slightly different than for Horizontal, because it needs to be rotated
-        textRect=QRect(QPoint(1+m_FrameLineWidth,1+m_FrameLineWidth), QPoint(height()-1-m_FrameLineWidth,width()-1-m_FrameLineWidth));
-        //Move the coordinate system and rotate it, so the text is displayed downwards
-        painter.translate(QPoint(width(),0));
+        // Rectangle is slightly different than for Horizontal, because it needs to be rotated
+        textRect = QRect(QPoint(1 + m_FrameLineWidth, 1 + m_FrameLineWidth), QPoint(height() - 1 - m_FrameLineWidth, width() - 1 - m_FrameLineWidth));
+        // Move the coordinate system and rotate it, so the text is displayed downwards
+        painter.translate(QPoint(width(), 0));
         painter.rotate(rotation);
     }
 
-    //Now that textrect and rotation/translation is set, draw the text aligned correctly
-    switch (m_Alignment) {
+    int widthTextLess = 0;
+    const QFontMetrics fm = painter.fontMetrics();
+
+    // Now that textrect and rotation/translation is set, draw the text aligned correctly
+    switch (m_Alignment)
+    {
     case Left:
         painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, m_Text);
         break;
     case Right:
         painter.drawText(textRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
+        widthTextLess = textRect.width() - fm.horizontalAdvance(m_Text);
         break;
     case Center:
     default:
         painter.drawText(textRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
+        widthTextLess = (textRect.width() / 2) - (fm.horizontalAdvance(m_Text) / 2);
         break;
     }
 
+    QList<int> letterCoordinates;
+    letterCoordinates << widthTextLess;
+    m_textRect = textRect;
+
+    int x;
+    int y = textRect.height();
+    for(int i = 0; i < m_Text.size(); i++){
+
+        QRect r = fm.boundingRect(m_Text[i]);
+        x = getSumOfCoords(letterCoordinates) + m_FrameLineWidth;
+
+        // Get accurate width of bounding rectangle
+        int horizontalAdvance = fm.horizontalAdvance(m_Text[i]);
+
+        // Calculate and set Startingpoint from previous letters
+        y += m_FrameLineWidth;
+        letterCoordinates << horizontalAdvance;
+        r.setX(x);
+        r.setY(y);
+        r.setWidth(horizontalAdvance);
+
+        painter.setPen(m_ForeColor);
+        BoundingRects << r;
+        painter.drawRect(r);
+    }
+
+    // MARKING
+
+    for(int i = 0; i < markedRects.size(); i++){
+        // Invert normal colors
+        painter.setPen(brush.color());
+        painter.setBackgroundMode(Qt::OpaqueMode);
+
+        painter.setBackground(m_ForeColor);
+        painter.fillRect(markedRects[i], m_ForeColor);;
+
+        QString text_normal;
+        QStringList q = markedText.split("|");
+        foreach(QString s, q){
+            text_normal +=s.split("-")[0];
+        }
+
+        // Draw Text on top of old one
+        painter.drawText(markedRects[i],Qt::AlignCenter | Qt::AlignVCenter,  getMarkedText(true)[i]);
+    }
+
+    // COLORING PATH
+    /*
+     * for(int i = 0; i < mouseLocation.size(); i++){
+        QRect r = QRect(0,0,0,0);
+        if(m_Direction == Up || m_Direction == Down){
+            QPoint cord = transformCoordinates(mouseLocation[i]);
+            r = QRect(cord.x(), cord.y(), 5, 5);
+        }
+        if(m_Direction == Horizontal){
+            int x = mouseLocation[i].x();
+            r = QRect(x, mouseLocation[i].y(), 5, 5);
+        }
+        painter.setPen(QPen(Qt::yellow));
+        painter.setBrush(QBrush(Qt::yellow));
+        painter.drawRect(r);
+    }
+    */
+
+    painter.setPen(m_ForeColor);
+    painter.setBrush(brush);
+
     painter.restore();
 
-    if(m_FramePresent) {
+    if (m_FramePresent)
+    {
         painter.setPen(QPen(m_FrameColorBottom, m_FrameLineWidth));
-        painter.drawLine(QPoint(0, height() - m_FrameLineWidth/2), QPoint(width(), height() - m_FrameLineWidth/2));
-        painter.drawLine(QPoint(width() -  m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(width() -  m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
+        painter.drawLine(QPoint(0, height() - m_FrameLineWidth / 2), QPoint(width(), height() - m_FrameLineWidth / 2));
+        painter.drawLine(QPoint(width() - m_FrameLineWidth / 2, m_FrameLineWidth / 2), QPoint(width() - m_FrameLineWidth / 2, height() - m_FrameLineWidth / 2));
         painter.setPen(QPen(m_FrameColorTop, m_FrameLineWidth));
-        painter.drawLine(QPoint(0, m_FrameLineWidth/2), QPoint(width(), m_FrameLineWidth/2));
-        painter.drawLine(QPoint(m_FrameLineWidth/2, m_FrameLineWidth/2), QPoint(m_FrameLineWidth/2, height() - m_FrameLineWidth/2));
+        painter.drawLine(QPoint(0, m_FrameLineWidth / 2), QPoint(width(), m_FrameLineWidth / 2));
+        painter.drawLine(QPoint(m_FrameLineWidth / 2, m_FrameLineWidth / 2), QPoint(m_FrameLineWidth / 2, height() - m_FrameLineWidth / 2));
     }
+
 }
 
 bool caLineDraw::event(QEvent *e)
 {
-    if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
+    if (e->type() == QEvent::Resize || e->type() == QEvent::Show)
+    {
         FontScalingWidget::rescaleFont(m_Text, calculateTextSpace());
 
         // we try to get the default color for the background set through the external stylesheets
-        if(!m_IsShown) {
+        if (!m_IsShown)
+        {
             QString c = palette().color(QPalette::Base).name();
             m_BackColorDefault = QColor(c);
-            //printf("default back color %s %s\n", qasc(c), qasc(this->objectName()));
+            // printf("default back color %s %s\n", qasc(c), qasc(this->objectName()));
             c = palette().color(QPalette::Text).name();
             m_ForeColorDefault = QColor(c);
-            //printf("default fore color %s %s\n", qasc(c), qasc(this->objectName()));
-            if(!m_BackColorDefault.isValid()) m_BackColorDefault = QColor(255, 248, 220, 255);
-            if(!m_ForeColorDefault.isValid()) m_ForeColorDefault = Qt::black;
+            // printf("default fore color %s %s\n", qasc(c), qasc(this->objectName()));
+            if (!m_BackColorDefault.isValid())
+                m_BackColorDefault = QColor(255, 248, 220, 255);
+            if (!m_ForeColorDefault.isValid())
+                m_ForeColorDefault = Qt::black;
 
             setColors(m_BackColor, m_ForeColor, m_FrameColor);
             m_IsShown = true;
@@ -396,16 +697,17 @@ QSize caLineDraw::calculateTextSpace()
     return d_savedTextSpace;
 }
 
+
 QSize caLineDraw::sizeHint() const
 {
-    if(!fontScaleEnabled())
+    if (!fontScaleEnabled())
     {
         return QWidget::sizeHint();
     }
     QFont f = font();
     f.setPointSize(4);
     QFontMetrics fm(f);
-    int w = QMETRIC_QT456_FONT_WIDTH(fm,m_Text);
+    int w = QMETRIC_QT456_FONT_WIDTH(fm, m_Text);
     int h = fm.height();
     /* add some pixels... */
     w += 4;
@@ -417,7 +719,7 @@ QSize caLineDraw::sizeHint() const
 QSize caLineDraw::minimumSizeHint() const
 {
     QSize size;
-    if(!fontScaleEnabled())
+    if (!fontScaleEnabled())
         size = QWidget::minimumSizeHint();
     else
         size = sizeHint();
@@ -427,8 +729,10 @@ QSize caLineDraw::minimumSizeHint() const
 
 void caLineDraw::setText(const QString &txt)
 {
-    if(m_Text == txt) return;
-    if(m_Text.size() != txt.size()) {
+    if (m_Text == txt)
+        return;
+    if (m_Text.size() != txt.size())
+    {
         FontScalingWidget::rescaleFont(txt, d_savedTextSpace);
     }
     m_Text = txt;
@@ -443,16 +747,22 @@ void caLineDraw::setDatatype(int datatype)
 void caLineDraw::setFormat(int prec)
 {
     int precision = prec;
-    if(precision > 17) precision = 17;
-    if(m_PrecMode == User) {
+    if (precision > 17)
+        precision = 17;
+    if (m_PrecMode == User)
+    {
         precision = getPrecision();
     }
-    switch (m_FormatType) {
+    switch (m_FormatType)
+    {
     case string:
     case decimal:
-        if(precision >= 0) {
+        if (precision >= 0)
+        {
             sprintf(m_Format, "%s.%dlf", "%", precision);
-        } else {
+        }
+        else
+        {
             sprintf(m_Format, "%s.%dle", "%", -precision);
         }
         break;
@@ -466,62 +776,94 @@ void caLineDraw::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%lld",MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "%d",MAX_STRING_LENGTH);
+        if (thisDatatype == caDOUBLE)
+            qstrncpy(m_Format, "%lld", MAX_STRING_LENGTH);
+        else
+            qstrncpy(m_Format, "%d", MAX_STRING_LENGTH);
         break;
     case utruncated:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%llu",MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "%u",MAX_STRING_LENGTH);
+        if (thisDatatype == caDOUBLE)
+            qstrncpy(m_Format, "%llu", MAX_STRING_LENGTH);
+        else
+            qstrncpy(m_Format, "%u", MAX_STRING_LENGTH);
         break;
     case hexadecimal:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "0x%llx",MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "0x%x",MAX_STRING_LENGTH);
+        if (thisDatatype == caDOUBLE)
+            qstrncpy(m_Format, "0x%llx", MAX_STRING_LENGTH);
+        else
+            qstrncpy(m_Format, "0x%x", MAX_STRING_LENGTH);
         break;
     case octal:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "O%llo",MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "O%o",MAX_STRING_LENGTH);
+        if (thisDatatype == caDOUBLE)
+            qstrncpy(m_Format, "O%llo", MAX_STRING_LENGTH);
+        else
+            qstrncpy(m_Format, "O%o", MAX_STRING_LENGTH);
         break;
     case sexagesimal:
     case sexagesimal_hms:
     case sexagesimal_dms:
         break;
-    case user_defined_format:{
-            qstrncpy(m_Format,thisFormatUserString.toLatin1().data(),MAX_STRING_LENGTH);
-            break;
-     }
-
+    case user_defined_format:
+    {
+        qstrncpy(m_Format, thisFormatUserString.toLatin1().data(), MAX_STRING_LENGTH);
+        break;
+    }
     }
 }
 
-void caLineDraw::setValue(double value, const QString& units)
+void caLineDraw::setValue(double value, const QString &units)
 {
     char asc[MAX_STRING_LENGTH];
-    if(m_FormatType == compact) {
-        if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0) {
+    if (m_FormatType == compact)
+    {
+        if ((value < 1.e4 && value > 1.e-4) || (value > -1.e4 && value < -1.e-4) || value == 0.0)
+        {
             snprintf(asc, MAX_STRING_LENGTH, m_FormatC, value);
-        } else {
+        }
+        else
+        {
             snprintf(asc, MAX_STRING_LENGTH, m_Format, value);
         }
-    } else if(m_FormatType == hexadecimal || m_FormatType == octal || m_FormatType == user_defined_format)  {
-        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
-        else  snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
-    } else if(m_FormatType == truncated) {
-        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
-        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
-    } else if(m_FormatType == enumeric) {
-        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long) value);
-        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (int) value);
-    } else if(m_FormatType == utruncated) {
-        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, m_Format, (unsigned long long) value);
-        else snprintf(asc, MAX_STRING_LENGTH, m_Format, (uint) value);
-    } else {
-        snprintf(asc,MAX_STRING_LENGTH,  m_Format, value);
+    }
+    else if (m_FormatType == hexadecimal || m_FormatType == octal || m_FormatType == user_defined_format)
+    {
+        if (thisDatatype == caDOUBLE)
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long)value);
+        else
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (int)value);
+    }
+    else if (m_FormatType == truncated)
+    {
+        if (thisDatatype == caDOUBLE)
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long)value);
+        else
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (int)value);
+    }
+    else if (m_FormatType == enumeric)
+    {
+        if (thisDatatype == caDOUBLE)
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (long long)value);
+        else
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (int)value);
+    }
+    else if (m_FormatType == utruncated)
+    {
+        if (thisDatatype == caDOUBLE)
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (unsigned long long)value);
+        else
+            snprintf(asc, MAX_STRING_LENGTH, m_Format, (uint)value);
+    }
+    else
+    {
+        snprintf(asc, MAX_STRING_LENGTH, m_Format, value);
     }
 
-    if(qIsNaN(value)){
-      snprintf(asc, MAX_STRING_LENGTH,  "nan");
+    if (qIsNaN(value))
+    {
+        snprintf(asc, MAX_STRING_LENGTH, "nan");
     }
-    if(m_UnitMode) {
+    if (m_UnitMode)
+    {
         strcat(asc, " ");
         strcat(asc, units.toUtf8().constData());
     }
@@ -530,96 +872,133 @@ void caLineDraw::setValue(double value, const QString& units)
 }
 
 // caWidgetInterface implementation
-void caLineDraw::caDataUpdate(const QString& units, const QString& String, const knobData& data)
+void caLineDraw::caDataUpdate(const QString &units, const QString &String, const knobData &data)
 {
     QColor bg = property("BColor").value<QColor>();
     QColor fg = property("FColor").value<QColor>();
 
-    if(data.edata.connected) {
+    if (data.edata.connected)
+    {
         setDatatype(data.edata.fieldtype);
         // enum string
-        if(data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR) {
+        if (data.edata.fieldtype == caENUM || data.edata.fieldtype == caSTRING || data.edata.fieldtype == caCHAR)
+        {
             QStringList list;
-            if(m_ColorMode == Static || m_ColorMode == Default) { // done at initialisation
-                if(!property("Connect").value<bool>()) {                    // but was disconnected before
-                    setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
+            if (m_ColorMode == Static || m_ColorMode == Default)
+            { // done at initialisation
+                if (!property("Connect").value<bool>())
+                { // but was disconnected before
+                    setAlarmColors(data.edata.severity, (double)data.edata.ivalue, bg, fg);
                     setProperty("Connect", true);
                 }
-            } else {
-                setAlarmColors(data.edata.severity, (double) data.edata.ivalue, bg, fg);
+            }
+            else
+            {
+                setAlarmColors(data.edata.severity, (double)data.edata.ivalue, bg, fg);
             }
             list = String.split((QChar)27);
 
-            if((data.edata.fieldtype == caENUM)  && (list.count() == 0)) {
-                QString str= QString::number((int) data.edata.ivalue);
-                setText(str);                              // no string, but number
-            } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue < list.count() ) && (list.count() > 0)) {
-                if(list.at((int) data.edata.ivalue).trimmed().size() == 0)  {  // string seems to empty, give value
-                    QString str= QString::number((int) data.edata.ivalue);
+            if ((data.edata.fieldtype == caENUM) && (list.count() == 0))
+            {
+                QString str = QString::number((int)data.edata.ivalue);
+                setText(str); // no string, but number
+            }
+            else if ((data.edata.fieldtype == caENUM) && ((int)data.edata.ivalue < list.count()) && (list.count() > 0))
+            {
+                if (list.at((int)data.edata.ivalue).trimmed().size() == 0)
+                { // string seems to empty, give value
+                    QString str = QString::number((int)data.edata.ivalue);
                     setText(str);
-                } else {                                                       // we have a string, we want as string
-                    if(m_FormatType != enumeric) {
-                        setText(list.at((int) data.edata.ivalue));
-                    } else {
-                        QString str= QString::number((int) data.edata.ivalue); // we have  astring, we want as number
+                }
+                else
+                { // we have a string, we want as string
+                    if (m_FormatType != enumeric)
+                    {
+                        setText(list.at((int)data.edata.ivalue));
+                    }
+                    else
+                    {
+                        QString str = QString::number((int)data.edata.ivalue); // we have  astring, we want as number
                         setText(str);
                     }
                 }
-            } else if((data.edata.fieldtype == caENUM)  && ((int) data.edata.ivalue >= list.count()) && (list.count() > 0)) {
-                QString str= QString::number((int) data.edata.ivalue);
+            }
+            else if ((data.edata.fieldtype == caENUM) && ((int)data.edata.ivalue >= list.count()) && (list.count() > 0))
+            {
+                QString str = QString::number((int)data.edata.ivalue);
                 setText(str);
-            } else if (data.edata.fieldtype == caENUM) {
+            }
+            else if (data.edata.fieldtype == caENUM)
+            {
                 setText("???");
 
                 // just one char (display as character when string format is specified, otherwise as number in specified format
-            } else if((data.edata.fieldtype == caCHAR) && (data.edata.nelm == 1)) {
-                if(m_FormatType == string) {
-                    QString str = QString(QChar((int) data.edata.ivalue));
+            }
+            else if ((data.edata.fieldtype == caCHAR) && (data.edata.nelm == 1))
+            {
+                if (m_FormatType == string)
+                {
+                    QString str = QString(QChar((int)data.edata.ivalue));
                     setText(str);
-                } else {
+                }
+                else
+                {
                     setValue(data.edata.ivalue, "");
                 }
 
                 // one or more strings, or a char array
-            } else {
-                if(data.edata.nelm == 1) {
+            }
+            else
+            {
+                if (data.edata.nelm == 1)
+                {
                     setText(String);
-                } else if(list.count() > 0) {
+                }
+                else if (list.count() > 0)
+                {
                     setText(list.at(0));
                 }
             }
 
             // double
-        } else {
+        }
+        else
+        {
 
-            if(m_ColorMode == Static || m_ColorMode == Default) { // done at initialisation
-                if(!property("Connect").value<bool>()) {                      // but was disconnected before
+            if (m_ColorMode == Static || m_ColorMode == Default)
+            { // done at initialisation
+                if (!property("Connect").value<bool>())
+                { // but was disconnected before
                     setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
                     setProperty("Connect", true);
                 }
-            } else {
+            }
+            else
+            {
                 setAlarmColors(data.edata.severity, data.edata.rvalue, bg, fg);
             }
 
-            if((m_PrecMode != User) && (data.edata.initialize)) {
+            if ((m_PrecMode != User) && (data.edata.initialize))
+            {
                 setFormat(data.edata.precision);
             }
             setValue(data.edata.rvalue, units);
         }
-
-    } else {
+    }
+    else
+    {
         setText("");
         setAlarmColors(NOTCONNECTED, 0.0, bg, fg);
         setProperty("Connect", false);
     }
-
 }
 
-void caLineDraw::caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent)
+void caLineDraw::caActivate(CaQtDM_Lib_Interface *lib_interface, QMap<QString, QString> map, knobData *kData, int *specData, QWidget *parent)
 {
-    if(getPV().size() > 0) {
+    if (getPV().size() > 0)
+    {
         QString pv;
-        lib_interface->addMonitor(parent, kData, getPV(), (QWidget *) this, specData, map, &pv);
+        lib_interface->addMonitor(parent, kData, getPV(), (QWidget *)this, specData, map, &pv);
         setPV(pv);
     }
     setFormat(1);
@@ -627,31 +1006,35 @@ void caLineDraw::caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, Q
     caDataInterface = lib_interface;
 }
 
-void caLineDraw::createContextMenu(QMenu& menu){
+void caLineDraw::createContextMenu(QMenu &menu)
+{
     // construct info for the pv we are pointing at
     menu.addAction("Get Info");
 }
 
-void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
-                               int& Precision, char* colMode, double& limitsMax, double& limitsMin){
+void caLineDraw::getWidgetInfo(QString *pv, int &nbPV, int &limitsDefault, int &precMode, int &limitsMode,
+                               int &Precision, char *colMode, double &limitsMax, double &limitsMin)
+{
     Q_UNUSED(limitsDefault);
 
     pv[0] = getPV().trimmed();
-    if(getPrecisionMode() == User) {
+    if (getPrecisionMode() == User)
+    {
         precMode = true;
         Precision = getPrecision();
     }
-    if(getLimitsMode() == User) {
+    if (getLimitsMode() == User)
+    {
         limitsMode = true;
         limitsMax = getMaxValue();
         limitsMin = getMinValue();
     }
-    if(getColorMode() == Alarm_Default) strcpy(colMode, "Alarm");
-    else if(getColorMode() == Alarm_Static) strcpy(colMode, "Alarm");
-    else strcpy(colMode, "Static");
+    if (getColorMode() == Alarm_Default)
+        strcpy(colMode, "Alarm");
+    else if (getColorMode() == Alarm_Static)
+        strcpy(colMode, "Alarm");
+    else
+        strcpy(colMode, "Static");
 
     nbPV = 1;
 }
-
-
-
