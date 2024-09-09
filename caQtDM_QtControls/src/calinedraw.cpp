@@ -375,16 +375,9 @@ bool caLineDraw::rotateText(float degrees)
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     QPoint position = event->pos();
-    markedText = "";
     mouseLocation = QList<QPoint>();
-    markedRects = QList<QRect>();
+    isMarked = QList<bool>();
     update();
-
-    if (event->button() == Qt::LeftButton)
-    {
-        //handleMarking(position);
-    }else if(event->button() == Qt::RightButton){
-    }
 }
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
@@ -400,25 +393,12 @@ void caLineDraw::handleUnmarking(QPoint position){
     int mouse_direction =  getDirectionOfMouseMove(position);
     qDebug() << "DIR:" << mouse_direction;
 
-    int idx = markedRects.indexOf(currentRect);
-    int BoundIdx = BoundingRects.indexOf(currentRect);
-    int length = m_Text.length();
+    int idx = markedRects.indexOf(lastRectLeft);
 
-    int beforeIdx = BoundIdx - 1;
-    int afterIdx = BoundIdx + 1;
-
-    qDebug() << "Before: " << beforeIdx << "Curr: " << BoundIdx << "After: " << afterIdx;
-    if(markedRects.contains(BoundingRects[BoundIdx]))
-    {
-        qDebug() << "\nCurrent Marked" << m_Text[(BoundIdx % 5)];
-    }
-
-    int ads = mouseLocation.size() - 1;
-    if(ads < 0){ ads = 0;}
-    if(!currentRect.contains(mouseLocation[ads])){
-
-        qDebug() << "\nLAST WITHIN: " << currentRect.contains(mouseLocation[ads]);
-        markedRects.removeAt(idx);
+    int lastIdx = mouseLocation.size() - 1;
+    if(lastIdx < 0){ lastIdx = 0;}
+    if(!currentRect.contains(mouseLocation[lastIdx])){
+        markedRects.removeLast();
     }
 }
 
@@ -436,6 +416,17 @@ void caLineDraw::handleMarking(QPoint position){
         p.setY(r.center().y());
 
         // Mark if Cursor is within Bounds of Letter
+
+        if(r.contains(p) && !getMarkedRects().contains(r)){
+            isMarked << true;
+            break;
+        }else if(!r.contains(p) && getMarkedRects().contains(r))
+        {
+            //isMarked << false;
+
+        }
+
+        /*
         if(!markedRects.contains(r)){
             if(r.contains(p)){
                 markedRects << r;
@@ -444,11 +435,14 @@ void caLineDraw::handleMarking(QPoint position){
                 break;
             }
         }else if(markedRects.contains(r) && !r.contains(p)){
+            lastRectLeft = r;
             removeRects << r;
             handleUnmarking(position);
         }
+*/
     }
 }
+
 
 int caLineDraw::getDirectionOfMouseMove(QPoint position){
     if(mouseLocation.size() > 0){
@@ -481,32 +475,19 @@ int caLineDraw::getDirectionOfMouseMove(QPoint position){
     }
 }
 
-QString caLineDraw::getMarkedText(bool keepOrder){
-    // Seperate String and Index of String within original text
-    QStringList marked = markedText.split("|");
+QString caLineDraw::getMarkedText(){
+    return "";
+}
 
-    QString str = "";
-    marked.removeAll(QString(""));
-
-    if(marked.size() > 0)
-    {
-        // Extract index
-        int firstIdx = marked.first().split("-")[1].toInt();
-        int lastIdx =  marked.last().split("-")[1].toInt();
-
-        // Assemble Text
-        for(int i = 0; i < marked.size(); i++){
-            QString s = marked[i];
-            str += s.split("-")[0];
-        }
-
-        // If text is marked backwards, reverse it
-        if(lastIdx < firstIdx && !keepOrder){
-            std::reverse(str.begin(), str.end());
-            qDebug() <<"reversed";
+QList<QRect> caLineDraw::getMarkedRects(){
+    QList<QRect> list;
+    for(int i = 0; i < isMarked.size(); i++){
+        if(isMarked[i]){
+            list.append(BoundingRects[i]);
         }
     }
-    return str;
+    qDebug() << "LIST:" << list;
+    return list;
 }
 
 QPoint caLineDraw::transformCoordinates(QPoint point){
@@ -618,9 +599,23 @@ void caLineDraw::paintEvent(QPaintEvent *)
     }
 
     // MARKING
+    for(int i = 0; i < getMarkedRects().size(); i++){
+        // Invert normal colors
+        painter.setPen(brush.color());
+        painter.setBackgroundMode(Qt::OpaqueMode);
+
+        QRect marked = getMarkedRects()[i];
+            painter.setBackground(m_ForeColor);
+            painter.fillRect(marked, m_ForeColor);;
+
+            // Draw Text on top of old one
+            painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[(i % 5)]);
+    }
+    /*
 
     for(int i = 0; i < markedRects.size(); i++){
         // Invert normal colors
+
         painter.setPen(brush.color());
         painter.setBackgroundMode(Qt::OpaqueMode);
 
@@ -636,24 +631,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
         // Draw Text on top of old one
         painter.drawText(markedRects[i],Qt::AlignCenter | Qt::AlignVCenter,  getMarkedText(true)[i]);
     }
-
-    // COLORING PATH
-    /*
-     * for(int i = 0; i < mouseLocation.size(); i++){
-        QRect r = QRect(0,0,0,0);
-        if(m_Direction == Up || m_Direction == Down){
-            QPoint cord = transformCoordinates(mouseLocation[i]);
-            r = QRect(cord.x(), cord.y(), 5, 5);
-        }
-        if(m_Direction == Horizontal){
-            int x = mouseLocation[i].x();
-            r = QRect(x, mouseLocation[i].y(), 5, 5);
-        }
-        painter.setPen(QPen(Qt::yellow));
-        painter.setBrush(QBrush(Qt::yellow));
-        painter.drawRect(r);
-    }
-    */
+*/
 
     painter.setPen(m_ForeColor);
     painter.setBrush(brush);

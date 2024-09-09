@@ -193,10 +193,13 @@ protected:
 
     int getSumOfCoords(QList<int> list);
     QPoint transformCoordinates(QPoint point);
-    QString getMarkedText(bool keepOrder);
+
+    QString getMarkedText();
     void handleMarking(QPoint position);
     int getDirectionOfMouseMove(QPoint position);
     void handleUnmarking(QPoint position);
+
+    QList<QRect> getMarkedRects();
 
     CaQtDM_Lib_Interface* caDataInterface;
 
@@ -232,12 +235,14 @@ private:
     QString thisFormatUserString;
 
     QList<QRect> BoundingRects;
-    QString markedText;
+    QList<bool> isMarked;
     QRect m_textRect;
+
 
     QList<QPoint> mouseLocation;
     QList<QRect> markedRects;
     QList<QRect> removeRects;
     QRect currentRect;
+    QRect lastRectLeft;
 };
 #endif
