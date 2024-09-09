@@ -200,6 +200,7 @@ protected:
     void handleUnmarking(QPoint position);
 
     QList<QRect> getMarkedRects();
+    QColor invertColor(QColor color);
 
     CaQtDM_Lib_Interface* caDataInterface;
 

@@ -409,14 +409,13 @@ void caLineDraw::handleMarking(QPoint position){
 
         // Harmonise Coordinates in relation to Direction
         QPoint p = position;
-        if(m_Direction == Up || m_Direction == Down){
-            p = transformCoordinates(position);
-        }
+        p = transformCoordinates(position);
+
         // Ignore Y-Axis for Marking
         p.setY(r.center().y());
 
         // Mark if Cursor is within Bounds of Letter
-
+        qDebug() << "POS:" << r.contains(p);
         if(r.contains(p) && !getMarkedRects().contains(r)){
             isMarked << true;
             break;
@@ -514,6 +513,7 @@ QPoint caLineDraw::transformCoordinates(QPoint point){
 }
 
 int caLineDraw::getSumOfCoords(QList<int> list) {
+    // Return Sum of Coordinates to get Beginning Point for Marking
     int sum = 0;
     for(int i = 0; i < list.size(); i++){
         sum += list[i];
@@ -601,12 +601,21 @@ void caLineDraw::paintEvent(QPaintEvent *)
     // MARKING
     for(int i = 0; i < getMarkedRects().size(); i++){
         // Invert normal colors
-        painter.setPen(brush.color());
+        QRect marked = getMarkedRects()[i];
+
+        QColor invForeColor = invertColor(m_ForeColor);
+        QColor invBrushColor = invertColor(brush.color());
+
+        painter.setPen(invForeColor);
+        painter.setBackground(invBrushColor);
         painter.setBackgroundMode(Qt::OpaqueMode);
 
-        QRect marked = getMarkedRects()[i];
-            painter.setBackground(m_ForeColor);
-            painter.fillRect(marked, m_ForeColor);;
+
+        painter.fillRect(marked, invForeColor);;
+
+
+        painter.setBackgroundMode(Qt::OpaqueMode);
+
 
             // Draw Text on top of old one
             painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[(i % 5)]);
@@ -677,6 +686,11 @@ bool caLineDraw::event(QEvent *e)
 
     return QWidget::event(e);
 }
+
+QColor caLineDraw::invertColor(QColor color){
+    return QColor(255 - color.red(), 255 - color.green(), 255 - color.blue());
+}
+
 
 QSize caLineDraw::calculateTextSpace()
 {
