@@ -388,58 +388,69 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 }
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
-
     QPoint position = event->pos();
-    mouseLocation << position;
+
     handleMarking(position);
+    mouseLocation << position;
     update();
 
 }
 
 void caLineDraw::handleUnmarking(QPoint position){
     int mouse_direction =  getDirectionOfMouseMove(position);
+    qDebug() << "DIR:" << mouse_direction;
 
-    int Idx = markedRects.indexOf(currentRect);
-    //if(Idx )
+    int idx = markedRects.indexOf(currentRect);
+    int BoundIdx = BoundingRects.indexOf(currentRect);
     int length = m_Text.length();
 
-    int beforeIdx = Idx - 1;
-   // if(beforeIdx < 0){beforeIdx = 0;}
-    int afterIdx = Idx + 1;
-   // if(afterIdx > m_Text.length()){afterIdx = m_Text.length();}
+    int beforeIdx = BoundIdx - 1;
+    int afterIdx = BoundIdx + 1;
 
-    qDebug() << "Before: " << beforeIdx << "Curr: " << Idx << "After: " << afterIdx;
+    qDebug() << "Before: " << beforeIdx << "Curr: " << BoundIdx << "After: " << afterIdx;
+    if(markedRects.contains(BoundingRects[BoundIdx]))
+    {
+        qDebug() << "\nCurrent Marked" << m_Text[(BoundIdx % 5)];
+    }
+
+    int ads = mouseLocation.size() - 1;
+    if(ads < 0){ ads = 0;}
+    if(!currentRect.contains(mouseLocation[ads])){
+
+        qDebug() << "\nLAST WITHIN: " << currentRect.contains(mouseLocation[ads]);
+        markedRects.removeAt(idx);
+    }
 }
 
 void caLineDraw::handleMarking(QPoint position){
 
-        for(int i = 0; i < BoundingRects.size(); i++){
-            QRect r = BoundingRects[i];
+    for(int i = 0; i < BoundingRects.size(); i++){
+        QRect r = BoundingRects[i];
 
-            // Harmonise Coordinates in relation to Direction
-            QPoint p = position;
-            if(m_Direction == Up || m_Direction == Down){
-                p = transformCoordinates(position);
-            }
-            // Ignore Y-Axis for Marking
-            p.setY(r.center().y());
-
-            // Mark if Cursor is within Bounds of Letter
-            if(!markedRects.contains(r)){
-                if(r.contains(p)){
-                    markedRects << r;
-                    markedText += m_Text[i] + '-' + QString::number(i) + '|';
-                    currentRect = r;
-                    break;
-                }
-            }else if(markedRects.contains(r)){
-                handleUnmarking(position);
-            }
+        // Harmonise Coordinates in relation to Direction
+        QPoint p = position;
+        if(m_Direction == Up || m_Direction == Down){
+            p = transformCoordinates(position);
         }
-        qDebug() << "\n-------------\nMarked:" << getMarkedText(false);
+        // Ignore Y-Axis for Marking
+        p.setY(r.center().y());
+
+        // Mark if Cursor is within Bounds of Letter
+        if(!markedRects.contains(r)){
+            if(r.contains(p)){
+                markedRects << r;
+                markedText += m_Text[i] + '-' + QString::number(i) + '|';
+                currentRect = r;
+                break;
+            }
+        }else if(markedRects.contains(r) && !r.contains(p)){
+            removeRects << r;
+            handleUnmarking(position);
+        }
+    }
 }
 
-int caLineDraw::getDirectionOfMouseMove(QPoint mouseMove){
+int caLineDraw::getDirectionOfMouseMove(QPoint position){
     if(mouseLocation.size() > 0){
         int endLocation;
         int startLocation;
@@ -447,21 +458,21 @@ int caLineDraw::getDirectionOfMouseMove(QPoint mouseMove){
         switch(m_Direction){
         case Down:
             startLocation = mouseLocation.last().y();
-            endLocation = mouseMove.y();
+            endLocation = position.y();
             break;
         case Up:
             endLocation = mouseLocation.last().y();
-            startLocation = mouseMove.y();
+            startLocation = position.y();
             break;
         case Horizontal:
             startLocation = mouseLocation.last().x();
-            endLocation = (mouseMove).x();
+            endLocation = position.x();
             break;
         }
 
         int difference = endLocation - startLocation;
 
-        return (difference%2);
+        return difference;
         // positive: right,
         // negative: left,
         // equal to zero: vertical
