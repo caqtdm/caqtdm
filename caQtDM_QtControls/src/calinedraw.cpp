@@ -637,6 +637,11 @@ void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& 
     Q_UNUSED(limitsDefault);
 
     pv[0] = getPV().trimmed();
+    nbPV = 0;
+    if (pv[0].length()>0){ // only when something is inside the PV it could be something
+        nbPV = 1;
+    }
+
     if(getPrecisionMode() == User) {
         precMode = true;
         Precision = getPrecision();
@@ -650,7 +655,6 @@ void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& 
     else if(getColorMode() == Alarm_Static) strcpy(colMode, "Alarm");
     else strcpy(colMode, "Static");
 
-    nbPV = 1;
 }
 
 
