@@ -149,16 +149,35 @@ public:
         Process.waitForFinished(); // sets current thread to sleep and waits for Process end
         QString output(Process.readAllStandardOutput());
 
-        QRegExp noDefaultReg("[^:]*no .*default");
+        QString noDefaultReg_pattern="[^:]*no .*default";
+        QString defaultReg_pattern="default.*: *([a-zA-Z0-9_]+)";
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp noDefaultReg(noDefaultReg_pattern);
         int pos = noDefaultReg.indexIn(output);
         if (pos >= 0) {
             return QString();
         }
 
-        QRegExp defaultReg("default.*: *([a-zA-Z0-9_]+)");
+        QRegExp defaultReg(defaultReg_pattern);
         defaultReg.indexIn(output);
         QString printer = defaultReg.cap(1);
         return printer;
+#else
+        QRegularExpression noDefaultReg(noDefaultReg_pattern);
+        QRegularExpressionMatch noDefaultReg_match = noDefaultReg.match(output);
+        qsizetype pos=noDefaultReg_match.capturedStart();
+        //qDebug() << "Regex output:"<< output;
+        if (pos >= 0) {
+            return QString();
+        }
+        QRegularExpression defaultReg(defaultReg_pattern);
+        QRegularExpressionMatch defaultReg_match = defaultReg.match(output);
+        QString printer = defaultReg_match.captured(1);
+        return printer;
+
+
+#endif
     }
 #else
     QString getDefaultPrinterFromSystem() {
