@@ -197,7 +197,7 @@ protected:
     QString getMarkedText();
     void handleMarking(QPoint position);
     int getDirectionOfMouseMove(QPoint position);
-    void handleUnmarking(QPoint position);
+    void setUpMarkingList();
 
     QList<QRect> getMarkedRects();
     QColor invertColor(QColor color);
@@ -239,11 +239,6 @@ private:
     QList<bool> isMarked;
     QRect m_textRect;
 
-
     QList<QPoint> mouseLocation;
-    QList<QRect> markedRects;
-    QList<QRect> removeRects;
-    QRect currentRect;
-    QRect lastRectLeft;
 };
 #endif

@@ -382,28 +382,22 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
     QPoint position = event->pos();
+    setUpMarkingList();
 
     handleMarking(position);
     mouseLocation << position;
+    qDebug() << "MARKED TEXT:" << getMarkedText();
     update();
 
 }
 
-void caLineDraw::handleUnmarking(QPoint position){
-    int mouse_direction =  getDirectionOfMouseMove(position);
-    qDebug() << "DIR:" << mouse_direction;
-
-    int idx = markedRects.indexOf(lastRectLeft);
-
-    int lastIdx = mouseLocation.size() - 1;
-    if(lastIdx < 0){ lastIdx = 0;}
-    if(!currentRect.contains(mouseLocation[lastIdx])){
-        markedRects.removeLast();
+void caLineDraw::setUpMarkingList(){
+    for(int i = 0; i < m_Text.size(); i++){
+        isMarked << false;
     }
 }
 
 void caLineDraw::handleMarking(QPoint position){
-
     for(int i = 0; i < BoundingRects.size(); i++){
         QRect r = BoundingRects[i];
 
@@ -415,14 +409,16 @@ void caLineDraw::handleMarking(QPoint position){
         p.setY(r.center().y());
 
         // Mark if Cursor is within Bounds of Letter
-        qDebug() << "POS:" << r.contains(p);
-        if(r.contains(p) && !getMarkedRects().contains(r)){
-            isMarked << true;
-            break;
-        }else if(!r.contains(p) && getMarkedRects().contains(r))
-        {
-            //isMarked << false;
-
+        if(!getMarkedRects().contains(r)){
+            if(r.contains(p)){
+                qDebug() << "MARKED:" <<isMarked;
+                /*
+                qDebug() << "POS:" << r;
+            qDebug() << "P:" << p << "C:" << r.contains(p);
+*/
+                isMarked[i] = true;
+                break;
+            }
         }
 
         /*
@@ -475,7 +471,13 @@ int caLineDraw::getDirectionOfMouseMove(QPoint position){
 }
 
 QString caLineDraw::getMarkedText(){
-    return "";
+    QString text;
+    for(int i = 0; i < isMarked.size(); i++){
+        if(isMarked[i]){
+            text += m_Text[(i % (m_Text.size() + 1))];
+        }
+    }
+    return text;
 }
 
 QList<QRect> caLineDraw::getMarkedRects(){
@@ -485,7 +487,6 @@ QList<QRect> caLineDraw::getMarkedRects(){
             list.append(BoundingRects[i]);
         }
     }
-    qDebug() << "LIST:" << list;
     return list;
 }
 
@@ -602,6 +603,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
     for(int i = 0; i < getMarkedRects().size(); i++){
         // Invert normal colors
         QRect marked = getMarkedRects()[i];
+        QString markedText = getMarkedText()[i];
 
         QColor invForeColor = invertColor(m_ForeColor);
         QColor invBrushColor = invertColor(brush.color());
@@ -610,37 +612,12 @@ void caLineDraw::paintEvent(QPaintEvent *)
         painter.setBackground(invBrushColor);
         painter.setBackgroundMode(Qt::OpaqueMode);
 
-
         painter.fillRect(marked, invForeColor);;
-
-
         painter.setBackgroundMode(Qt::OpaqueMode);
-
-
-            // Draw Text on top of old one
-            painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[(i % 5)]);
-    }
-    /*
-
-    for(int i = 0; i < markedRects.size(); i++){
-        // Invert normal colors
-
-        painter.setPen(brush.color());
-        painter.setBackgroundMode(Qt::OpaqueMode);
-
-        painter.setBackground(m_ForeColor);
-        painter.fillRect(markedRects[i], m_ForeColor);;
-
-        QString text_normal;
-        QStringList q = markedText.split("|");
-        foreach(QString s, q){
-            text_normal +=s.split("-")[0];
-        }
 
         // Draw Text on top of old one
-        painter.drawText(markedRects[i],Qt::AlignCenter | Qt::AlignVCenter,  getMarkedText(true)[i]);
+        painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  markedText);
     }
-*/
 
     painter.setPen(m_ForeColor);
     painter.setBrush(brush);
