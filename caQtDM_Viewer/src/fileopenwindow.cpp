@@ -63,9 +63,11 @@ bool HTTPCONFIGURATOR = false;
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
    #define CAQTDM_X11 Q_WS_X11
 #else
-   #ifndef MOBILE_ANDROID
-      #define CAQTDM_X11 Q_OS_UNIX
-   #endif
+    #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        #ifndef MOBILE_ANDROID
+           #define CAQTDM_X11 Q_OS_UNIX
+        #endif
+    #endif
 #endif
 #endif
 
