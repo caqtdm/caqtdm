@@ -375,19 +375,17 @@ bool caLineDraw::rotateText(float degrees)
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     QPoint position = event->pos();
-    mouseLocation = QList<QPoint>();
     isMarked = QList<bool>();
+    startPointMarker = position;
 
-    handleMarking(position);
     update();
 }
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
     QPoint position = event->pos();
     setUpMarkingList();
-
     handleMarking(position);
-    mouseLocation << position;
+
     qDebug() << "MARKED TEXT:" << getMarkedText();
     update();
 
@@ -402,68 +400,90 @@ void caLineDraw::setUpMarkingList(){
 void caLineDraw::handleMarking(QPoint position){
 
 
+    for(int i = 0; i < isMarked.size(); i++){
+        isMarked[i] = false;
+    }
+
     for(int i = 0; i < isMarked.count(); i++){
+
         QRect rect = BoundingRects[i];
 
         // Harmonise Coordinates in relation to Direction
         QPoint p = position;
         p = transformCoordinates(position);
-
         // Ignore Y-Axis for Marking
         p.setY(rect.center().y());
 
-        qDebug() << position;
+        int direction = getDirectionOfMouseMove(startPointMarker, position);
+        int startIndex = getIndexOfMarkedRect(startPointMarker);
+        int currentIndex = getIndexOfMarkedRect(p);
 
-        int index = getIndexOfMarkedRect(p);
-        // Mark if Cursor is within Bounds of Letter
-        if(!getMarkedRects().contains(rect)){
-            if(rect.contains(p)){
-                qDebug() << "MARKED:" <<isMarked;
+
+        int start;
+        int end;
+
+        switch(startIndex < currentIndex){
+        case false:
+            start = currentIndex;
+            end = startIndex;
+            break;
+        case true:
+        default:
+            start = startIndex;
+            end = currentIndex;
+            break;
+        }
+
+        for(int i = start; i <= end ; i++){
+            if(start >= 0 && end >= 0){
                 isMarked[i] = true;
-                break;
+            }else{
+                isMarked[i] = false;
             }
         }
 
     }
 }
+
 int caLineDraw::getIndexOfMarkedRect(QPoint position){
+    int index;
+
     for(int i = 0; i < isMarked.count(); i++){
         if(BoundingRects[i].contains(position)){
-            return i;
+            index = i;
+            break;
         }
     }
-    return -1;
+    if(index > m_Text.size()){index = m_Text.size(); }
+    if(index < 0){index = 0; }
+    return index;
 }
 
-int caLineDraw::getDirectionOfMouseMove(QPoint position){
-    if(mouseLocation.size() > 0){
-        int endLocation;
-        int startLocation;
+int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition){
+    int endLocation = 0;
+    int startLocation = 0;
 
-        switch(m_Direction){
-        case Down:
-            startLocation = mouseLocation.last().y();
-            endLocation = position.y();
-            break;
-        case Up:
-            endLocation = mouseLocation.last().y();
-            startLocation = position.y();
-            break;
-        case Horizontal:
-            startLocation = mouseLocation.last().x();
-            endLocation = position.x();
-            break;
-        }
-
-        int difference = endLocation - startLocation;
-
-        return difference;
-        // positive: right,
-        // negative: left,
-        // equal to zero: vertical
-    }else{
-        return NULL;
+    switch(m_Direction){
+    case Down:
+        startLocation = startPosition.y();
+        endLocation = endPosition.y();
+        break;
+    case Up:
+        endLocation = startPosition.y();
+        startLocation = endPosition.y();
+        break;
+    case Horizontal:
+        startLocation = startPosition.x();
+        endLocation = endPosition.x();
+        break;
     }
+
+    int difference = endLocation - startLocation;
+
+    return difference;
+    // positive: right,
+    // negative: left,
+    // equal to zero: vertical or no at all
 }
 
 QString caLineDraw::getMarkedText(){

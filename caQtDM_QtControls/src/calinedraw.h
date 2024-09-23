@@ -199,7 +199,7 @@ protected:
     void setUpMarkingList();
     int getIndexOfMarkedRect(QPoint position);
 
-    int getDirectionOfMouseMove(QPoint position);
+    int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);
 
     QList<QRect> getMarkedRects();
     QColor invertColor(QColor color);
@@ -240,7 +240,6 @@ private:
     QList<QRect> BoundingRects;
     QList<bool> isMarked;
     QRect m_textRect;
-
-    QList<QPoint> mouseLocation;
+    QPoint startPointMarker;
 };
 #endif
