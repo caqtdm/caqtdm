@@ -196,8 +196,10 @@ protected:
 
     QString getMarkedText();
     void handleMarking(QPoint position);
-    int getDirectionOfMouseMove(QPoint position);
     void setUpMarkingList();
+    int getIndexOfMarkedRect(QPoint position);
+
+    int getDirectionOfMouseMove(QPoint position);
 
     QList<QRect> getMarkedRects();
     QColor invertColor(QColor color);

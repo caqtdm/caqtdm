@@ -377,6 +377,8 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
     QPoint position = event->pos();
     mouseLocation = QList<QPoint>();
     isMarked = QList<bool>();
+
+    handleMarking(position);
     update();
 }
 
@@ -398,46 +400,40 @@ void caLineDraw::setUpMarkingList(){
 }
 
 void caLineDraw::handleMarking(QPoint position){
-    for(int i = 0; i < BoundingRects.size(); i++){
-        QRect r = BoundingRects[i];
+
+
+    for(int i = 0; i < isMarked.count(); i++){
+        QRect rect = BoundingRects[i];
 
         // Harmonise Coordinates in relation to Direction
         QPoint p = position;
         p = transformCoordinates(position);
 
         // Ignore Y-Axis for Marking
-        p.setY(r.center().y());
+        p.setY(rect.center().y());
 
+        qDebug() << position;
+
+        int index = getIndexOfMarkedRect(p);
         // Mark if Cursor is within Bounds of Letter
-        if(!getMarkedRects().contains(r)){
-            if(r.contains(p)){
+        if(!getMarkedRects().contains(rect)){
+            if(rect.contains(p)){
                 qDebug() << "MARKED:" <<isMarked;
-                /*
-                qDebug() << "POS:" << r;
-            qDebug() << "P:" << p << "C:" << r.contains(p);
-*/
                 isMarked[i] = true;
                 break;
             }
         }
 
-        /*
-        if(!markedRects.contains(r)){
-            if(r.contains(p)){
-                markedRects << r;
-                markedText += m_Text[i] + '-' + QString::number(i) + '|';
-                currentRect = r;
-                break;
-            }
-        }else if(markedRects.contains(r) && !r.contains(p)){
-            lastRectLeft = r;
-            removeRects << r;
-            handleUnmarking(position);
-        }
-*/
     }
 }
-
+int caLineDraw::getIndexOfMarkedRect(QPoint position){
+    for(int i = 0; i < isMarked.count(); i++){
+        if(BoundingRects[i].contains(position)){
+            return i;
+        }
+    }
+    return -1;
+}
 
 int caLineDraw::getDirectionOfMouseMove(QPoint position){
     if(mouseLocation.size() > 0){
@@ -498,7 +494,6 @@ QPoint caLineDraw::transformCoordinates(QPoint point){
     case Up:
         x = (-point.y() + m_textRect.right());
         y = point.x();
-
         break;
     case Down:
         x = point.y();
@@ -592,6 +587,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
         letterCoordinates << horizontalAdvance;
         r.setX(x);
         r.setY(y);
+        r.setHeight(-y);
         r.setWidth(horizontalAdvance);
 
         painter.setPen(m_ForeColor);
