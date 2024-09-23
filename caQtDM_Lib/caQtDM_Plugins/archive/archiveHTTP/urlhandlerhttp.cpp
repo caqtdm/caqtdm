@@ -46,11 +46,22 @@ UrlHandlerHttp::UrlHandlerHttp()
         m_apiPathRaw = "/api/4/events";
     }
 
+    QString customApiPathList = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_APIPATH_LIST");
+
+    if (!customApiPathList.isEmpty() && !customApiPathList.isNull()) {
+        m_apiPathList = customApiPathList;
+    } else {
+        m_apiPathList = "/api/4/backend/list";
+    }
+
     // Set this to true by default as we are not a browser and can handle large results.
     m_allowLargeResult = true;
 
     // Set this to false by default as we don't need https for our archiver data, if needed the archiver can redirect us.
     m_usesHttps = false;
+    // the list is not the standard url that is generated, and it is only needed at startup
+    m_backendlist = false;
+
 }
 
 UrlHandlerHttp::~UrlHandlerHttp()
@@ -66,6 +77,11 @@ QUrl UrlHandlerHttp::assembleUrl() const
         assembledUrl = QUrl(QString(QString("https://") + m_hostName.toString()));
     } else {
         assembledUrl = QUrl(QString(QString("http://") + m_hostName.toString()));
+    }
+    if (m_backendlist){
+        // the list is a simple command and dosen't need any query
+        assembledUrl.setPath(m_apiPathList);
+        return assembledUrl;
     }
 
     // Add the needed api path.
@@ -195,6 +211,16 @@ bool UrlHandlerHttp::usesHttps() const
 void UrlHandlerHttp::setUsesHttps(const bool &newHttps)
 {
     m_usesHttps = newHttps;
+}
+
+bool UrlHandlerHttp::BackendListRequest() const
+{
+    return m_backendlist;
+}
+
+void UrlHandlerHttp::setBackeendListRequest(const bool &newbackendlist)
+{
+    m_backendlist=newbackendlist;
 }
 
 bool UrlHandlerHttp::binned() const

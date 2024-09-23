@@ -1014,8 +1014,17 @@ void caLineDraw::getWidgetInfo(QString *pv, int &nbPV, int &limitsDefault, int &
     Q_UNUSED(limitsDefault);
 
     pv[0] = getPV().trimmed();
+<<<<<<< HEAD
     if (getPrecisionMode() == User)
     {
+=======
+    nbPV = 0;
+    if (pv[0].length()>0){ // only when something is inside the PV it could be something
+        nbPV = 1;
+    }
+
+    if(getPrecisionMode() == User) {
+>>>>>>> cc042e1dcb66606165fc789cdce3cad669b378bf
         precMode = true;
         Precision = getPrecision();
     }
@@ -1032,5 +1041,4 @@ void caLineDraw::getWidgetInfo(QString *pv, int &nbPV, int &limitsDefault, int &
     else
         strcpy(colMode, "Static");
 
-    nbPV = 1;
 }

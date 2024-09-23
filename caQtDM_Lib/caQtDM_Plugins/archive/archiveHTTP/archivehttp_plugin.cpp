@@ -75,10 +75,14 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
 {
     m_mutexKnobDataP = data;
     m_messageWindowP = messageWindow;
-
+    UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
+    urlHandler->setBackeendListRequest(true);
+    urlHandler->setHostName(QString(DEFAULT_HOSTNAME));
     // Send a request to query available backends
     QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QNetworkReply* reply = manager->get(QNetworkRequest(QUrl("https://" DEFAULT_HOSTNAME "/api/4/backend/list")));
+//    QNetworkReply* reply = manager->get(QNetworkRequest(QUrl("https://" DEFAULT_HOSTNAME "/api/4/backend/list")));
+    QNetworkReply* reply = manager->get(QNetworkRequest(urlHandler->assembleUrl()));
+
     connect(reply, &QNetworkReply::finished, this, [reply, manager, this]() {
         if (reply->error() == QNetworkReply::NoError) {
             QByteArray responseData = reply->readAll();

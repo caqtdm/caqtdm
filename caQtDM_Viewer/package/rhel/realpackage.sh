@@ -6,7 +6,7 @@ if [ "$1" == "--help" ]; then
   echo "" 
   echo "" 
   echo "Usage: realpackage.sh [OPTION...]"
-  echo "Buildscript for caQtDM on Redhat Linux 7/8 to RPM"
+  echo "Buildscript for caQtDM on Redhat Linux 8/9 to RPM"
   echo "" 
   echo "Examples:" 
   echo "./realpackage.sh              # Normal git checkout + using spec file from git " 
@@ -33,7 +33,7 @@ rm -rf .git
 cd ..
 if [ "$1" != "--rpmdev" ]; then
     mv ./caqtdm.spec "./caqtdm.spec_$(date +"%Y_%m_%d_%I_%M")"
-    cp ./caqtdm/caQtDM_Viewer/package/rhel7/caqtdm.spec ./
+    cp ./caqtdm/caQtDM_Viewer/package/rhel/caqtdm.spec ./
 fi
 
 

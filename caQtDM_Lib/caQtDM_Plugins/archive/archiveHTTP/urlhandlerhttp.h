@@ -80,6 +80,11 @@ public:
 
     bool usesHttps() const;
     void setUsesHttps(const bool &newHttps);
+    /*
+     * enables to generate the url for getting the valid backend list request
+     * */
+    bool BackendListRequest() const;
+    void setBackeendListRequest(const bool &newbackendlist);
 
     /*
      * Returns whether or not the url is configured to request binned data.
@@ -121,10 +126,12 @@ private:
 
     QString m_apiPathBinned;
     QString m_apiPathRaw;
+    QString m_apiPathList;
     bool m_allowLargeResult;
     QUrl m_hostName;
     bool m_usesHttps;
     bool m_binned;
+    bool m_backendlist;
     int m_binCount;
     QString m_backend;
     QString m_channelName;
