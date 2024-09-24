@@ -374,32 +374,32 @@ bool caLineDraw::rotateText(float degrees)
 
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
-    QPoint position = event->pos();
-    isMarked = QList<bool>();
-    startPointMarker = position;
-
-    update();
-}
-
-void caLineDraw::mouseMoveEvent(QMouseEvent *event){
-    QPoint position = event->pos();
-    setUpMarkingList();
-    handleMarking(position);
-
-    qDebug() << "MARKED TEXT:" << getMarkedText();
-    update();
-
-}
-
-void caLineDraw::setUpMarkingList(){
-    for(int i = 0; i < m_Text.size(); i++){
-        isMarked << false;
+    if(event->buttons() == Qt::LeftButton){
+        isMarked = QList<bool>();
+        startPointMarker = transformCoordinates(event->pos());
+        update();
     }
 }
 
+void caLineDraw::mouseMoveEvent(QMouseEvent *event){
+    if(event->buttons() == Qt::LeftButton){
+        QPoint position = event->pos();
+
+        for(int i = 0; i < m_Text.size(); i++){
+            isMarked << false;
+        }
+
+        handleMarking(position);
+        qDebug() << "MARKED TEXT:" << getMarkedText();
+        update();
+    }
+}
+
+/**
+ * @brief Handles Marking of Text when clicking and moving the mouse
+ * @param position -> Current Mouse Position
+ */
 void caLineDraw::handleMarking(QPoint position){
-
-
     for(int i = 0; i < isMarked.size(); i++){
         isMarked[i] = false;
     }
@@ -414,10 +414,10 @@ void caLineDraw::handleMarking(QPoint position){
         // Ignore Y-Axis for Marking
         p.setY(rect.center().y());
 
-        int direction = getDirectionOfMouseMove(startPointMarker, position);
         int startIndex = getIndexOfMarkedRect(startPointMarker);
         int currentIndex = getIndexOfMarkedRect(p);
 
+        qDebug() << "START:" << startIndex << "CURR:" << currentIndex;
 
         int start;
         int end;
@@ -445,20 +445,40 @@ void caLineDraw::handleMarking(QPoint position){
     }
 }
 
+/**
+ * @brief Return Index of Currently Marked Rectangle
+ * @param position -> Current Position of Mouse
+ * @return index -> index of marked Rectangle for the "isMarked" list
+ */
 int caLineDraw::getIndexOfMarkedRect(QPoint position){
-    int index;
+    int index = 0;
 
-    for(int i = 0; i < isMarked.count(); i++){
+    for(int i = 0; i < isMarked.size(); i++){
         if(BoundingRects[i].contains(position)){
             index = i;
             break;
         }
     }
-    if(index > m_Text.size()){index = m_Text.size(); }
-    if(index < 0){index = 0; }
+
+    // If Mouse leaves Text and index is bigger than text, set to length of text
+    if(position.x() > BoundingRects[m_Text.size()-1].x()){
+        index = m_Text.size()-1;
+    }
     return index;
 }
 
+/**
+ * @brief Returns Direction of Mouse
+ * @param startPosition -> Starting (1st) Position of Mouse
+ * @param endPosition -> Ending (2nd) Position of Mouse
+ * @return difference -> Direction is returned as difference of distance
+ *
+ *  IF diff > 0 -> RIGHT
+ *
+ *  IF diff < 0 -> LEFT
+ *
+ *  IF diff = 0 -> VERTICAL or NONE
+ */
 int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition){
     int endLocation = 0;
     int startLocation = 0;
@@ -486,9 +506,13 @@ int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition
     // equal to zero: vertical or no at all
 }
 
+/**
+ * @brief Returns text that is currently marked
+ * @return text -> Currently Marked Text
+ */
 QString caLineDraw::getMarkedText(){
     QString text;
-    for(int i = 0; i < isMarked.size(); i++){
+    for(int i = 0; i < isMarked.count(); i++){
         if(isMarked[i]){
             text += m_Text[(i % (m_Text.size() + 1))];
         }
@@ -496,18 +520,27 @@ QString caLineDraw::getMarkedText(){
     return text;
 }
 
+/**
+ * @brief Returns all Currently Marked Rectangles
+ * @return list -> List of marked Rectangles
+ */
 QList<QRect> caLineDraw::getMarkedRects(){
     QList<QRect> list;
-    for(int i = 0; i < isMarked.size(); i++){
-        if(isMarked[i]){
+    for(int i = 0; i < isMarked.count(); i++){
+        if(isMarked[i] && !list.contains(BoundingRects[i])){
             list.append(BoundingRects[i]);
         }
     }
     return list;
 }
 
+/**
+ * @brief Converts coordinates of a point to same kind of coordinates across all directions and alignments *
+ * @param point -> The Point that will be transformed
+ * @return point -> The same point but with transformed Coordinates
+ */
 QPoint caLineDraw::transformCoordinates(QPoint point){
-    // transforms Coordinates from Horizontal Orientation to Vertical - aligns selected text with mouse when hovering over
+    // Unifies Coordinates so that the same ones can be used regardeless of orientation.
     int x;
     int y;
     switch(m_Direction){
@@ -528,6 +561,11 @@ QPoint caLineDraw::transformCoordinates(QPoint point){
     return QPoint(x, y);
 }
 
+/**
+ * @brief Returns Sum Of Coordinate List.
+ * @param list -> List of Coordinates
+ * @return sum -> Sum Of Coordinates
+ */
 int caLineDraw::getSumOfCoords(QList<int> list) {
     // Return Sum of Coordinates to get Beginning Point for Marking
     int sum = 0;
@@ -1014,17 +1052,12 @@ void caLineDraw::getWidgetInfo(QString *pv, int &nbPV, int &limitsDefault, int &
     Q_UNUSED(limitsDefault);
 
     pv[0] = getPV().trimmed();
-<<<<<<< HEAD
-    if (getPrecisionMode() == User)
-    {
-=======
     nbPV = 0;
     if (pv[0].length()>0){ // only when something is inside the PV it could be something
         nbPV = 1;
     }
 
     if(getPrecisionMode() == User) {
->>>>>>> cc042e1dcb66606165fc789cdce3cad669b378bf
         precMode = true;
         Precision = getPrecision();
     }

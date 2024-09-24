@@ -190,15 +190,14 @@ protected:
 
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
     int getSumOfCoords(QList<int> list);
     QPoint transformCoordinates(QPoint point);
 
     QString getMarkedText();
     void handleMarking(QPoint position);
-    void setUpMarkingList();
     int getIndexOfMarkedRect(QPoint position);
-
     int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);
 
     QList<QRect> getMarkedRects();
