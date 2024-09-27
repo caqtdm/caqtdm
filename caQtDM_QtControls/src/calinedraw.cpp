@@ -385,12 +385,12 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
     if(event->buttons() == Qt::LeftButton){
         QPoint position = event->pos();
 
+        // Setup Marking-List
         for(int i = 0; i < m_Text.size(); i++){
             isMarked << false;
         }
 
         handleMarking(position);
-        qDebug() << "MARKED TEXT:" << getMarkedText();
         update();
     }
 }
@@ -400,6 +400,7 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
  * @param position -> Current Mouse Position
  */
 void caLineDraw::handleMarking(QPoint position){
+    // Reset Marking-List
     for(int i = 0; i < isMarked.size(); i++){
         isMarked[i] = false;
     }
@@ -414,14 +415,19 @@ void caLineDraw::handleMarking(QPoint position){
         // Ignore Y-Axis for Marking
         p.setY(rect.center().y());
 
+        // Get starting index (mouseclick) and current index (mousemoveposition)
         int startIndex = getIndexOfMarkedRect(startPointMarker);
+
         int currentIndex = getIndexOfMarkedRect(p);
 
-        qDebug() << "START:" << startIndex << "CURR:" << currentIndex;
+        for(int i = 0; i < m_Text.size(); i++){
+            BoundingRects[i].contains(startPointMarker);
+        }
 
         int start;
         int end;
 
+        // Define Correct Startingindex
         switch(startIndex < currentIndex){
         case false:
             start = currentIndex;
@@ -434,6 +440,7 @@ void caLineDraw::handleMarking(QPoint position){
             break;
         }
 
+        // Set Marking-List
         for(int i = start; i <= end ; i++){
             if(start >= 0 && end >= 0){
                 isMarked[i] = true;
@@ -442,6 +449,20 @@ void caLineDraw::handleMarking(QPoint position){
             }
         }
 
+        // Is Starting Point within Text
+        bool startWithinBounds = (startPointMarker.x() > BoundingRects[0].x() && startPointMarker.x() <= BoundingRects[m_Text.size()-1].right());
+        // Is End Point within Text
+        bool endWithinBounds = (p.x() > BoundingRects[0].x() && p.x() <= BoundingRects[m_Text.size()-1].right());
+
+        // Is Any Text between both Points, i.e. are both points on the same side outside of the text
+        bool isTextBetween = ((startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right()));
+
+        if(!startWithinBounds && !endWithinBounds && !isTextBetween){
+            qDebug() << "Outside";
+            for(int i = 0; i < isMarked.size(); i++){
+                isMarked[i] = false;
+            }
+        }
     }
 }
 
@@ -460,8 +481,10 @@ int caLineDraw::getIndexOfMarkedRect(QPoint position){
         }
     }
 
+    int lastIdx = m_Text.size()-1;
+
     // If Mouse leaves Text and index is bigger than text, set to length of text
-    if(position.x() > BoundingRects[m_Text.size()-1].x()){
+    if(position.x() > BoundingRects[lastIdx].x()){
         index = m_Text.size()-1;
     }
     return index;
@@ -632,6 +655,8 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
     int x;
     int y = textRect.height();
+    painter.setPen(brush.color());
+
     for(int i = 0; i < m_Text.size(); i++){
 
         QRect r = fm.boundingRect(m_Text[i]);
@@ -648,7 +673,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
         r.setHeight(-y);
         r.setWidth(horizontalAdvance);
 
-        painter.setPen(m_ForeColor);
+        //   painter.setPen(m_ForeColor);
         BoundingRects << r;
         painter.drawRect(r);
     }
@@ -718,6 +743,11 @@ bool caLineDraw::event(QEvent *e)
     return QWidget::event(e);
 }
 
+/**
+ * @brief Inverts Color to opposite of the color wheel
+ * @param color -> Color to be inverted
+ * @return Inverted Color
+ */
 QColor caLineDraw::invertColor(QColor color){
     return QColor(255 - color.red(), 255 - color.green(), 255 - color.blue());
 }
