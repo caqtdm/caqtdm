@@ -757,13 +757,16 @@ void caStripPlot::defineCurves(QStringList titles, units unit, double period, in
             s = getStyle(i);
             c = getColor(i);
             delete curve[i];
+            curve[i] = (QwtPlotCurve*) Q_NULLPTR;
         }
 
         if(errorcurve[i] != (QwtPlotIntervalCurveNaN*) Q_NULLPTR) {
             delete errorcurve[i];
+            errorcurve[i] = (QwtPlotIntervalCurveNaN*) Q_NULLPTR;
         }
-        if(fillcurve[i] != (QwtPlotCurve*) Q_NULLPTR) {
+        if(fillcurve[i] != (QwtPlotCurveNaN*) Q_NULLPTR) {
             delete fillcurve[i];
+            fillcurve[i] = (QwtPlotCurveNaN*) Q_NULLPTR;
         }
 
         if(i < NumberOfCurves) {
