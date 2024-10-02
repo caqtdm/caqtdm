@@ -458,7 +458,6 @@ void caLineDraw::handleMarking(QPoint position){
         bool isTextBetween = ((startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right()));
 
         if(!startWithinBounds && !endWithinBounds && !isTextBetween){
-            qDebug() << "Outside";
             for(int i = 0; i < isMarked.size(); i++){
                 isMarked[i] = false;
             }
@@ -540,6 +539,9 @@ QString caLineDraw::getMarkedText(){
             text += m_Text[(i % (m_Text.size() + 1))];
         }
     }
+    text = text.replace(QString(" "), "");
+    text = text.replace("\u0000", "");
+    qDebug() << text;
     return text;
 }
 
@@ -645,7 +647,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
     case Center:
     default:
         painter.drawText(textRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
-        widthTextLess = (textRect.width() / 2) - (fm.horizontalAdvance(m_Text) / 2);
+        widthTextLess = (textRect.width() / 2) - (fm.horizontalAdvance(m_Text)/2);
         break;
     }
 
@@ -673,16 +675,29 @@ void caLineDraw::paintEvent(QPaintEvent *)
         r.setHeight(-y);
         r.setWidth(horizontalAdvance);
 
-        //   painter.setPen(m_ForeColor);
+        painter.setPen(m_ForeColor);
         BoundingRects << r;
         painter.drawRect(r);
     }
 
     // MARKING
-    for(int i = 0; i < getMarkedRects().size(); i++){
+
+    letterCoordinates = QList<int>();
+    letterCoordinates << widthTextLess;
+
+    for(int i = 0; i < getMarkedRects().size() -1; i++){
         // Invert normal colors
         QRect marked = getMarkedRects()[i];
         QString markedText = getMarkedText()[i];
+
+     //   if(m_Alignment == Center || m_Alignment == Right){
+            int xx = getSumOfCoords(letterCoordinates) + m_FrameLineWidth;
+            int wid = marked.width();
+            letterCoordinates << getMarkedRects()[i].width();
+            marked.setX(xx);
+            marked.setWidth(wid);
+    //    }
+
 
         QColor invForeColor = invertColor(m_ForeColor);
         QColor invBrushColor = invertColor(brush.color());
@@ -691,11 +706,12 @@ void caLineDraw::paintEvent(QPaintEvent *)
         painter.setBackground(invBrushColor);
         painter.setBackgroundMode(Qt::OpaqueMode);
 
-        painter.fillRect(marked, invForeColor);;
+        painter.fillRect(marked, invForeColor);
         painter.setBackgroundMode(Qt::OpaqueMode);
 
         // Draw Text on top of old one
         painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  markedText);
+
     }
 
     painter.setPen(m_ForeColor);
