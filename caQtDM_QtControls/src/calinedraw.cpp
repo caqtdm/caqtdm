@@ -419,11 +419,6 @@ void caLineDraw::handleMarking(QPoint position){
         int startIndex = getIndexOfMarkedRect(startPointMarker);
 
         int currentIndex = getIndexOfMarkedRect(p);
-
-        for(int i = 0; i < m_Text.size(); i++){
-            BoundingRects[i].contains(startPointMarker);
-        }
-
         int start;
         int end;
 
@@ -440,12 +435,14 @@ void caLineDraw::handleMarking(QPoint position){
             break;
         }
 
+
+
         // Set Marking-List
-        for(int i = start; i <= end ; i++){
+        for(int j = start; j <= end; j++){
             if(start >= 0 && end >= 0){
-                isMarked[i] = true;
+                isMarked[j] = true;
             }else{
-                isMarked[i] = false;
+                isMarked[j] = false;
             }
         }
 
@@ -457,9 +454,10 @@ void caLineDraw::handleMarking(QPoint position){
         // Is Any Text between both Points, i.e. are both points on the same side outside of the text
         bool isTextBetween = ((startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right()));
 
+
         if(!startWithinBounds && !endWithinBounds && !isTextBetween){
             for(int i = 0; i < isMarked.size(); i++){
-                isMarked[i] = false;
+               isMarked[i] = false;
             }
         }
     }
@@ -473,19 +471,20 @@ void caLineDraw::handleMarking(QPoint position){
 int caLineDraw::getIndexOfMarkedRect(QPoint position){
     int index = 0;
 
-    for(int i = 0; i < isMarked.size(); i++){
+    for(int i = 0; i <= isMarked.size(); i++){
         if(BoundingRects[i].contains(position)){
             index = i;
             break;
         }
     }
-
     int lastIdx = m_Text.size()-1;
 
     // If Mouse leaves Text and index is bigger than text, set to length of text
+
     if(position.x() > BoundingRects[lastIdx].x()){
         index = m_Text.size()-1;
     }
+
     return index;
 }
 
@@ -534,13 +533,14 @@ int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition
  */
 QString caLineDraw::getMarkedText(){
     QString text;
-    for(int i = 0; i < isMarked.count(); i++){
+    for(int i = 0; i < m_Text.size(); i++){
         if(isMarked[i]){
             text += m_Text[(i % (m_Text.size() + 1))];
         }
     }
+    // Replace Spaces and null Values
     text = text.replace(QString(" "), "");
-    text = text.replace("\u0000", "");
+    text = text.replace(QString(1, QChar('\0')), "");
     qDebug() << text;
     return text;
 }
@@ -591,10 +591,16 @@ QPoint caLineDraw::transformCoordinates(QPoint point){
  * @param list -> List of Coordinates
  * @return sum -> Sum Of Coordinates
  */
-int caLineDraw::getSumOfCoords(QList<int> list) {
+int caLineDraw::getSumOfCoords(QList<int> list, int end)
+{
+    if(end == -1){
+        end = list.size();
+    }else{
+        end += 1;
+    }
     // Return Sum of Coordinates to get Beginning Point for Marking
     int sum = 0;
-    for(int i = 0; i < list.size(); i++){
+    for(int i = 0; i < end; i++){
         sum += list[i];
     }
     return sum;
@@ -682,31 +688,27 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
     // MARKING
 
-    letterCoordinates = QList<int>();
-    letterCoordinates << widthTextLess;
-
-    for(int i = 0; i < getMarkedRects().size() -1; i++){
-        // Invert normal colors
+    for(int i = 0; i < getMarkedRects().size(); i++){
         QRect marked = getMarkedRects()[i];
         QString markedText = getMarkedText()[i];
 
-     //   if(m_Alignment == Center || m_Alignment == Right){
-            int xx = getSumOfCoords(letterCoordinates) + m_FrameLineWidth;
-            int wid = marked.width();
-            letterCoordinates << getMarkedRects()[i].width();
-            marked.setX(xx);
-            marked.setWidth(wid);
-    //    }
+        // Calculate starting position for the rectangles
+        if(m_Alignment == Center || m_Alignment == Right){
+            int sumUntilCurrentIndex = getIndexOfMarkedRect(marked.center());
+            int x = getSumOfCoords(letterCoordinates, sumUntilCurrentIndex) + m_FrameLineWidth;
+            int width = marked.width();
+
+            marked.setX(x);
+            marked.setWidth(width);
+        }
 
 
+        // Invert normal colors
         QColor invForeColor = invertColor(m_ForeColor);
         QColor invBrushColor = invertColor(brush.color());
 
         painter.setPen(invForeColor);
         painter.setBackground(invBrushColor);
-        painter.setBackgroundMode(Qt::OpaqueMode);
-
-        painter.fillRect(marked, invForeColor);
         painter.setBackgroundMode(Qt::OpaqueMode);
 
         // Draw Text on top of old one

@@ -191,7 +191,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
-    int getSumOfCoords(QList<int> list);
+    int getSumOfCoords(QList<int> list, int end = -1);
     QPoint transformCoordinates(QPoint point);
 
     QString getMarkedText();
