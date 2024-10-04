@@ -424,29 +424,21 @@ void caLineDraw::handleMarking(QPoint position){
     int startIndex = getIndexOfMarkedRect(startPointMarker);
     int currentIndex = getIndexOfMarkedRect(p);
 
-    int start;
-    int end;
+    int start = 0;
+    int end = 0;
 
     // Define Correct Startingindex
     if(startIndex < currentIndex)
     {
         start = startIndex;
         end = currentIndex;
-    }else if(startIndex > currentIndex){
-        start = currentIndex;
-        end = startIndex;
-    }else if(startIndex == currentIndex){
+    }else if(startIndex >= currentIndex){
         start = currentIndex;
         end = startIndex;
     }
 
-
     // Is Any Text between both Points, i.e. are both points on the same side outside of the text
-    bool isTextBetween = ((startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right()));
-
-    // Is Starting Point within Text
-    bool outsideLeftBounds = startPointMarker.x() < BoundingRects[0].x() || p.x() < BoundingRects[0].x();
-    bool outsideRightBounds = startPointMarker.x() > BoundingRects[m_Text.size()-1].right() || p.x() > BoundingRects[m_Text.size()-1].right();
+    bool isTextBetween = (startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right());
 
     int last_idx = m_Text.size()-1;
     if(start < 0 && end < 0){
@@ -462,15 +454,13 @@ void caLineDraw::handleMarking(QPoint position){
         }
     }
 
-
-
     if(start < 0){
-        // Outside Left Bounds
-        if(startPointMarker.x() < BoundingRects[0].x()){
+        // Is Starting Point Outside Left Bounds
+        if(startPointMarker.x() < BoundingRects[0].x() || p.x() < BoundingRects[0].x()){
             start = 0;
         }
         // Outside right Bounds
-        else if(startPointMarker.x() > BoundingRects[last_idx].right()){
+        else if(startPointMarker.x() > BoundingRects[last_idx].x()){
             start = last_idx;
         }
     }else if(end < 0){
@@ -490,9 +480,6 @@ void caLineDraw::handleMarking(QPoint position){
         end = s;
     }
 
-    qDebug() << "\n" << outsideLeftBounds << outsideRightBounds;
-    qDebug() << "START:" << start << "END:" << end << getMarkedText();
-
 
     for(int j = start; j <= end; j++){
         if(start >= 0 && end >= 0){
@@ -501,7 +488,6 @@ void caLineDraw::handleMarking(QPoint position){
             isMarked[j] = false;
         }
     }
-    // qDebug() << "START" << start << "END" << end << startWithinBounds << endWithinBounds << isTextBetween;
 }
 
 /**
