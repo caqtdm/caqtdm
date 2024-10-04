@@ -45,9 +45,6 @@ contains(QT_VER_MAJ, 6) {
        DEFINES += CAQTDM_GPS
     }
 
-    unix:!macx:!ios:!android{
-        QT     += x11extras
-    }
     !ios:!android {
         QT     += printsupport
      }
