@@ -191,6 +191,8 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
+    void keyPressEvent(QKeyEvent *e);
+
     int getSumOfCoords(QList<int> list, int end = -1);
     QPoint transformCoordinates(QPoint point);
 

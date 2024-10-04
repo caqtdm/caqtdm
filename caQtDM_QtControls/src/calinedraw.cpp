@@ -381,6 +381,10 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
         BoundingRects = QList<QRect>();
         update();
     }
+
+    if(event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton){
+        setFocus();
+    }
 }
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
@@ -399,6 +403,23 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
     }else if(event->buttons() == Qt::RightButton){
         qDebug() << BoundingRects;
     }
+}
+
+void caLineDraw::keyPressEvent(QKeyEvent *e){
+    int key = e->key();
+    int modifier = e->modifiers();
+
+    if(modifier == Qt::ControlModifier){
+        switch(key){
+        case Qt::Key_C:
+            qDebug() << "CTRL + C";
+            break;
+        case Qt::Key_A:
+            qDebug() << "CTRL + A";
+            break;
+        }
+    }
+
 }
 
 /**
