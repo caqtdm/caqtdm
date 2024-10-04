@@ -110,6 +110,12 @@ unix:!macx:{
     CONFIG += XDR_HACK
    }
  }
+ contains(QT_VER_MAJ, 6) {
+    DEFINES += XDR_HACK
+    DEFINES += XDR_LE
+    CONFIG += XDR_HACK
+ }
+
 }
 
 # enable ADL_EDL automatic on the fly conversion, if not enabled, when an adl file is encountered,
