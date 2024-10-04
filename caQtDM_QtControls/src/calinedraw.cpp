@@ -32,6 +32,8 @@
 #include <QPainter>
 #include <qnumeric.h>
 #include <QDebug>
+#include <QApplication>
+#include <QClipboard>
 #if defined(_MSC_VER)
 #ifndef snprintf
 #define snprintf _snprintf
@@ -375,10 +377,17 @@ bool caLineDraw::rotateText(float degrees)
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton){
-        isMarked = QList<bool>();
 
         startPointMarker = transformCoordinates(event->pos());
+
+        // Reset Marking
+        isMarked = QList<bool>();
+        for(int i = 0; i <= m_Text.size(); i++){
+            isMarked << false;
+        }
         BoundingRects = QList<QRect>();
+        markAll = false;
+
         update();
     }
 
@@ -392,12 +401,6 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
 
         QPoint position = event->pos();
 
-        // Setup Marking-List
-        for(int i = 0; i <= m_Text.size()-1; i++){
-            isMarked << false;
-        }
-
-
         handleMarking(position);
         update();
     }else if(event->buttons() == Qt::RightButton){
@@ -409,13 +412,21 @@ void caLineDraw::keyPressEvent(QKeyEvent *e){
     int key = e->key();
     int modifier = e->modifiers();
 
+    QClipboard *clipboard = QApplication::clipboard();
+
     if(modifier == Qt::ControlModifier){
         switch(key){
+        // CTRL + C
         case Qt::Key_C:
-            qDebug() << "CTRL + C";
+            clipboard->setText(getMarkedText());
             break;
+        // CTRL + A
         case Qt::Key_A:
-            qDebug() << "CTRL + A";
+            for(int i = 0; i <= isMarked.size()-1; i++){
+                isMarked[i] = true;
+            }
+            markAll = true;
+            update();
             break;
         }
     }
@@ -432,81 +443,88 @@ void caLineDraw::handleMarking(QPoint position){
         isMarked[i] = false;
     }
 
-    QPoint p = position;
-    p = transformCoordinates(position);
-    // Ignore Y-Axis for Marking
+    if(BoundingRects.size() > 0){
+        QPoint p = position;
+        p = transformCoordinates(position);
+        // Ignore Y-Axis for Marking
 
-    int rect_y = BoundingRects[0].center().y();
-    p.setY(rect_y);
+        int rect_y = m_textRect.y();
+        p.setY(rect_y);
 
-    // Harmonise Coordinates in relation to Direction
+        // Harmonise Coordinates in relation to Direction
 
-    // Get starting index (mouseclick) and current index (mousemoveposition)
-    int startIndex = getIndexOfMarkedRect(startPointMarker);
-    int currentIndex = getIndexOfMarkedRect(p);
+        // Get starting index (mouseclick) and current index (mousemoveposition)
+        int startIndex = getIndexOfMarkedRect(startPointMarker);
+        int currentIndex = getIndexOfMarkedRect(p);
 
-    int start = 0;
-    int end = 0;
+        int start = 0;
+        int end = 0;
 
-    // Define Correct Startingindex
-    if(startIndex < currentIndex)
-    {
-        start = startIndex;
-        end = currentIndex;
-    }else if(startIndex >= currentIndex){
-        start = currentIndex;
-        end = startIndex;
-    }
+        // Define Correct Startingindex
+        if(startIndex < currentIndex)
+        {
+            start = startIndex;
+            end = currentIndex;
+        }else if(startIndex >= currentIndex){
+            start = currentIndex;
+            end = startIndex;
+        }
 
-    // Is Any Text between both Points, i.e. are both points on the same side outside of the text
-    bool isTextBetween = (startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right());
+        // Is Any Text between both Points, i.e. are both points on the same side outside of the text
+        bool isTextBetween = (startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right());
 
-    int last_idx = m_Text.size()-1;
-    if(start < 0 && end < 0){
+        int last_idx = m_Text.size()-1;
+        if(start < 0 && end < 0){
 
-        if(isTextBetween){
+            if(isTextBetween){
+                start = 0;
+                end = last_idx;
+            }else {
+                for(int j = 0; j < isMarked.size(); j++){
+                    isMarked[j] = false;
+                }
+                return;
+            }
+        }
+
+        if(start < 0){
+            // Is Starting Point Outside Left Bounds
+            if(startPointMarker.x() < BoundingRects[0].x() || p.x() < BoundingRects[0].x()){
+                start = 0;
+            }
+            // Outside right Bounds
+            else if(startPointMarker.x() > BoundingRects[last_idx].x()){
+                start = last_idx;
+            }
+        }else if(end < 0){
+            // Outside Left Bounds)
+            if(p.x() < BoundingRects[0].x()){
+                end = 0;
+            }
+            // Outside right Bounds
+            else if(p.x() > BoundingRects[last_idx].x()){
+                end = last_idx;
+            }
+        }
+
+        if(start > end){
+            int s = start;
+            start = end;
+            end = s;
+        }
+
+        if(markAll){
             start = 0;
-            end = last_idx;
-        }else {
-            for(int j = 0; j < isMarked.size(); j++){
+            end = m_Text.size()-1;
+        }
+
+        qDebug() << "MARKED:" << isMarked;
+        for(int j = start; j <= end; j++){
+            if(start >= 0 && end >= 0){
+                isMarked[j] = true;
+            }else{
                 isMarked[j] = false;
             }
-            return;
-        }
-    }
-
-    if(start < 0){
-        // Is Starting Point Outside Left Bounds
-        if(startPointMarker.x() < BoundingRects[0].x() || p.x() < BoundingRects[0].x()){
-            start = 0;
-        }
-        // Outside right Bounds
-        else if(startPointMarker.x() > BoundingRects[last_idx].x()){
-            start = last_idx;
-        }
-    }else if(end < 0){
-        // Outside Left Bounds)
-        if(p.x() < BoundingRects[0].x()){
-            end = 0;
-        }
-        // Outside right Bounds
-        else if(p.x() > BoundingRects[last_idx].x()){
-            end = last_idx;
-        }
-    }
-
-    if(start > end){
-        int s = start;
-        start = end;
-        end = s;
-    }
-
-
-    for(int j = start; j <= end; j++){
-        if(start >= 0 && end >= 0){
-            isMarked[j] = true;
-        }else{
-            isMarked[j] = false;
         }
     }
 }
@@ -519,7 +537,7 @@ void caLineDraw::handleMarking(QPoint position){
 int caLineDraw::getIndexOfMarkedRect(QPoint position){
     int index = -1;
 
-    for(int i = 0; i <= m_Text.size(); i++){
+    for(int i = 0; i <= BoundingRects.size()-1; i++){
         if(BoundingRects[i].contains(position)){
             index = i;
             break;

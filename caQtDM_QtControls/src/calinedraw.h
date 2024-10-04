@@ -239,7 +239,9 @@ private:
 
     QList<QRect> BoundingRects;
     QList<bool> isMarked;
-    QRect m_textRect;
     QPoint startPointMarker;
+
+    bool markAll;
+    QRect m_textRect;
 };
 #endif
