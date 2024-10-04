@@ -387,10 +387,8 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
     if(event->buttons() == Qt::LeftButton){
 
         QPoint position = event->pos();
-        qDebug() << "POS:" << event->pos();
 
         // Setup Marking-List
-
         for(int i = 0; i <= m_Text.size()-1; i++){
             isMarked << false;
         }
@@ -417,82 +415,93 @@ void caLineDraw::handleMarking(QPoint position){
     p = transformCoordinates(position);
     // Ignore Y-Axis for Marking
 
-    for(int i = 0; i < m_Text.size(); i++){
+    int rect_y = BoundingRects[0].center().y();
+    p.setY(rect_y);
 
-        QRect rect = BoundingRects[i];
-        p.setY(rect.center().y());
+    // Harmonise Coordinates in relation to Direction
 
-        // Harmonise Coordinates in relation to Direction
+    // Get starting index (mouseclick) and current index (mousemoveposition)
+    int startIndex = getIndexOfMarkedRect(startPointMarker);
+    int currentIndex = getIndexOfMarkedRect(p);
 
-        // Get starting index (mouseclick) and current index (mousemoveposition)
-        int startIndex = getIndexOfMarkedRect(startPointMarker);
-        int currentIndex = getIndexOfMarkedRect(p);
+    int start;
+    int end;
 
-        int start;
-        int end;
-
-        // Define Correct Startingindex
-        if(startIndex < currentIndex)
-        {
-            start = startIndex;
-            end = currentIndex;
-        }else if(startIndex > currentIndex){
-            start = currentIndex;
-            end = startIndex;
-        }else if(startIndex == currentIndex){
-            start = currentIndex;
-            end = startIndex;
-        }
-
-        // Is Any Text between both Points, i.e. are both points on the same side outside of the text
-        bool isTextBetween = ((startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right()));
-
-        // Is Starting Point within Text
-        bool outsideLeftBounds = startPointMarker.x() < BoundingRects[0].left() || p.x() < BoundingRects[0].left();
-        bool outsideRightBounds = startPointMarker.x() > BoundingRects[m_Text.size()-1].right() || p.x() > BoundingRects[m_Text.size()-1].right();
-
-        if(start < 0 && end < 0){
-
-            if(isTextBetween){
-                start = 0;
-                end = m_Text.size()-1;
-            }else {
-                for(int i = 0; i < isMarked.size(); i++){
-                    isMarked[i] = false;
-                }
-                return;
-            }
-        }
-
-        if(start < 0){
-            if(outsideLeftBounds){ start = 0;}
-            if(outsideRightBounds){ start = m_Text.size()-1;}
-        }
-
-        if(end < 0){
-            if(outsideLeftBounds){ end = 0;}
-            if(outsideRightBounds){ end = m_Text.size()-1;}
-        }
-
-        if(start > end){
-            int s = start;
-            start = end;
-            end = s;
-        }
+    // Define Correct Startingindex
+    if(startIndex < currentIndex)
+    {
+        start = startIndex;
+        end = currentIndex;
+    }else if(startIndex > currentIndex){
+        start = currentIndex;
+        end = startIndex;
+    }else if(startIndex == currentIndex){
+        start = currentIndex;
+        end = startIndex;
+    }
 
 
-        qDebug() << "START:" << start << "END:" << end << getMarkedText();
+    // Is Any Text between both Points, i.e. are both points on the same side outside of the text
+    bool isTextBetween = ((startPointMarker.x() < BoundingRects[0].x() && p.x() > BoundingRects[m_Text.size()-1].right()) || (startPointMarker.x() > BoundingRects[0].x() && p.x() < BoundingRects[m_Text.size()-1].right()));
 
+    // Is Starting Point within Text
+    bool outsideLeftBounds = startPointMarker.x() < BoundingRects[0].x() || p.x() < BoundingRects[0].x();
+    bool outsideRightBounds = startPointMarker.x() > BoundingRects[m_Text.size()-1].right() || p.x() > BoundingRects[m_Text.size()-1].right();
 
-        for(int j = start; j <= end; j++){
-            if(start >= 0 && end >= 0){
-                isMarked[j] = true;
-            }else{
+    int last_idx = m_Text.size()-1;
+    if(start < 0 && end < 0){
+
+        if(isTextBetween){
+            start = 0;
+            end = last_idx;
+        }else {
+            for(int j = 0; j < isMarked.size(); j++){
                 isMarked[j] = false;
             }
+            return;
         }
-        // qDebug() << "START" << start << "END" << end << startWithinBounds << endWithinBounds << isTextBetween;
     }
+
+
+
+    if(start < 0){
+        // Outside Left Bounds
+        if(startPointMarker.x() < BoundingRects[0].x()){
+            start = 0;
+        }
+        // Outside right Bounds
+        else if(startPointMarker.x() > BoundingRects[last_idx].right()){
+            start = last_idx;
+        }
+    }else if(end < 0){
+        // Outside Left Bounds)
+        if(p.x() < BoundingRects[0].x()){
+            end = 0;
+        }
+        // Outside right Bounds
+        else if(p.x() > BoundingRects[last_idx].x()){
+            end = last_idx;
+        }
+    }
+
+    if(start > end){
+        int s = start;
+        start = end;
+        end = s;
+    }
+
+    qDebug() << "\n" << outsideLeftBounds << outsideRightBounds;
+    qDebug() << "START:" << start << "END:" << end << getMarkedText();
+
+
+    for(int j = start; j <= end; j++){
+        if(start >= 0 && end >= 0){
+            isMarked[j] = true;
+        }else{
+            isMarked[j] = false;
+        }
+    }
+    // qDebug() << "START" << start << "END" << end << startWithinBounds << endWithinBounds << isTextBetween;
 }
 
 /**
@@ -506,7 +515,6 @@ int caLineDraw::getIndexOfMarkedRect(QPoint position){
     for(int i = 0; i <= m_Text.size(); i++){
         if(BoundingRects[i].contains(position)){
             index = i;
-            qDebug() << "COORD:" << BoundingRects[i].left() << BoundingRects[i].right() << "POS:" << position;
             break;
         }
     }
@@ -565,8 +573,8 @@ QString caLineDraw::getMarkedText(){
         }
     }
     // Replace Spaces and null Values
-    // text = text.replace(QString(" "), "");
-    // text = text.replace(QString(1, QChar('\0')), "");
+    text = text.replace(QString(" "), "");
+    text = text.replace(QString(1, QChar('\0')), "");
     return text;
 }
 
