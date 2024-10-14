@@ -383,8 +383,8 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
         startPointMarker = transformCoordinates(event->pos());
 
         // Reset Marking
-        isMarked = QList<bool>();
-        BoundingRects = QList<QRect>();
+        isMarked.clear();
+        BoundingRects.clear();
         if(m_Text.size() > 0){
             for(int i = 0; i <= m_Text.size() ; i++){
                 isMarked << false;
@@ -426,9 +426,6 @@ void caLineDraw::keyPressEvent(QKeyEvent *e){
             break;
         // CTRL + A
         case Qt::Key_A:
-            for(int i = 0; i <= isMarked.size()-1; i++){
-                isMarked[i] = true;
-            }
             markAll = true;
             update();
             break;
@@ -599,8 +596,8 @@ int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition
 QString caLineDraw::getMarkedText(){
     QString text;
 
-    for(int i = 0; i < m_Text.size(); i++){
-        if(i <= (isMarked.size() -1)){
+    if(isMarked.size() > 0){
+        for(int i = 0; i < m_Text.size(); i++){
             if(isMarked[i]){
                 text += m_Text[(i % (m_Text.size() + 1))];
             }
@@ -626,11 +623,19 @@ QList<QRect> caLineDraw::getMarkedRects(){
     QList<QRect> list;
     if(isMarked.size() > 0){
         for(int i = 0; i < isMarked.count(); i++){
-            if((isMarked[i] && !list.contains(BoundingRects[i])) || markAll){
+            if((isMarked[i] && !list.contains(BoundingRects[i]))){
                 list.append(BoundingRects[i]);
             }
         }
     }
+
+    if(markAll){
+        list.clear();
+        for(int i = 0; i < m_Text.size(); i++){
+            list.append(BoundingRects[i]);
+        }
+    }
+
     return list;
 }
 
@@ -762,19 +767,17 @@ void caLineDraw::paintEvent(QPaintEvent *)
             if(BoundingRects.size() <= m_Text.size()){
                 BoundingRects << r;
             }
-            painter.drawRect(r);
+            // painter.drawRect(r);
         }
     }
 
     // MARKING
 
-    QList<QRect> toMark = getMarkedRects();
-    if(markAll) { toMark = BoundingRects;}
-
-    for(int i = 0; i < toMark.size(); i++){
-        QRect marked = toMark[i];
+    for(int i = 0; i < getMarkedRects().size(); i++){
+        QRect marked = getMarkedRects()[i];
         QString markedText = getMarkedText()[i % (m_Text.size() + 1)];
 
+        qDebug() << getMarkedText();
         if(markedText != " "){
             // Calculate starting position for the rectangles
             if(m_Alignment == Center || m_Alignment == Right){
