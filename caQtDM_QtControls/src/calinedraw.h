@@ -28,6 +28,7 @@
 
 #include <QEvent>
 #include <qtcontrols_global.h>
+#include <QMutex>
 #include "fontscalingwidget.h"
 #include "caWidgetInterface.h"
 
@@ -243,5 +244,6 @@ private:
 
     bool markAll;
     QRect m_textRect;
+    QMutex mutex;
 };
 #endif

@@ -34,6 +34,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QClipboard>
+#include <QMutexLocker>
 #if defined(_MSC_VER)
 #ifndef snprintf
 #define snprintf _snprintf
@@ -382,7 +383,7 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 
         // Reset Marking
         isMarked = QList<bool>();
-        for(int i = 0; i <= m_Text.size(); i++){
+        for(int i = 0; i <= m_Text.size() ; i++){
             isMarked << false;
         }
         BoundingRects = QList<QRect>();
@@ -438,6 +439,8 @@ void caLineDraw::keyPressEvent(QKeyEvent *e){
  * @param position -> Current Mouse Position
  */
 void caLineDraw::handleMarking(QPoint position){
+    QMutexLocker locker(&mutex);
+
     // Reset Marking-List
     for(int i = 0; i < isMarked.size(); i++){
         isMarked[i] = false;
@@ -715,6 +718,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
         break;
     }
 
+    QMutexLocker locker(&mutex);
     QList<int> letterCoordinates;
     letterCoordinates << widthTextLess;
     m_textRect = textRect;
@@ -778,6 +782,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
             QRect r = marked;
         }
     }
+    locker.unlock();
 
     painter.setPen(m_ForeColor);
     painter.setBrush(brush);
