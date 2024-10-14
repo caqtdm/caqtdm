@@ -92,6 +92,7 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     setDirection(Horizontal);
 
     m_AlarmState = 0;
+    markAll = false;
 
     brush = QBrush(m_BackColor);
     //setText(" ");
@@ -383,10 +384,12 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 
         // Reset Marking
         isMarked = QList<bool>();
-        for(int i = 0; i <= m_Text.size() ; i++){
-            isMarked << false;
-        }
         BoundingRects = QList<QRect>();
+        if(m_Text.size() > 0){
+            for(int i = 0; i <= m_Text.size() ; i++){
+                isMarked << false;
+            }
+        }
         markAll = false;
 
         update();
@@ -405,7 +408,7 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
         handleMarking(position);
         update();
     }else if(event->buttons() == Qt::RightButton){
-        qDebug() << BoundingRects;
+        // qDebug() << BoundingRects;
     }
 }
 
@@ -521,7 +524,7 @@ void caLineDraw::handleMarking(QPoint position){
             end = m_Text.size()-1;
         }
 
-        qDebug() << "MARKED:" << isMarked;
+
         for(int j = start; j <= end; j++){
             if(start >= 0 && end >= 0){
                 isMarked[j] = true;
@@ -595,14 +598,23 @@ int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition
  */
 QString caLineDraw::getMarkedText(){
     QString text;
+
     for(int i = 0; i < m_Text.size(); i++){
-        if(isMarked[i]){
-            text += m_Text[(i % (m_Text.size() + 1))];
+        if(i <= (isMarked.size() -1)){
+            if(isMarked[i]){
+                text += m_Text[(i % (m_Text.size() + 1))];
+            }
         }
     }
+
+    if(markAll){
+        text = m_Text;
+    }
+
     // Replace Spaces and null Values
     text = text.replace(QString(" "), "");
     text = text.replace(QString(1, QChar('\0')), "");
+
     return text;
 }
 
@@ -612,9 +624,11 @@ QString caLineDraw::getMarkedText(){
  */
 QList<QRect> caLineDraw::getMarkedRects(){
     QList<QRect> list;
-    for(int i = 0; i < isMarked.count(); i++){
-        if(isMarked[i] && !list.contains(BoundingRects[i])){
-            list.append(BoundingRects[i]);
+    if(isMarked.size() > 0){
+        for(int i = 0; i < isMarked.count(); i++){
+            if((isMarked[i] && !list.contains(BoundingRects[i])) || markAll){
+                list.append(BoundingRects[i]);
+            }
         }
     }
     return list;
@@ -718,7 +732,6 @@ void caLineDraw::paintEvent(QPaintEvent *)
         break;
     }
 
-    QMutexLocker locker(&mutex);
     QList<int> letterCoordinates;
     letterCoordinates << widthTextLess;
     m_textRect = textRect;
@@ -746,16 +759,21 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
             painter.setPen(m_ForeColor);
 
-            BoundingRects << r;
+            if(BoundingRects.size() <= m_Text.size()){
+                BoundingRects << r;
+            }
             painter.drawRect(r);
         }
     }
 
     // MARKING
 
-    for(int i = 0; i < getMarkedRects().size(); i++){
-        QRect marked = getMarkedRects()[i];
-        QString markedText = getMarkedText()[i];
+    QList<QRect> toMark = getMarkedRects();
+    if(markAll) { toMark = BoundingRects;}
+
+    for(int i = 0; i < toMark.size(); i++){
+        QRect marked = toMark[i];
+        QString markedText = getMarkedText()[i % (m_Text.size() + 1)];
 
         if(markedText != " "){
             // Calculate starting position for the rectangles
@@ -779,10 +797,8 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
             // Draw Text on top of old one
             painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  markedText);
-            QRect r = marked;
         }
     }
-    locker.unlock();
 
     painter.setPen(m_ForeColor);
     painter.setBrush(brush);
