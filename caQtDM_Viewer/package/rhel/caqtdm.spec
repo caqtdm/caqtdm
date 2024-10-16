@@ -3,7 +3,7 @@
 
 #############################################################################
 # special EPICS things
-%define EPICS_TARGET_VERSION -7.0.7
+%define EPICS_TARGET_VERSION -7.0.8
 #############################################################################
 
 # build qt4 support (or not)
@@ -44,13 +44,10 @@ BuildRequires: pkgconfig(QtGui) pkgconfig(QtSvg)
 BuildRequires: pkgconfig(QtDesigner)
 %{?_qt4_version:Requires: qt4%{?_isa} >= %{_qt4_version}}
 %endif
-
-BuildRequires: epics-base%{EPICS_TARGET_VERSION}-devel
-Requires: epics-base%{EPICS_TARGET_VERSION}-devel-static
 #####################################
 #EPICS Libs
-BuildRequires: epics-base-7.0.7-devel
-Requires: epics-base-7.0.7
+BuildRequires: epics-base%{EPICS_TARGET_VERSION}-devel
+Requires: epics-base%{EPICS_TARGET_VERSION}
 #####################################
 Provides: caqtdm = %{version}-%{release}
 Provides: caqtdm%{_isa} = %{version}-%{release}
