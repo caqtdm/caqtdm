@@ -521,9 +521,8 @@ void caLineDraw::handleMarking(QPoint position){
             end = m_Text.size()-1;
         }
 
-
         for(int j = start; j <= end; j++){
-            if(start >= 0 && end >= 0){
+            if((start >= 0 && end >= 0) || markAll){
                 isMarked[j] = true;
             }else{
                 isMarked[j] = false;
@@ -767,39 +766,22 @@ void caLineDraw::paintEvent(QPaintEvent *)
             if(BoundingRects.size() <= m_Text.size()){
                 BoundingRects << r;
             }
-            // painter.drawRect(r);
-        }
-    }
 
-    // MARKING
-
-    for(int i = 0; i < getMarkedRects().size(); i++){
-        QRect marked = getMarkedRects()[i];
-        QString markedText = getMarkedText()[i % (m_Text.size() + 1)];
-
-        qDebug() << getMarkedText();
-        if(markedText != " "){
-            // Calculate starting position for the rectangles
-            if(m_Alignment == Center || m_Alignment == Right){
-                int sumUntilCurrentIndex = getIndexOfMarkedRect(marked.center());
-                int x = getSumOfCoords(letterCoordinates, sumUntilCurrentIndex) + m_FrameLineWidth;
-                int width = marked.width();
-
-                marked.setX(x);
-                marked.setWidth(width);
+            bool isFieldMarked = false;
+            if(isMarked.size() > 0){
+                isFieldMarked = isMarked[i];
             }
 
+            if(markAll || isFieldMarked){
+                QColor invForeColor = invertColor(m_ForeColor);
+                QColor invBrushColor = invertColor(brush.color());
 
-            // Invert normal colors
-            QColor invForeColor = invertColor(m_ForeColor);
-            QColor invBrushColor = invertColor(brush.color());
+                painter.setPen(invForeColor);
+                painter.setBackground(invBrushColor);
+                painter.setBackgroundMode(Qt::OpaqueMode);
 
-            painter.setPen(invForeColor);
-            painter.setBackground(invBrushColor);
-            painter.setBackgroundMode(Qt::OpaqueMode);
-
-            // Draw Text on top of old one
-            painter.drawText(marked,Qt::AlignCenter | Qt::AlignVCenter,  markedText);
+                painter.drawText(r,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[i]);
+            }
         }
     }
 
