@@ -90,6 +90,7 @@ int Epics3Plugin::pvClearMonitor(knobData *kData) {
 int Epics3Plugin::pvFreeAllocatedData(knobData *kData)
 {
     //qDebug() << "Epics3Plugin:pvFreeAllocatedData";
+    QMutexLocker locker((QMutex *)kData->mutex);
     if (kData->edata.info != (void *) Q_NULLPTR) {
         free(kData->edata.info);
         kData->edata.info = (void*) Q_NULLPTR;
