@@ -192,17 +192,16 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
-    void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *event);
 
-    int getSumOfCoords(QList<int> list, int end = -1);
-    QPoint transformCoordinates(QPoint point);
+    int calculateSumOfStartingCoordinates(QList<int> list, int calculateUntilIndex = -1);
+    QPoint calculateCoordinates(QPoint point);
 
     QString getMarkedText();
     void handleMarking(QPoint position);
-    int getIndexOfMarkedRect(QPoint position);
+    int getIndexofTextRectangle(QPoint position);
     int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);
 
-    QList<QRect> getMarkedRects();
     QColor invertColor(QColor color);
 
     CaQtDM_Lib_Interface* caDataInterface;
@@ -238,12 +237,11 @@ private:
     int thisDatatype;
     QString thisFormatUserString;
 
-    QList<QRect> BoundingRects;
-    QList<bool> isMarked;
-    QPoint startPointMarker;
+    QList<QRect> m_LettersBoundingRects;
+    QList<bool> m_LetterMarkedList;
+    QPoint m_MouseClickPosition;
 
-    bool markAll;
-    QRect m_textRect;
-    QMutex mutex;
+    bool m_markAllText;
+    QRect m_caLineDrawRectangle;
 };
 #endif
