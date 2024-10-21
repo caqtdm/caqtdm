@@ -25,10 +25,13 @@
 
 #include "calinedraw.h"
 #include "alarmdefs.h"
+#include "qevent.h"
 
 #include <QPainter>
 #include <qnumeric.h>
 #include <QDebug>
+#include <QApplication>
+#include <QClipboard>
 #if defined(_MSC_VER)
     #ifndef snprintf
      #define snprintf _snprintf
@@ -84,6 +87,7 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     setDirection(Horizontal);
 
     m_AlarmState = 0;
+    m_markAllText = false;
 
     brush = QBrush(m_BackColor);
     setText(" ");
@@ -308,6 +312,283 @@ bool caLineDraw::rotateText(float degrees)
     return false;
 }
 
+void caLineDraw::mousePressEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton){
+
+        m_MouseClickPosition = calculateCoordinates(event->pos());
+
+        // Reset Marking
+        m_LetterMarkedList.clear();
+        m_LettersBoundingRects.clear();
+        m_markAllText = false;
+        if(m_Text.size() > 0){
+            for(int i = 0; i <= m_Text.size() ; i++){
+                m_LetterMarkedList << false;
+            }
+        }
+
+        update();
+    }
+
+    if(event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton){
+        setFocus();
+    }
+}
+
+void caLineDraw::mouseMoveEvent(QMouseEvent *event){
+    if(event->buttons() == Qt::LeftButton){
+
+        QPoint position = event->pos();
+
+        handleMarking(position);
+        update();
+    }
+}
+
+void caLineDraw::keyPressEvent(QKeyEvent *event){
+    int keyPressed = event->key();
+    int event_modifier = event->modifiers();
+
+    QClipboard *clipboard = QApplication::clipboard();
+
+    if(event_modifier == Qt::ControlModifier){
+        switch(keyPressed){
+        // CTRL + C
+        case Qt::Key_C:
+            clipboard->setText(getMarkedText());
+            break;
+        // CTRL + A
+        case Qt::Key_A:
+            m_markAllText = true;
+            update();
+            break;
+        }
+    }
+
+}
+
+void caLineDraw::handleMarking(QPoint currentMousePosition){
+
+    // Reset Marking-List
+    for(int i = 0; i < m_LetterMarkedList.size(); i++){
+        m_LetterMarkedList[i] = false;
+    }
+
+    if(m_LettersBoundingRects.size() > 0){
+        QPoint position = currentMousePosition;
+
+        // Correct coordinates
+        position = calculateCoordinates(currentMousePosition);
+
+        // Ignore Y-Axis for Marking
+        int rectY = m_caLineDrawRectangle.y();
+        position.setY(rectY);
+
+
+        // This Function calculates indexes of the text based on the position where the mouse is clicked and
+        // where the mouse currently is. This indexes are then used to color in the marking.
+        int mouseClickIndex = getIndexofTextRectangle(m_MouseClickPosition);
+        int currentMouseIndex = getIndexofTextRectangle(position);
+
+
+        // If the starting point is outside the text it is not marked. If both are outside the starting point, but on either side of the text (one to the left and one to the right),
+        // the text inbetween ist marked.         *
+        bool isTextBetweenIndexes = (m_MouseClickPosition.x() < m_LettersBoundingRects[0].x() && position.x() > m_LettersBoundingRects[m_Text.size()-1].right()) || (m_MouseClickPosition.x() > m_LettersBoundingRects[0].x() && position.x() < m_LettersBoundingRects[m_Text.size()-1].right());
+        int startIndex = 0;
+        int endIndex = 0;
+
+        // Set order that smaller index is first (simpler to loop through)
+        if(mouseClickIndex < currentMouseIndex)
+        {
+            startIndex = mouseClickIndex;
+            endIndex = currentMouseIndex;
+        }else if(mouseClickIndex >= currentMouseIndex){
+            startIndex = currentMouseIndex;
+            endIndex = mouseClickIndex;
+        }
+
+        int lastTextIndex = m_Text.size()-1;
+        if(startIndex < 0 && endIndex < 0){
+            if(isTextBetweenIndexes){
+                startIndex = 0;
+                endIndex = lastTextIndex;
+            }else {
+                for(int j = 0; j < m_LetterMarkedList.size(); j++){
+                    m_LetterMarkedList[j] = false;
+                }
+                return;
+            }
+        }
+
+        // Depending on the position, one point may be outside the text and one on text. In case of this, depending on the location, the index is chosen appropriately.
+        // The Index is chosen based on the index it would hit first, when it would be moved towards the text.
+        if(startIndex < 0){
+            // Is Starting Point Outside Left Bounds
+            if(m_MouseClickPosition.x() < m_LettersBoundingRects[0].x() || position.x() < m_LettersBoundingRects[0].x()){
+                startIndex = 0;
+            }
+            // Outside right Bounds
+            else if(m_MouseClickPosition.x() > m_LettersBoundingRects[lastTextIndex].x()){
+                startIndex = lastTextIndex;
+            }
+        }else if(endIndex < 0){
+            // Outside Left Bounds)
+            if(position.x() < m_LettersBoundingRects[0].x()){
+                endIndex = 0;
+            }
+            // Outside Right Bounds
+            else if(position.x() > m_LettersBoundingRects[lastTextIndex].x()){
+                endIndex = lastTextIndex;
+            }
+        }
+
+        // Ensure that the startindex is smaller than the endIndex
+        if(startIndex > endIndex){
+            int changeIndx = startIndex;
+            startIndex = endIndex;
+            endIndex = changeIndx;
+        }
+
+        // With CTRL+A, all Text can be selected, regardless of its past, current or future length.
+        // For that, the "m_markAllText"-Flag is used.
+        if(m_markAllText){
+            startIndex = 0;
+            endIndex = m_Text.size()-1;
+        }
+
+        // Mark all Indexes within the range, and unmark all those not.
+        for(int j = startIndex; j <= endIndex; j++){
+            if((startIndex >= 0 && endIndex >= 0)){
+                m_LetterMarkedList[j] = true;
+            }else{
+                m_LetterMarkedList[j] = false;
+            }
+        }
+    }
+}
+
+int caLineDraw::getIndexofTextRectangle(QPoint currentMousePosition){
+    int index = -1;
+
+    for(int i = 0; i <= m_LettersBoundingRects.size()-1; i++){
+        if(m_LettersBoundingRects[i].contains(currentMousePosition)){
+            index = i;
+            break;
+        }
+    }
+
+    return index++;
+}
+
+/*
+ * @brief Returns Direction of Mouse
+ * @return difference -> Direction is returned as difference of distance
+ *
+ *  IF diff > 0 -> RIGHT
+ *  IF diff < 0 -> LEFT
+ *  IF diff = 0 -> VERTICAL or NONE
+ */
+int caLineDraw::getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition){
+    int endLocation = 0;
+    int startLocation = 0;
+
+    // Since the Coordinates are tilted along direction, a different parameter must be used to always get the same direction
+    switch(m_Direction){
+    case Down:
+        startLocation = startPosition.y();
+        endLocation = endPosition.y();
+        break;
+    case Up:
+        endLocation = startPosition.y();
+        startLocation = endPosition.y();
+        break;
+    case Horizontal:
+        startLocation = startPosition.x();
+        endLocation = endPosition.x();
+        break;
+    }
+
+    int difference = endLocation - startLocation;
+
+    return difference;
+}
+
+QString caLineDraw::getMarkedText(){
+    QString markedText;
+
+    if(m_markAllText){
+        markedText = m_Text;
+    } else if(!m_markAllText){
+        if(m_LetterMarkedList.size() > 0){
+            for(int i = 0; i < m_Text.size(); i++){
+                if(m_LetterMarkedList[i]){
+                    markedText += m_Text[(i % (m_Text.size() + 1))];
+                }
+            }
+        }
+    }
+
+    // Replace Spaces and null Values
+    markedText = markedText.replace(QString(" "), "");
+    markedText = markedText.replace(QString(1, QChar('\0')), "");
+
+    return markedText;
+}
+
+/**
+ * @brief Converts coordinates of a point to same kind of coordinates across all directions
+ * @param point -> The Point whose X and Y Coordinates will be transformed
+ * @return Returns Point with new calculated Coordinates
+ */
+QPoint caLineDraw::calculateCoordinates(QPoint point){
+    /*
+     * Depending of the direction of a field, the system of coordinates is flipped too - making calculations etc. difficult
+     * This function converts them all, so they act the same as the horizontal ones
+     * It is needed to correctly track the mouse and subsequently the position of the marking.
+    */
+    int xCoord;
+    int yCoord;
+    switch(m_Direction){
+    case Up:
+        xCoord = (-point.y() + m_caLineDrawRectangle.right());
+        yCoord = point.x();
+        break;
+    case Down:
+        xCoord = point.y();
+        yCoord = (-point.x() + m_caLineDrawRectangle.height());
+        break;
+    case Horizontal:
+    default:
+        xCoord = point.x();
+        yCoord = point.y();
+        break;
+    }
+    return QPoint(xCoord, yCoord);
+}
+
+int caLineDraw::calculateSumOfStartingCoordinates(QList<int> list, int calculateUntilIndex)
+{
+    // Calculate entire, if default
+    if(calculateUntilIndex == -1){
+        calculateUntilIndex = list.size();
+    }else{
+        calculateUntilIndex += 1;
+    }
+    // Return Sum of Coordinates to get Beginning Point for the Rectangles
+    int sumCoordinates = 0;
+    for(int i = 0; i < calculateUntilIndex; i++){
+        sumCoordinates += list[i];
+    }
+    return sumCoordinates;
+}
+
+
+QColor caLineDraw::invertColor(QColor color){
+    // Flips Color to opposite on color wheel
+    return QColor(255 - color.red(), 255 - color.green(), 255 - color.blue());
+}
+
 void caLineDraw::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -338,6 +619,11 @@ void caLineDraw::paintEvent(QPaintEvent *)
         painter.rotate(rotation);
     }
 
+    // Set the Width of the calinedraw-Rectangle without text to get an accurate starting point
+    int widthTextLess = 0;
+    const QFontMetrics fm = painter.fontMetrics();
+
+
     //Now that textrect and rotation/translation is set, draw the text aligned correctly
     switch (m_Alignment) {
     case Left:
@@ -345,12 +631,68 @@ void caLineDraw::paintEvent(QPaintEvent *)
         break;
     case Right:
         painter.drawText(textRect, Qt::AlignRight | Qt::AlignVCenter, m_Text);
+        widthTextLess = textRect.width() - fm.horizontalAdvance(m_Text);
         break;
     case Center:
     default:
         painter.drawText(textRect, Qt::AlignCenter | Qt::AlignVCenter, m_Text);
+        widthTextLess = (textRect.width() / 2) - (fm.horizontalAdvance(m_Text)/2);
         break;
     }
+
+    // MARKING
+    QList<int> letterCoordinates;
+    letterCoordinates << widthTextLess;
+    m_caLineDrawRectangle = textRect;
+
+    int xCoordinate;
+    int yCoordinate = textRect.height();
+    painter.setPen(brush.color());
+
+    for(int i = 0; i <= m_Text.size() -1; i++){
+
+        if(m_Text[i] !=  QString(" ")){
+            QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
+            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + m_FrameLineWidth;
+
+            // Get accurate width of bounding rectangle
+            int horizontalAdvance = fm.horizontalAdvance(m_Text[i]);
+
+            // Calculate and set Startingpoint from previous letters
+            yCoordinate += m_FrameLineWidth;
+            letterCoordinates << horizontalAdvance;
+            rectangleToDraw.setX(xCoordinate);
+            rectangleToDraw.setY(yCoordinate);
+            rectangleToDraw.setHeight(-yCoordinate);
+            rectangleToDraw.setWidth(horizontalAdvance);
+
+            painter.setPen(m_ForeColor);
+
+            if(m_LettersBoundingRects.size() <= m_Text.size()){
+                m_LettersBoundingRects << rectangleToDraw;
+            }
+
+            bool isCurrentFieldMarked = false;
+            if(m_LetterMarkedList.size() > 0){
+                isCurrentFieldMarked = m_LetterMarkedList[i];
+            }
+
+            if(m_markAllText || isCurrentFieldMarked){
+                QColor invForeColor = invertColor(m_ForeColor);
+                QColor invBrushColor = invertColor(brush.color());
+
+                painter.setPen(invForeColor);
+                painter.setBackground(invBrushColor);
+                painter.setBackgroundMode(Qt::OpaqueMode);
+
+                painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[i]);
+            }
+        }
+    }
+
+    painter.setPen(m_ForeColor);
+    painter.setBrush(brush);
+
 
     painter.restore();
 

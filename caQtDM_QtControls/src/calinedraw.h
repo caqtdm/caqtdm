@@ -186,6 +186,16 @@ protected:
     virtual QSize minimumSizeHint() const;
     QSize calculateTextSpace();
     void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    int calculateSumOfStartingCoordinates(QList<int> list, int calculateUntilIndex = -1);
+    QPoint calculateCoordinates(QPoint point);
+    QString getMarkedText();
+    void handleMarking(QPoint position);
+    int getIndexofTextRectangle(QPoint position);
+    int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);
+    QColor invertColor(QColor color);
     CaQtDM_Lib_Interface* caDataInterface;
 
 private:
@@ -218,5 +228,10 @@ private:
     QBrush brush;
     int thisDatatype;
     QString thisFormatUserString;
+    QList<QRect> m_LettersBoundingRects;
+    QList<bool> m_LetterMarkedList;
+    QPoint m_MouseClickPosition;
+    bool m_markAllText;
+    QRect m_caLineDrawRectangle;
 };
 #endif
