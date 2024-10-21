@@ -28,7 +28,6 @@
 
 #include <QEvent>
 #include <qtcontrols_global.h>
-#include <QMutex>
 #include "fontscalingwidget.h"
 #include "caWidgetInterface.h"
 
@@ -39,7 +38,6 @@ class QTCON_EXPORT caLineDraw : public QWidget, public FontScalingWidget, public
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
     Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
-
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
@@ -94,7 +92,7 @@ public:
     void caDataUpdate(const QString& units, const QString& String, const knobData& data);
     void caActivate(CaQtDM_Lib_Interface* lib_interface, QMap<QString, QString> map, knobData* kData, int* specData, QWidget* parent);
     void getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& precMode, int& limitsMode,
-                       int& Precision, char* colMode, double& limitsMax, double& limitsMin);
+                                    int& Precision, char* colMode, double& limitsMax, double& limitsMin);
     void createContextMenu(QMenu& menu);
     QString getDragText() { return getPV();}
     // caWidgetInterface implementation finish
@@ -139,8 +137,8 @@ public:
 
     colMode getColorMode() const { return m_ColorMode; }
     void setColorMode(colMode colormode) {m_ColorMode = colormode;
-        setBackground(m_BackColor);
-        setForeground(m_ForeColor);}
+                                          setBackground(m_BackColor);
+                                          setForeground(m_ForeColor);}
 
     SourceMode getPrecisionMode() const { return m_PrecMode; }
     void setPrecisionMode(SourceMode precmode) {m_PrecMode = precmode;}
@@ -188,22 +186,16 @@ protected:
     virtual QSize minimumSizeHint() const;
     QSize calculateTextSpace();
     void paintEvent(QPaintEvent *);
-
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-
     void keyPressEvent(QKeyEvent *event);
-
     int calculateSumOfStartingCoordinates(QList<int> list, int calculateUntilIndex = -1);
     QPoint calculateCoordinates(QPoint point);
-
     QString getMarkedText();
     void handleMarking(QPoint position);
     int getIndexofTextRectangle(QPoint position);
     int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);
-
     QColor invertColor(QColor color);
-
     CaQtDM_Lib_Interface* caDataInterface;
 
 private:
@@ -236,11 +228,9 @@ private:
     QBrush brush;
     int thisDatatype;
     QString thisFormatUserString;
-
     QList<QRect> m_LettersBoundingRects;
     QList<bool> m_LetterMarkedList;
     QPoint m_MouseClickPosition;
-
     bool m_markAllText;
     QRect m_caLineDrawRectangle;
 };
