@@ -808,20 +808,20 @@ void caLineDraw::setFormat(int prec)
         break;
     case truncated:
     case enumeric:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%lld", MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "%d", MAX_STRING_LENGTH);
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%lld",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "%d",MAX_STRING_LENGTH);
         break;
     case utruncated:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%llu", MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "%u", MAX_STRING_LENGTH);
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "%llu",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "%u",MAX_STRING_LENGTH);
         break;
     case hexadecimal:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "0x%llx", MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "0x%x", MAX_STRING_LENGTH);
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "0x%llx",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "0x%x",MAX_STRING_LENGTH);
         break;
     case octal:
-        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "O%llo", MAX_STRING_LENGTH);
-        else qstrncpy(m_Format, "O%o", MAX_STRING_LENGTH);
+        if(thisDatatype == caDOUBLE) qstrncpy(m_Format, "O%llo",MAX_STRING_LENGTH);
+        else qstrncpy(m_Format, "O%o",MAX_STRING_LENGTH);
         break;
     case sexagesimal:
     case sexagesimal_hms:
@@ -863,10 +863,9 @@ void caLineDraw::setValue(double value, const QString& units)
     if(qIsNaN(value)){
       snprintf(asc, MAX_STRING_LENGTH,  "nan");
     }
-
     if(m_UnitMode) {
         strcat(asc, " ");
-        strcat(asc, qasc(units));
+        strcat(asc, units.toUtf8().constData());
     }
     setText(asc);
     emit textChanged(QString(asc));
@@ -998,7 +997,6 @@ void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& 
     else if(getColorMode() == Alarm_Static) strcpy(colMode, "Alarm");
     else strcpy(colMode, "Static");
 
-    nbPV = 1;
 }
 
 
