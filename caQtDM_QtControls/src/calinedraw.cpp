@@ -658,6 +658,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
             rectangleToDraw.setY(yCoordinate);
             rectangleToDraw.setHeight(-yCoordinate);
             rectangleToDraw.setWidth(horizontalAdvance);
+            rectangleToDraw = rectangleToDraw.normalized();
 
             painter.setPen(m_ForeColor);
 
