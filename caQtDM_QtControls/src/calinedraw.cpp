@@ -530,8 +530,10 @@ QString caLineDraw::getMarkedText(){
     }
 
     // Replace Spaces and null Values
-    markedText = markedText.replace(QString(" "), "");
-    markedText = markedText.replace(QString(1, QChar('\0')), "");
+    if(markedText[markedText.size()-1] == QString("")){
+        markedText = markedText.replace(QString(" "), "");
+        markedText = markedText.replace(QString(1, QChar('\0')), "");
+    }
 
     return markedText;
 }
@@ -652,6 +654,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
     for(int i = 0; i <= m_Text.size() -1; i++){
 
         if(m_Text[i] !=  QString(" ")){
+        if(m_Text[i] !=  QString(" ") || (m_Text[i] == QString(" ") && i != (m_Text.size()-1))){
             QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
             xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + m_FrameLineWidth;
 
