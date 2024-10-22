@@ -640,17 +640,29 @@ void caLineDraw::paintEvent(QPaintEvent *)
     m_caLineDrawRectangle = textRect;
 
     int xCoordinate;
-    int yCoordinate = textRect.height() + m_FrameLineWidth;
+    int yCoordinate;
+
+    switch(m_Direction){
+    case Horizontal:
+        yCoordinate = height();
+        break;
+    case Up:
+    case Down:
+        yCoordinate = width();
+        break;
+    }
+
     painter.setPen(brush.color());
 
     QString textTrimmed = m_Text.trimmed();
     for(int i = 0; i <= textTrimmed.size() -1; i++){
 
             QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
-            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + 1+m_FrameLineWidth;
+            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + (1 + m_FrameLineWidth);
 
             // Get accurate width of bounding rectangle
             int horizontalAdvance = fm.horizontalAdvance(m_Text[i]);
+
 
             // Calculate and set Startingpoint from previous letters
             letterCoordinates << horizontalAdvance;
