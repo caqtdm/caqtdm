@@ -376,10 +376,7 @@ void caLineDraw::handleMarking(QPoint currentMousePosition){
     }
 
     if(m_LettersBoundingRects.size() > 0){
-        QPoint position = currentMousePosition;
-
-        // Correct coordinates
-        position = calculateCoordinates(currentMousePosition);
+        QPoint position = calculateCoordinates(currentMousePosition);
 
         // Ignore Y-Axis for Marking
         int rectY = m_caLineDrawRectangle.y();
@@ -648,21 +645,19 @@ void caLineDraw::paintEvent(QPaintEvent *)
     m_caLineDrawRectangle = textRect;
 
     int xCoordinate;
-    int yCoordinate = textRect.height();
+    int yCoordinate = textRect.height() + m_FrameLineWidth;
     painter.setPen(brush.color());
 
     for(int i = 0; i <= m_Text.size() -1; i++){
 
-        if(m_Text[i] !=  QString(" ")){
         if(m_Text[i] !=  QString(" ") || (m_Text[i] == QString(" ") && i != (m_Text.size()-1))){
             QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
-            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + m_FrameLineWidth;
+            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + 1+m_FrameLineWidth;
 
             // Get accurate width of bounding rectangle
             int horizontalAdvance = fm.horizontalAdvance(m_Text[i]);
 
             // Calculate and set Startingpoint from previous letters
-            yCoordinate += m_FrameLineWidth;
             letterCoordinates << horizontalAdvance;
             rectangleToDraw.setX(xCoordinate);
             rectangleToDraw.setY(yCoordinate);
