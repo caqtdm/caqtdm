@@ -343,6 +343,7 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
 
         handleMarking(position);
         update();
+        // qDebug() << "POS:" << position;
     }
 }
 
@@ -376,10 +377,7 @@ void caLineDraw::handleMarking(QPoint currentMousePosition){
     }
 
     if(m_LettersBoundingRects.size() > 0){
-        QPoint position = currentMousePosition;
-
-        // Correct coordinates
-        position = calculateCoordinates(currentMousePosition);
+        QPoint position = calculateCoordinates(currentMousePosition);
 
         // Ignore Y-Axis for Marking
         int rectY = m_caLineDrawRectangle.y();
@@ -423,22 +421,29 @@ void caLineDraw::handleMarking(QPoint currentMousePosition){
 
         // Depending on the position, one point may be outside the text and one on text. In case of this, depending on the location, the index is chosen appropriately.
         // The Index is chosen based on the index it would hit first, when it would be moved towards the text.
+        int  firstXVal = m_LettersBoundingRects[0].x();
+        int  lastXVal = m_LettersBoundingRects[lastTextIndex].x();
+        int  mouseVal = m_MouseClickPosition.x();
+        int  posVal = position.x();
+
+
+        // qDebug() << "F:"<< firstXVal << "L:" << lastXVal << "M:" << mouseVal << "P:" << posVal;
         if(startIndex < 0){
-            // Is Starting Point Outside Left Bounds
-            if(m_MouseClickPosition.x() < m_LettersBoundingRects[0].x() || position.x() < m_LettersBoundingRects[0].x()){
+            // Is Starting Point Outside Left/Upper Bounds
+            if(mouseVal < firstXVal || posVal < firstXVal){
                 startIndex = 0;
             }
-            // Outside right Bounds
-            else if(m_MouseClickPosition.x() > m_LettersBoundingRects[lastTextIndex].x()){
+            // Outside Right/Lower Bounds
+            else if(mouseVal > lastXVal || posVal > lastXVal){
                 startIndex = lastTextIndex;
             }
         }else if(endIndex < 0){
-            // Outside Left Bounds)
-            if(position.x() < m_LettersBoundingRects[0].x()){
+            // Outside Left/Upper Bounds)
+            if(mouseVal < firstXVal || mouseVal < firstXVal){
                 endIndex = 0;
             }
-            // Outside Right Bounds
-            else if(position.x() > m_LettersBoundingRects[lastTextIndex].x()){
+            // Outside Lower/Right Bounds
+            else if(posVal > lastXVal || mouseVal > lastXVal){
                 endIndex = lastTextIndex;
             }
         }
@@ -529,10 +534,8 @@ QString caLineDraw::getMarkedText(){
         }
     }
 
-    // Replace Spaces and null Values
-    markedText = markedText.replace(QString(" "), "");
-    markedText = markedText.replace(QString(1, QChar('\0')), "");
-
+    markedText = markedText.trimmed();
+    // qDebug() << "MarkedText:" << markedText;
     return markedText;
 }
 
@@ -646,25 +649,37 @@ void caLineDraw::paintEvent(QPaintEvent *)
     m_caLineDrawRectangle = textRect;
 
     int xCoordinate;
-    int yCoordinate = textRect.height();
+    int yCoordinate;
+
+    switch(m_Direction){
+    case Horizontal:
+        yCoordinate = height();
+        break;
+    case Up:
+    case Down:
+        yCoordinate = width();
+        break;
+    }
+
     painter.setPen(brush.color());
 
-    for(int i = 0; i <= m_Text.size() -1; i++){
+    QString textTrimmed = m_Text.trimmed();
+    for(int i = 0; i <= textTrimmed.size() -1; i++){
 
-        if(m_Text[i] !=  QString(" ")){
             QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
-            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + m_FrameLineWidth;
+            xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + (1 + m_FrameLineWidth);
 
             // Get accurate width of bounding rectangle
             int horizontalAdvance = fm.horizontalAdvance(m_Text[i]);
 
+
             // Calculate and set Startingpoint from previous letters
-            yCoordinate += m_FrameLineWidth;
             letterCoordinates << horizontalAdvance;
             rectangleToDraw.setX(xCoordinate);
             rectangleToDraw.setY(yCoordinate);
             rectangleToDraw.setHeight(-yCoordinate);
             rectangleToDraw.setWidth(horizontalAdvance);
+            rectangleToDraw = rectangleToDraw.normalized();
 
             painter.setPen(m_ForeColor);
 
@@ -687,7 +702,6 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
                 painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[i]);
             }
-        }
     }
 
     painter.setPen(m_ForeColor);
