@@ -294,6 +294,20 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
+# 4.4.2
+# special character feature handling by CAQTDM_CUSTOM_UNIT_REPLACMETS
+# caStripplot improved data handling
+# optimized UI loading by reducing the load of incoming data (CAQTDM_SUPPRESS_UPDATES_ONLOAD)
+# improved colors in caQtDM status window
+# added UI loading benchmark
+# added the new archiverhttp-protocol
+# some code refurbishments
+# RPM for RHEL9
+# logfile generation for status window (CAQTDM_CREATE_LOGFILE,CAQTDM_LOGFILE_PATH)
+
+
+
+
 # 4.4.1
 # caQtDM can be compiled with Qt6
 # new signals for caCartesianplot
