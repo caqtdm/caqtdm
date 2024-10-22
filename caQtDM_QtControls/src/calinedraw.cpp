@@ -343,6 +343,7 @@ void caLineDraw::mouseMoveEvent(QMouseEvent *event){
 
         handleMarking(position);
         update();
+        // qDebug() << "POS:" << position;
     }
 }
 
@@ -420,22 +421,29 @@ void caLineDraw::handleMarking(QPoint currentMousePosition){
 
         // Depending on the position, one point may be outside the text and one on text. In case of this, depending on the location, the index is chosen appropriately.
         // The Index is chosen based on the index it would hit first, when it would be moved towards the text.
+        int  firstXVal = m_LettersBoundingRects[0].x();
+        int  lastXVal = m_LettersBoundingRects[lastTextIndex].x();
+        int  mouseVal = m_MouseClickPosition.x();
+        int  posVal = position.x();
+
+
+        // qDebug() << "F:"<< firstXVal << "L:" << lastXVal << "M:" << mouseVal << "P:" << posVal;
         if(startIndex < 0){
-            // Is Starting Point Outside Left Bounds
-            if(m_MouseClickPosition.x() < m_LettersBoundingRects[0].x() || position.x() < m_LettersBoundingRects[0].x()){
+            // Is Starting Point Outside Left/Upper Bounds
+            if(mouseVal < firstXVal || posVal < firstXVal){
                 startIndex = 0;
             }
-            // Outside right Bounds
-            else if(m_MouseClickPosition.x() > m_LettersBoundingRects[lastTextIndex].x()){
+            // Outside Right/Lower Bounds
+            else if(mouseVal > lastXVal || posVal > lastXVal){
                 startIndex = lastTextIndex;
             }
         }else if(endIndex < 0){
-            // Outside Left Bounds)
-            if(position.x() < m_LettersBoundingRects[0].x()){
+            // Outside Left/Upper Bounds)
+            if(mouseVal < firstXVal || mouseVal < firstXVal){
                 endIndex = 0;
             }
-            // Outside Right Bounds
-            else if(position.x() > m_LettersBoundingRects[lastTextIndex].x()){
+            // Outside Lower/Right Bounds
+            else if(posVal > lastXVal || mouseVal > lastXVal){
                 endIndex = lastTextIndex;
             }
         }
@@ -527,6 +535,7 @@ QString caLineDraw::getMarkedText(){
     }
 
     markedText = markedText.trimmed();
+    // qDebug() << "MarkedText:" << markedText;
     return markedText;
 }
 
