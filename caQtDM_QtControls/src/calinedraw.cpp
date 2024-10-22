@@ -526,12 +526,7 @@ QString caLineDraw::getMarkedText(){
         }
     }
 
-    // Replace Spaces and null Values
-    if(markedText[markedText.size()-1] == QString("")){
-        markedText = markedText.replace(QString(" "), "");
-        markedText = markedText.replace(QString(1, QChar('\0')), "");
-    }
-
+    markedText = markedText.trimmed();
     return markedText;
 }
 
@@ -648,9 +643,9 @@ void caLineDraw::paintEvent(QPaintEvent *)
     int yCoordinate = textRect.height() + m_FrameLineWidth;
     painter.setPen(brush.color());
 
-    for(int i = 0; i <= m_Text.size() -1; i++){
+    QString textTrimmed = m_Text.trimmed();
+    for(int i = 0; i <= textTrimmed.size() -1; i++){
 
-        if(m_Text[i] !=  QString(" ") || (m_Text[i] == QString(" ") && i != (m_Text.size()-1))){
             QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
             xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + 1+m_FrameLineWidth;
 
@@ -685,7 +680,6 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
                 painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[i]);
             }
-        }
     }
 
     painter.setPen(m_ForeColor);
