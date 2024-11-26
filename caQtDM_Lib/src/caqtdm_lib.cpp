@@ -2818,14 +2818,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         for(int i=0; i< caCartesianPlot::curveCount; i++) {
             QString pvs ="";
             QStringList thisString = cartesianplotWidget->getPV(i).split(";");
-            // Remove empty channels as they should just be ignored instead of stopping the whole curve from being monitored.
-            thisString.removeAll(QString(""));
+
 
             cartesianplotWidget->setColor(cartesianplotWidget->getColor(i), i);
             cartesianplotWidget->setStyle(cartesianplotWidget->getStyle(i), i);
             cartesianplotWidget->setSymbol(cartesianplotWidget->getSymbol(i), i);
 
-            if(thisString.count() == 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0) {
+            if(thisString.count() >= 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() > 0) {
                 specData[0] = i; // curve number
                 specData[1] = caCartesianPlot::XY_both;
                 specData[2] = caCartesianPlot::CH_X; // X
@@ -2843,7 +2842,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 pvs.append(";");
                 pvs.append(pv);
                 tooltip.append("<br>");
-            } else if(thisString.count() == 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() == 0) {
+            } else if(thisString.count() >= 2 && thisString.at(0).trimmed().length() > 0 && thisString.at(1).trimmed().length() == 0) {
                 specData[0] = i; // curve number
                 specData[1] = caCartesianPlot::X_only;
                 specData[2] = caCartesianPlot::CH_X; // X
@@ -2854,7 +2853,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 pvs.append(";");
                 tooltip.append(pv);
                 tooltip.append("<br>");
-            } else if(thisString.count() == 2 && thisString.at(1).trimmed().length() > 0 && thisString.at(0).trimmed().length() == 0) {
+            } else if(thisString.count() >= 2 && thisString.at(1).trimmed().length() > 0 && thisString.at(0).trimmed().length() == 0) {
                 specData[0] = i; // curve number
                 specData[1] = caCartesianPlot::Y_only;
                 specData[2] = caCartesianPlot::CH_Y; // Y
@@ -2865,12 +2864,13 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                 pvs.append(pv);
                 tooltip.append(pv);
                 tooltip.append("<br>");
-            } else if (thisString.count() > 2) {
+            }
+            if (thisString.count() > 2) {
                 postMessage(
-                    QtFatalMsg,
+                    QtWarningMsg,
                     (char *) qasc(
                         tr("caCartesianPlot widget %1 has too many entries (%2) in "
-                           "channelList_%3, has to be 2. The curve is therefore not drawn.")
+                           "channelList_%3, should be 2.")
                             .arg(cartesianplotWidget->objectName())
                             .arg(thisString.count())
                             .arg(i + 1)));
