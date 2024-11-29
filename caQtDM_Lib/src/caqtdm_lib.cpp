@@ -5576,12 +5576,18 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
                     if(data.edata.lower_disp_limit != data.edata.upper_disp_limit) {
                         cartesianplotWidget->setScaleX(data.edata.lower_disp_limit, data.edata.upper_disp_limit);
                     } else {
+                        char asc[MAX_STRING_LENGTH];
+                        snprintf(asc, MAX_STRING_LENGTH, "PV <%s> (x axis) in widget <%s> is set to channel scaling, but the channel limits are invalid. Therefore, the x axis scaling for the widget is reset to auto.", data.pv, qasc(w->objectName()));
+                        postMessage(QtFatalMsg, asc);
                         cartesianplotWidget->setXscaling(caCartesianPlot::Auto);
                     }
                 } else if(XorY == caCartesianPlot::CH_Y && cartesianplotWidget->getYscaling() == caCartesianPlot::Channel) {
                     if(data.edata.lower_disp_limit != data.edata.upper_disp_limit) {
                         cartesianplotWidget->setScaleY(data.edata.lower_disp_limit, data.edata.upper_disp_limit);
                     } else {
+                        char asc[MAX_STRING_LENGTH];
+                        snprintf(asc, MAX_STRING_LENGTH, "PV <%s> (y axis) in widget <%s> is set to channel scaling, but the channel limits are invalid. Therefore, the y axis scaling for the widget is reset to auto.", data.pv, qasc(w->objectName()));
+                        postMessage(QtFatalMsg, asc);
                         cartesianplotWidget->setYscaling(caCartesianPlot::Auto);
                     }
                 }
@@ -7656,6 +7662,11 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
             } else if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
                 limitsCartesianplotDialog dialog(cartesianplotWidget, mutexKnobDataP, "cartesianplot modifications", this);
                 dialog.exec();
+                if (dialog.getChannelScalingWasReset()) {
+                   char asc[MAX_STRING_LENGTH];
+                   snprintf(asc, MAX_STRING_LENGTH, "Selected scaling \"channel\" has been reset to \"auto\" in cartesian plot: \"%s\" because the limits provided by the PV are invalid.", qasc(cartesianplotWidget->objectName()));
+                   postMessage(QtFatalMsg, asc);
+                }
             }
         } else if(selectedItem->text().contains(RESETZOOM)) {
             if(caCartesianPlot* cartesianplotWidget = qobject_cast<caCartesianPlot *>(w)) {
