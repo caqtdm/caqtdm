@@ -36,6 +36,9 @@ typedef struct _zOrder {
     string40 z;
 } zOrder;
 
+#define zorder_size 20000
+
+
 #define True (1==1)
 #define False !True
 
