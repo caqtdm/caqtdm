@@ -22,7 +22,7 @@
 Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
 Version: 4.4.2
-Release: 0.9%{?dist}
+Release: 0.10%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm
