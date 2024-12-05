@@ -373,6 +373,8 @@ quint64 WorkerHTTP::updateStartSecondsFromMutexKnobData(int index, double curren
         // Data is stored in miliseconds but we want seconds so convert it
         newStartSeconds = (reinterpret_cast<double *>(kData.edata.dataB)[kData.edata.valueCount - 1]
                            / 1000);
+        if (newStartSeconds<currentStartSeconds) newStartSeconds = currentStartSeconds;
+
     }
     m_mutexKnobDataPtr->DataUnlock(&kData);
 
