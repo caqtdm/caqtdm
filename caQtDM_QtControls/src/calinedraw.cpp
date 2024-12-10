@@ -663,8 +663,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
     painter.setPen(brush.color());
 
-    QString textTrimmed = m_Text.trimmed();
-    for(int i = 0; i <= textTrimmed.size() -1; i++){
+    for(int i = 0; i <= m_Text.size() -1; i++){
 
             QRect rectangleToDraw = fm.boundingRect(m_Text[i]);
             xCoordinate = calculateSumOfStartingCoordinates(letterCoordinates) + (1 + m_FrameLineWidth);
@@ -700,7 +699,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
                 painter.setBackground(invBrushColor);
                 painter.setBackgroundMode(Qt::OpaqueMode);
 
-                painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  m_Text[i]);
+                painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  QString(m_Text[i]));
             }
     }
 
