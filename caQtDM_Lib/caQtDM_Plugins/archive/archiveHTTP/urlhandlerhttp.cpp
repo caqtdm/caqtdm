@@ -60,7 +60,16 @@ UrlHandlerHttp::UrlHandlerHttp()
     // Set this to false by default as we don't need https for our archiver data, if needed the archiver can redirect us.
     m_usesHttps = false;
     // the list is not the standard url that is generated, and it is only needed at startup
-    m_backendlist = false;
+    m_backendList = false;
+
+    // Initialize memory
+    m_hostName = "data-api.psi.ch";
+    m_binned = true;
+    m_binCount = 100;
+    m_backend = "sf-archiver";
+    m_channelName  = "";
+    m_beginTime = QDateTime::fromSecsSinceEpoch(0);
+    m_endTime = QDateTime::currentDateTime();
 
 }
 
@@ -78,7 +87,7 @@ QUrl UrlHandlerHttp::assembleUrl() const
     } else {
         assembledUrl = QUrl(QString(QString("http://") + m_hostName.toString()));
     }
-    if (m_backendlist){
+    if (m_backendList){
         // the list is a simple command and dosen't need any query
         assembledUrl.setPath(m_apiPathList);
         return assembledUrl;
@@ -215,12 +224,12 @@ void UrlHandlerHttp::setUsesHttps(const bool &newHttps)
 
 bool UrlHandlerHttp::BackendListRequest() const
 {
-    return m_backendlist;
+    return m_backendList;
 }
 
-void UrlHandlerHttp::setBackeendListRequest(const bool &newbackendlist)
+void UrlHandlerHttp::setBackendListRequest(const bool &newBackendList)
 {
-    m_backendlist=newbackendlist;
+    m_backendList=newBackendList;
 }
 
 bool UrlHandlerHttp::binned() const
