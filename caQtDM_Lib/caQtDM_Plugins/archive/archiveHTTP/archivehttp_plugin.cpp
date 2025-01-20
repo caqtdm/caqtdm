@@ -76,11 +76,15 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
     m_mutexKnobDataP = data;
     m_messageWindowP = messageWindow;
     UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
-    urlHandler->setBackeendListRequest(true);
-    urlHandler->setHostName(QString(DEFAULT_HOSTNAME));
+    urlHandler->setBackendListRequest(true);
+    QString url = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_URL");
+    if (!url.isEmpty()) {
+        urlHandler->setUrl(url);
+    } else {
+        urlHandler->setHostName(QString(DEFAULT_HOSTNAME));
+    }
     // Send a request to query available backends
     QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-//    QNetworkReply* reply = manager->get(QNetworkRequest(QUrl("https://" DEFAULT_HOSTNAME "/api/4/backend/list")));
     QNetworkReply* reply = manager->get(QNetworkRequest(urlHandler->assembleUrl()));
 
     connect(reply, &QNetworkReply::finished, this, [reply, manager, this]() {
@@ -566,8 +570,8 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     }
                 }
             } else { // Environment variable is set but no dynamic property exists
+                indexNew.backend = backendEnvironmentVariable;
                 if (indexNew.init) {
-                    indexNew.backend = backendEnvironmentVariable;
                     QString mess("ArchiveHTTP plugin -- archiver backend defined as " + indexNew.backend
                                  + " from environment variable CAQTDM_ARCHIVEHTTP_BACKEND");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
@@ -624,6 +628,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     }
                 }
             } else { // Environment variable is set but no dynamic property exists
+                index_name = url;
                 if (indexNew.init) {
                     QString mess("ArchiveHTTP plugin -- archiver URL defined as " + url
                                  + " from environment variable CAQTDM_ARCHIVEHTTP_URL");
@@ -631,7 +636,6 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
-                index_name = url;
             }
         }
         WorkerHTTP *newWorker = new WorkerHTTP;
