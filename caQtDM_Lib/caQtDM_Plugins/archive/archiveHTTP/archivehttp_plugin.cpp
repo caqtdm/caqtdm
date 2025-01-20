@@ -77,48 +77,51 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
     m_messageWindowP = messageWindow;
     UrlHandlerHttp *urlHandler = new UrlHandlerHttp();
     urlHandler->setBackendListRequest(true);
-    QString url = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_URL");
-    if (!url.isEmpty()) {
-        urlHandler->setUrl(url);
-    } else {
-        urlHandler->setHostName(QString(DEFAULT_HOSTNAME));
-    }
-    // Send a request to query available backends
-    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
-    QNetworkReply* reply = manager->get(QNetworkRequest(urlHandler->assembleUrl()));
+    QString overrideBackend = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_OVERRIDE_BACKEND");
+    // Only check available backends if the backend is not overriden.
+    if (overrideBackend.isEmpty()) {
+        QString url = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_URL");
+        if (!url.isEmpty()) {
+            urlHandler->setUrl(url);
+        } else {
+            urlHandler->setHostName(QString(DEFAULT_HOSTNAME));
+        }
+        // Send a request to query available backends
+        QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+        QNetworkReply *reply = manager->get(QNetworkRequest(urlHandler->assembleUrl()));
 
-    connect(reply, &QNetworkReply::finished, this, [reply, manager, this]() {
-        if (reply->error() == QNetworkReply::NoError) {
-            QByteArray responseData = reply->readAll();
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-            if (!jsonDoc.isNull() && jsonDoc.isObject()) {
-                QJsonObject jsonObj = jsonDoc.object();
-                if (jsonObj.contains("backends_available") && jsonObj["backends_available"].isArray()) {
-                    QJsonArray backendsArray = jsonObj["backends_available"].toArray();
-                    QStringList backendNames;
-                    foreach (const QJsonValue& value, backendsArray) {
-                        if (value.isObject()) {
-                            QJsonObject backendObj = value.toObject();
-                            if (backendObj.contains("name") && backendObj["name"].isString()) {
-                                backendNames.append(backendObj["name"].toString());
+        connect(reply, &QNetworkReply::finished, this, [reply, manager, this]() {
+            if (reply->error() == QNetworkReply::NoError) {
+                QByteArray responseData = reply->readAll();
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+                if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+                    QJsonObject jsonObj = jsonDoc.object();
+                    if (jsonObj.contains("backends_available")
+                        && jsonObj["backends_available"].isArray()) {
+                        QJsonArray backendsArray = jsonObj["backends_available"].toArray();
+                        QStringList backendNames;
+                        foreach (const QJsonValue &value, backendsArray) {
+                            if (value.isObject()) {
+                                QJsonObject backendObj = value.toObject();
+                                if (backendObj.contains("name") && backendObj["name"].isString()) {
+                                    backendNames.append(backendObj["name"].toString());
+                                }
                             }
                         }
+                        availableBackends = backendNames;
                     }
-                    availableBackends = backendNames;
+                }
+            } else {
+                QString mess("ArchiveHTTP plugin -- failed to retrieve available backends from: "
+                             + reply->url().toString() + ", Error: " + reply->errorString());
+                if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                    m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
                 }
             }
-        } else {
-            QString mess(
-                "ArchiveHTTP plugin -- failed to retrieve available backends from: "
-                + reply->url().toString() + ", Error: " + reply->errorString());
-            if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
-                m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
-            }
-        }
-        reply->deleteLater();
-        manager->deleteLater();
-    });
-
+            reply->deleteLater();
+            manager->deleteLater();
+        });
+    }
     // Also initialize archiverGeneral
     return m_archiverGeneral->initCommunicationLayer(data, messageWindow, options);
 }
@@ -537,9 +540,20 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
             // Else, if the user defined an environment variable, take that.
             // If neither a dynamic property or an environment variable is set, we use the hardcoded default value.
             // Therefore, dynamic property comes first, then environment variable, then predefined url.
-            QString backendEnvironmentVariable = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_BACKEND");
+            QString backendEnvironmentVariable = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_DEFAULT_BACKEND");
+            QString backendOverrideEnvironmentVariable = (QString) qgetenv("CAQTDM_ARCHIVEHTTP_OVERRIDE_BACKEND");
             var = w->property("backend");
-            if (backendEnvironmentVariable.isEmpty() || (!var.toString().isEmpty())) {
+            if (!backendOverrideEnvironmentVariable.isEmpty()) {
+                // Override the backend, doesn't matter what the user specified
+                indexNew.backend = backendOverrideEnvironmentVariable;
+                if (indexNew.init) {
+                    QString mess("ArchiveHTTP plugin -- archiver backend defined as " + indexNew.backend
+                                 + " from environment variable CAQTDM_ARCHIVEHTTP_OVERRIDE_BACKEND. This environment variable overrides any other definitions.");
+                    if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                        m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
+                    }
+                }
+            } else if (backendEnvironmentVariable.isEmpty() || (!var.toString().isEmpty())) {
                 // Do this if dynamic property is set
                 if (!var.toString().isEmpty()) {
                     indexNew.backend = var.toString();
@@ -561,7 +575,7 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                     indexNew.backend = DEFAULT_BACKEND;
                     if (indexNew.init) {
                         QString mess(
-                            "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVEHTTP_BACKEND "
+                            "ArchiveHTTP plugin -- no environment variable CAQTDM_ARCHIVEHTTP_DEFAULT_BACKEND "
                             "set and no backend defined as dynamic property in widget "
                             + w->objectName() + ", defaulting to " + indexNew.backend);
                         if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
@@ -573,26 +587,36 @@ void ArchiveHTTP_Plugin::Callback_UpdateInterface(QMap<QString, indexes> listOfI
                 indexNew.backend = backendEnvironmentVariable;
                 if (indexNew.init) {
                     QString mess("ArchiveHTTP plugin -- archiver backend defined as " + indexNew.backend
-                                 + " from environment variable CAQTDM_ARCHIVEHTTP_BACKEND");
+                                 + " from environment variable CAQTDM_ARCHIVEHTTP_DEFAULT_BACKEND");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
                         m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
             }
 
-            // If we have already gotten a result from the backend confirming the available backends,
+            // If we have already gotten a result from the API confirming the available backends,
             // we can check if the backend is available and warn the user if not.
-            if (indexNew.init && !availableBackends.isEmpty()) {
-                if (!availableBackends.contains(indexNew.backend)) {
-                    QString mess("ArchiveHTTP plugin -- specified backend: " + indexNew.backend
-                                 + " is not available in API. Available backends are:");
-                    foreach(QString backend, availableBackends) {
-                        mess.append(" " + backend + ",");
+            if (indexNew.init) {
+                if (!availableBackends.isEmpty()) {
+                    if (!availableBackends.contains(indexNew.backend)) {
+                        QString mess("ArchiveHTTP plugin -- specified backend: " + indexNew.backend
+                                     + " is not available in API. Available backends are:");
+                        foreach (QString backend, availableBackends) {
+                            mess.append(" " + backend + ",");
+                        }
+                        // Remove the last comma character ","
+                        mess.chop(1);
+                        if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
+                            m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
+                        }
                     }
-                    // Remove the last comma character ","
-                    mess.chop(1);
+                } else if (backendOverrideEnvironmentVariable.isEmpty()) {
+                    // If we did not get an answer from the API, tell the user we couldn't validate the specified backend.
+                    // Don't warn if backend was overriden.
+                    QString mess("ArchiveHTTP plugin -- could not check if specified backend: " + indexNew.backend
+                                 + " is available in API, might not be.");
                     if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
-                        m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
+                        m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                     }
                 }
             }
