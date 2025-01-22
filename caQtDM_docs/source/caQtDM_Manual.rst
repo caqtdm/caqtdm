@@ -3066,14 +3066,20 @@ caQtDM uses the following environment variables:
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_ARCHIVEHTTP_URL``            | point the archiveHTTP plugin to a different backend       |
 +---------------------------------------+-----------------------------------------------------------+
-| ``CAQTDM_ARCHIVEHTTP_BACKEND``        | Specify the "backend" parameter for archiver api queries. |
-|                                       | This can be overwritten by the dynamic property "backend".|
+| ``CAQTDM_ARCHIVEHTTP_DEFAULT_BACKEND``| Specify the "backend" parameter for archiver api queries, |
+|                                       | which is used if none is set in the widget.               |
++---------------------------------------+-----------------------------------------------------------+
+|``CAQTDM_ARCHIVEHTTP_OVERRIDE_BACKEND``| Overrides any other definition of the "backend" paramter  |
+|                                       | for queries, including dynamic properties in the widget.  |
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_ARCHIVEHTTP_APIPATH_BINNED`` | Overwrite the default api path for binned data.           |
 |                                       | Needs to be in the format: /path/to/binned                |
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_ARCHIVEHTTP_APIPATH_RAW``    | Overwrite the default api path for raw data (events).     |
 |                                       | Needs to be in the format: /path/to/events                |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVEHTTP_APIPATH_LIST``   | Overwrite the default path to fetch the list of available |
+|                                       | backends. Needs to be in the format: /path/to/backend/list|
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_OPTIMIZE_EPICS3CONNECTIONS`` | Disable Epics3 connections when tabwidget is not active   |
 |                                       | Set to "TRUE" to activate                                 |
