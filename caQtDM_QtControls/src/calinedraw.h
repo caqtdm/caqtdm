@@ -195,6 +195,7 @@ protected:
     void handleMarking(QPoint position);
     int getIndexofTextRectangle(QPoint position);
     int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);
+    void resetMarking();
     QColor invertColor(QColor color);
     CaQtDM_Lib_Interface* caDataInterface;
 

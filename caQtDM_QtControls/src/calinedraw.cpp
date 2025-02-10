@@ -312,6 +312,17 @@ bool caLineDraw::rotateText(float degrees)
     return false;
 }
 
+void caLineDraw::resetMarking(){
+    m_LetterMarkedList.clear();
+    m_LettersBoundingRects.clear();
+    m_markAllText = false;
+    if(m_Text.size() > 0){
+        for(int i = 0; i <= m_Text.size() ; i++){
+            m_LetterMarkedList << false;
+        }
+    }
+}
+
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton){
@@ -319,13 +330,11 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
         m_MouseClickPosition = calculateCoordinates(event->pos());
 
         // Reset Marking
-        m_LetterMarkedList.clear();
-        m_LettersBoundingRects.clear();
-        m_markAllText = false;
-        if(m_Text.size() > 0){
-            for(int i = 0; i <= m_Text.size() ; i++){
-                m_LetterMarkedList << false;
-            }
+        resetMarking();
+
+        QList l = (parent()->findChildren<caLineDraw *>());
+        for(int i = 0; i <= l.length() -1; i++){
+            l[i]->resetMarking();
         }
 
         update();
