@@ -323,6 +323,16 @@ void caLineDraw::resetMarking(){
     }
 }
 
+void caLineDraw::handleMultipleMarkedObjects(){
+    QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+    qDebug() << "NEW:";
+    for(int i = 0; i <= lineDrawList.length() -1; i++){
+        if(lineDrawList[i]->m_markAllText == true){
+            qDebug() << lineDrawList[i]->objectName() << lineDrawList[i]->getPV();
+        }
+    }
+}
+
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton){
@@ -332,9 +342,9 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
         // Reset Marking
         resetMarking();
 
-        QList l = (parent()->findChildren<caLineDraw *>());
-        for(int i = 0; i <= l.length() -1; i++){
-            l[i]->resetMarking();
+        QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+        for(int i = 0; i <= lineDrawList.length() -1; i++){
+           // lineDrawList[i]->resetMarking();
         }
 
         update();
@@ -342,6 +352,9 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 
     if(event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton){
         setFocus();
+        handleMultipleMarkedObjects();
+
+        update();
     }
 }
 
@@ -711,6 +724,10 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
                 painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  QString(m_Text[i]));
             }
+    }
+
+    if(m_Text == getMarkedText()){
+        m_markAllText = true;
     }
 
     painter.setPen(m_ForeColor);
