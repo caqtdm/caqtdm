@@ -686,8 +686,9 @@ void caLineDraw::paintEvent(QPaintEvent *)
                 m_LettersBoundingRects << rectangleToDraw;
             }
 
+            bool isLastEmpty = m_Text[i] == QString(" ") && i == (m_Text.size() -1);
             bool isCurrentFieldMarked = false;
-            if(m_LetterMarkedList.size() > 0){
+            if(m_LetterMarkedList.size() > 0 && !isLastEmpty){
                 isCurrentFieldMarked = m_LetterMarkedList[i];
             }
 
