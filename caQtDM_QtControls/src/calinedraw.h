@@ -190,6 +190,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     int calculateSumOfStartingCoordinates(QList<int> list, int calculateUntilIndex = -1);
     QPoint calculateCoordinates(QPoint point);
     QString getMarkedText();

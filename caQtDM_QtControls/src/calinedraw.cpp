@@ -331,7 +331,7 @@ void caLineDraw::handleMultipleMarkedObjects(){
     QList lineDrawList = (parent()->findChildren<caLineDraw *>());
     qDebug() << "NEW:";
     for(int i = 0; i <= lineDrawList.length() -1; i++){
-        if(lineDrawList[i]->m_markAllText == true){
+        if(lineDrawList[i]->m_markAllText == true && (lineDrawList[i]->m_Text.length() > 0)){
             copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
             markedCount++;
         }else{
@@ -355,7 +355,6 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
     if(event->buttons() == Qt::LeftButton){
 
         m_MouseClickPosition = calculateCoordinates(event->pos());
-
         // Reset Marking
         resetMarking();
     }
@@ -368,13 +367,27 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 void caLineDraw::mouseReleaseEvent(QMouseEvent *event){
     QList lineDrawList = (parent()->findChildren<caLineDraw *>());
 
+    // Remove currently Marked Instance rom list
     lineDrawList.removeAt(lineDrawList.indexOf(this));
-    if(!(m_Text == getMarkedText())){
+
+    QString s = m_Text;
+    if(s[s.length()-1] == QString(" ")){
+        s.removeAt(s.length()-1);
+        qDebug() << s;
+    }
+
+    qDebug() << this->thisPV << m_Text << s;
+    if(s != getMarkedText() && s.length() > 0){
         for(int i = 0; i <= lineDrawList.size() -1; i++){
-            lineDrawList[i]->resetMarking();
+           // lineDrawList[i]->resetMarking();
         }
         update();
     }
+}
+
+void caLineDraw::mouseDoubleClickEvent(QMouseEvent *event){
+    m_markAllText = true;
+    update();
 }
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
@@ -403,6 +416,13 @@ void caLineDraw::keyPressEvent(QKeyEvent *event){
             m_markAllText = true;
             update();
             break;
+        }
+    }
+
+    if(keyPressed == Qt::Key_Escape){
+        QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+        for(int i = 0; i <= lineDrawList.size() -1; i++){
+            lineDrawList[i]->resetMarking();
         }
     }
 
