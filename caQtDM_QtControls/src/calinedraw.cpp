@@ -321,25 +321,29 @@ void caLineDraw::resetMarking(){
             m_LetterMarkedList << false;
         }
     }
+    update();
 }
 
 void caLineDraw::handleMultipleMarkedObjects(){
     QString copyString;
-    bool isMoreThanOneMarked = false;
+    int markedCount = 0;
 
     QList lineDrawList = (parent()->findChildren<caLineDraw *>());
     qDebug() << "NEW:";
     for(int i = 0; i <= lineDrawList.length() -1; i++){
         if(lineDrawList[i]->m_markAllText == true){
             copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
-            if(i == 1){isMoreThanOneMarked = true;}
+            markedCount++;
+        }else{
+           // lineDrawList[i]->resetMarking();
         }
+        qDebug() << lineDrawList[i]->m_markAllText << markedCount;
     }
     qDebug().noquote() << copyString;
     // Copy to Clipboard
 
     QClipboard *clipboard = QApplication::clipboard();
-    if(copyString.size() > 0 && isMoreThanOneMarked){
+    if(copyString.size() > 0 && markedCount >= 2){
         clipboard->setText(copyString);
     }else{
         clipboard->setText(getMarkedText());
@@ -354,19 +358,21 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 
         // Reset Marking
         resetMarking();
-
-        QList lineDrawList = (parent()->findChildren<caLineDraw *>());
-        for(int i = 0; i <= lineDrawList.length() -1; i++){
-           // lineDrawList[i]->resetMarking();
-        }
-
-        update();
     }
 
     if(event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton){
         setFocus();
-        handleMultipleMarkedObjects();
+    }
+}
 
+void caLineDraw::mouseReleaseEvent(QMouseEvent *event){
+    QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+
+    lineDrawList.removeAt(lineDrawList.indexOf(this));
+    if(!(m_Text == getMarkedText())){
+        for(int i = 0; i <= lineDrawList.size() -1; i++){
+            lineDrawList[i]->resetMarking();
+        }
         update();
     }
 }
