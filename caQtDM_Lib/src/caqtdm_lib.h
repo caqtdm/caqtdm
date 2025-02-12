@@ -510,6 +510,7 @@ private slots:
     void handleFileChanged(const QString&);
 
     void Callback_WriteDetectedValues(QWidget* w);
+    void Callback_CopyMarked();
 
     void Callback_ReloadWindowL() {
 

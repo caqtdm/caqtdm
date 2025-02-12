@@ -688,6 +688,11 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     connect(ResizeDownAction, SIGNAL(triggered()), this, SLOT(Callback_ResizeDown()));
     this->addAction(ResizeDownAction);
 
+    QAction *CopyMarkedAction = new QAction(this);
+    CopyMarkedAction->setShortcut(QKeySequence(tr("Ctrl+C")));
+    connect(CopyMarkedAction, SIGNAL(triggered()), this, SLOT(Callback_CopyMarked()));
+    this->addAction(CopyMarkedAction);
+
     char asc[MAX_STRING_LENGTH];
     QString path = thisFileFull;
     int pos = path.lastIndexOf("/");
@@ -6696,6 +6701,29 @@ void CaQtDM_Lib::Callback_ScriptButton()
         w->setProcess(t);
     }
 #endif
+}
+
+void CaQtDM_Lib::Callback_CopyMarked(){
+    QString copyString;
+    int markedCount = 0;
+    QClipboard *clipboard = QApplication::clipboard();
+
+    QList lineDrawList = findChildren<caLineDraw *>();
+
+    for(int i = 0; i <= lineDrawList.length() -1; i++){
+        if(lineDrawList[i]->getMarkAll() == true && (lineDrawList[i]->getText().length() > 0)){
+            copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+            markedCount++;
+        }else if(lineDrawList[i]->getMarkedText().length() > 0){
+            copyString = lineDrawList[i]->getMarkedText();
+            break;
+        }
+    }
+
+    // Copy to Clipboard
+    if(copyString.size() > 0 && markedCount >= 2){
+        clipboard->setText(copyString);
+    }
 }
 
 void CaQtDM_Lib::processTerminated()
