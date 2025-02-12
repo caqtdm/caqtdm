@@ -324,32 +324,6 @@ void caLineDraw::resetMarking(){
     update();
 }
 
-void caLineDraw::handleMultipleMarkedObjects(){
-    QString copyString;
-    int markedCount = 0;
-
-    QList lineDrawList = (parent()->findChildren<caLineDraw *>());
-    qDebug() << "NEW:";
-    for(int i = 0; i <= lineDrawList.length() -1; i++){
-        if(lineDrawList[i]->m_markAllText == true && (lineDrawList[i]->m_Text.length() > 0)){
-            copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
-            markedCount++;
-        }else{
-           // lineDrawList[i]->resetMarking();
-        }
-        qDebug() << lineDrawList[i]->m_markAllText << markedCount;
-    }
-    qDebug().noquote() << copyString;
-    // Copy to Clipboard
-
-    QClipboard *clipboard = QApplication::clipboard();
-    if(copyString.size() > 0 && markedCount >= 2){
-        clipboard->setText(copyString);
-    }else{
-        clipboard->setText(getMarkedText());
-    }
-}
-
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton){
@@ -407,10 +381,6 @@ void caLineDraw::keyPressEvent(QKeyEvent *event){
 
     if(event_modifier == Qt::ControlModifier){
         switch(keyPressed){
-        // CTRL + C
-        case Qt::Key_C:
-            handleMultipleMarkedObjects();
-            break;
         // CTRL + A
         case Qt::Key_A:
             m_markAllText = true;
