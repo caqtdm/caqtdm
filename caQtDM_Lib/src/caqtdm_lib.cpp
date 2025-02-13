@@ -6704,6 +6704,7 @@ void CaQtDM_Lib::Callback_ScriptButton()
 }
 
 void CaQtDM_Lib::Callback_CopyMarked(){
+    setFocus(Qt::MouseFocusReason);
     QString copyString;
     int markedCount = 0;
     QClipboard *clipboard = QApplication::clipboard();
@@ -6711,19 +6712,32 @@ void CaQtDM_Lib::Callback_CopyMarked(){
     QList lineDrawList = findChildren<caLineDraw *>();
 
     for(int i = 0; i <= lineDrawList.length() -1; i++){
-        if(lineDrawList[i]->getMarkAll() == true && (lineDrawList[i]->getText().length() > 0)){
-            copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+        if(lineDrawList[i]->getMarkedText().length() > 0){
+            if(lineDrawList[i]->getMarkAll() == true){
+                copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+            }
+
             markedCount++;
-        }else if(lineDrawList[i]->getMarkedText().length() > 0){
-            copyString = lineDrawList[i]->getMarkedText();
-            break;
         }
     }
 
+    if(markedCount == 1){
+        qDebug() << markedCount;
+        copyString = copyString.split("\t")[1].replace("\n", QString(""));
+    }
+
     // Copy to Clipboard
-    if(copyString.size() > 0 && markedCount >= 2){
+    if(copyString.size() > 0){
         clipboard->setText(copyString);
     }
+
+    // CaTextentry inherits from caLineEdit
+    QList lle = findChildren<caLineEdit *>();
+    for(int i = 0; i <= lle.length() -1; i++){
+   //     qDebug() << lle[i]->selectedText() << lle[i]->getPV();
+    }
+    qDebug() << copyString;
+    clearFocus();
 }
 
 void CaQtDM_Lib::processTerminated()
