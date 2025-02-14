@@ -6704,33 +6704,11 @@ void CaQtDM_Lib::Callback_ScriptButton()
 }
 
 void CaQtDM_Lib::Callback_CopyMarked(){
-    QClipboard *clipboard = QApplication::clipboard();
     QWidget *widg = QApplication::focusWidget();
-    QString copyString;
 
     caLineDraw *draw = qobject_cast<caLineDraw *>(widg);
     if(draw){
-        int markedCount = 0;
-        QList lineDrawList = findChildren<caLineDraw *>();
-        for(int i = 0; i <= lineDrawList.length() -1; i++){
-            if(lineDrawList[i]->getMarkedText().length() > 0){
-                if(lineDrawList[i]->getMarkAll() == true){
-                    copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
-                }
-
-                markedCount++;
-            }
-        }
-
-        if(markedCount == 1){
-            qDebug() << markedCount;
-            copyString = copyString.split("\t")[1].replace("\n", QString(""));
-        }
-
-        // Copy to Clipboard
-        if(copyString.size() > 0){
-            clipboard->setText(copyString);
-        }
+        draw->copy();
     }
 
     caWaveTable *wavetable = qobject_cast<caWaveTable *>(widg);

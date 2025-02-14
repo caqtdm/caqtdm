@@ -1046,5 +1046,33 @@ void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& 
 
 }
 
+void caLineDraw::copy(){
+    QClipboard *clipboard = QApplication::clipboard();
+    QList lineDrawList = parent()->findChildren<caLineDraw *>();
+
+    QString copyString;
+    int markedCount = 0;
+
+    for(int i = 0; i <= lineDrawList.length() -1; i++){
+        if(lineDrawList[i]->getMarkedText().length() > 0){
+            if(lineDrawList[i]->getMarkAll() == true){
+                copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+            }
+
+            markedCount++;
+        }
+    }
+
+    if(markedCount == 1){
+        qDebug() << markedCount;
+        copyString = copyString.split("\t")[1].replace("\n", QString(""));
+    }
+
+    // Copy to Clipboard
+    if(copyString.size() > 0){
+        clipboard->setText(copyString);
+    }
+}
+
 
 

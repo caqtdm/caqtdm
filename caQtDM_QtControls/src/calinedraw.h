@@ -170,7 +170,7 @@ public:
     QString getMarkedText();
     void resetMarking();
     bool getMarkAll() {return m_markAllText;}
-    QString getText() {return m_Text;}
+    void copy();
 
 signals:
     void textChanged(QString);
