@@ -116,8 +116,8 @@ void caTable::celldoubleclicked(int row, int col)
 void caTable::createActions() {
 
     copyAct = new QAction(this);
-    copyAct->setShortcut(tr("Ctrl+C"));
-    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
+ //   copyAct->setShortcut(tr("Ctrl+C"));
+ //   connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 }
 
 void caTable::setColumnSizes(QString const &newSizes)

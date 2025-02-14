@@ -663,9 +663,9 @@ void caWaveTable::copy()
 void caWaveTable::createActions() {
 
     copyAct = new QAction(this);
-    copyAct->setShortcut(tr("Ctrl+C"));
-    copyAct->setShortcutContext(Qt::WidgetShortcut);
-    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
+  //  copyAct->setShortcut(tr("Ctrl+C"));
+  //  copyAct->setShortcutContext(Qt::WidgetShortcut);
+  //  connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 }
 
 

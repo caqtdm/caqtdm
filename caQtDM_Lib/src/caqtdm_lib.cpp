@@ -688,10 +688,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     connect(ResizeDownAction, SIGNAL(triggered()), this, SLOT(Callback_ResizeDown()));
     this->addAction(ResizeDownAction);
 
-    QAction *CopyMarkedAction = new QAction(this);
-    CopyMarkedAction->setShortcut(QKeySequence(tr("Ctrl+C")));
-    connect(CopyMarkedAction, SIGNAL(triggered()), this, SLOT(Callback_CopyMarked()));
-    this->addAction(CopyMarkedAction);
+
+    QShortcut *CopyMarking = new QShortcut(tr("Ctrl+C"), this);
+    connect(CopyMarking, SIGNAL(activated()), this, SLOT(Callback_CopyMarked()));
+
 
     char asc[MAX_STRING_LENGTH];
     QString path = thisFileFull;
@@ -6704,40 +6704,46 @@ void CaQtDM_Lib::Callback_ScriptButton()
 }
 
 void CaQtDM_Lib::Callback_CopyMarked(){
-    setFocus(Qt::MouseFocusReason);
-    QString copyString;
-    int markedCount = 0;
     QClipboard *clipboard = QApplication::clipboard();
+    QWidget *widg = QApplication::focusWidget();
+    QString copyString;
 
-    QList lineDrawList = findChildren<caLineDraw *>();
+    caLineDraw *draw = qobject_cast<caLineDraw *>(widg);
+    if(draw){
+        int markedCount = 0;
+        QList lineDrawList = findChildren<caLineDraw *>();
+        for(int i = 0; i <= lineDrawList.length() -1; i++){
+            if(lineDrawList[i]->getMarkedText().length() > 0){
+                if(lineDrawList[i]->getMarkAll() == true){
+                    copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+                }
 
-    for(int i = 0; i <= lineDrawList.length() -1; i++){
-        if(lineDrawList[i]->getMarkedText().length() > 0){
-            if(lineDrawList[i]->getMarkAll() == true){
-                copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+                markedCount++;
             }
+        }
 
-            markedCount++;
+        if(markedCount == 1){
+            qDebug() << markedCount;
+            copyString = copyString.split("\t")[1].replace("\n", QString(""));
+        }
+
+        // Copy to Clipboard
+        if(copyString.size() > 0){
+            clipboard->setText(copyString);
         }
     }
 
-    if(markedCount == 1){
-        qDebug() << markedCount;
-        copyString = copyString.split("\t")[1].replace("\n", QString(""));
+    caWaveTable *wavetable = qobject_cast<caWaveTable *>(widg);
+    if(wavetable){
+        wavetable->copy();
     }
 
-    // Copy to Clipboard
-    if(copyString.size() > 0){
-        clipboard->setText(copyString);
+    caTable *table = qobject_cast<caTable *>(widg);
+    if(table){
+        table->copy();
     }
 
-    // CaTextentry inherits from caLineEdit
-    QList lle = findChildren<caLineEdit *>();
-    for(int i = 0; i <= lle.length() -1; i++){
-   //     qDebug() << lle[i]->selectedText() << lle[i]->getPV();
-    }
-    qDebug() << copyString;
-    clearFocus();
+
 }
 
 void CaQtDM_Lib::processTerminated()
