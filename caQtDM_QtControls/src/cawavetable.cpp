@@ -114,9 +114,6 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 
     connect(this, SIGNAL(currentCellChanged(int, int, int, int)), this,  SLOT(cellChange(int,int, int, int)));
 
-    createActions();
-    addAction(copyAct);
-
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     defaultForeColor = palette().foreground().color();
 #else
