@@ -276,11 +276,12 @@ bool caMultiLineString::event(QEvent *e)
 
     } else if(e->type() == QEvent::KeyPress) {
 
+        /*
         QKeyEvent *key_event = static_cast<QKeyEvent*>(e);
         if (key_event->matches(QKeySequence::Copy)) {
             emit copy();
         }
-
+        */
     }
     return QPlainTextEdit::event(e);
 }

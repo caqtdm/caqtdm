@@ -6721,6 +6721,10 @@ void CaQtDM_Lib::Callback_CopyMarked(){
         table->copy();
     }
 
+    caMultiLineString *multiline = qobject_cast<caMultiLineString *>(widg);
+    if(multiline){
+        multiline->copy();
+    }
 
 }
 

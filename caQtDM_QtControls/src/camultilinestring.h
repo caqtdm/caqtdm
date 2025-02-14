@@ -134,6 +134,7 @@ public:
     void setAlarmColors(short status, double value, QColor bgAtInit, QColor fgAtInit);
     void updateAlarmColors();
     void setColors(QColor bg, QColor fg, QColor fr, int lineWidth);
+    void copy();
 
 public slots:
     void animation(QRect p) {
@@ -146,7 +147,6 @@ public slots:
 
 private slots:
     void rescaleFont(const QString& newText);
-    void copy();
 
 protected:
       virtual bool event(QEvent *);
