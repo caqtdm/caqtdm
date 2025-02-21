@@ -168,7 +168,7 @@ public:
     void setFormatString(const QString m) { thisFormatUserString = m; }
     QString getFormatString() {return thisFormatUserString;}
     QString getMarkedText();
-    void resetMarking();
+    void clearSelection();
     bool getMarkAll() {return m_markAllText;}
     void copy();
 
