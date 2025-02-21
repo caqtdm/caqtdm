@@ -420,6 +420,8 @@ void caMultiLineString::copy()
 }
 
 void caMultiLineString::clearSelection(){
-    textCursor().clearSelection();
+    QTextCursor c = textCursor();
+    c.clearSelection();
+    setTextCursor(c);
 }
 
