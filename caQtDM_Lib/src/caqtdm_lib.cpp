@@ -6707,17 +6707,49 @@ void CaQtDM_Lib::Callback_CopyMarked(){
     QWidget *widg = QApplication::focusWidget();
 
     caLineDraw *draw = qobject_cast<caLineDraw *>(widg);
-    if(draw){ draw->copy(); }
+    if(draw){
+        draw->copy();
+    }
 
     caWaveTable *wavetable = qobject_cast<caWaveTable *>(widg);
-    if(wavetable){ wavetable->copy(); }
+    if(wavetable){
+        wavetable->copy();
+    }
 
     caTable *table = qobject_cast<caTable *>(widg);
-    if(table){ table->copy(); }
+    if(table){
+        table->copy();
+    }
 
     caMultiLineString *multiline = qobject_cast<caMultiLineString *>(widg);
-    if(multiline){ multiline->copy(); }
+    if(multiline){
+        multiline->copy();
+    }
+}
 
+void CaQtDM_Lib::clearCaLineDraw(){
+    QList<caLineDraw *> drawChild = parent()->findChildren<caLineDraw *>();
+
+}
+void CaQtDM_Lib::clearcaLineEdit(){
+    QList<caLineEdit *> editChild = parent()->findChildren<caLineEdit *>();
+}
+void CaQtDM_Lib::clearCaMultiLineString(){
+    QList<caMultiLineString *> multiChild = parent()->findChildren<caMultiLineString *>();
+}
+void CaQtDM_Lib::clearCaWaveTable(){
+    QList<caWaveTable *> waveChild = parent()->findChildren<caWaveTable *>();
+
+    foreach(caWaveTable *wt, waveChild){
+        wt->clearSelection();
+    }
+}
+void CaQtDM_Lib::clearCaTable(){
+    QList<caTable *> tableChild = parent()->findChildren<caTable *>();
+
+    foreach(caTable *tt, tableChild){
+        tt->clearSelection();
+    }
 }
 
 void CaQtDM_Lib::processTerminated()
