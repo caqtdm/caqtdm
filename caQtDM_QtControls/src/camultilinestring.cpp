@@ -419,3 +419,7 @@ void caMultiLineString::copy()
     clipboard->setText(s);
 }
 
+void caMultiLineString::clearSelection(){
+    textCursor().clearSelection();
+}
+

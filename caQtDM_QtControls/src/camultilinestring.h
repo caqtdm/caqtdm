@@ -135,6 +135,7 @@ public:
     void updateAlarmColors();
     void setColors(QColor bg, QColor fg, QColor fr, int lineWidth);
     void copy();
+    void clearSelection();
 
 public slots:
     void animation(QRect p) {
