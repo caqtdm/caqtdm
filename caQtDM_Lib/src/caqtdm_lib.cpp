@@ -6709,28 +6709,42 @@ void CaQtDM_Lib::Callback_CopyMarked(){
     caLineDraw *draw = qobject_cast<caLineDraw *>(widg);
     if(draw){
         draw->copy();
+
+        clearCaMultiLineString();
+        clearcaLineEdit();
+        clearCaWaveTable();
+        clearCaTable();
     }
 
     caWaveTable *wavetable = qobject_cast<caWaveTable *>(widg);
     if(wavetable){
         wavetable->copy();
+
+        clearCaLineDraw();
+        clearCaMultiLineString();
+        clearcaLineEdit();
+        clearCaTable();
     }
 
     caTable *table = qobject_cast<caTable *>(widg);
     if(table){
         table->copy();
+
+        clearCaLineDraw();
+        clearCaMultiLineString();
+        clearcaLineEdit();
+        clearCaWaveTable();
     }
 
     caMultiLineString *multiline = qobject_cast<caMultiLineString *>(widg);
     if(multiline){
         multiline->copy();
-    }
 
-    clearCaLineDraw();
-    clearCaMultiLineString();
-    clearcaLineEdit();
-    clearCaWaveTable();
-    clearCaTable();
+        clearCaLineDraw();
+        clearcaLineEdit();
+        clearCaWaveTable();
+        clearCaTable();
+    }
 }
 
 void CaQtDM_Lib::clearCaLineDraw(){
