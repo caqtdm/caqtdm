@@ -6725,17 +6725,32 @@ void CaQtDM_Lib::Callback_CopyMarked(){
     if(multiline){
         multiline->copy();
     }
+
+    clearCaLineDraw();
+    clearCaMultiLineString();
+    clearcaLineEdit();
+    clearCaWaveTable();
+    clearCaTable();
 }
 
 void CaQtDM_Lib::clearCaLineDraw(){
     QList<caLineDraw *> drawChild = parent()->findChildren<caLineDraw *>();
+    foreach(caLineDraw *ld, drawChild){
+        ld->clearSelection();
+    }
 
 }
 void CaQtDM_Lib::clearcaLineEdit(){
     QList<caLineEdit *> editChild = parent()->findChildren<caLineEdit *>();
+    foreach(caLineEdit *le, editChild){
+        le->setSelection(0,0);
+    }
 }
 void CaQtDM_Lib::clearCaMultiLineString(){
     QList<caMultiLineString *> multiChild = parent()->findChildren<caMultiLineString *>();
+    foreach(caMultiLineString *mls, multiChild){
+        mls->clearSelection();
+    }
 }
 void CaQtDM_Lib::clearCaWaveTable(){
     QList<caWaveTable *> waveChild = parent()->findChildren<caWaveTable *>();
