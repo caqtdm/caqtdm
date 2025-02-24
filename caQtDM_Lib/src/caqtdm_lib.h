@@ -423,7 +423,7 @@ private:
     void clearCaMultiLineString();
     void clearCaWaveTable();
     void clearCaTable();
-    void clearcaLineEdit();
+    void clearCaLineEdit();
 
 #ifndef MOBILE
     myQProcess *proc;
@@ -517,6 +517,7 @@ private slots:
 
     void Callback_WriteDetectedValues(QWidget* w);
     void Callback_CopyMarked();
+    void clearSelection();
 
     void Callback_ReloadWindowL() {
 

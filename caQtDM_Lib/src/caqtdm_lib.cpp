@@ -692,6 +692,9 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     QShortcut *CopyMarking = new QShortcut(tr("Ctrl+C"), this);
     connect(CopyMarking, SIGNAL(activated()), this, SLOT(Callback_CopyMarked()));
 
+    // Ctrl+Shift+D was selected arbitrarily -> "Deselect" everything currently marked
+    QShortcut *DeSelect = new QShortcut(tr("Ctrl+Shift+D"), this);
+    connect(DeSelect, SIGNAL(activated()), this, SLOT(clearSelection()));
 
     char asc[MAX_STRING_LENGTH];
     QString path = thisFileFull;
@@ -6703,6 +6706,14 @@ void CaQtDM_Lib::Callback_ScriptButton()
 #endif
 }
 
+void CaQtDM_Lib::clearSelection(){
+    clearCaLineDraw();
+    clearCaMultiLineString();
+    clearCaLineEdit();
+    clearCaWaveTable();
+    clearCaTable();
+}
+
 void CaQtDM_Lib::Callback_CopyMarked(){
     QWidget *widg = QApplication::focusWidget();
 
@@ -6711,7 +6722,7 @@ void CaQtDM_Lib::Callback_CopyMarked(){
         draw->copy();
 
         clearCaMultiLineString();
-        clearcaLineEdit();
+        clearCaLineEdit();
         clearCaWaveTable();
         clearCaTable();
     }
@@ -6722,7 +6733,7 @@ void CaQtDM_Lib::Callback_CopyMarked(){
 
         clearCaLineDraw();
         clearCaMultiLineString();
-        clearcaLineEdit();
+        clearCaLineEdit();
         clearCaTable();
     }
 
@@ -6732,7 +6743,7 @@ void CaQtDM_Lib::Callback_CopyMarked(){
 
         clearCaLineDraw();
         clearCaMultiLineString();
-        clearcaLineEdit();
+        clearCaLineEdit();
         clearCaWaveTable();
     }
 
@@ -6741,9 +6752,19 @@ void CaQtDM_Lib::Callback_CopyMarked(){
         multiline->copy();
 
         clearCaLineDraw();
-        clearcaLineEdit();
+        clearCaLineEdit();
         clearCaWaveTable();
         clearCaTable();
+    }
+
+    caLineEdit *lineedit = qobject_cast<caLineEdit *>(widg);
+    if(lineedit){
+        lineedit->copy();
+
+        clearCaLineDraw();
+        clearCaWaveTable();
+        clearCaTable();
+        clearCaMultiLineString();
     }
 }
 
@@ -6754,7 +6775,7 @@ void CaQtDM_Lib::clearCaLineDraw(){
     }
 
 }
-void CaQtDM_Lib::clearcaLineEdit(){
+void CaQtDM_Lib::clearCaLineEdit(){
     QList<caLineEdit *> editChild = parent()->findChildren<caLineEdit *>();
     foreach(caLineEdit *le, editChild){
         le->setSelection(0,0);
