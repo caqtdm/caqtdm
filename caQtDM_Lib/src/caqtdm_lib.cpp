@@ -6718,54 +6718,19 @@ void CaQtDM_Lib::Callback_CopyMarked(){
     QWidget *widg = QApplication::focusWidget();
 
     caLineDraw *draw = qobject_cast<caLineDraw *>(widg);
-    if(draw){
-        draw->copy();
-
-        clearCaMultiLineString();
-        clearCaLineEdit();
-        clearCaWaveTable();
-        clearCaTable();
-    }
+    if(draw){ draw->copy(); }
 
     caWaveTable *wavetable = qobject_cast<caWaveTable *>(widg);
-    if(wavetable){
-        wavetable->copy();
-
-        clearCaLineDraw();
-        clearCaMultiLineString();
-        clearCaLineEdit();
-        clearCaTable();
-    }
+    if(wavetable){ wavetable->copy(); }
 
     caTable *table = qobject_cast<caTable *>(widg);
-    if(table){
-        table->copy();
-
-        clearCaLineDraw();
-        clearCaMultiLineString();
-        clearCaLineEdit();
-        clearCaWaveTable();
-    }
+    if(table){ table->copy(); }
 
     caMultiLineString *multiline = qobject_cast<caMultiLineString *>(widg);
-    if(multiline){
-        multiline->copy();
-
-        clearCaLineDraw();
-        clearCaLineEdit();
-        clearCaWaveTable();
-        clearCaTable();
-    }
+    if(multiline){ multiline->copy(); }
 
     caLineEdit *lineedit = qobject_cast<caLineEdit *>(widg);
-    if(lineedit){
-        lineedit->copy();
-
-        clearCaLineDraw();
-        clearCaWaveTable();
-        clearCaTable();
-        clearCaMultiLineString();
-    }
+    if(lineedit){ lineedit->copy(); }
 }
 
 void CaQtDM_Lib::clearCaLineDraw(){
