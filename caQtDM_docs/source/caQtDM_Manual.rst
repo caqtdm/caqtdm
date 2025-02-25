@@ -1584,7 +1584,7 @@ curves
       when either one changes, in the case of X, Y Scalar) a new point
       is plotted until there are Count points. The points are plotted
       from i = 0 to the lesser of Count -1 and the number of updates.
-      When the Plot Mode is "PlotNPointsAndStop",ù no more points are
+      When the Plot Mode is "PlotNPointsAndStop", no more points are
       plotted. When the Plot Mode is "PlotLastNPoints", the earliest point
       is discarded and the others are moved down, and the latest is
       plotted at the end. In the cases where one of the process
@@ -2806,7 +2806,7 @@ other string, both on the command line and when calling a `related
 display <#RelatedDisplay>`__. Specific directions for each of these
 cases are given in the correspoonding sections of the manual. In
 general, there is an argument string with the form
-``name1=value1[,name2=value2]...``.  All occurrences of "(name1)"ù in the
+``name1=value1[,name2=value2]...``.  All occurrences of "(name1)" in the
 ``.ui`` file are replaced with "value1", then all occurences of $(name2)
 are replaced by value2, *etc*. The substitition is recursive; that is,
 if value1 contains an occurrence of $(name2), then when name2=value2
@@ -2964,7 +2964,7 @@ You have to first write the source characters you want to replace, then an equal
 character replacements, seperate them by semicolon (;). Parts that dont contain an equal sign but are seperated from other parts with semicolon are ignored. All put together this would be the structure:
 CAQTDM_CUSTOM_UNIT_REPLACEMENTS={sourceCharacters}={replacementCharacters};{anotherReplacement}
 An example (that doesnt make much sense but displays many possibilities) would be:
-CAQTDM_CUSTOM_UNIT_REPLACEMENTS=charsToReplace=charsToUse;0x48,0x68=bye;charsWithHex,0x4f=something;∞=o
+CAQTDM_CUSTOM_UNIT_REPLACEMENTS=charsToReplace=charsToUse;0x48,0x68=bye;charsWithHex,0x4f=something;
 It can be seen that all combinations of strings, hex- and deciaml character codes are possible to form a source or replacement string.
 All replacements will be done sequentially, with the leftmost replacements being done first. Therefore, it can also be possible, that later replacements replace characters in a string
 that has already been replaced before by another replacements.
