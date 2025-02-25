@@ -2976,6 +2976,28 @@ CAQTDM_DEFAULT_UNIT_REPLACEMENTS
 It is not recommended to disable them, as they are tested on all common systems and should be working with most clients, however disabling might help
 in some edge cases.
 
+Copying and selecting Text
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Multiple widgets support some kind of selection of their displayed values. All of them also enable copying of their values into the clipboard.
+They do not behave exactly the same, but their differences are relatively minor and mostly in how they are implemented: 
+
++------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
+| Widget                 | Ctrl+C | Ctrl+A | Behaviour on Single Click| Behaviour on Double-Click   |  Selection on Change  |
++========================+========+========+==========================+=============================+=======================+
+| caLineDraw             |  true  |  true  |  nothing                 |  marks entire text          |  retained             |
++------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
+| caLineEdit             |  true  |  true  |  nothing                 |  marks entire text          |  lost                 |
++------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
+| caMultiLineString      |  true  |  true  |  nothing                 |  marks entire text          |  not tested           |
++------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
+| caTable                |  true  |  true  |  marks current cell      |  deselects current cell     |  retained             |
++------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
+| caWaveTable            |  true  |  true  |  marks current cell      |  enables editing of cell    |  not tested           |
++------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
+| caTextEntry            |  true  |  true  |  enables editing of cell |  marks entire text          |  lost                 |
++------------------------+--------------------------------------------+-----------------------------+-----------------------+
+
 .. _env.var:
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
