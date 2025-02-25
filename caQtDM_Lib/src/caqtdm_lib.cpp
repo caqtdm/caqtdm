@@ -692,8 +692,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     QShortcut *CopyMarking = new QShortcut(tr("Ctrl+C"), this);
     connect(CopyMarking, SIGNAL(activated()), this, SLOT(Callback_CopyMarked()));
 
-    // Ctrl+Shift+D was selected arbitrarily -> "Deselect" everything currently marked
-    QShortcut *DeSelect = new QShortcut(tr("Ctrl+Shift+D"), this);
+    // Ctrl+Alt+D was selected arbitrarily -> "Deselect" everything currently marked
+    QShortcut *DeSelect = new QShortcut(tr("Ctrl+Alt+D"), this);
     connect(DeSelect, SIGNAL(activated()), this, SLOT(clearSelection()));
 
     char asc[MAX_STRING_LENGTH];

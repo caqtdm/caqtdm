@@ -2982,6 +2982,7 @@ Copying and selecting Text
 Multiple widgets support some kind of selection of their displayed values. All of them also enable copying of their values into the clipboard.
 They do not behave exactly the same, but their differences are relatively minor and mostly in how they are implemented: 
 
+**Comparison**
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
 | Widget                 | Ctrl+C | Ctrl+A | Behaviour on Single Click| Behaviour on Double-Click   |  Selection on Change  |
 +========================+========+========+==========================+=============================+=======================+
@@ -2997,6 +2998,27 @@ They do not behave exactly the same, but their differences are relatively minor 
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
 | caTextEntry            |  true  |  true  |  enables editing of cell |  marks entire text          |  lost                 |
 +------------------------+--------------------------------------------+-----------------------------+-----------------------+
+
+**Shortcuts**
+Although the widgets might work differently, the shortcuts are the same across all of them. The shortcuts use, if any exists, the industry standard that most people are familiar with.
+When no industry standard is available, caQtDM uses the Combination ``Ctrl+Alt``, in combination with the first letter of the action performed (Ex. **R** for **R**eload in ``Ctrl+Alt+R``).
+
++------------------+-----------------------------------------------------+
+| ``Ctrl+C``       | Copies currently selected text to clipboard         |
++------------------+-----------------------------------------------------+
+| ``Ctrl+A``       | Selects entirety of the text inside a widget        |
++------------------+-----------------------------------------------------+
+| ``Ctrl+Alt+D``   | Removes selection from all widgets currently marked |
++------------------+-----------------------------------------------------+
+| ``Ctrl+R``       | Reload current window                               |
++------------------+-----------------------------------------------------+
+| ``Ctrl+Alt+R``   | Reload all windows                                  |
++------------------+-----------------------------------------------------+
+| ``Ctrl+O``       | Open File                                           |
++------------------+-----------------------------------------------------+
+| ``Ctrl+P``       | Print                                               |
++------------------+-----------------------------------------------------+
+
 
 .. _env.var:
 Environment Variables
