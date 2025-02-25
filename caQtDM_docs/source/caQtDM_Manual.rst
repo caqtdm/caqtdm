@@ -2990,11 +2990,11 @@ They do not behave exactly the same, but their differences are relatively minor 
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
 | caLineEdit             |  true  |  true  |  nothing                 |  marks entire text          |  lost                 |
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
-| caMultiLineString      |  true  |  true  |  nothing                 |  marks entire text          |  not tested           |
+| caMultiLineString      |  true  |  true  |  nothing                 |  marks entire text          |  lost                 |
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
 | caTable                |  true  |  true  |  marks current cell      |  deselects current cell     |  retained             |
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
-| caWaveTable            |  true  |  true  |  marks current cell      |  enables editing of cell    |  not tested           |
+| caWaveTable            |  true  |  true  |  marks current cell      |  enables editing of cell    |  lost                 |
 +------------------------+--------+--------+--------------------------+-----------------------------+-----------------------+
 | caTextEntry            |  true  |  true  |  enables editing of cell |  marks entire text          |  lost                 |
 +------------------------+--------------------------------------------+-----------------------------+-----------------------+
