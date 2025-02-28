@@ -115,7 +115,7 @@ int ArchiveHTTP_Plugin::initCommunicationLayer(MutexKnobData *data,
                 QString mess("ArchiveHTTP plugin -- failed to retrieve available backends from: "
                              + reply->url().toString() + ", Error: " + reply->errorString());
                 if (m_messageWindowP != (MessageWindow *) Q_NULLPTR) {
-                    m_messageWindowP->postMsgEvent(QtFatalMsg, (char *) qasc(mess));
+                    m_messageWindowP->postMsgEvent(QtWarningMsg, (char *) qasc(mess));
                 }
             }
             reply->deleteLater();
