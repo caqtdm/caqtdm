@@ -434,7 +434,10 @@ void caLineEdit::setValue(double value, const QString& units)
       } else {
         snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
-    } else if(thisFormatType == hexadecimal || thisFormatType == octal || thisFormatType == user_defined_format)  {
+    } else if (thisFormatType == user_defined_format) {
+        if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
+        else snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
+    } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
         if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
         else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {
