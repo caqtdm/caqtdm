@@ -38,7 +38,7 @@
 #define DEFAULT_FORMAT_WIDTH 6
 #define DEFAULT_FORMAT_PRECISION 2
 
-zOrder zorder[10000];
+zOrder zorder[zorder_size];
 int zindex=0;
 
 /*
@@ -155,10 +155,12 @@ void Qt_writeOpenTag(char *tag, char *typ, char *value)
 void Qt_writeCloseTag(char *tag, char *value, int visibilityStatic)
 {
     if(!strcmp(tag, "widget") && strstr(value, "ca")) {
+
         strcpy(zorder[zindex].z, value);
         zorder[zindex].vis = visibilityStatic;
         zorder[zindex].indx = zindex;
-        zindex++;
+        if (zindex<zorder_size) zindex++;
+                else printf("Error: to many Layers(%i)\n",zindex);
     }
     C_writeCloseTag(myParserPtr, tag);
 }

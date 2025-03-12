@@ -28,6 +28,8 @@
 
 limitsCartesianplotDialog::limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent) : QWidget(parent)
 {
+    m_channelScalingWasReset = false;
+
     bool ok1, ok2;
     QString xmin, xmax,  ymin, ymax;
     int thisWidth = 650;
@@ -272,6 +274,7 @@ void limitsCartesianplotDialog::applyClicked()
                 } else {
                     //qDebug() << "set to auto";
                     CartesianPlot->setXscaling(caCartesianPlot::Auto);
+                    m_channelScalingWasReset = true;
                 }
              }
         }
@@ -299,6 +302,7 @@ void limitsCartesianplotDialog::applyClicked()
                 } else {
                     //qDebug() << "set to auto";
                     CartesianPlot->setYscaling(caCartesianPlot::Auto);
+                    m_channelScalingWasReset = true;
                 }
              }
         }

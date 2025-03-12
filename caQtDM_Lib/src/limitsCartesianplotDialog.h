@@ -68,6 +68,9 @@
 
      limitsCartesianplotDialog(caCartesianPlot *w, MutexKnobData *data, const QString &title, QWidget *parent);
      void exec();
+     bool getChannelScalingWasReset() {
+         return m_channelScalingWasReset;
+     };
 
  public slots:
      void cancelClicked();
@@ -92,6 +95,7 @@
      MutexKnobData *monData;
      QDialogButtonBox *buttonBox;
      QEventLoop loop;
+     bool m_channelScalingWasReset;
  };
 
 
