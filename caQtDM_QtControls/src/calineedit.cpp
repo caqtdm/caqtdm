@@ -426,7 +426,7 @@ void caLineEdit::setFormat(int prec)
         }
     }
 }
-#pragma optimize( "", off )
+
 void caLineEdit::setValue(double value, const QString& units)
 {
     char asc[MAX_STRING_LENGTH];
@@ -491,7 +491,7 @@ void caLineEdit::setValue(double value, const QString& units)
         setTextLine(asc);
     }
 }
-#pragma optimize( "", on )
+
 void caLineEdit::appendUnits(const QString& units)
 {
     specialUnitsAppend = true;
