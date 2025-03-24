@@ -3756,7 +3756,7 @@ void CaQtDM_Lib::FlushAllInterfaces()
  */
 int CaQtDM_Lib::addMonitor(QWidget *thisW, knobData *kData, QString pv, QWidget *w, int *specData, QMap<QString, QString> map, QString *pvRep)
 {
-    QMutex *mutex;
+    QMutex *mutex= Q_NULLPTR;
     struct timeb now;
     bool doNothing = false;
 
