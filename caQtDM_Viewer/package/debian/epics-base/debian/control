@@ -1,0 +1,13 @@
+Source: epics-base
+Section: science
+Priority: optional
+Maintainer: Your Name <your.email@example.com>
+Build-Depends: debhelper (>= 12), debhelper-compat (= 12), libreadline-dev, libncurses-dev, perl
+Standards-Version: 4.5.0
+Homepage: https://epics-controls.org
+
+Package: epics-base
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, libreadline8, libncurses6, perl
+Description: Experimental Physics and Industrial Control System
+ EPICS is a set of software tools and libraries used for building distributed control systems.

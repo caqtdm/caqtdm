@@ -1,0 +1,17 @@
+Source: caqtdm
+Section: sciences
+Priority: optional
+Maintainer: Your Name <your.email@example.com>
+Build-Depends: debhelper (>= 12), debhelper-compat (= 12), qtbase5-dev, qt5-qmake, libqwt-qt5-dev, epics-base, python3-dev, qttools5-dev, qttools5-dev, libqt5svg5-dev, libqt5x11extras5-dev, libcom-dev, libzmq3-dev
+Standards-Version: 4.5.0
+Homepage: http://caqtdm.github.io/
+
+Package: caqtdm
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqwt-qt5-6, epics-base, python3, libqt5designer5, libqt5svg5
+Description: Qt Widgets for Technical Applications
+  caQtDM offers a collection of special widgets in order to display and control control system data in various ways. 
+  The widgets have been inspired from the well known MEDM package used at many EPICS sites. 
+  However caQtDM is not restricted to EPICS and can/could also support other control systems. 
+  At PSI caQtDM is used at several facilities and controls not only EPICS, but also simultaneously an older house-made system. 
+  Moreover support has already been introduced for EPICS4, but is still in development.
