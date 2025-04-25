@@ -6707,11 +6707,32 @@ void CaQtDM_Lib::Callback_ScriptButton()
 }
 
 void CaQtDM_Lib::clearSelection(){
-    clearCaLineDraw();
-    clearCaMultiLineString();
-    clearCaLineEdit();
-    clearCaWaveTable();
-    clearCaTable();
+
+    QList<caLineDraw *> drawChild = parent()->findChildren<caLineDraw *>();
+    foreach(caLineDraw *ld, drawChild){
+        ld->clearSelection();
+    }
+
+    QList<caLineEdit *> editChild = parent()->findChildren<caLineEdit *>();
+    foreach(caLineEdit *le, editChild){
+        le->setSelection(0,0);
+    }
+
+    QList<caMultiLineString *> multiChild = parent()->findChildren<caMultiLineString *>();
+    foreach(caMultiLineString *mls, multiChild){
+        mls->clearSelection();
+    }
+
+    QList<caWaveTable *> waveChild = parent()->findChildren<caWaveTable *>();
+    foreach(caWaveTable *wt, waveChild){
+        wt->clearSelection();
+    }
+
+    QList<caTable *> tableChild = parent()->findChildren<caTable *>();
+
+    foreach(caTable *tt, tableChild){
+        tt->clearSelection();
+    }
 }
 
 void CaQtDM_Lib::Callback_CopyMarked(){
@@ -6731,40 +6752,6 @@ void CaQtDM_Lib::Callback_CopyMarked(){
 
     caLineEdit *lineedit = qobject_cast<caLineEdit *>(widg);
     if(lineedit){ lineedit->copy(); }
-}
-
-void CaQtDM_Lib::clearCaLineDraw(){
-    QList<caLineDraw *> drawChild = parent()->findChildren<caLineDraw *>();
-    foreach(caLineDraw *ld, drawChild){
-        ld->clearSelection();
-    }
-
-}
-void CaQtDM_Lib::clearCaLineEdit(){
-    QList<caLineEdit *> editChild = parent()->findChildren<caLineEdit *>();
-    foreach(caLineEdit *le, editChild){
-        le->setSelection(0,0);
-    }
-}
-void CaQtDM_Lib::clearCaMultiLineString(){
-    QList<caMultiLineString *> multiChild = parent()->findChildren<caMultiLineString *>();
-    foreach(caMultiLineString *mls, multiChild){
-        mls->clearSelection();
-    }
-}
-void CaQtDM_Lib::clearCaWaveTable(){
-    QList<caWaveTable *> waveChild = parent()->findChildren<caWaveTable *>();
-
-    foreach(caWaveTable *wt, waveChild){
-        wt->clearSelection();
-    }
-}
-void CaQtDM_Lib::clearCaTable(){
-    QList<caTable *> tableChild = parent()->findChildren<caTable *>();
-
-    foreach(caTable *tt, tableChild){
-        tt->clearSelection();
-    }
 }
 
 void CaQtDM_Lib::processTerminated()

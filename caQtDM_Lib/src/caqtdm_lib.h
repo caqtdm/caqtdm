@@ -419,12 +419,6 @@ private:
     QString savedMacro[CAQTDM_MAX_INCLUDE_LEVEL];
     QString savedFile[CAQTDM_MAX_INCLUDE_LEVEL];
 
-    void clearCaLineDraw();
-    void clearCaMultiLineString();
-    void clearCaWaveTable();
-    void clearCaTable();
-    void clearCaLineEdit();
-
 #ifndef MOBILE
     myQProcess *proc;
 #endif
