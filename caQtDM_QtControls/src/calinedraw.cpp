@@ -339,15 +339,15 @@ void caLineDraw::mousePressEvent(QMouseEvent *event)
 }
 
 void caLineDraw::mouseReleaseEvent(QMouseEvent *event){
-    QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+    QList<caLineDraw *> lineDrawList = (parent()->findChildren<caLineDraw *>());
 
-    // Remove currently Marked Instance rom list
+    // Remove currently Marked Instance from list
     lineDrawList.removeAt(lineDrawList.indexOf(this));
 
     QString s = m_Text;
     if(s[s.length()-1] == QString(" ")){
-        s.removeAt(s.length()-1);
-        qDebug() << s;
+        s.remove(s.length()-1,1);
+        //qDebug() << s;
     }
 
     qDebug() << this->thisPV << m_Text << s;
@@ -390,7 +390,7 @@ void caLineDraw::keyPressEvent(QKeyEvent *event){
     }
 
     if(keyPressed == Qt::Key_Escape){
-        QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+        QList<caLineDraw *> lineDrawList = (parent()->findChildren<caLineDraw *>());
         for(int i = 0; i <= lineDrawList.size() -1; i++){
             lineDrawList[i]->clearSelection();
         }
@@ -1048,7 +1048,7 @@ void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& 
 
 void caLineDraw::copy(){
     QClipboard *clipboard = QApplication::clipboard();
-    QList lineDrawList = parent()->findChildren<caLineDraw *>();
+    QList<caLineDraw *> lineDrawList = parent()->findChildren<caLineDraw *>();
 
     QString copyString;
     int markedCount = 0;
