@@ -31,7 +31,11 @@
 #include <QMouseEvent>
 #include <qnumeric.h>
 #include "knobDefines.h"
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    #include <QRegExp>
+#else
+    #include <QRegularExpression>
+#endif
 #if defined(_MSC_VER)
     #ifndef snprintf
      #define snprintf _snprintf
@@ -435,7 +439,20 @@ void caLineEdit::setValue(double value, const QString& units)
       } else {
         snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
-    } else if(thisFormatType == hexadecimal || thisFormatType == octal || thisFormatType == user_defined_format)  {
+    } else if (thisFormatType == user_defined_format) {
+        QString pattern = QString("%[+\\- 0#]*[0-9]*([.][0-9]+)?[aefgAEFG]");
+        bool isDouble=false;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QRegExp rx(pattern);
+        isDouble=rx.indexIn(thisFormat)!=-1;
+#else
+        QRegularExpression rx(pattern);
+        QRegularExpressionMatch match = rx.match(thisFormat);
+        isDouble=match.hasMatch();
+#endif
+        if(isDouble) snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
+        else snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
+    } else if(thisFormatType == hexadecimal || thisFormatType == octal)  {
         if(thisDatatype == caDOUBLE) snprintf(asc, MAX_STRING_LENGTH, thisFormat, (long long) value);
         else  snprintf(asc, MAX_STRING_LENGTH, thisFormat, (int) value);
     } else if(thisFormatType == truncated) {

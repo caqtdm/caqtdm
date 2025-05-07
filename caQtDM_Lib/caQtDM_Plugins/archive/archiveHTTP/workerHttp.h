@@ -87,7 +87,7 @@ signals:
 private:
     void setCartesianLimits(caCartesianPlot *cartesianWidget, double startSeconds, double endSeconds, double timeBuffer = -1);
 
-    UrlHandlerHttp *initializeNewUrlHandler(QString url, indexes channelData, bool useHttps, bool isBinned, double endSeconds, double startSeconds = 0);
+    UrlHandlerHttp *initializeNewUrlHandler(QString url, indexes channelData, bool isBinned, double endSeconds, double startSeconds = 0);
 
     quint64 updateStartSecondsFromMutexKnobData(int index, double currentStartSeconds);
 

@@ -84,7 +84,7 @@ public:
      * enables to generate the url for getting the valid backend list request
      * */
     bool BackendListRequest() const;
-    void setBackeendListRequest(const bool &newbackendlist);
+    void setBackendListRequest(const bool &newBackendList);
 
     /*
      * Returns whether or not the url is configured to request binned data.
@@ -131,7 +131,7 @@ private:
     QUrl m_hostName;
     bool m_usesHttps;
     bool m_binned;
-    bool m_backendlist;
+    bool m_backendList;
     int m_binCount;
     QString m_backend;
     QString m_channelName;

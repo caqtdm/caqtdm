@@ -1237,7 +1237,7 @@ is the equivalent of the Text Update in MEDM.
       |                                  | absolaute precision from user or |
       |                                  | channel                          |
       +----------------------------------+----------------------------------+
-      | compact                          | value encode in e or f format    |
+      | compact                          | value encoded in e or f format   |
       |                                  | using absolaute precision from   |
       |                                  | user or channel, format will     |
       |                                  | switch to e format for values    |
@@ -1254,6 +1254,11 @@ is the equivalent of the Text Update in MEDM.
       +----------------------------------+----------------------------------+
       | string                           | will be treated as decimal       |
       |                                  | format                           |
+      +----------------------------------+----------------------------------+
+      | user_defined_format              | takes a c printf style format    |
+      |                                  | string taking a float if the     |
+      |                                  | channel has the type of double   |
+      |                                  | and an int if not                |
       +----------------------------------+----------------------------------+
 
 --------------
@@ -3110,14 +3115,20 @@ caQtDM uses the following environment variables:
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_ARCHIVEHTTP_URL``            | point the archiveHTTP plugin to a different backend       |
 +---------------------------------------+-----------------------------------------------------------+
-| ``CAQTDM_ARCHIVEHTTP_BACKEND``        | Specify the "backend" parameter for archiver api queries. |
-|                                       | This can be overwritten by the dynamic property "backend".|
+| ``CAQTDM_ARCHIVEHTTP_DEFAULT_BACKEND``| Specify the "backend" parameter for archiver api queries, |
+|                                       | which is used if none is set in the widget.               |
++---------------------------------------+-----------------------------------------------------------+
+|``CAQTDM_ARCHIVEHTTP_OVERRIDE_BACKEND``| Overrides any other definition of the "backend" paramter  |
+|                                       | for queries, including dynamic properties in the widget.  |
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_ARCHIVEHTTP_APIPATH_BINNED`` | Overwrite the default api path for binned data.           |
 |                                       | Needs to be in the format: /path/to/binned                |
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_ARCHIVEHTTP_APIPATH_RAW``    | Overwrite the default api path for raw data (events).     |
 |                                       | Needs to be in the format: /path/to/events                |
++---------------------------------------+-----------------------------------------------------------+
+| ``CAQTDM_ARCHIVEHTTP_APIPATH_LIST``   | Overwrite the default path to fetch the list of available |
+|                                       | backends. Needs to be in the format: /path/to/backend/list|
 +---------------------------------------+-----------------------------------------------------------+
 | ``CAQTDM_OPTIMIZE_EPICS3CONNECTIONS`` | Disable Epics3 connections when tabwidget is not active   |
 |                                       | Set to "TRUE" to activate                                 |

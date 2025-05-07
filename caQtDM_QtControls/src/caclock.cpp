@@ -51,7 +51,7 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     setPalette( colorTheme( thisBaseColor.darker( 150 ) ) );
 
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#if QWT_VERSION < QT_VERSION_CHECK(6, 2, 0)
     scaleDraw()->setPenWidth(3);
 #else
     scaleDraw()->setPenWidthF(3);

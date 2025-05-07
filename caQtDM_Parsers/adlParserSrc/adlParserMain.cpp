@@ -31,7 +31,7 @@
 #include "dmsearchfile.h"
 #include <QDebug>
 #include <QFileInfo>
-
+#define zorder_size 20000
 
 extern "C" TOKEN parseAndAppendDisplayList(DisplayInfo *displayInfo, FrameOffset *offset, char *firstToken, TOKEN firstTokenType);
 extern "C" TOKEN getToken(DisplayInfo *displayInfo, char *word);
@@ -53,7 +53,7 @@ typedef struct _zOrder {
     string40 z;
 } zOrder;
 
-extern "C" zOrder zorder[1000];
+extern "C" zOrder zorder[zorder_size];
 extern "C" int zindex;
 extern "C" char filePrefix[128];
 

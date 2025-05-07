@@ -374,7 +374,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             }
             // get average timestamp in seconds
             archiveTime = secondsAnchor
-                          + ((FirstMsJson[i].toInt() + LastMsJson[i].toInt()) / 2000);
+                          + ((FirstMsJson[i].toInt() + LastMsJson[i].toInt()) / 2000.0);
 
             // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
             if (archiveTime) {
@@ -383,7 +383,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                     if (!m_isAbsoluteTimeAxis) {
                         m_vecX.append(-(seconds - archiveTime) / 3600.0);
                     } else {
-                        m_vecX.append(archiveTime * 1000);
+                        m_vecX.append(archiveTime * 1000.0);
                     }
                     m_vecY.append(avg);
                     m_vecMinY.append(min);
@@ -406,7 +406,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
             }
 
             // get timestamp in seconds
-            archiveTime = secondsAnchor + (MsJson[i].toInt() / 1000);
+            archiveTime = secondsAnchor + (MsJson[i].toInt() / 1000.0);
 
             // fill in our data, yes this step is redundant (same code for binned and non binned), but to do this in a seperate loop would butcher performance
             if (archiveTime) {
@@ -415,7 +415,7 @@ void HttpRetrieval::finishReply(QNetworkReply *reply)
                     if (!m_isAbsoluteTimeAxis) {
                         m_vecX.append(-(seconds - archiveTime) / 3600.0);
                     } else {
-                        m_vecX.append(archiveTime * 1000);
+                        m_vecX.append(archiveTime * 1000.0);
                     }
                     m_vecY.append(value);
                     count++;

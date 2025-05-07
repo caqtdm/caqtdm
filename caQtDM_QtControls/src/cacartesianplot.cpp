@@ -44,6 +44,9 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
     thisToBeTriggered = false;
     thisTriggerNow = true;
+    thisTriggerPV = "";
+    thisErasePV = "";
+    thisCountPV = "";
     thisCountNumber = 0;
     thisXaxisSyncGroup = 0;
     thisXticks = 5;
@@ -147,9 +150,11 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setColor_5(Qt::green);
     setColor_6(Qt::magenta);
 
-    thisLegendshow = false;
+    setLegendEnabled(false);
     setXaxisEnabled(true);
     setYaxisEnabled(true);
+    setXaxisType(axisType::linear);
+    setYaxisType(axisType::linear);
     setXscaling(Auto);
     setYscaling(Auto);
     setXaxisLimits("0;1");

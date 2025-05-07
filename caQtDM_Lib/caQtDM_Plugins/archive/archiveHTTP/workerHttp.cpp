@@ -91,7 +91,6 @@ void WorkerHTTP::getFromArchive(indexes indexNew,
     // Initialize urlhandler with all parameters except startSeconds, as this will be changed
     UrlHandlerHttp *urlHandler = initializeNewUrlHandler(index_name,
                                                          indexNew,
-                                                         false,
                                                          isBinned,
                                                          endSeconds);
 
@@ -326,7 +325,6 @@ void WorkerHTTP::setCartesianLimits(caCartesianPlot *cartesianWidget,
 
 UrlHandlerHttp *WorkerHTTP::initializeNewUrlHandler(QString url,
                                                     indexes channelData,
-                                                    bool useHttps,
                                                     bool isBinned,
                                                     double endSeconds,
                                                     double startSeconds)
@@ -345,7 +343,6 @@ UrlHandlerHttp *WorkerHTTP::initializeNewUrlHandler(QString url,
     }
 
     // Set other parameters
-    urlHandler->setUsesHttps(useHttps);
     urlHandler->setBackend(channelData.backend);
     urlHandler->setChannelName(channelData.pv);
     urlHandler->setBinned(isBinned);
@@ -373,6 +370,8 @@ quint64 WorkerHTTP::updateStartSecondsFromMutexKnobData(int index, double curren
         // Data is stored in miliseconds but we want seconds so convert it
         newStartSeconds = (reinterpret_cast<double *>(kData.edata.dataB)[kData.edata.valueCount - 1]
                            / 1000);
+        if (newStartSeconds<currentStartSeconds) newStartSeconds = currentStartSeconds;
+
     }
     m_mutexKnobDataPtr->DataUnlock(&kData);
 
