@@ -493,7 +493,8 @@ caQtDM_Lib {
                 INCLUDEPATH += ./caQtDM_Plugins
 		ios {
       			INCLUDEPATH += $(EPICSINCLUDE)/os/iOS
-                        INCLUDEPATH   += $(EPICSINCLUDE)/compiler/clang
+                        INCLUDEPATH += $(EPICSINCLUDE)/compiler/clang
+                        INCLUDEPATH += $(QTHOME)/include
 # this instruction is actually needed for me while the build does not work for multiple architectures
                         QMAKE_CXXFLAGS_RELEASE -= -O2
 		}
@@ -720,7 +721,7 @@ caQtDM_Viewer {
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
                     target.name=IPHONEOS_DEPLOYMENT_TARGET
-                    target.value = 16.0
+                    target.value = 18.0
 
                     QMAKE_MAC_XCODE_SETTINGS += target
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME

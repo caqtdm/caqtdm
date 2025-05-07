@@ -52,7 +52,7 @@ unix {
 
 
 # Set the overall Deployment Target for MACOSX
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 14.0
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 15.0
 
 # at psi the designer in 4.8.2 is patched in order to display tooltip description (not a nice test, but for now ok)
 # when the qt version is higher then 5.5.0 then we can also compile the plugins with description texts
