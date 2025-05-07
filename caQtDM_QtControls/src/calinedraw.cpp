@@ -312,28 +312,56 @@ bool caLineDraw::rotateText(float degrees)
     return false;
 }
 
+void caLineDraw::clearSelection(){
+    m_LetterMarkedList.clear();
+    m_LettersBoundingRects.clear();
+    m_markAllText = false;
+    if(m_Text.size() > 0){
+        for(int i = 0; i <= m_Text.size() ; i++){
+            m_LetterMarkedList << false;
+        }
+    }
+    update();
+}
+
 void caLineDraw::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton){
 
         m_MouseClickPosition = calculateCoordinates(event->pos());
-
         // Reset Marking
-        m_LetterMarkedList.clear();
-        m_LettersBoundingRects.clear();
-        m_markAllText = false;
-        if(m_Text.size() > 0){
-            for(int i = 0; i <= m_Text.size() ; i++){
-                m_LetterMarkedList << false;
-            }
-        }
-
-        update();
+        clearSelection();
     }
 
     if(event->buttons() == Qt::LeftButton || event->buttons() == Qt::RightButton){
         setFocus();
     }
+}
+
+void caLineDraw::mouseReleaseEvent(QMouseEvent *event){
+    QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+
+    // Remove currently Marked Instance rom list
+    lineDrawList.removeAt(lineDrawList.indexOf(this));
+
+    QString s = m_Text;
+    if(s[s.length()-1] == QString(" ")){
+        s.removeAt(s.length()-1);
+        qDebug() << s;
+    }
+
+    qDebug() << this->thisPV << m_Text << s;
+    if(s != getMarkedText() && s.length() > 0){
+        for(int i = 0; i <= lineDrawList.size() -1; i++){
+           // lineDrawList[i]->resetMarking();
+        }
+        update();
+    }
+}
+
+void caLineDraw::mouseDoubleClickEvent(QMouseEvent *event){
+    m_markAllText = true;
+    update();
 }
 
 void caLineDraw::mouseMoveEvent(QMouseEvent *event){
@@ -351,19 +379,20 @@ void caLineDraw::keyPressEvent(QKeyEvent *event){
     int keyPressed = event->key();
     int event_modifier = event->modifiers();
 
-    QClipboard *clipboard = QApplication::clipboard();
-
     if(event_modifier == Qt::ControlModifier){
         switch(keyPressed){
-        // CTRL + C
-        case Qt::Key_C:
-            clipboard->setText(getMarkedText());
-            break;
         // CTRL + A
         case Qt::Key_A:
             m_markAllText = true;
             update();
             break;
+        }
+    }
+
+    if(keyPressed == Qt::Key_Escape){
+        QList lineDrawList = (parent()->findChildren<caLineDraw *>());
+        for(int i = 0; i <= lineDrawList.size() -1; i++){
+            lineDrawList[i]->clearSelection();
         }
     }
 
@@ -686,8 +715,9 @@ void caLineDraw::paintEvent(QPaintEvent *)
                 m_LettersBoundingRects << rectangleToDraw;
             }
 
+            bool isLastEmpty = m_Text[i] == QString(" ") && i == (m_Text.size() -1);
             bool isCurrentFieldMarked = false;
-            if(m_LetterMarkedList.size() > 0){
+            if(m_LetterMarkedList.size() > 0 && !isLastEmpty){
                 isCurrentFieldMarked = m_LetterMarkedList[i];
             }
 
@@ -701,6 +731,10 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
                 painter.drawText(rectangleToDraw,Qt::AlignCenter | Qt::AlignVCenter,  QString(m_Text[i]));
             }
+    }
+
+    if(m_Text == getMarkedText()){
+        m_markAllText = true;
     }
 
     painter.setPen(m_ForeColor);
@@ -1010,6 +1044,34 @@ void caLineDraw::getWidgetInfo(QString* pv, int& nbPV, int& limitsDefault, int& 
     else if(getColorMode() == Alarm_Static) strcpy(colMode, "Alarm");
     else strcpy(colMode, "Static");
 
+}
+
+void caLineDraw::copy(){
+    QClipboard *clipboard = QApplication::clipboard();
+    QList lineDrawList = parent()->findChildren<caLineDraw *>();
+
+    QString copyString;
+    int markedCount = 0;
+
+    for(int i = 0; i <= lineDrawList.length() -1; i++){
+        if(lineDrawList[i]->getMarkedText().length() > 0){
+            if(lineDrawList[i]->getMarkAll() == true){
+                copyString +=  lineDrawList[i]->getPV() + "\t" + lineDrawList[i]->getMarkedText() + "\n";
+            }
+
+            markedCount++;
+        }
+    }
+
+    if(markedCount == 1){
+        qDebug() << markedCount;
+        copyString = copyString.split("\t")[1].replace("\n", QString(""));
+    }
+
+    // Copy to Clipboard
+    if(copyString.size() > 0){
+        clipboard->setText(copyString);
+    }
 }
 
 

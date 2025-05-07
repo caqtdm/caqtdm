@@ -95,7 +95,6 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     }
 #endif
     createActions();
-    addAction(copyAct);
 
     connect(this, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT(celldoubleclicked( int, int ) ) );
     setFocusPolicy(Qt::ClickFocus);
@@ -115,9 +114,6 @@ void caTable::celldoubleclicked(int row, int col)
 
 void caTable::createActions() {
 
-    copyAct = new QAction(this);
-    copyAct->setShortcut(tr("Ctrl+C"));
-    connect(copyAct, SIGNAL(triggered()), this, SLOT(copy()));
 }
 
 void caTable::setColumnSizes(QString const &newSizes)

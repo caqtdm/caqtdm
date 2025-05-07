@@ -274,13 +274,6 @@ bool caMultiLineString::event(QEvent *e)
             setEnabled(false);
         }
 
-    } else if(e->type() == QEvent::KeyPress) {
-
-        QKeyEvent *key_event = static_cast<QKeyEvent*>(e);
-        if (key_event->matches(QKeySequence::Copy)) {
-            emit copy();
-        }
-
     }
     return QPlainTextEdit::event(e);
 }
@@ -424,5 +417,11 @@ void caMultiLineString::copy()
     QString s = textCursor().selectedText();
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(s);
+}
+
+void caMultiLineString::clearSelection(){
+    QTextCursor c = textCursor();
+    c.clearSelection();
+    setTextCursor(c);
 }
 

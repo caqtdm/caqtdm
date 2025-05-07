@@ -167,6 +167,10 @@ public:
 
     void setFormatString(const QString m) { thisFormatUserString = m; }
     QString getFormatString() {return thisFormatUserString;}
+    QString getMarkedText();
+    void clearSelection();
+    bool getMarkAll() {return m_markAllText;}
+    void copy();
 
 signals:
     void textChanged(QString);
@@ -189,9 +193,10 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     int calculateSumOfStartingCoordinates(QList<int> list, int calculateUntilIndex = -1);
     QPoint calculateCoordinates(QPoint point);
-    QString getMarkedText();
     void handleMarking(QPoint position);
     int getIndexofTextRectangle(QPoint position);
     int getDirectionOfMouseMove(QPoint startPosition, QPoint endPosition);

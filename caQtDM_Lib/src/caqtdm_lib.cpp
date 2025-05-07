@@ -688,6 +688,14 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     connect(ResizeDownAction, SIGNAL(triggered()), this, SLOT(Callback_ResizeDown()));
     this->addAction(ResizeDownAction);
 
+
+    QShortcut *CopyMarking = new QShortcut(tr("Ctrl+C"), this);
+    connect(CopyMarking, SIGNAL(activated()), this, SLOT(Callback_CopyMarked()));
+
+    // Ctrl+Alt+D was selected arbitrarily -> "Deselect" everything currently marked
+    QShortcut *DeSelect = new QShortcut(tr("Ctrl+Alt+D"), this);
+    connect(DeSelect, SIGNAL(activated()), this, SLOT(clearSelection()));
+
     char asc[MAX_STRING_LENGTH];
     QString path = thisFileFull;
     int pos = path.lastIndexOf("/");
@@ -6702,6 +6710,54 @@ void CaQtDM_Lib::Callback_ScriptButton()
         w->setProcess(t);
     }
 #endif
+}
+
+void CaQtDM_Lib::clearSelection(){
+
+    QList<caLineDraw *> drawChild = parent()->findChildren<caLineDraw *>();
+    foreach(caLineDraw *ld, drawChild){
+        ld->clearSelection();
+    }
+
+    QList<caLineEdit *> editChild = parent()->findChildren<caLineEdit *>();
+    foreach(caLineEdit *le, editChild){
+        le->setSelection(0,0);
+    }
+
+    QList<caMultiLineString *> multiChild = parent()->findChildren<caMultiLineString *>();
+    foreach(caMultiLineString *mls, multiChild){
+        mls->clearSelection();
+    }
+
+    QList<caWaveTable *> waveChild = parent()->findChildren<caWaveTable *>();
+    foreach(caWaveTable *wt, waveChild){
+        wt->clearSelection();
+    }
+
+    QList<caTable *> tableChild = parent()->findChildren<caTable *>();
+
+    foreach(caTable *tt, tableChild){
+        tt->clearSelection();
+    }
+}
+
+void CaQtDM_Lib::Callback_CopyMarked(){
+    QWidget *widg = QApplication::focusWidget();
+
+    caLineDraw *draw = qobject_cast<caLineDraw *>(widg);
+    if(draw){ draw->copy(); }
+
+    caWaveTable *wavetable = qobject_cast<caWaveTable *>(widg);
+    if(wavetable){ wavetable->copy(); }
+
+    caTable *table = qobject_cast<caTable *>(widg);
+    if(table){ table->copy(); }
+
+    caMultiLineString *multiline = qobject_cast<caMultiLineString *>(widg);
+    if(multiline){ multiline->copy(); }
+
+    caLineEdit *lineedit = qobject_cast<caLineEdit *>(widg);
+    if(lineedit){ lineedit->copy(); }
 }
 
 void CaQtDM_Lib::processTerminated()

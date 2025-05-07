@@ -359,6 +359,7 @@ bool caLineEdit::event(QEvent *e)
     // for context menu it will be enabled again when drag gets initiated (in caQtDM_Lib)
     } else if(e->type() == QEvent::MouseButtonPress) {
         QMouseEvent *ev = (QMouseEvent *) e;
+        setFocus();
 #if QT_VERSION< QT_VERSION_CHECK(4, 8, 0)
         if(ev->button() == Qt::MidButton) {
 #else

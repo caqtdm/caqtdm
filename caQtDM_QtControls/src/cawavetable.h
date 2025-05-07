@@ -121,6 +121,8 @@ public:
                                                   }
     Alignment getAlignment() const {return thisAlignment;}
 
+                                                  void copy();
+
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -131,7 +133,6 @@ public slots:
     }
 
 private slots:
-    void copy();
     void dataInput(int, int);
     void cellDoubleclicked(int, int);
     void cellClicked(int, int);

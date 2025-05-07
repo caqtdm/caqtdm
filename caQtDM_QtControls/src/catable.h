@@ -109,6 +109,7 @@ public:
     void createActions();
 
     void setValueFont(QFont font);
+    void copy();
 
 public slots:
     void animation(QRect p) {
@@ -123,7 +124,6 @@ signals:
    void TableDoubleClickedSignal(QString pv);
 
 private slots:
-    void copy();
     void celldoubleclicked(int, int);
     void cellclicked(int, int);
 

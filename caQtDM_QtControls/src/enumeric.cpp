@@ -400,16 +400,20 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 {
     if (text == NULL) {
         text = new QLineEdit(this);
-        connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
-        connect(text, SIGNAL(editingFinished() ), text, SLOT(hide()));
+    }else{
+        text->raise();
+        text->show();
     }
+    connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
+    connect(text, SIGNAL(editingFinished()), text, SLOT(hide()));
+
     text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
     text->setFont(signLabel->font());
     text->setAlignment(Qt::AlignRight);
     text->setMaxLength(digits+2);
     text->setText("");
     text->setFocus();
-    text->show();
+
 }
 
 bool ENumeric::eventFilter(QObject *obj, QEvent *event)
