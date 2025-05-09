@@ -404,6 +404,10 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
         text->raise();
         text->show();
     }
+    QString valueString;
+    valueString = QString().number(this->value());
+    text->setText(valueString);
+
     connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
     connect(text, SIGNAL(editingFinished()), text, SLOT(hide()));
 
@@ -411,7 +415,7 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
     text->setFont(signLabel->font());
     text->setAlignment(Qt::AlignRight);
     text->setMaxLength(digits+2);
-    text->setText("");
+    text->setSelection(0, valueString.length());
     text->setFocus();
 
 }
