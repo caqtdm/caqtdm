@@ -639,6 +639,9 @@ void limitsDialog::applyClicked()
 
         // ************* we have a caNumeric, caApplyNumeric or caSpinbox
     } else if(className.contains("caNumeric") || className.contains("caApplyNumeric")  || className.contains("caSpinbox")) {
+        int precWithoutLoss = 13;
+        if(prec > precWithoutLoss) prec = precWithoutLoss;
+        // qDebug() << "set precision to:"  << prec;
 
         if(limitsMode == Channel) {
             setLimitsModeChannel(thisWidget);

@@ -228,7 +228,7 @@ void SNumeric::init()
 
 void SNumeric::setValue(double v)
 {
-    long long temp = (long long) round(v * pow(10.0, decDig));
+    long long temp = (long long) round(v * (long long) pow(10.0, decDig));
     if ((temp >= minVal) && (temp <= maxVal))
     {
         bool valChanged = data != temp;
@@ -246,7 +246,7 @@ void SNumeric::setValue(double v)
 void SNumeric::silentSetValue(double v)
 {
     csValue = v;
-    long long temp = (long long) round(v * pow(10.0, decDig));
+    long long temp = (long long)round(v * (long long)pow(10.0, decDig));
     data = temp;
     showData();
 }
@@ -256,7 +256,7 @@ void SNumeric::setMaximum(double v)
     if (v >= d_minAsDouble)
     {
         d_maxAsDouble = v;
-        maxVal = (long long) round(v* (long)pow(10.0, decDig));
+        maxVal = (long long) round(v* (long long)pow(10.0, decDig));
     }
 }
 
@@ -265,7 +265,7 @@ void SNumeric::setMinimum(double v)
     if (v <= d_maxAsDouble)
     {
         d_minAsDouble = v;
-        minVal = (long long) round(v* (long)pow(10.0, decDig));
+        minVal = (long long) round(v* (long long)pow(10.0, decDig));
     }
 }
 
