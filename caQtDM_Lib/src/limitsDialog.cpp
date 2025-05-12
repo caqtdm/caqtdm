@@ -177,6 +177,7 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
     if(className.contains("caNumeric") || className.contains("caApplyNumeric") || className.contains("caSpinbox")) {
+        precisionLineEdit->setMaximum(PREC_LIMIT_NUMERIC);
          Layout->addWidget(buttonBox, 5, 0, 1, -1);
     }
     else if(className.contains("caSlider"))
@@ -639,8 +640,7 @@ void limitsDialog::applyClicked()
 
         // ************* we have a caNumeric, caApplyNumeric or caSpinbox
     } else if(className.contains("caNumeric") || className.contains("caApplyNumeric")  || className.contains("caSpinbox")) {
-        int precWithoutLoss = 13;
-        if(prec > precWithoutLoss) prec = precWithoutLoss;
+        if(prec > PREC_LIMIT_NUMERIC) prec = PREC_LIMIT_NUMERIC;
         // qDebug() << "set precision to:"  << prec;
 
         if(limitsMode == Channel) {

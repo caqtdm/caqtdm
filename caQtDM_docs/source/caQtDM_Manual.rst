@@ -2275,7 +2275,8 @@ is the equivalent of the Wheelswitch in MEDM
    selected digit. Clicking on an arrow button will increment or
    decrement the digit. The WheelSwitch will also accept input of a new
    value via the keyboard by double clicking on the value. Escape aborts
-   the input. Type Enter to finish the input.
+   the input. Type Enter to finish the input. 
+   Due to type constraints, the precision is limited to 13 digits past zero.
 
 --------------
 
