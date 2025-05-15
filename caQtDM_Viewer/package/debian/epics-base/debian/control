@@ -1,7 +1,7 @@
 Source: epics-base
 Section: science
 Priority: optional
-Maintainer: Your Name <your.email@example.com>
+Maintainer: Julian Houba <craftingdragon007@outlook.com>
 Build-Depends: debhelper (>= 12), debhelper-compat (= 12), libreadline-dev, libncurses-dev, perl
 Standards-Version: 4.5.0
 Homepage: https://epics-controls.org
