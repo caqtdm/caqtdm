@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.caqtdm.caqtdm</id>
+  
+  <name>caQtDM</name>
+  <summary>caQtDM is a popular Epics framework for developing panels</summary>
+
+  <developer id="io.github.caqtdm">
+    <name>caQtDM contributers</name>
+  </developer>
+  
+  <metadata_license>CC-BY-4.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  
+  <categories>
+    <category>Science</category>
+  </categories>
+
+  <url type="homepage">https://caqtdm.github.io/</url>
+  <url type="bugtracker">https://github.com/caQtDM/caQtDM/issues</url>
+  
+  <content_rating type="oars-1.0" />
+
+  <description>
+    <p>
+      caQtDM offers a collection of special widgets in order to display and control control system data in various ways. The widgets have been inspired from the well known MEDM package used at many EPICS sites. However caQtDM is not restricted to EPICS and can/could also support other control systems. At PSI caQtDM is used at several facilities and controls not only EPICS, but also simultaneously an older house-made system. Moreover support has already been introduced for EPICS4, but is still in development.
+    </p>
+  </description>
+
+  <icon type="stock">io.github.caqtdm.caqtdm</icon>
+  
+  <launchable type="desktop-id">io.github.caqtdm.caqtdm.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://caqtdm.github.io/snapshot1.png</image>
+      <caption>An image of a caQtDM panel of the PSI SwissFEL Facility</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://caqtdm.github.io/snapshot4.png</image>
+      <caption>An image of a caQtDM panel being used for the LINAC Main Control panel</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://caqtdm.github.io/snapshot2.png</image>
+      <caption>An image of a caQtDM panel displaying the status of the PROSCAN facility</caption>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="4.5.0-rc2" date="2025-05-06">
+      <description>
+        <p>Release candidate 2 for version 4.5.0</p>
+        <ul>
+          <li>Fixed some bugs</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>

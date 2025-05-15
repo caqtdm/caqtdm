@@ -1,0 +1,182 @@
+id: io.github.caqtdm.caqtdm
+runtime: org.kde.Platform
+runtime-version: "6.9"
+sdk: org.kde.Sdk
+command: caQtDM
+finish-args:
+  - --device=shm
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=network
+  - --filesystem=home
+  - --require-version=1.6.1
+
+modules:
+  - name: epics-base
+    buildsystem: simple
+    sources:
+      - type: archive
+        url: https://epics-controls.org/download/base/base-7.0.9.tar.gz
+        sha256: acd62c9b97b60caea9303cc3aab922dbf2bc3bfb3d20e0027110ffe4c906a6c7
+    build-commands:
+      - |
+        
+        FINAL_LOCATION=/app/lib/epics
+
+        # Configure
+        echo "INSTALL_LOCATION=${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}" > configure/CONFIG_SITE.local
+        echo "FINAL_LOCATION=${FINAL_LOCATION}" >> configure/CONFIG_SITE.local
+        
+        # Determine EPICS host architecture
+        EPICS_HOST_ARCH=$(perl -CSD src/tools/EpicsHostArch.pl)
+        echo ${EPICS_HOST_ARCH} > "${FLATPAK_BUILDER_BUILDDIR}/EPICS_HOST_ARCH"
+        
+        # Build
+        export EPICS_HOST_ARCH=${EPICS_HOST_ARCH}
+        export LD_LIBRARY_PATH="${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/lib/${EPICS_HOST_ARCH}"
+        make -s -j$(nproc)
+        
+        # Install
+        mkdir -p ${FINAL_LOCATION}
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/bin/${EPICS_HOST_ARCH} ${FINAL_LOCATION}/bin
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/lib/${EPICS_HOST_ARCH} ${FINAL_LOCATION}/lib
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/include ${FINAL_LOCATION}
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/db ${FINAL_LOCATION}/db
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/dbd ${FINAL_LOCATION}/dbd
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/staging${FINAL_LOCATION}/templates ${FINAL_LOCATION}/templates
+        
+        # Create symlinks for binaries
+        mkdir -p /app/bin
+        for bin in caget caput cainfo camonitor caRepeater casw pvget pvinfo pvlist pvput softIoc softIocPVA; do
+          ln -s ${FINAL_LOCATION}/bin/${EPICS_HOST_ARCH}/${bin} /app/bin/${bin}
+        done
+
+  - name: qwt-qt6
+    buildsystem: qmake
+    sources:
+      - type: archive
+        url: http://downloads.sourceforge.net/qwt/qwt-6.3.0.tar.bz2
+        sha256: dcb085896c28aaec5518cbc08c0ee2b4e60ada7ac929d82639f6189851a6129a
+    build-commands:
+      - |
+        # Configure
+        sed -e '/^\s*QWT_INSTALL_PREFIX/ s|=.*|= /app|' \
+          -e '/^QWT_INSTALL_DOCS/ s|/doc|/share/doc/qwt-qt6|' \
+          -e '/^QWT_INSTALL_HEADERS/ s|include|&/qwt-qt6|' \
+          -e '/^QWT_INSTALL_PLUGINS/ s|plugins/designer|lib/qt6/&|' \
+          -e '/^QWT_INSTALL_FEATURES/ s|features|lib/qt6/mkspecs/&|' \
+          -i qwtconfig.pri
+        sed -e '/^TARGET/ s|(qwt)|(qwt-qt$${QT_MAJOR_VERSION})|' \
+          -e '/^\s*QWT_SONAME/ s|libqwt|&-qt$${QT_MAJOR_VERSION}|' \
+          -i src/src.pro
+      - qmake6 qwt.pro
+      - make -j$(nproc)
+      - make install
+
+  - name: zeromq
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz
+        sha256: 6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43
+    config-opts:
+      - --prefix=/app
+
+  - name: caqtdm
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/caqtdm/caqtdm.git
+        tag: v4.5.0-rc2
+        patches:
+          - fix_qwt_static_cast.patch
+      - type: file
+        path: io.github.caqtdm.caqtdm.desktop
+      - type: dir
+        path: icons
+        dest: icons
+      - type: file
+        path: io.github.caqtdm.caqtdm.metainfo.xml
+      - type: file
+        path: debug.patch
+
+    build-commands:
+      - |
+        # Set up environment variables
+        export QWTLIBNAME=qwt-qt6
+        export QWTINCLUDE=/app/include/qwt-qt6
+        export EPICS_BASE=/app/lib/epics
+        export PYTHONVERSION=$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1-2)
+        export ZMQ=/app
+        export ZMQINC=$ZMQ/include
+        export ZMQLIB=$ZMQ/lib
+        export QTDM_RPATH=/app/lib/caqtdm/qt6
+        export CARCH=$(uname -m)
+        export EPICS_HOST_ARCH=linux-${CARCH}
+        export QTHOME=/app
+        export QWTHOME=/app
+        export QWTLIB=${QWTHOME}/lib
+        export QWTVERSION=6.1
+        export EPICSINCLUDE=${EPICS_BASE}/include
+        export EPICSLIB=${EPICS_BASE}/lib
+        export EPICSEXTENSIONS=${EPICS_BASE}/extensions
+        export QTCONTROLS_LIBS=${FLATPAK_BUILDER_BUILDDIR}/binaries
+        export CAQTDM_COLLECT=${FLATPAK_BUILDER_BUILDDIR}/binaries
+        export QTBASE=${QTCONTROLS_LIBS}
+        export CAQTDM_CA_ARCHIVELIBS=${FLATPAK_BUILDER_BUILDDIR}/binaries
+        export CAQTDM_LOGGING_ARCHIVELIBS=${FLATPAK_BUILDER_BUILDDIR}/binaries
+        export QTDM_LIBINSTALL=$EPICSEXTENSIONS/lib
+        export QTDM_BININSTALL=$EPICSEXTENSIONS/bin
+        export PYTHONINCLUDE=/usr/include/python$PYTHONVERSION
+        export PYTHONLIB=/usr/lib
+
+        # Patches for debugging purposes
+        #sed -i.bak '472/setWindowTitle(title);/printf("title:%s \n",title);fflush(stdout);/' ${FLATPAK_BUILDER_BUILDDIR}/caQtDM_Lib/src/caqtdm_lib.cpp
+        patch -p1 < ${FLATPAK_BUILDER_BUILDDIR}/debug.patch
+
+        
+        # Build caQtDM
+        qmake6 ./all.pro
+        make -j$(nproc)
+        
+        mkdir -p /app/doc
+        mkdir -p /app/lib/caqtdm/qt6
+        mkdir -p /app/bin
+        mkdir -p /app/include/caqtdm
+        mkdir -p /app/include/caqtdm/plugins
+        mkdir -p /app/include/caqtdm/caQtDM_Plugins
+        mkdir -p /app/lib/qt6/plugins/designer/
+        
+        # Install binaries
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/binaries/* /app/lib/caqtdm/qt6
+        
+        # Create caQtDM script
+        echo '#!/bin/sh' > /app/bin/caqtdm
+        echo 'caQtDM -style Fusion "$@" &' >> /app/bin/caqtdm
+        chmod +x /app/bin/caqtdm
+        
+        # Create qt designer script
+        echo '#!/bin/sh' > /app/bin/caqtdm_designer
+        echo 'export QT_PLUGIN_PATH=/app/lib/qt6' >> /app/bin/caqtdm_designer
+        echo 'assistant6 -register /app/doc/caQtDM.qch' >> /app/bin/caqtdm_designer
+        echo 'designer6 "$@"' >> /app/bin/caqtdm_designer
+        chmod +x /app/bin/caqtdm_designer
+
+        # Create symlinks
+        ln -sfv /app/lib/caqtdm/qt6/caQtDM /app/bin/caQtDM
+        ln -sfv /app/lib/caqtdm/qt6/adl2ui /app/bin/adl2ui
+        ln -sfv /app/lib/caqtdm/qt6/edl2ui /app/bin/edl2ui
+        
+        ln -sfv /app/lib/caqtdm/qt6/designer/libqtcontrols_controllers_plugin.so /app/lib/qt6/plugins/designer/
+        ln -sfv /app/lib/caqtdm/qt6/designer/libqtcontrols_graphics_plugin.so /app/lib/qt6/plugins/designer/
+        ln -sfv /app/lib/caqtdm/qt6/designer/libqtcontrols_monitors_plugin.so /app/lib/qt6/plugins/designer/
+        ln -sfv /app/lib/caqtdm/qt6/designer/libqtcontrols_utilities_plugin.so /app/lib/qt6/plugins/designer/
+
+        # Install icons, metadata, and desktop file
+        mkdir -p /app/share/icons/hicolor
+        cp -r ${FLATPAK_BUILDER_BUILDDIR}/icons/* /app/share/icons/hicolor/
+        mkdir -p /app/share/applications
+        cp ${FLATPAK_BUILDER_BUILDDIR}/io.github.caqtdm.caqtdm.desktop /app/share/applications/io.github.caqtdm.caqtdm.desktop
+        mkdir -p /app/share/metainfo
+        cp ${FLATPAK_BUILDER_BUILDDIR}/io.github.caqtdm.caqtdm.metainfo.xml /app/share/metainfo/io.github.caqtdm.caqtdm.metainfo.xml

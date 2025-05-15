@@ -1,0 +1,110 @@
+diff --git a/caQtDM.pri b/caQtDM.pri
+index e8ca786f..e007995f 100644
+--- a/caQtDM.pri
++++ b/caQtDM.pri
+@@ -460,8 +460,9 @@ caQtDM_Lib {
+ 
+       		OBJECTS_DIR = ./obj
+                 DESTDIR = $(CAQTDM_COLLECT)
+-                QMAKE_CXXFLAGS += "-g"
+-                QMAKE_CFLAGS_RELEASE += "-g"
++                QMAKE_CXXFLAGS += "-g -fsanitize=address -fno-omit-frame-pointer -O5"
++                QMAKE_LFLAGS += -fsanitize=address
++                QMAKE_CFLAGS_RELEASE += "-g -fsanitize=address -fno-omit-frame-pointer -O5"
+                 CONFIG += Define_Build_Python
+    	}
+ 
+diff --git a/caQtDM_Lib/caQtDM_Plugins/epics3/epicsSubs.c b/caQtDM_Lib/caQtDM_Plugins/epics3/epicsSubs.c
+index 983531a2..58b0b652 100644
+--- a/caQtDM_Lib/caQtDM_Plugins/epics3/epicsSubs.c
++++ b/caQtDM_Lib/caQtDM_Plugins/epics3/epicsSubs.c
+@@ -854,7 +854,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
+ 
+     //printf("we have to add an epics device <%s>\n", kData->pv);
+     status = ca_create_channel(kData->pv,
+-                               (void(*)())connectCallback,
++                               connectCallback,
+                                info,
+                                CA_PRIORITY_DEFAULT,
+                                &info->ch);
+@@ -888,7 +888,7 @@ void EpicsReconnect(knobData *kData)
+ 
+     if (info != (connectInfo *) 0) {
+         status = ca_create_channel(kData->pv,
+-                                   (void(*)())connectCallback,
++                                   connectCallback,
+                                    info,
+                                    CA_PRIORITY_DEFAULT,
+                                    &info->ch);
+diff --git a/caQtDM_Lib/src/caqtdm_lib.cpp b/caQtDM_Lib/src/caqtdm_lib.cpp
+index f437fe27..db4e17c9 100644
+--- a/caQtDM_Lib/src/caqtdm_lib.cpp
++++ b/caQtDM_Lib/src/caqtdm_lib.cpp
+@@ -470,8 +470,26 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
+             title = Title;
+         }
+ 
+-        setWindowTitle(title);
+-        setUnifiedTitleAndToolBarOnMac(true);
++
++        printf("title:%s \n",title.toUtf8().constData());
++        fflush(stdout);
++
++        QString currentTitle = "test"; //windowTitle();
++
++        printf("current_title:%s \n",currentTitle.toUtf8().constData());
++        fflush(stdout);
++
++        /*QTimer::singleShot(2000, [title, this]{
++            printf("title start \n");
++            fflush(stdout);
++            setWindowTitle(title);
++            setUnifiedTitleAndToolBarOnMac(true);
++            printf("title end \n");
++            fflush(stdout);
++        });*/
++
++
++
+ 
+         delete file;
+ 
+diff --git a/caQtDM_Lib/src/mutexKnobData.cpp b/caQtDM_Lib/src/mutexKnobData.cpp
+index b390647f..d74c8167 100644
+--- a/caQtDM_Lib/src/mutexKnobData.cpp
++++ b/caQtDM_Lib/src/mutexKnobData.cpp
+@@ -869,7 +869,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
+ QString getBufferAsHexStr(char* buf, int buffsize) {
+     QString result;
+     for(int i = 0; i < buffsize; ++i)
+-        result += "0x" + QString("%1:").arg(buf[i], 2, 16, QChar('0')).toUpper();
++        result += "0x" + QString("%1:").arg(static_cast<unsigned char>(buf[i]), 2, 16, QChar('0')).toUpper();
+     result.chop(1);
+     return result;
+ }
+diff --git a/caQtDM_Parsers/adlParserSrc/QtProperties.h b/caQtDM_Parsers/adlParserSrc/QtProperties.h
+index 4bae855e..151edfd4 100644
+--- a/caQtDM_Parsers/adlParserSrc/QtProperties.h
++++ b/caQtDM_Parsers/adlParserSrc/QtProperties.h
+@@ -60,7 +60,7 @@ void Qt_writeOpenTag(char *tag, char *typ, char *value);
+ void Qt_writeCloseTag(char *tag, char *value, int visibilityStatic);
+ void Qt_writeOpenProperty(char *property);
+ void Qt_writeCloseProperty();
+-void Qt_writeStyleSheet();
++void Qt_writeStyleSheet(int r, int g, int b);
+ void Qt_setWheelSwitchForm(char *widget, char *token);
+ int Qt_setColorMode(char *widget, char *token);
+ int Qt_setVisibilityMode(char *widget, char *token);
+diff --git a/caQtDM_QtControls/caQtDM_QtControls.pro b/caQtDM_QtControls/caQtDM_QtControls.pro
+index 7cbb379f..8635c83f 100644
+--- a/caQtDM_QtControls/caQtDM_QtControls.pro
++++ b/caQtDM_QtControls/caQtDM_QtControls.pro
+@@ -27,7 +27,7 @@ contains(QT_VER_MAJ, 5) {
+ }
+ contains(QT_VER_MAJ, 6) {
+       QT += widgets concurrent uitools opengl core
+-      CONFIG  += qwt plugin
++      CONFIG  += plugin
+       ios | android {
+             QT += uiplugin
+       }else {

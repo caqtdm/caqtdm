@@ -60,7 +60,7 @@ void Qt_writeOpenTag(char *tag, char *typ, char *value);
 void Qt_writeCloseTag(char *tag, char *value, int visibilityStatic);
 void Qt_writeOpenProperty(char *property);
 void Qt_writeCloseProperty();
-void Qt_writeStyleSheet();
+void Qt_writeStyleSheet(int r, int g, int b);
 void Qt_setWheelSwitchForm(char *widget, char *token);
 int Qt_setColorMode(char *widget, char *token);
 int Qt_setVisibilityMode(char *widget, char *token);

@@ -27,7 +27,7 @@ contains(QT_VER_MAJ, 5) {
 }
 contains(QT_VER_MAJ, 6) {
       QT += widgets concurrent uitools opengl core
-      CONFIG  += qwt plugin
+      CONFIG  += plugin
       ios | android {
             QT += uiplugin
       }else {
