@@ -88,7 +88,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/caqtdm/caqtdm.git
-        tag: v4.5.0-rc2
+        tag: v4.6.0
         patches:
           - fix_qwt_static_cast.patch
       - type: file

@@ -19,7 +19,7 @@ fi
 
 # If you want to compile latest release candidate uncomment this line
 REPOSITORY_NAME=caqtdm
-PACKAGE_VERSION=4.4.2
+PACKAGE_VERSION=4.6.0
 REPOSITORY=https://github.com/caqtdm/$REPOSITORY_NAME.git
 # BRANCH_OR_TAG=V${PACKAGE_VERSION}
 BRANCH_OR_TAG=Development

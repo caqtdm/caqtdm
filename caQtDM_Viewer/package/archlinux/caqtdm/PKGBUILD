@@ -1,6 +1,6 @@
 # Maintainer: Julian Houba <craftingdragon007 at outlook dot com>
 pkgname='caqtdm'
-pkgver=4.5.0rc2
+pkgver=4.6.0
 pkgrel=2
 pkgdesc="caQtDM is a popular Epics framework for developing panels"
 arch=('any')

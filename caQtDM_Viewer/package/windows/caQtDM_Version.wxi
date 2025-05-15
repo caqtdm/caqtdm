@@ -3,7 +3,7 @@
   <!--
   Alles sollte hier sein damit man spaeter die einzelene Abhaenigkeiten im Griff hat
   -->
-<?define CaQtDMVersion = "4.5.0.0"?>
+<?define CaQtDMVersion = "4.6.0.0"?>
 <?define CaQtDM_ProductUpgradeCode = "CEE4C381-28DA-478F-A7C6-3A95B4DF2A89"?>
 <?define CaQtDM_x86_ProductUpgradeCode = "DDEABE6C-16D9-48E8-98A6-3F2BB3740BB9"?>
 <?define CaQtDM_x64_ProductUpgradeCode = "86ABEDAA-C06B-4485-9DF0-5EFE2EB497DD"?>

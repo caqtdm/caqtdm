@@ -3,7 +3,7 @@
 
 #############################################################################
 # special EPICS things
-%define EPICS_TARGET_VERSION -7.0.8
+%define EPICS_TARGET_VERSION -7.0.9
 #############################################################################
 
 # build qt4 support (or not)
@@ -21,8 +21,8 @@
 #############################################################################
 Name:    caqtdm 
 Summary: Qt Widgets for Technical Applications
-Version: 4.5.0
-Release: 0.2%{?dist}
+Version: 4.6.0
+Release: 0.1%{?dist}
 #############################################################################
 License: GPLv2
 URL:     https://github.com/caqtdm/caqtdm

@@ -3,7 +3,7 @@ Section: sciences
 Priority: optional
 Maintainer: Julian Houba <craftingdragon007@outlook.com>
 Build-Depends: debhelper (>= 12), debhelper-compat (= 12), qtbase5-dev, qt5-qmake, libqwt-qt5-dev, epics-base, python3-dev, qttools5-dev, qttools5-dev, libqt5svg5-dev, libqt5x11extras5-dev, libcom-dev, libzmq3-dev
-Standards-Version: 4.5.0
+Standards-Version: 4.6.0
 Homepage: http://caqtdm.github.io/
 
 Package: caqtdm
