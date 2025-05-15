@@ -854,7 +854,7 @@ int CreateAndConnect(int index, knobData *kData, int rate, int skip)
 
     //printf("we have to add an epics device <%s>\n", kData->pv);
     status = ca_create_channel(kData->pv,
-                               (void(*)())connectCallback,
+                               connectCallback,
                                info,
                                CA_PRIORITY_DEFAULT,
                                &info->ch);
@@ -888,7 +888,7 @@ void EpicsReconnect(knobData *kData)
 
     if (info != (connectInfo *) 0) {
         status = ca_create_channel(kData->pv,
-                                   (void(*)())connectCallback,
+                                   connectCallback,
                                    info,
                                    CA_PRIORITY_DEFAULT,
                                    &info->ch);

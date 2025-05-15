@@ -869,7 +869,7 @@ extern "C" MutexKnobData* C_SetMutexKnobDataConnected(MutexKnobData* p, int inde
 QString getBufferAsHexStr(char* buf, int buffsize) {
     QString result;
     for(int i = 0; i < buffsize; ++i)
-        result += "0x" + QString("%1:").arg(buf[i], 2, 16, QChar('0')).toUpper();
+        result += "0x" + QString("%1:").arg(static_cast<unsigned char>(buf[i]), 2, 16, QChar('0')).toUpper();
     result.chop(1);
     return result;
 }
