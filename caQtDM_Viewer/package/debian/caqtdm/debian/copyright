@@ -1,0 +1,6 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: https://caqtdm.github.io/
+
+Files: *
+Copyright: caQtDM Developers
+License: GPL-3.0

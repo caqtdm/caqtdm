@@ -1,0 +1,130 @@
+#!/usr/bin/make -f
+
+export QWTLIBNAME=qwt-qt5
+export QWTINCLUDE=/usr/include/qwt
+export PYTHONVERSION=$(shell python3 --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1-2)
+export ZMQ=/usr
+export ZMQINC=${ZMQ}/include
+export ZMQLIB=${ZMQ}/lib
+export QTDM_RPATH=/opt/caqtdm/lib/qt5
+export QTHOME=/usr
+export QWTHOME=/usr
+export QWTLIB=${QWTHOME}/lib
+export QWTVERSION=6.1
+export EPICSINCLUDE=${EPICS_BASE}/include
+export EPICSLIB=${EPICS_BASE}/lib/${EPICS_HOST_ARCH}
+export EPICSEXTENSIONS=${EPICS_BASE}/extensions
+export QTCONTROLS_LIBS=$(shell pwd)/binaries
+export CAQTDM_COLLECT=$(shell pwd)/binaries
+export QTBASE=${QTCONTROLS_LIBS}
+export CAQTDM_CA_ARCHIVELIBS=$(shell pwd)/binaries
+export CAQTDM_LOGGING_ARCHIVELIBS=$(shell pwd)/binaries
+export QTDM_LIBINSTALL=${EPICSEXTENSIONS}/lib
+export QTDM_BININSTALL=${EPICSEXTENSIONS}/bin
+export PYTHONINCLUDE=/usr/include/python${PYTHONVERSION}
+export PYTHONLIB=/usr/local/lib
+
+%:
+	dh $@
+
+override_dh_auto_configure:	
+	qmake ./all.pro
+
+override_dh_auto_install:
+	# Install beginning
+
+	# Create directories
+
+	mkdir -p debian/caqtdm/opt/caqtdm/lib/qt5
+	mkdir -p debian/caqtdm/opt/caqtdm/doc
+	mkdir -p debian/caqtdm/usr/include/caqtdm
+	mkdir -p debian/caqtdm/usr/include/caqtdm/plugins
+	mkdir -p debian/caqtdm/usr/include/caqtdm/caQtDM_Plugins
+	mkdir -p debian/caqtdm/usr/bin/
+	mkdir -p debian/caqtdm/usr/lib/qt5/plugins/designer
+
+	# Install binaries
+	cp -r binaries/* debian/caqtdm/opt/caqtdm/lib/qt5
+	
+	# Create caqtdm script
+	echo "#!/bin/bash" > binaries/caqtdm
+	echo "caQtDM -style Fusion \"$$@\" &" >> binaries/caqtdm
+
+	install -Dm755 binaries/caqtdm debian/caqtdm/opt/caqtdm/lib/qt5/caqtdm
+	
+	# Create qt designer script
+	echo "#!/bin/bash" >> binaries/caqtdm_designer
+	echo "SOURCE=\"\$${BASH_SOURCE[0]}\"" >> binaries/caqtdm_designer
+	echo "while [ -h \"\$$SOURCE\" ]; do # resolve \$$SOURCE until the file is no longer a symlink" >> binaries/caqtdm_designer
+	echo "  DIR=\"\$$( cd -P \"\$$( dirname \"\$$SOURCE\" )\" && pwd )\"" >> binaries/caqtdm_designer
+	echo "  SOURCE=\"\$$(readlink \"\$$SOURCE\")\"" >> binaries/caqtdm_designer
+	echo "  [[ \$$SOURCE != /* ]] && SOURCE=\"\$$DIR/\$$SOURCE\" # if \$$SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located" >> binaries/caqtdm_designer
+	echo "done" >> binaries/caqtdm_designer
+	echo "DIR=\"\$$( cd -P \"\$$( dirname \"\$$SOURCE\" )\" && pwd )\"" >> binaries/caqtdm_designer
+	echo "CAQTDM_HOME=\$$DIR/../.." >> binaries/caqtdm_designer
+	echo "# Register help" >> binaries/caqtdm_designer
+	echo "assistant6 -register \$$CAQTDM_HOME/doc/caQtDM.qch" >> binaries/caqtdm_designer
+	echo "export QT_PLUGIN_PATH=\$$CAQTDM_HOME/lib/qt6" >> binaries/caqtdm_designer
+	echo "designer6 \$$@" >> binaries/caqtdm_designer
+	
+	install -Dm755 binaries/caqtdm_designer debian/caqtdm/opt/caqtdm/lib/qt5/caQtDM_designer
+
+	# Create symlinks
+	ln -sfv /opt/caqtdm/lib/qt5/caqtdm debian/caqtdm/usr/bin/caqtdm
+	ln -sfv /opt/caqtdm/lib/qt5/caQtDM debian/caqtdm/usr/bin/caQtDM
+	ln -sfv /opt/caqtdm/lib/qt5/adl2ui debian/caqtdm/usr/bin/adl2ui
+	ln -sfv /opt/caqtdm/lib/qt5/edl2ui debian/caqtdm/usr/bin/edl2ui
+	ln -sfv /opt/caqtdm/lib/qt5/caqtdm_designer debian/caqtdm/usr/bin/caqtdm_designer
+
+	# Create symlinks for qt designer plugins
+	ln -sfv /opt/caqtdm/lib/qt5/designer/libqtcontrols_controllers_plugin.so debian/caqtdm/usr/lib/qt5/plugins/designer/
+	ln -sfv /opt/caqtdm/lib/qt5/designer/libqtcontrols_graphics_plugin.so debian/caqtdm/usr/lib/qt5/plugins/designer/
+	ln -sfv /opt/caqtdm/lib/qt5/designer/libqtcontrols_monitors_plugin.so debian/caqtdm/usr/lib/qt5/plugins/designer/
+	ln -sfv /opt/caqtdm/lib/qt5/designer/libqtcontrols_utilities_plugin.so debian/caqtdm/usr/lib/qt5/plugins/designer/
+
+	# Install include files and docs
+	install -Dm644 caQtDM_QtControls/src/*.h debian/caqtdm/usr/include/caqtdm/
+	
+	install -Dm644 caQtDM_QtControls/src/caApplyNumeric debian/caqtdm/usr/include/caqtdm/caApplyNumeric
+	install -Dm644 caQtDM_QtControls/src/caBitnames debian/caqtdm/usr/include/caqtdm/caBitnames
+	install -Dm644 caQtDM_QtControls/src/caByte debian/caqtdm/usr/include/caqtdm/caByte
+	install -Dm644 caQtDM_QtControls/src/caCalc debian/caqtdm/usr/include/caqtdm/caCalc
+	install -Dm644 caQtDM_QtControls/src/caCamera debian/caqtdm/usr/include/caqtdm/caCamera
+	install -Dm644 caQtDM_QtControls/src/caCartesianPlot debian/caqtdm/usr/include/caqtdm/caCartesianPlot
+	install -Dm644 caQtDM_QtControls/src/caChoice debian/caqtdm/usr/include/caqtdm/caChoice
+	install -Dm644 caQtDM_QtControls/src/caFrame debian/caqtdm/usr/include/caqtdm/caFrame
+	install -Dm644 caQtDM_QtControls/src/caGauge debian/caqtdm/usr/include/caqtdm/caGauge
+	install -Dm644 caQtDM_QtControls/src/caGraphics debian/caqtdm/usr/include/caqtdm/caGraphics
+	install -Dm644 caQtDM_QtControls/src/caImage debian/caqtdm/usr/include/caqtdm/caImage
+	install -Dm644 caQtDM_QtControls/src/caLabel debian/caqtdm/usr/include/caqtdm/caLabel
+	install -Dm644 caQtDM_QtControls/src/caLed debian/caqtdm/usr/include/caqtdm/caLed
+	install -Dm644 caQtDM_QtControls/src/caLineEdit debian/caqtdm/usr/include/caqtdm/caLineEdit
+	install -Dm644 caQtDM_QtControls/src/caMenu debian/caqtdm/usr/include/caqtdm/caMenu
+	install -Dm644 caQtDM_QtControls/src/caMessageButton debian/caqtdm/usr/include/caqtdm/caMessageButton
+	install -Dm644 caQtDM_QtControls/src/caMimeDisplay debian/caqtdm/usr/include/caqtdm/caMimeDisplay
+	install -Dm644 caQtDM_QtControls/src/caMultiLineString debian/caqtdm/usr/include/caqtdm/caMultiLineString
+	install -Dm644 caQtDM_QtControls/src/caNumeric debian/caqtdm/usr/include/caqtdm/caNumeric
+	install -Dm644 caQtDM_QtControls/src/caSlider debian/caqtdm/usr/include/caqtdm/caSlider
+	install -Dm644 caQtDM_QtControls/src/caSpinbox debian/caqtdm/usr/include/caqtdm/caSpinbox
+	install -Dm644 caQtDM_QtControls/src/caStripPlot debian/caqtdm/usr/include/caqtdm/caStripPlot
+	install -Dm644 caQtDM_QtControls/src/caTextEntry debian/caqtdm/usr/include/caqtdm/caTextEntry
+	install -Dm644 caQtDM_QtControls/src/caThermo debian/caqtdm/usr/include/caqtdm/caThermo
+	install -Dm644 caQtDM_QtControls/src/caToggleButton debian/caqtdm/usr/include/caqtdm/caToggleButton
+	install -Dm644 caQtDM_QtControls/src/caWaterfallPlot debian/caqtdm/usr/include/caqtdm/caWaterfallPlot
+	install -Dm644 caQtDM_QtControls/src/EApplyButton debian/caqtdm/usr/include/caqtdm/EApplyButton
+	install -Dm644 caQtDM_QtControls/src/EArrow debian/caqtdm/usr/include/caqtdm/EArrow
+	install -Dm644 caQtDM_QtControls/src/EFlag debian/caqtdm/usr/include/caqtdm/EFlag
+	install -Dm644 caQtDM_QtControls/src/EGauge debian/caqtdm/usr/include/caqtdm/EGauge
+	install -Dm644 caQtDM_QtControls/src/ELabel debian/caqtdm/usr/include/caqtdm/ELabel
+	install -Dm644 caQtDM_QtControls/src/ESimpleLabel debian/caqtdm/usr/include/caqtdm/ESimpleLabel
+	install -Dm644 caQtDM_QtControls/src/EWidget debian/caqtdm/usr/include/caqtdm/EWidget
+	install -Dm644 caQtDM_QtControls/src/QtControls debian/caqtdm/usr/include/caqtdm/QtControls
+	
+	install -Dm644 caQtDM_QtControls/plugins/*.h debian/caqtdm/usr/include/caqtdm/plugins/
+	install -Dm644 caQtDM_Lib/src/*.h debian/caqtdm/usr/include/caqtdm/
+	install -Dm644 caQtDM_Lib/caQtDM_Plugins/*.h debian/caqtdm/usr/include/caqtdm/caQtDM_Plugins/
+	install -Dm644 caQtDM_Viewer/src/*.h debian/caqtdm/usr/include/caqtdm/
+	
+	install -Dm644 caQtDM_QtControls/doc/*.qch debian/caqtdm/opt/caqtdm/doc/
+	install -Dm644 caQtDM_QtControls/doc/*.html debian/caqtdm/opt/caqtdm/doc/
+	install -Dm644 caQtDM_QtControls/doc/*.css debian/caqtdm/opt/caqtdm/doc/

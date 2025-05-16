@@ -1,2 +1,23 @@
 # Sphinx
 docs/build
+# Qt Creator
+*.pro.user
+*.pro.user.*
+.qtc_clangd/
+*.qtc_*
+build/
+
+# Qmake
+.qmake.stash
+Makefile
+Makefile.*
+moc/
+obj/
+moc_*
+
+# Generated files
+ui_main.h
+caQtDM_Binaries/
+qrc_qtcontrols.cpp
+qrc_qtcontrolsplugin.cpp
+qrc_caQtDM.cpp

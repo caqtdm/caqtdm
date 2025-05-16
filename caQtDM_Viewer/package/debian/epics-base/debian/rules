@@ -1,0 +1,69 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+# Build stage variables
+EPICS_STAGING = $(CURDIR)/debian/staging
+EPICS_FINAL = /usr/lib/epics
+# Get EPICS_HOST_ARCH
+EPICS_HOST_ARCH=$$(perl -CSD src/tools/EpicsHostArch.pl)
+
+override_dh_auto_configure:
+	echo ${EPICS_HOST_ARCH} > EPICS_HOST_ARCH	
+	# Configure EPICS
+	echo "INSTALL_LOCATION=$(EPICS_STAGING)$(EPICS_FINAL)" > configure/CONFIG_SITE.local
+	echo "FINAL_LOCATION=$(EPICS_FINAL)" >> configure/CONFIG_SITE.local
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf $(EPICS_STAGING)
+	rm -f EPICS_HOST_ARCH
+	rm -f modules/RELEASE.*.local
+
+override_dh_auto_build:
+	export EPICS_HOST_ARCH=$$(cat EPICS_HOST_ARCH)
+	export LD_LIBRARY_PATH=$(EPICS_STAGING)$(EPICS_FINAL)/lib/$$EPICS_HOST_ARCH
+	make -j$$(nproc)
+
+override_dh_auto_install:
+	EPICS_HOST_ARCH=$$(cat EPICS_HOST_ARCH)
+	# Create install directory
+	mkdir -p debian/epics-base$(EPICS_FINAL)
+	# Install files to package directory
+	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/bin debian/epics-base$(EPICS_FINAL)
+	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/lib debian/epics-base$(EPICS_FINAL)
+	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/include debian/epics-base$(EPICS_FINAL)
+	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/cfg $(EPICS_STAGING)$(EPICS_FINAL)/configure $(EPICS_STAGING)$(EPICS_FINAL)/db $(EPICS_STAGING)$(EPICS_FINAL)/dbd $(EPICS_STAGING)$(EPICS_FINAL)/templates debian/epics-base$(EPICS_FINAL)
+	
+	# Create symlinks
+	mkdir -p debian/epics-base/usr/bin
+	for bin in caget caput cainfo camonitor caRepeater casw pvget pvinfo pvlist pvput softIoc softIocPVA; do \
+		ln -svf ../lib/epics/bin/${EPICS_HOST_ARCH}/$$bin debian/epics-base/usr/bin/$$bin; \
+	done
+	
+	mkdir -p debian/epics-base/usr/include/epics
+	ln -svf ../../lib/epics/include debian/epics-base/usr/include/epics
+	
+	mkdir -p debian/epics-base/usr/share/epics
+	for dir in db dbd templates; do \
+		ln -svf ../../lib/epics/$$dir debian/epics-base/usr/share/epics/$$dir; \
+	done
+	
+	# Install docs
+	mkdir -p debian/epics-base/usr/share/doc/epics
+	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/html debian/epics-base/usr/share/doc/epics/
+	
+	# Install license
+	mkdir -p debian/epics-base/usr/share/licenses/epics-base
+	cp LICENSE debian/epics-base/usr/share/licenses/epics-base/
+	
+	# Environment file
+	mkdir -p debian/epics-base/usr/lib/environment.d
+	echo "EPICS_HOST_ARCH=${EPICS_HOST_ARCH}" > debian/epics-base/usr/lib/environment.d/10-epics-base.conf
+	echo "EPICS_BASE=/usr/lib/epics" >> debian/epics-base/usr/lib/environment.d/10-epics-base.conf
+
+	# Create CONFIG_SITE.local
+	echo "EPICS_HOST_ARCH=${EPICS_HOST_ARCH}" > debian/epics-base$(EPICS_FINAL)/configure/CONFIG_SITE.local
+	echo "INSTALL_LOCATION=." >> debian/epics-base$(EPICS_FINAL)/configure/CONFIG_SITE.local
+	echo "FINAL_LOCATION=$(EPICS_FINAL)" >> debian/epics-base$(EPICS_FINAL)/configure/CONFIG_SITE.local
