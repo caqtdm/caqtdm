@@ -247,7 +247,7 @@ void ENumeric::setValue(double v)
          * in the labels of the TNumeric.
          */
         showData();
-        if (valChanged) emit valueChanged(temp*pow(10.0, -decDig));
+        if (valChanged) emit valueChanged(temp* (long long) pow(10.0, -decDig));
     }
 }
 
@@ -358,6 +358,7 @@ void ENumeric::showData()
     else
         signLabel->setText(QString("+"));
 
+    int mantissaDigits = QString().number(data).length();
     for (int i = 0; i < digits; i++) {
         double power =  pow(10.0, digits-i-1);
         double numd = (double) temp / power;
@@ -368,6 +369,12 @@ void ENumeric::showData()
         numd = num * power;
         temp = temp - (long long) numd;
 
+        // Check if current mantissa exceedes 15 digits --> rounding errors begin there and color other
+        if (i - (digits-mantissaDigits) >= 15) {
+            labels[i]->setStyleSheet("QLabel { color:grey;}");
+        } else {
+            labels[i]->setStyleSheet("QLabel { color:black;}");
+        }
         thisDigit = abs((int) num);
         if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
@@ -375,6 +382,7 @@ void ENumeric::showData()
         if(thisDigit != 0) suppress = false;
         if(i >= intDig-1)  suppress = false;
     }
+    update();
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
 }
 

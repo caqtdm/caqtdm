@@ -177,8 +177,8 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
     if(className.contains("caNumeric") || className.contains("caApplyNumeric") || className.contains("caSpinbox")) {
-        precisionLineEdit->setMaximum(PREC_LIMIT_NUMERIC);
-         Layout->addWidget(buttonBox, 5, 0, 1, -1);
+        // precisionLineEdit->setMaximum(PREC_LIMIT_NUMERIC);
+        Layout->addWidget(buttonBox, 5, 0, 1, -1);
     }
     else if(className.contains("caSlider"))
     {
