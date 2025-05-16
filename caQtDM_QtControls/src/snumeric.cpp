@@ -352,6 +352,7 @@ void SNumeric::showData()
     else
         signLabel->setText(QString("+"));
 
+    int mantissaDigits = QString().number(data).length();
     for (int i = 0; i < digits; i++)
     {
         double power =  pow(10.0, digits-i-1);
@@ -363,16 +364,25 @@ void SNumeric::showData()
         numd = num * power;
         temp = temp - (long long) numd;
 
+        // Check if current mantissa exceedes 15 digits --> rounding errors begin there and color other
+        if (i - (digits-mantissaDigits) >= 15) {
+            labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), "grey", false));
+        } else {
+            labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), "black", false));
+        }
+
         thisDigit = abs((int) num);
         if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
         prvDigit = thisDigit;
         if(thisDigit != 0) suppress = false;
         if(i >= intDig-1)  suppress = false;
-
     }
+    update();
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
 }
+
+
 
 void SNumeric::valueUpdated()
 {
@@ -501,11 +511,11 @@ void SNumeric::resizeEvent(QResizeEvent *e)
 
         // put a border around selected digit
         for(int j=0; j< digits; j++) {
-            labels[j]->setStyleSheet("");
+            labels[j]->setStyleSheet(getStylesheetUpdate(labels[j]->styleSheet(), true));
         }
-        if(lastLabel != -1)
-            labels[lastLabel]->setStyleSheet("border: 2px solid red;");
-
+        if(lastLabel != -1){
+            labels[lastLabel]->setStyleSheet(getStylesheetUpdate(labels[lastLabel]->styleSheet(), false));
+        }
 
         foreach (QAbstractButton* but, bup->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
@@ -572,6 +582,36 @@ void SNumeric::resizeEvent(QResizeEvent *e)
     QWidget::resizeEvent(e);
 }
 
+QString SNumeric::getStylesheetUpdate(QString styleSheet, QString color, bool reset){
+    // Remove Border
+    if (styleSheet.length() > 0) {
+        if (reset) {
+            QString borderStyle = "border: 2px solid red;";
+            styleSheet.replace(borderStyle, "");
+            return styleSheet;
+        } else {
+            if (color.length() == 0) {
+                color = "black";
+            }
+            return "QLabel { Color:" + color + ";}";
+        }
+    }
+    return "QLabel { Color:black;}";
+}
+
+QString SNumeric::getStylesheetUpdate(QString styleSheet, bool resetBorder){
+    if (styleSheet.length() > 0) {
+        if (resetBorder) {
+            QString borderStyle = "border: 2px solid red;";
+            styleSheet.replace(borderStyle, "");
+            return styleSheet;
+        } else {
+            styleSheet.replace("}", "border: 2px solid red; }");
+            return styleSheet;
+        }
+    }
+    return styleSheet;
+}
 
 void  SNumeric::formatButton(QPushButton *button) {
     button->setText("");
