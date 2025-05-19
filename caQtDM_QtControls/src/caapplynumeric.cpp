@@ -110,6 +110,9 @@ void caApplyNumeric::setColors(QColor bg, QColor fg, bool init)
             delete re;
             return;
         }
+    }else if(thisColorMode == Static){
+        setStyleSheet("");
+        renewStyleSheet = true;
     }
 
     if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
