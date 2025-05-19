@@ -321,6 +321,7 @@ static void dataCallback(struct event_handler_args args)
 
             // concatenate strings separated with ';'
             dataSize = dbr_size_n(args.type, args.count) + (args.count+1) * sizeof(char);
+            // the reason for this here are crashes mainly on reloads of the panels
             if (dataSize < db_strval_dim) dataSize=db_strval_dim;
             if(dataSize != kData.edata.dataSize) {
                 if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
