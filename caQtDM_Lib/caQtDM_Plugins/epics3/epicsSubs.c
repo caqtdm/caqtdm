@@ -332,7 +332,7 @@ static void dataCallback(struct event_handler_args args)
             ptr = (char*) kData.edata.dataB;
             ptr[0] = '\0';
             len = 0;
-            strcpy_s(ptr,kData.edata.dataSize, myLimitedString(val_ptr[0]));
+            strncpy(ptr, myLimitedString(val_ptr[0]),kData.edata.dataSize);
             for (i = 1; i < args.count; i++) {
                 len = len+ (int) strlen(myLimitedString(val_ptr[i-1]));
                 strcat(&ptr[len++], "\033");
