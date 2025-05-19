@@ -98,8 +98,8 @@ archiveSF.depends = caQtDM_QtControls caQtDM_Lib
 archiveHTTP.depends = caQtDM_QtControls caQtDM_Lib
 archiveHIPA.depends = caQtDM_QtControls caQtDM_Lib
 
-iosArchitectures=armv7
-iosTarget=13.0
+iosArchitectures=arm64
+iosTarget=17.0
 
 # Set "Architectures"
 QMAKE_IOS_DEVICE_ARCHS = $$iosArchitectures

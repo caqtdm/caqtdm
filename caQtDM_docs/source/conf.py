@@ -7,9 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "caQtDM"
-copyright = "2007, Anton Mezger, Helge Brands"  # GPL3
+copyright = "2012-2025, Anton Mezger, Helge Brands"  # GPL3
 author = "Anton Mezger, Helge Brands"
-release = "4.4.1"
+release = "4.5.0"
 root_doc = "documentation"
 
 
@@ -26,7 +26,7 @@ extensions = """
 """.split()
 
 templates_path = ["_templates"]
-source_suffix = ".rst .md".split()
+#source_suffix = ".rst"
 exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------

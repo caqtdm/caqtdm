@@ -35,7 +35,7 @@ message ("Qt $$[QT_VERSION] QWT $$(QWTVERSION)")
 
 TARGET_COMPANY = "Paul Scherrer Institut"
 TARGET_DESCRIPTION = "Channel Access Qt Display Manager"
-TARGET_COPYRIGHT = "Copyright (C) 2012-2024 Paul Scherrer Institut"
+TARGET_COPYRIGHT = "Copyright (C) 2012-2025 Paul Scherrer Institut"
 TARGET_INTERNALNAME = "caqtdm"
 
 # enable opengl in stripplot and cartesianplot (edo not use, experimental only, for Qt5 and qwt6.1)
@@ -52,7 +52,7 @@ unix {
 
 
 # Set the overall Deployment Target for MACOSX
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 14.0
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 15.0
 
 # at psi the designer in 4.8.2 is patched in order to display tooltip description (not a nice test, but for now ok)
 # when the qt version is higher then 5.5.0 then we can also compile the plugins with description texts
@@ -294,7 +294,7 @@ DEFINES += TARGET_DESCRIPTION=\"\\\"$${TARGET_DESCRIPTION}\\\"\"
 DEFINES += TARGET_COPYRIGHT=\"\\\"$${TARGET_COPYRIGHT}\\\"\"
 DEFINES += TARGET_INTERNALNAME=\"\\\"$${TARGET_INTERNALNAME}\\\"\"
 DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
-# 4.4.2
+# 4.5.0
 # special character feature handling by CAQTDM_CUSTOM_UNIT_REPLACMETS
 # caStripplot improved data handling
 # optimized UI loading by reducing the load of incoming data (CAQTDM_SUPPRESS_UPDATES_ONLOAD)
@@ -304,7 +304,7 @@ DEFINES += TARGET_VERSION_STR=\"\\\"$${CAQTDM_VERSION}\\\"\"
 # some code refurbishments
 # RPM for RHEL9
 # logfile generation for status window (CAQTDM_CREATE_LOGFILE,CAQTDM_LOGFILE_PATH)
-
+# small documentation updates
 
 
 

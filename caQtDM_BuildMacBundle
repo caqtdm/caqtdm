@@ -27,7 +27,7 @@ cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Con
 echo
 echo ========== macdeployqt caQtDM ============
 echo
-macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM -libpath=./caQtDM_Binaries -libpath=/Users/brands/Documents/Entwicklung/epics/base-7.0.7/lib/darwin-aarch64 -libpath=/Users/brands/Documents/Entwicklung/qt/qwt-6.2.0/lib -libpath=/Users/brands/Documents/Entwicklung/qt/zmqbuild/lib
+macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM -libpath=./caQtDM_Binaries -libpath=/Users/brands/Documents/Entwicklung/epics/base-7.0.8.1/lib/darwin-aarch64 -libpath=${QWTLIB} -libpath=/Users/brands/Documents/Entwicklung/qt/zmqbuild/lib
 
 echo
 echo ========== change plugin libs =============

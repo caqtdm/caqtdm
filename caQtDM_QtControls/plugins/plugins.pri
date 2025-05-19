@@ -32,6 +32,7 @@ ios | android {
   LIBS += ../$(CAQTDM_COLLECT)/libqtcontrols.a
   INCLUDEPATH += $(QWTINCLUDE)
   INCLUDEPATH += $$(QWTHOME)/src
+  INCLUDEPATH += $(QTHOME)/include
   MOC_DIR = moc
   OBJECTS_DIR = obj
 }
@@ -84,6 +85,7 @@ unix:!ios {
       LIBS += -L $(CAQTDM_COLLECT) -lqtcontrols
 
    }
+
 }
 
 INCLUDEPATH += ../../caQtDM_Lib/src

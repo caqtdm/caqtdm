@@ -3,7 +3,7 @@ caQtDM Manual
 =============
 
 | **Anton Mezger/Helge Brands**
-| **November 2023**
+| **May 2025**
 | Paul Scherrer Institute
 | CH-5232 Villigen
 | Switzerland
@@ -17,6 +17,14 @@ Display Manager MEDM [#]_, therefore this manual is of course also inspired
 by the existing MEDM manual.
 
 The HTML was converted to restructured text using spinx.
+
+.. sourcecode:: none 
+   :caption: building/installing 
+   
+     pip install sphinx
+     pip install pydata-sphinx-theme
+     make singlehtml
+
 
 .. [#] EPICS: https://epics.anl.gov
 .. [#] MEDM: https://epics.anl.gov/extensions/medm
@@ -146,10 +154,10 @@ Min:
    -  Wix 3.0
 
 Max:
-   -  Qt 6.5.2
-   -  Qwt 6.2.0
-   -  EPICS 7.0.7
-   -  MS Visual Studio 2019
+   -  Qt 6.9.0
+   -  Qwt 6.3.0
+   -  EPICS 7.0.9
+   -  MS Visual Studio 2022
    -  Wix 3.11
 
 
@@ -383,9 +391,24 @@ release. You can follow the development history and detect if a bug in
 the used version has been solved.
 
 .. container::
-   
-   4.4.1
 
+   4.5.0
+   
+-  special character feature handling by CAQTDM_CUSTOM_UNIT_REPLACMETS
+-  caStripplot improved data handling
+-  optimized UI loading by reducing the load of incoming data (CAQTDM_SUPPRESS_UPDATES_ONLOAD)
+-  improved colors in caQtDM status window
+-  added UI loading benchmark
+-  added the new archiverhttp-protocol
+-  some code refurbishments
+-  RPM for RHEL9
+-  logfile generation for status window (CAQTDM_CREATE_LOGFILE,CAQTDM_LOGFILE_PATH)
+-  small documentation updates
+
+.. container::
+
+   4.4.1
+   
 -  caQtDM can be compiled with Qt6
 -  new signals for caCartesianplot
 -  fix for caInclude with upscaling
@@ -1748,7 +1771,7 @@ This serves as the replacement for the StripChart Monitor in MEDM.
       bool: specifies if the legend should be drawn
    
    | **Dynamic Properties:**
-   .. container::
+      container::
       caStripPlot also has dynamic properties. For panel designers, they can be treated the same as regular QProperties.
       
       **xAxisToleranceFactor:**
