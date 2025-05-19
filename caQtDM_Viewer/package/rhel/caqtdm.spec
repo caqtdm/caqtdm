@@ -116,7 +116,7 @@ Obsoletes:  caqtdm
 %description bin-qt5
 %define qt_vers qt5
 %if 0%{?rhel} <  8
-Requires: python==3.9
+Requires: python==3.12
 %endif
 Requires: epics-base%{EPICS_TARGET_VERSION}
 
@@ -155,7 +155,7 @@ export EPICS_BASE=/usr/local/epics/base%{EPICS_TARGET_VERSION}
 export EPICSINCLUDE=${EPICS_BASE}/include
 export EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH
 %if 0%{?rhel} >  7
-export PYTHONVERSION=3.9
+export PYTHONVERSION=3.12
 %else
 export PYTHONVERSION=2.7
 %endif
