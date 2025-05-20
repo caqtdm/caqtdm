@@ -224,6 +224,7 @@ void SNumeric::init()
 
     connect(bup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(upData(QAbstractButton*)));
     connect(bdown, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(downData(QAbstractButton*)));
+    triggerRoundColorUpdate();
 }
 
 void SNumeric::setValue(double v)
@@ -352,7 +353,6 @@ void SNumeric::showData()
     else
         signLabel->setText(QString("+"));
 
-    int mantissaDigits = QString().number(data).length();
     for (int i = 0; i < digits; i++)
     {
         double power =  pow(10.0, digits-i-1);
@@ -364,13 +364,6 @@ void SNumeric::showData()
         numd = num * power;
         temp = temp - (long long) numd;
 
-        // Check if current mantissa exceedes 15 digits --> rounding errors begin there and color other
-        if (i - (digits-mantissaDigits) >= 15) {
-            labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), "grey", false));
-        } else {
-            labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), "black", false));
-        }
-
         thisDigit = abs((int) num);
         if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
@@ -378,17 +371,41 @@ void SNumeric::showData()
         if(thisDigit != 0) suppress = false;
         if(i >= intDig-1)  suppress = false;
     }
-    update();
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
+    triggerRoundColorUpdate();
 }
 
+void SNumeric::triggerRoundColorUpdate(){
+    for(int i = 1; i < digits ; i++){
+        updateRoundColors(i);
+    }
+}
 
+void SNumeric::updateRoundColors(int i) {
+    int mantissaDigits = QString().number(data).length();
+    QColor currColor = labels[i]->palette().color(QPalette::Text);
+    QColor txtColor = labels[0]->palette().color(QPalette::Text);
+    qDebug() << currColor;
+    if (i - (digits - mantissaDigits) >= 15) {
+        if(currColor == txtColor){
+            QColor c = QColor(255 - currColor.red(), 255 - currColor.green(), 255 - currColor.blue(), 255);
+            labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), c.name(), false));
+        }else{
+            labels[i]->setStyleSheet(
+                getStylesheetUpdate(labels[i]->styleSheet(), currColor.name(), false));
+        }
+    } else {
+        labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), currColor.name(), false));
+    }
+    update();
+}
 
 void SNumeric::valueUpdated()
 {
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
     delete re;
+    update();
 }
 
 bool SNumeric::eventFilter(QObject *obj, QEvent *event)
@@ -408,6 +425,7 @@ bool SNumeric::eventFilter(QObject *obj, QEvent *event)
         QApplication::restoreOverrideCursor();
         valueUpdated();
         updateGeometry();
+        triggerRoundColorUpdate();
     } else if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *ev = (QMouseEvent *) event;
         for (int i = 0; i < digits; i++) {
@@ -584,6 +602,10 @@ void SNumeric::resizeEvent(QResizeEvent *e)
 
 QString SNumeric::getStylesheetUpdate(QString styleSheet, QString color, bool reset){
     // Remove Border
+    QColor currColor = this->palette().color(QPalette::Text);
+    QColor c = QColor(255 - currColor.red(), 255 - currColor.green(),
+                      255 - currColor.blue(), 255);
+
     if (styleSheet.length() > 0) {
         if (reset) {
             QString borderStyle = "border: 2px solid red;";
@@ -591,12 +613,12 @@ QString SNumeric::getStylesheetUpdate(QString styleSheet, QString color, bool re
             return styleSheet;
         } else {
             if (color.length() == 0) {
-                color = "black";
+                color = c.name();
             }
             return "QLabel { Color:" + color + ";}";
         }
     }
-    return "QLabel { Color:black;}";
+    return "QLabel { Color:" + c.name() + ";}";
 }
 
 QString SNumeric::getStylesheetUpdate(QString styleSheet, bool resetBorder){

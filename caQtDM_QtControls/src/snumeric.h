@@ -116,6 +116,8 @@ private:
 
     QString getStylesheetUpdate(QString styleSheet, QString color = "", bool reset = false);
     QString getStylesheetUpdate(QString styleSheet, bool resetBorder = false);
+    void updateRoundColors(int i);
+    void triggerRoundColorUpdate();
 
     int intDig;
     int decDig;
