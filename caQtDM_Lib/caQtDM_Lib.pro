@@ -29,7 +29,7 @@ contains(QT_VER_MAJ, 6) {
        QT += printsupport
     }
     CONFIG += qt plugin thread
-    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
+    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050000
 }
 
 FORMS += ../caQtDM_Viewer/src/main.ui

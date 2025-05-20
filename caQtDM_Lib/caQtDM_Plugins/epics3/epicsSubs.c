@@ -321,6 +321,8 @@ static void dataCallback(struct event_handler_args args)
 
             // concatenate strings separated with ';'
             dataSize = dbr_size_n(args.type, args.count) + (args.count+1) * sizeof(char);
+            // the reason for this here are crashes mainly on reloads of the panels
+            if (dataSize < db_strval_dim) dataSize=db_strval_dim;
             if(dataSize != kData.edata.dataSize) {
                 if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                 kData.edata.dataB = (void*) malloc((size_t) dataSize);
@@ -330,7 +332,7 @@ static void dataCallback(struct event_handler_args args)
             ptr = (char*) kData.edata.dataB;
             ptr[0] = '\0';
             len = 0;
-            strcpy(ptr, myLimitedString(val_ptr[0]));
+            strncpy(ptr, myLimitedString(val_ptr[0]),kData.edata.dataSize);
             for (i = 1; i < args.count; i++) {
                 len = len+ (int) strlen(myLimitedString(val_ptr[i-1]));
                 strcat(&ptr[len++], "\033");
