@@ -369,12 +369,7 @@ void ENumeric::showData()
         numd = num * power;
         temp = temp - (long long) numd;
 
-        // Check if current mantissa exceedes 15 digits --> rounding errors begin there and color other
-        if (i - (digits-mantissaDigits) >= 15) {
-            labels[i]->setStyleSheet("QLabel { color:grey;}");
-        } else {
-            labels[i]->setStyleSheet("QLabel { color:black;}");
-        }
+
         thisDigit = abs((int) num);
         if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
@@ -382,8 +377,32 @@ void ENumeric::showData()
         if(thisDigit != 0) suppress = false;
         if(i >= intDig-1)  suppress = false;
     }
-    update();
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
+    triggerRoundColorUpdate();
+}
+
+void ENumeric::triggerRoundColorUpdate(){
+    for(int i = 1; i < digits ; i++){
+        updateRoundColors(i);
+    }
+}
+
+void ENumeric::updateRoundColors(int i) {
+    int mantissaDigits = QString().number(data).length();
+    QColor currColor = labels[i]->palette().color(QPalette::Text);
+    QColor txtColor = labels[0]->palette().color(QPalette::Text);
+
+    if (i - (digits - mantissaDigits) >= 15) {
+        if(currColor == txtColor){
+            QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
+            labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
+        }else{
+            labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
+        }
+    } else {
+        labels[i]->setStyleSheet("QLabel {color:" + txtColor.name() + ";}");
+    }
+    update();
 }
 
 void ENumeric::valueUpdated()
@@ -449,6 +468,7 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
             valueUpdated();
             updateGeometry();
+            triggerRoundColorUpdate();
         }
     } else if(event->type() == QEvent::MouseButtonDblClick) {
         if(!_AccessW) return true;

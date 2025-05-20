@@ -112,6 +112,8 @@ private:
     void reconstructGeometry();
     void downDataIndex(int id);
     void upDataIndex(int id);
+    void updateRoundColors(int i);
+    void triggerRoundColorUpdate();
 
     int idUpVuoto, idDownVuoto;
     int idUpPoint, idDownPoint;

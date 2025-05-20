@@ -385,17 +385,17 @@ void SNumeric::updateRoundColors(int i) {
     int mantissaDigits = QString().number(data).length();
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
-    qDebug() << currColor;
+
     if (i - (digits - mantissaDigits) >= 15) {
         if(currColor == txtColor){
-            QColor c = QColor(255 - currColor.red(), 255 - currColor.green(), 255 - currColor.blue(), 255);
+            QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), c.name(), false));
         }else{
             labels[i]->setStyleSheet(
                 getStylesheetUpdate(labels[i]->styleSheet(), currColor.name(), false));
         }
     } else {
-        labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), currColor.name(), false));
+        labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), txtColor.name(), false));
     }
     update();
 }
