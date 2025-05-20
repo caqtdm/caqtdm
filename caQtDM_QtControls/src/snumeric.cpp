@@ -224,7 +224,6 @@ void SNumeric::init()
 
     connect(bup, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(upData(QAbstractButton*)));
     connect(bdown, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(downData(QAbstractButton*)));
-    triggerRoundColorUpdate();
 }
 
 void SNumeric::setValue(double v)

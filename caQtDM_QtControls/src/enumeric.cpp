@@ -358,7 +358,6 @@ void ENumeric::showData()
     else
         signLabel->setText(QString("+"));
 
-    int mantissaDigits = QString().number(data).length();
     for (int i = 0; i < digits; i++) {
         double power =  pow(10.0, digits-i-1);
         double numd = (double) temp / power;
@@ -368,7 +367,6 @@ void ENumeric::showData()
             num = ceil(numd);
         numd = num * power;
         temp = temp - (long long) numd;
-
 
         thisDigit = abs((int) num);
         if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
@@ -431,8 +429,13 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
         text->raise();
         text->show();
     }
-    QString valueString;
-    valueString = QString().number(this->value());
+    QString valueString = "";
+    for(int i = 0; i < digits; i++){
+        if(i == intDig) valueString += ".";
+        QString txt = labels[i]->text();
+        if(txt != " ") valueString += txt;
+
+    }
     text->setText(valueString);
 
     connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
