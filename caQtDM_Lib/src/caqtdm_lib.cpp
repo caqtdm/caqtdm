@@ -7504,8 +7504,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
                         info.append("<br>=====================================");
                         if(!kPtr->soft) {
-                            info.append("<br>");
-                            info.append("Description: ");
+                            info.append("<br>Description: ");
                             if(plugininterface != (ControlsInterface *) Q_NULLPTR) {
                                 if (qstrcmp(kPtr->pluginName, "archiveHTTP") == 0) {
                                         char specificKey[MAX_STRING_LENGTH];
@@ -7517,6 +7516,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                 }
                             }
                             info.append(description);
+                            info.append("<br>"); // for Timestamp
                             if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvGetTimeStamp(kPtr->pv, timestamp);
                             info.append(timestamp);
                         }
