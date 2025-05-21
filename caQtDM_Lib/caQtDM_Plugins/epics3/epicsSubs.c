@@ -1410,7 +1410,7 @@ int EpicsGetDescription(char *pv, char *description)
     strcpy(pvDesc,pv);
     pch = strstr (pvDesc,".{");
 
-    if (pch) *pch='\0';
+    if ((pch)&&(pch!=pvDesc)) *pch='\0';
 
     sprintf(pvDesc, "%s.DESC", pvDesc);
 printf("%s,%s\n",pv,pvDesc);
