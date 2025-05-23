@@ -1395,6 +1395,7 @@ int EpicsGetDescription(char *pv, char *description)
     chid     ch;
     int status;
     pv_desc pvDesc = {'\0'};
+    pv_desc pvDescTarget = {'\0'};
     char * pch;
     dbr_string_t value;
     strcpy(description, "");
@@ -1410,13 +1411,11 @@ int EpicsGetDescription(char *pv, char *description)
     strcpy(pvDesc,pv);
     pch = strstr (pvDesc,".{");
 
-    if ((pch)&&(pch!=pvDesc)) *pch='\0';
+    if (pch) *pch='\0';
 
-    sprintf(pvDesc, "%s.DESC", pvDesc);
-printf("%s,%s\n",pv,pvDesc);
-fflush(stdout);
+    sprintf(pvDescTarget, "%s.DESC", pvDesc);
     // get description
-    status = ca_create_channel(pvDesc, Q_NULLPTR, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pvDescTarget, Q_NULLPTR, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) return !ECA_NORMAL;
 
     status = ca_pend_io(CA_TIMEOUT/2);
