@@ -391,6 +391,7 @@ void caDoubleTabWidget::setFont(int dir)
         padding[j] = thisVerPadding.at(j).toInt();
     }
 
+    QColor bg = hTabBar->palette().base().color();
     int count =  vTabBar->buttons().count();
     for(int i = count-1; i >= 0; i--) {
         QPushButton* button = (QPushButton*) vTabBar->button(i);
@@ -410,7 +411,10 @@ void caDoubleTabWidget::setFont(int dir)
 
         style.append(tr("text-align: left; padding-left: %1px;").arg(padding[i]));
         style.append("} ");
-        style.append("QPushButton:checked {background-color: magenta;}");
+
+        QString pushbtnColor = QString("QPushButton:checked {background-color: rgb( %1, %2, %3);}")
+                                   .arg(bg.red()).arg(bg.green()).arg(bg.blue());
+        style.append(pushbtnColor);
         style.append("QPushButton:default {border-color: navy; }");
         button->setStyleSheet(style);
     }
