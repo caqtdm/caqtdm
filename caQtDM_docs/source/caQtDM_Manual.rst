@@ -2270,10 +2270,14 @@ is the equivalent of the Composite in MEDM
 ``caDoubleTabWidget``
 ~~~~~~~~~~~~~~~~~~~~~
 
-has no equivalent in MEDM and is not a controls object
+has no equivalent in MEDM and is not a controls object.
 
    :ref:`geometry` is used for any object
    **Description:**
+
+   enables the use of tabs. A new tab can be added in Qt Designer by right-clicking on the widget
+   and using 'Insert Before' or 'Insert After' (doesnt matter which). Color of tabs can be edited via stylesheet
+   (QTabBar::tab for horizontal, QPushButton:checked for vertical ones)
 
 all controller objects
 --------------------------
