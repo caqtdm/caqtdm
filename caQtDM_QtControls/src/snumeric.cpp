@@ -389,6 +389,7 @@ void SNumeric::updateRoundColors(int i) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), c.name(), false));
+            labels[i]->setToolTip("digit affected by rounding errors due to technical limits");
         }else{
             labels[i]->setStyleSheet(
                 getStylesheetUpdate(labels[i]->styleSheet(), currColor.name(), false));
