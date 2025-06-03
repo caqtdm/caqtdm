@@ -79,9 +79,7 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
     addPages = false;
 
     // colorize horizontal bar
-    QPalette pal = hTabBar->palette();
-    pal.setColor(QPalette::Base, QColor(255, 0, 255));
-    hTabBar->setPalette(pal);
+    setFont(0);
 
     setRow(0);
     setCol(0);
@@ -104,6 +102,10 @@ bool caDoubleTabWidget::eventFilter(QObject *obj, QEvent *event)
                 }
             }
         }
+    }
+
+    if(event->type() == QEvent::Polish){
+        editStyleSheet(this->styleSheet());
     }
     return QWidget::event(event);
 }
@@ -366,7 +368,7 @@ void caDoubleTabWidget::fontChange(const QFont & oldFont) {
     style.append("} ");
     hTabBar->setStyleSheet(style);
 
-    setFont(1);
+//    setFont(1);
 }
 
 void caDoubleTabWidget::setItemsPadding(QString const &padding) {
@@ -410,12 +412,19 @@ void caDoubleTabWidget::setFont(int dir)
 
         style.append(tr("text-align: left; padding-left: %1px;").arg(padding[i]));
         style.append("} ");
-        style.append("QPushButton:checked {background-color: magenta;}");
-        style.append("QPushButton:default {border-color: navy; }");
-        button->setStyleSheet(style);
+
+        QString pushbtnColor = QString("QPushButton:checked {background-color: rgb( 255, 0, 255);}");
+        style.append(pushbtnColor);
+
+         style.append("QPushButton:default {border-color: navy; }");
+        style.append("QTabBar::tab  {background-color: rgb( 255, 0, 255);}");
+         this->setStyleSheet(style);
     }
 #ifdef _MSC_VER
     delete[] padding;
 #endif
 }
 
+void caDoubleTabWidget::editStyleSheet(QString styleSheet){
+    this->setStyleSheet(styleSheet);
+}
