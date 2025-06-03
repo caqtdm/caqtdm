@@ -77,7 +77,6 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
     addSampleWidget(0);
     addSampleWidget(1);
     addPages = false;
-    firstExecution = true;
 
     // colorize horizontal bar
     setFont(0);
@@ -427,18 +426,5 @@ void caDoubleTabWidget::setFont(int dir)
 }
 
 void caDoubleTabWidget::editStyleSheet(QString styleSheet){
-    if(firstExecution){
-         if (styleSheet.length() == 0) {
-            this->setStyleSheet("");
-         }else{
-            this->setStyleSheet(styleSheet);
-         }
-         firstExecution = false;
-    }else{
-         if(styleSheet.length() > 0){
-         this->setStyleSheet(styleSheet);
-         }else{
-         }
-    }
- }
-
+    this->setStyleSheet(styleSheet);
+}

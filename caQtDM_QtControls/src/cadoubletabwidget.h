@@ -150,8 +150,6 @@ private:
     bool addPages;
     QVBoxLayout*  buttonLayout;
     int vCount;
-    bool firstExecution;
-
 };
 
 #endif
