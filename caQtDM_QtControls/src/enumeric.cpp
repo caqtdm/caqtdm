@@ -38,6 +38,7 @@
 #include <QTimer>
 #include <QtDebug>
 #include <QApplication>
+#include <QTime>
 
 #define MIN_FONT_SIZE 5
 
@@ -56,6 +57,7 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
 {
     lastLabelOnTab = lastLabel = -1;
     intDig = id;
+    original_decDig = dd;
     decDig = dd;
     digits = id + dd;
     data = 0;
@@ -239,7 +241,7 @@ void ENumeric::init()
 
 void ENumeric::setValue(double v)
 {
-    long long temp = (long long)round(v * (long long)pow(10.0, decDig));
+    long long temp = transformNumberSpace(v, decDig);
     if ((temp >= minVal) && (temp <= maxVal)) {
         bool valChanged = data != temp;
         data = temp;
@@ -247,14 +249,19 @@ void ENumeric::setValue(double v)
          * in the labels of the TNumeric.
          */
         showData();
-        if (valChanged) emit valueChanged(temp* (long long) pow(10.0, -decDig));
+        if (valChanged) emit valueChanged(transformNumberSpace(temp, -decDig));
     }
 }
 
 void ENumeric::silentSetValue(double v)
 {
     csValue = v;
-    long long temp = (long long) round(v * (long long) pow(10.0, decDig));
+    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << "silentDig:" << digits;
+    while (digits > 15) {
+        decDig -= 1;
+        digits = decDig + intDig;
+    }
+    long long temp = (long long)round(v * (long long)pow(10.0, decDig));
     data = temp;
     showData();
 }
@@ -263,30 +270,34 @@ void ENumeric::setMaximum(double v)
 {
     if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
-        int firstDig = 0, secondDig = 0;
-        if(decDig > 10){
-            firstDig = 10;
-            secondDig = decDig - firstDig;
-        }else{
-            firstDig = decDig;
+
+        int ddig = digits;
+        while (ddig > 18) {
+            decDig--;
+            ddig--;
+            intDig++;
+            digits = decDig + intDig;
         }
 
-        long long temp = 0;
-        if(secondDig > 0){
-            temp = (long long) round (v * (long long) pow(10.0, firstDig));
-            temp *= (long long) pow(10.0, secondDig);
-        }else{
-            temp = (long long) round(v* (long long)pow(10.0, firstDig));
-        }
-        maxVal = temp;
+        // maxVal = (long long)round(v * (long long)pow(10.0, decDig));
+        maxVal = transformNumberSpace(v, decDig);
     }
 }
 
 void ENumeric::setMinimum(double v)
 {
     if (v <= d_maxAsDouble) {
-        d_minAsDouble = v;
-        minVal = (long long) round(v* (long long)pow(10.0, decDig));
+        /*
+        int ddig = digits;
+        while (ddig > 18) {
+            decDig--;
+            ddig--;
+            intDig++;
+            digits = decDig + intDig;
+        }
+        minVal = transformNumberSpace(v, decDig);
+*/
+        minVal = (long long)round(v * (long long)pow(10.0, decDig));
     }
 }
 
@@ -345,6 +356,19 @@ void ENumeric::upDataIndex(int id)
     if (text != NULL) text->hide();
 }
 
+double ENumeric::transformNumberSpace(double value, int dig){
+    double pw = value;
+    while (dig > 10) {
+        qDebug() << dig<< "lft:" << dig-10;
+        dig -= 10;
+        pw *= pow(10.0, 10);
+    }
+
+    pw *= pow(10.0, dig);
+    qDebug() << pw << (long long) pw;
+    return pw;
+}
+
 void ENumeric::downData(QAbstractButton* b)
 {
     int id = b->objectName().remove("layoutmember").toInt();
@@ -398,6 +422,7 @@ void ENumeric::showData()
     }
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
     triggerRoundColorUpdate();
+    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << "DIGITS" << digits;
 }
 
 void ENumeric::triggerRoundColorUpdate(){
@@ -411,7 +436,7 @@ void ENumeric::updateRoundColors(int i) {
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
 
-    if (i - (digits - mantissaDigits) >= 15) {
+    if (i - ((digits) - mantissaDigits) >= 15) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
