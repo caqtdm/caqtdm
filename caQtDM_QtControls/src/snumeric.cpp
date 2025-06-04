@@ -256,7 +256,23 @@ void SNumeric::setMaximum(double v)
     if (v >= d_minAsDouble)
     {
         d_maxAsDouble = v;
-        maxVal = (long long) round(v* (long long)pow(10.0, decDig));
+        int firstDig = 0, secondDig = 0;
+        if(decDig > 10){
+            firstDig = 10;
+            secondDig = decDig - firstDig;
+        }else{
+            firstDig = decDig;
+        }
+
+        long long temp = 0;
+        if(secondDig > 0){
+            temp = (long long) round (v * (long long) pow(10.0, firstDig));
+            temp *= (long long) pow(10.0, secondDig);
+        }else{
+            temp = (long long) round(v* (long long)pow(10.0, firstDig));
+        }
+        maxVal = temp;
+
     }
 }
 
@@ -305,15 +321,21 @@ void SNumeric::upDataIndex(int id)
 {
     if(!_AccessW) return;
     if(id == -1) return;
-    double datad = (double) data;
-    double power =  pow(10.0, digits-id-1);
+    long long datad = data;
+    long long const currentData = data;
+    long long power =  qPow(10.0, digits-id-1);
     datad = datad + power;
-    if (datad <= (double) maxVal) {
-        data = (long long) datad;
+    // (long long) power overflows between 10^18 and 10^19
+    if (datad <= ((double)maxVal) && digits-id-1 < 19) {
+        data = datad;
         power = pow(10.0, -decDig);
-        datad = datad * power;
-        emit valueChanged(datad);
-        showData();
+        double dataDouble = (double) datad;
+        dataDouble *= pow(10.0, -decDig);
+
+        if (currentData <= datad) {
+            emit valueChanged(dataDouble);
+            showData();
+        }
     }
     if (text != NULL) text->hide();
 }
