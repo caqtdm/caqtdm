@@ -2299,7 +2299,12 @@ is the equivalent of the Wheelswitch in MEDM
    decrement the digit. The WheelSwitch will also accept input of a new
    value via the keyboard by double clicking on the value. Escape aborts
    the input. Type Enter to finish the input. 
-   Due to type constraints, the precision is limited to 13 digits past zero.
+   Due to type constraints rounding errors begin at 15 total digits, 
+   affected digits will be colored with a different color.
+   The constraints also affect the maximum and minimum values: 
+   the higher the precision used, the lower the maximum value  will be (and other way around) 
+   - these constraints depend on the maximum limit that set by either the EPICS channel or the user
+   by right-clicking on the widget. 
 
 --------------
 

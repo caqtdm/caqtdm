@@ -352,7 +352,9 @@ void SNumeric::downDataIndex(int id)
     if(id == -1) return;
     double datad = (double) data;
     double power =  pow(10.0, digits-id-1);
+    long long const curr_d = data;
     datad = datad - power;
+    qDebug() << curr_d << power << minVal;
     if (datad >= (double) minVal) {
         data = (long long) datad;
         power = pow(10.0, -decDig);
