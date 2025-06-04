@@ -426,11 +426,12 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 {
     if (text == NULL) {
         text = new QLineEdit(this);
-    }else{
+    } else {
         text->raise();
         text->show();
     }
     QString valueString = "";
+    if(signLabel->text() == "-") valueString += signLabel->text();
     for(int i = 0; i < digits; i++){
         if(i == intDig) valueString += ".";
         QString txt = labels[i]->text();
