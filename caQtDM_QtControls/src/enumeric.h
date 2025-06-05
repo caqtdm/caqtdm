@@ -136,6 +136,6 @@ private:
     int lastLabel, lastLabelOnTab;
     double csValue;
 
-    int original_decDig;
+    int original_digits;
 };
 #endif // EDIGIT_H

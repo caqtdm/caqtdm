@@ -57,9 +57,9 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
 {
     lastLabelOnTab = lastLabel = -1;
     intDig = id;
-    original_decDig = dd;
     decDig = dd;
     digits = id + dd;
+    original_digits = digits;
     data = 0;
     csValue = 0.0;
     minVal = (int) -pow(10.0, digits) + 1;
@@ -256,12 +256,10 @@ void ENumeric::setValue(double v)
 void ENumeric::silentSetValue(double v)
 {
     csValue = v;
-    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << "silentDig:" << digits;
-    while (digits > 15) {
-        decDig -= 1;
-        digits = decDig + intDig;
-    }
-    long long temp = (long long)round(v * (long long)pow(10.0, decDig));
+    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << "silentDig:" << digits << original_digits;
+
+    qDebug() << decDig << intDig;
+    long long temp = transformNumberSpace(v, decDig);
     data = temp;
     showData();
 }
@@ -287,7 +285,6 @@ void ENumeric::setMaximum(double v)
 void ENumeric::setMinimum(double v)
 {
     if (v <= d_maxAsDouble) {
-        /*
         int ddig = digits;
         while (ddig > 18) {
             decDig--;
@@ -296,8 +293,8 @@ void ENumeric::setMinimum(double v)
             digits = decDig + intDig;
         }
         minVal = transformNumberSpace(v, decDig);
-*/
-        minVal = (long long)round(v * (long long)pow(10.0, decDig));
+
+        // minVal = (long long)round(v * (long long)pow(10.0, decDig));
     }
 }
 
@@ -359,13 +356,11 @@ void ENumeric::upDataIndex(int id)
 double ENumeric::transformNumberSpace(double value, int dig){
     double pw = value;
     while (dig > 10) {
-        qDebug() << dig<< "lft:" << dig-10;
         dig -= 10;
         pw *= pow(10.0, 10);
     }
 
     pw *= pow(10.0, dig);
-    qDebug() << pw << (long long) pw;
     return pw;
 }
 
@@ -382,7 +377,13 @@ void ENumeric::downDataIndex(int id)
     double datad = (double) data;
     double power =  pow(10.0, digits-id-1);
     datad = datad - power;
-    if (datad >= (double) minVal) {
+    QString dataLength = QString().number(data);
+    for(int i = 0; i < original_digits; i++){
+        dataLength += "0";
+    }
+    QString minLength = QString().number(minVal);
+    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << digits-id-1;
+    if (datad >= (double) minVal && digits+original_digits-id-1) {
         data = (long long) datad;
         power = pow(10.0, -decDig);
         datad = datad * power;
@@ -422,7 +423,6 @@ void ENumeric::showData()
     }
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
     triggerRoundColorUpdate();
-    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << "DIGITS" << digits;
 }
 
 void ENumeric::triggerRoundColorUpdate(){
@@ -432,7 +432,7 @@ void ENumeric::triggerRoundColorUpdate(){
 }
 
 void ENumeric::updateRoundColors(int i) {
-    int mantissaDigits = QString().number(data).length();
+    int mantissaDigits = digits;// QString().number(data).length();
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
 
@@ -440,7 +440,7 @@ void ENumeric::updateRoundColors(int i) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
-            labels[i]->setToolTip("digit affected by rounding errors due to technical limits");
+            labels[i]->setToolTip("rounding error may occur");
         }else{
             labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
         }
@@ -483,6 +483,9 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
         QString txt = labels[i]->text();
         if(txt != " ") valueString += txt;
 
+    }
+    for(int i = 0;i < original_digits; i++){
+        valueString += "0";
     }
     text->setText(valueString);
 
