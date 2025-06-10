@@ -375,20 +375,18 @@ void ENumeric::downDataIndex(int id)
     if(!_AccessW) return;
     if(id == -1) return;
     double datad = (double) data;
+    long long const currentData = data;
     double power =  pow(10.0, digits-id-1);
     datad = datad - power;
-    QString dataLength = QString().number(data);
-    for(int i = 0; i < original_digits; i++){
-        dataLength += "0";
-    }
-    QString minLength = QString().number(minVal);
-    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << digits-id-1;
-    if (datad >= (double) minVal && digits+original_digits-id-1) {
+    if (datad >= (double) minVal && (digits)-id-1 < 19) {
         data = (long long) datad;
         power = pow(10.0, -decDig);
         datad = datad * power;
-        emit valueChanged(datad);
-        showData();
+
+        if (currentData >= datad) {
+            emit valueChanged(datad);
+            showData();
+        }
     }
     if (text != NULL) text->hide();
 }
