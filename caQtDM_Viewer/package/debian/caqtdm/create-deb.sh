@@ -1,26 +1,43 @@
 #!/bin/bash -e
 
-CAQTDM_TAG=v4.5.0-rc2
+CAQTDM_TAG=V4.6.0
 CAQTDM_REVISION=1
-export CAQTDM_VERSION=$(echo ${CAQTDM_TAG} | sed 's/v//;s/-/~/g')
+export CAQTDM_VERSION=$(echo ${CAQTDM_TAG} | sed 's/V//;s/-/~/g')
 export CAQTDM_VERSION_DEB=${CAQTDM_VERSION}-${CAQTDM_REVISION}
 
+mkdir -p caqtdm/debian/
+cp -r ./debian/* caqtdm/debian/
+cd caqtdm
 
-rm -rf caqtdm-${CAQTDM_VERSION} || true
-rm -f caqtdm* || true
 
-# Download the source code
-wget https://github.com/caqtdm/caqtdm/archive/refs/tags/${CAQTDM_TAG}.tar.gz -O caqtdm_${CAQTDM_VERSION}.orig.tar.gz
 
-tar xf caqtdm_${CAQTDM_VERSION}.orig.tar.gz
+CAQTDM_TAG=Development
+# Get source code (equivalent to PKGBUILD's source field)
+git clone -c advice.detachedHead=false --branch ${CAQTDM_TAG} https://github.com/caqtdm/caqtdm.git temp
+# Remove the .git directory
+rm -rf temp/.git
 
-mv caqtdm-$(echo ${CAQTDM_TAG} | sed 's/v//') caqtdm-${CAQTDM_VERSION}
-cd caqtdm-${CAQTDM_VERSION}
+cd temp
+# Compress to caqtdm-${CAQTDM_VERSION}.orig.tar.gz
+tar -czf ../caqtdm_${CAQTDM_VERSION}.orig.tar.gz --exclude=.git . 
+cd ..
 
-dh_make --createorig -p caqtdm_${CAQTDM_VERSION} --packagename caqtdm -s -y
-cp -rf ../debian/* debian/
-rm -f debian/*.ex debian/README.Debian debian/README.source
-pwd
+rsync -a --remove-source-files temp/ .
+rm -rf temp/
+
+mv ./caqtdm_${CAQTDM_VERSION}.orig.tar.gz ../
+
+# Make rules executable
+chmod +x debian/rules
+
+cd debian/
+
+# Replace change log %DATE% with the current date
+sed -i "s/%DATE%/$(LC_TIME=C date +'%a, %d %b %Y %H:%M:%S %z')/" changelog
+
+# Replace control and changelog with the current version
+sed -i "s/%VERSION%/${CAQTDM_VERSION_DEB}/" control
+sed -i "s/%VERSION%/${CAQTDM_VERSION_DEB}/" changelog
 
 # Build the package
-dpkg-buildpackage -us -uc
+debuild -us -uc

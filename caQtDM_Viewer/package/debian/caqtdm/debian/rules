@@ -3,17 +3,20 @@
 export QWTLIBNAME=qwt-qt5
 export QWTINCLUDE=/usr/include/qwt
 export PYTHONVERSION=$(shell python3 --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1-2)
-export ZMQ=/usr
+export ZMQ=/usr/
 export ZMQINC=${ZMQ}/include
 export ZMQLIB=${ZMQ}/lib
 export QTDM_RPATH=/opt/caqtdm/lib/qt5
+export GCC_BUILD_ARCH=$(shell gcc -dumpmachine)
+export EPICS_HOST_ARCH=$(shell uname -m)
 export QTHOME=/usr
 export QWTHOME=/usr
 export QWTLIB=${QWTHOME}/lib
 export QWTVERSION=6.1
-export EPICSINCLUDE=${EPICS_BASE}/include
-export EPICSLIB=${EPICS_BASE}/lib/${EPICS_HOST_ARCH}
-export EPICSEXTENSIONS=${EPICS_BASE}/extensions
+export EPICSINCLUDE=/usr/include/epics
+export EPICSLIB=/usr/lib/${GCC_BUILD_ARCH}
+export EPICS_BASE=/usr
+export EPICSEXTENSIONS=/usr/lib/${GCC_BUILD_ARCH}/epics/extensions
 export QTCONTROLS_LIBS=$(shell pwd)/binaries
 export CAQTDM_COLLECT=$(shell pwd)/binaries
 export QTBASE=${QTCONTROLS_LIBS}
@@ -23,6 +26,8 @@ export QTDM_LIBINSTALL=${EPICSEXTENSIONS}/lib
 export QTDM_BININSTALL=${EPICSEXTENSIONS}/bin
 export PYTHONINCLUDE=/usr/include/python${PYTHONVERSION}
 export PYTHONLIB=/usr/local/lib
+export CAQTDM_MODBUS=1
+export CAQTDM_GPS=1
 
 %:
 	dh $@
