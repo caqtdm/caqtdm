@@ -1,43 +1,61 @@
 #!/bin/bash -e
+echo "" 
+echo "     caQtDM BuildScript2DEB  "
+echo "" 
+if [ "$1" == "--help" ]; then
+  echo "" 
+  echo "" 
+  echo "Usage: create-deb.sh [OPTION...]"
+  echo "Buildscript for caQtDM on Debian "
+  echo "" 
+  echo "Examples:" 
+  echo "./create-deb.sh              # Normal git checkout + using spec file from git " 
+  echo "./create-deb.sh --debdev     # use the current caqtdm.spec in this directory  " 
+  echo "" 
+  echo "" 
+  echo "" 
+  exit 0
+fi
 
-CAQTDM_TAG=V4.6.0
-CAQTDM_REVISION=1
-export CAQTDM_VERSION=$(echo ${CAQTDM_TAG} | sed 's/V//;s/-/~/g')
-export CAQTDM_VERSION_DEB=${CAQTDM_VERSION}-${CAQTDM_REVISION}
+# If you want to compile latest release candidate uncomment this line
+REPOSITORY_NAME=caqtdm
+PACKAGE_VERSION=4.6.0
+REPOSITORY=https://github.com/caqtdm/$REPOSITORY_NAME.git
+# BRANCH_OR_TAG=V${PACKAGE_VERSION}
+BRANCH_OR_TAG=Development
 
-mkdir -p caqtdm/debian/
-cp -r ./debian/* caqtdm/debian/
-cd caqtdm
+rm -rf caqtdm-${PACKAGE_VERSION}  || true
 
+if [ "$1" != "--debdev" ]; then
+  #### Clone and build caqtdm sources
+  git clone $REPOSITORY
+  cd $REPOSITORY_NAME
+  # TODO Enable this again for serious builds
+  git checkout $BRANCH_OR_TAG
+  rm -rf .git
+  cd ..
 
+  mv caqtdm caqtdm_${PACKAGE_VERSION}
+  cd caqtdm_${PACKAGE_VERSION}
 
-CAQTDM_TAG=Development
-# Get source code (equivalent to PKGBUILD's source field)
-git clone -c advice.detachedHead=false --branch ${CAQTDM_TAG} https://github.com/caqtdm/caqtdm.git temp
-# Remove the .git directory
-rm -rf temp/.git
-
-cd temp
-# Compress to caqtdm-${CAQTDM_VERSION}.orig.tar.gz
-tar -czf ../caqtdm_${CAQTDM_VERSION}.orig.tar.gz --exclude=.git . 
+  tar -czf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz  --exclude=.git . 
+  cd ..
+fi
 cd ..
 
-rsync -a --remove-source-files temp/ .
-rm -rf temp/
+mkdir -p caqtdm-${PACKAGE_VERSION}/
+cd caqtdm-${PACKAGE_VERSION}
+dh_make --createorig -p caqtdm_${CAQTDM_VERSION} --packagename caqtdm -s -y
+cd ..
+cp -r ./debian/* caqtdm-${PACKAGE_VERSION}/debian/
+cd caqtdm-${PACKAGE_VERSION}
 
-mv ./caqtdm_${CAQTDM_VERSION}.orig.tar.gz ../
 
-# Make rules executable
-chmod +x debian/rules
+tar -xf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz
 
-cd debian/
-
-# Replace change log %DATE% with the current date
-sed -i "s/%DATE%/$(LC_TIME=C date +'%a, %d %b %Y %H:%M:%S %z')/" changelog
-
-# Replace control and changelog with the current version
-sed -i "s/%VERSION%/${CAQTDM_VERSION_DEB}/" control
-sed -i "s/%VERSION%/${CAQTDM_VERSION_DEB}/" changelog
+cp -rf ../debian/* debian/
+rm -f debian/*.ex debian/README.Debian debian/README.source
+pwd
 
 # Build the package
-debuild -us -uc
+dpkg-buildpackage -us -uc
