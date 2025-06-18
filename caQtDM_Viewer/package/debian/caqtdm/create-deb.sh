@@ -41,18 +41,22 @@ if [ "$1" != "--debdev" ]; then
   tar -czf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz  --exclude=.git . 
   cd ..
 fi
-cd ..
+
 
 mkdir -p caqtdm-${PACKAGE_VERSION}/
 cd caqtdm-${PACKAGE_VERSION}
-dh_make --createorig -p caqtdm_${CAQTDM_VERSION} --packagename caqtdm -s -y
+pwd
+dh_make --createorig -p caqtdm_${CAQTDM_VERSION} --packagename caqtdm -s -y || true
+pwd
 cd ..
+pwd
 cp -r ./debian/* caqtdm-${PACKAGE_VERSION}/debian/
+pwd
 cd caqtdm-${PACKAGE_VERSION}
-
+pwd
 
 tar -xf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz
-
+pwd
 cp -rf ../debian/* debian/
 rm -f debian/*.ex debian/README.Debian debian/README.source
 pwd
