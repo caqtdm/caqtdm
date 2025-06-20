@@ -7,16 +7,23 @@
 #############################################################################
 
 # build qt4 support (or not)
-%if 0%{?rhel} <  8
+%if (0%{?rhel} && 0%{?rhel} < 8) || (0%{?fedora} && 0%{?fedora} < 24)
 %global qt4 1
 %else
 %global qt4 0
 %endif
 # build qt5 support (or not)
+%if 0%{?fedora} > 39
+%global qt5 0
+%else
 %global qt5 1
-
-
-
+%endif
+# build qt6 support (or not)
+%if 0%{?fedora} > 39 
+%global qt6 1
+%else
+%global qt6 0
+%endif
 
 #############################################################################
 Name:    caqtdm 
@@ -24,10 +31,13 @@ Summary: Qt Widgets for Technical Applications
 Version: 4.6.0
 Release: 0.1%{?dist}
 #############################################################################
-License: GPLv2
+License: GPLv3
 URL:     https://github.com/caqtdm/caqtdm
 Source:  https://github.com/caqtdm/caqtdm/%{name}/%{name}-%{version}.tar.gz
 
+%if 0%{?qt6}
+Patch0: no_rpath.patch
+%endif
 
 %if 0%{?qt5}
 # Requires: caqtdm_archiver
@@ -37,6 +47,18 @@ BuildRequires: qt5-devel
 BuildRequires: qt5-qtbase-devel
 %endif
 BuildRequires: qt5-qtserialbus-devel qt5-qtsvg-devel qt5-qttools-devel qwt-qt5-devel libXext-devel czmq-devel cppzmq-devel 
+%endif
+
+%if 0%{?qt6}
+BuildRequires: qt6-qtbase-devel
+BuildRequires: qt6-qttools-devel
+BuildRequires: qt6-qtsvg-devel
+BuildRequires: qt6-qtserialbus-devel
+BuildRequires: qt6-qt5compat-devel
+BuildRequires: qt6-qtlocation-devel
+BuildRequires: qwt-qt6-devel
+BuildRequires: libXext-devel czmq-devel cppzmq-devel
+BuildRequires: python3-devel
 %endif
 
 %if 0%{?qt4}
@@ -122,6 +144,33 @@ Requires: epics-base%{EPICS_TARGET_VERSION}
 
 %endif
 
+%if 0%{?qt6}
+%package qt6
+Summary: Qt6 Widgets for Technical Applications
+Provides: caqtdm-qt6 = %{version}-%{release}
+Provides: caqtdm-qt6%{_isa} = %{version}-%{release}
+Provides: %{name}%{?_isa}
+Requires: %{name}-bin-qt6 = %{version}-%{release}
+Requires: %{name}-doc = %{version}-%{release}
+Requires: qt6-assistant
+Conflicts: %{name}-qt5
+Conflicts: %{name}-qt4
+%description qt6
+%{summary}.
+
+%package bin-qt6
+Summary: caQtDM built against Qt 6.
+Requires: qt6-qttools
+Requires: qwt-qt6 zeromq
+Obsoletes:  caqtdm
+%description bin-qt6
+%define qt_vers qt6
+Requires: epics-base%{EPICS_TARGET_VERSION}
+Requires: qt6-qt5compat
+Requires: qt6-qtlocation
+Requires: python3
+%endif
+
 
 %prep
 
@@ -132,6 +181,9 @@ Requires: epics-base%{EPICS_TARGET_VERSION}
 #%patch52 -p1 -b .qt5
 #%patch53 -p1 -b .no_rpath
 
+%if 0%{?qt6}
+%patch 0 -p1
+%endif
 
 %build
 mkdir -p %{buildroot}/opt/caqtdm/lib
@@ -152,10 +204,13 @@ export QWTINCLUDE=/usr/include/qt5/qwt
 export QWTVERSION=6.1
 export QWTLIBNAME=qwt-qt5
 export EPICS_BASE=/usr/local/epics/base%{EPICS_TARGET_VERSION}
+# Set EPICS_HOST_ARCH if not set
+: "${EPICS_HOST_ARCH:=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)}"
+export EPICS_HOST_ARCH=${EPICS_HOST_ARCH:-linux-x86_64}
 export EPICSINCLUDE=${EPICS_BASE}/include
 export EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH
 %if 0%{?rhel} >  7
-export PYTHONVERSION=3.12
+export PYTHONVERSION=$(python3 --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1-2)
 %else
 export PYTHONVERSION=2.7
 %endif
@@ -191,6 +246,9 @@ export QWTINCLUDE=/usr/include/qwt
 export QWTVERSION=6.1
 export QWTLIBNAME=qwt
 export EPICS_BASE=/usr/local/epics/base%{EPICS_TARGET_VERSION}
+# Set EPICS_HOST_ARCH if not set
+: "${EPICS_HOST_ARCH:=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)}"
+export EPICS_HOST_ARCH=${EPICS_HOST_ARCH:-linux-x86_64}
 export EPICSINCLUDE=${EPICS_BASE}/include
 export EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH
 export PYTHONVERSION=2.7
@@ -211,6 +269,45 @@ export CAQTDM_LOGGING_ARCHIVELIBS=/opt/caqtdm-archiver/lib
 popd
 %endif
 
+%if 0%{?qt6}
+mkdir -p %{_target_platform}-qt6
+pushd %{_target_platform}-qt6
+mkdir -p %{_builddir}/%{name}-%{version}/build/opt/caqtdm/lib/qt6
+export CAQTDM_MODBUS=1
+export CAQTDM_GPS=1
+export CAQTDM_COLLECT=%{_builddir}/%{name}-%{version}/build/opt/caqtdm/lib/qt6
+export QTDM_RPATH=/opt/caqtdm/lib/qt6
+export QTCONTROLS_LIBS=%{_builddir}/%{name}-%{version}/build/opt/caqtdm/lib/qt6
+export QTBASE=%{_builddir}/%{name}-%{version}/build/opt/caqtdm/lib/qt6
+export QTHOME=/usr
+export QWTHOME=/usr
+export QWTLIB=/usr/lib
+export QWTINCLUDE=/usr/include/qt6/qwt
+export QWTVERSION=6.2
+export QWTLIBNAME=qwt-qt6
+export EPICS_BASE=/usr/local/epics/base%{EPICS_TARGET_VERSION}
+# Set EPICS_HOST_ARCH if not set
+: "${EPICS_HOST_ARCH:=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)}"
+export EPICS_HOST_ARCH=${EPICS_HOST_ARCH:-linux-x86_64}
+export EPICSINCLUDE=${EPICS_BASE}/include
+export EPICSLIB=${EPICS_BASE}/lib/$EPICS_HOST_ARCH
+export PYTHONVERSION=$(python --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1-2)
+export PYTHONINCLUDE=/usr/include/python$PYTHONVERSION
+export PYTHONLIB=/usr/lib/
+export ZMQINC=/usr/include
+export ZMQLIB=/usr/lib64
+
+export QMAKESPEC=/usr/lib64/qt6/mkspecs/linux-g++-64
+
+export CAQTDM_CA_ARCHIVELIBS=/opt/caqtdm-archiver/lib
+export CAQTDM_LOGGING_ARCHIVELIBS=/opt/caqtdm-archiver/lib
+
+%{?qmake_qt6}%{?!qmake_qt6:%{_qt6_qmake}} ../all.pro
+
+%make_build
+#%make_install
+popd
+%endif
 
 %install
 	mkdir -p %{buildroot}/opt/caqtdm/doc
@@ -228,6 +325,11 @@ popd
 %if 0%{?qt5}
         pushd %{_builddir}/%{name}-%{version}/%{_target_platform}-qt5
         mkdir -p %{buildroot}/usr/lib64/qt5/plugins/designer
+%endif
+
+%if 0%{?qt6}
+        pushd %{_builddir}/%{name}-%{version}/%{_target_platform}-qt6
+        mkdir -p %{buildroot}/usr/lib64/qt6/plugins/designer
 %endif
         %make_install 
         popd
@@ -297,6 +399,8 @@ popd
         echo "designer-qt4 \$@" >>  %{buildroot}/opt/caqtdm/lib/qt4/caqtdm_designer
 %endif
 
+%if 0%{?qt5}
+
         echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
         echo "SOURCE=\"\${BASH_SOURCE[0]}\"" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
         echo "while [ -h \"\$SOURCE\" ]; do # resolve \$SOURCE until the file is no longer a symlink" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm_designer
@@ -321,6 +425,42 @@ popd
         echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
         echo "fi" >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
         echo " " >>  %{buildroot}/opt/caqtdm/lib/qt5/caqtdm
+
+%endif
+
+%if 0%{?qt6}
+        echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "SOURCE=\"\${BASH_SOURCE[0]}\"" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "while [ -h \"\$SOURCE\" ]; do # resolve \$SOURCE until the file is no longer a symlink" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "  DIR=\"\$( cd -P \"\$( dirname \"\$SOURCE\" )\" && pwd )\"" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "  SOURCE=\"\$(readlink \"\$SOURCE\")\"" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "  [[ \$SOURCE != /* ]] && SOURCE=\"\$DIR/\$SOURCE\" # if \$SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "done" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "DIR=\"\$( cd -P \"\$( dirname \"\$SOURCE\" )\" && pwd )\"" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "CAQTDM_HOME=\$DIR/../.." >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "# Register help" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "assistant-qt6 -register \$CAQTDM_HOME/doc/caQtDM.qch" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "export QT_PLUGIN_PATH=\$CAQTDM_HOME/lib/qt6" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+        echo "designer-qt6 \$@" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm_designer
+
+        echo "#!/bin/bash" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "echo \"CAQTDM_DISPLAY_PATH=\$CAQTDM_DISPLAY_PATH\"" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo " " >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "if [ -n \"\$SSH_CLIENT\" ]; then" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "  echo \"start from remote session\"" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "else" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "  caQtDM -style Fusion \"\$@\" &" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo "fi" >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+        echo " " >>  %{buildroot}/opt/caqtdm/lib/qt6/caqtdm
+
+        # Create ld.so.conf.d/caqtdm.conf file because there is no rpath in the binaries
+        mkdir -p %{buildroot}/etc/ld.so.conf.d
+        echo "/opt/caqtdm/lib/qt6" > %{buildroot}/etc/ld.so.conf.d/caqtdm.conf
+        echo "/opt/caqtdm/lib/qt6/designer" >> %{buildroot}/etc/ld.so.conf.d/caqtdm.conf
+        echo "/opt/caqtdm/lib/qt6/controlsystems" >> %{buildroot}/etc/ld.so.conf.d/caqtdm.conf
+
+%endif
 
 
 %if 0%{?qt4}
@@ -383,6 +523,9 @@ fi
 
 %endif
 
+
+%if 0%{?qt5}
+
 %files bin-qt5
 /opt/caqtdm/lib/qt5
 %defattr(755,root,root)
@@ -416,6 +559,39 @@ fi
 	
 
 %preun qt5
+%endif
+
+%if 0%{?qt6}
+%files bin-qt6
+/opt/caqtdm/lib/qt6
+/etc/ld.so.conf.d/caqtdm.conf
+%defattr(755,root,root)
+/opt/caqtdm/lib/qt6/caqtdm_designer
+/opt/caqtdm/lib/qt6/caqtdm
+%files qt6
+/usr/local/bin
+
+%post qt6
+echo "clean caqtdm when update"
+if [ "$1" = "2" ] ; then # upgrade
+        if [ -z "$(ls -A /usr/local/bin/caqtdm)" ]; then
+           %{__rm} -rf /usr/local/bin/caqtdm
+        fi
+fi
+ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt6/caqtdm
+ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt6/adl2ui
+ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt6/edl2ui
+ln -t /usr/local/bin -sfv /opt/caqtdm/lib/qt6/caqtdm_designer
+ln -t /usr/lib64/qt6/plugins/designer -sfv /opt/caqtdm/lib/qt6/designer/libqtcontrols_controllers_plugin.so
+ln -t /usr/lib64/qt6/plugins/designer -sfv /opt/caqtdm/lib/qt6/designer/libqtcontrols_graphics_plugin.so
+ln -t /usr/lib64/qt6/plugins/designer -sfv /opt/caqtdm/lib/qt6/designer/libqtcontrols_monitors_plugin.so
+ln -t /usr/lib64/qt6/plugins/designer -sfv /opt/caqtdm/lib/qt6/designer/libqtcontrols_utilities_plugin.so
+ln -sfv /opt/caqtdm/lib/qt6/caQtDM /usr/local/bin/caQtDM
+if [ -e "/opt/caqtdm/doc/caQtDM.qch" ]; then
+   assistant-qt6 -register /opt/caqtdm/doc/caQtDM.qch
+fi
+%preun qt6
+%endif
 
 %postun doc
 if [ "$1" = "0" ] ; then # last uninstall
@@ -449,6 +625,9 @@ fi
 
 %endif
 
+
+%if 0%{?qt5}
+
 %postun qt5
 if [ "$1" = "0" ] ; then # last uninstall
         %{__rm} -rf /opt/caqtdm/bin
@@ -477,6 +656,37 @@ if [ "$1" = "0" ] ; then # last uninstall
            %{__rm} -rf /opt/caqtdm
         fi
 fi
+%endif
+
+%if 0%{?qt6}
+%postun qt6
+if [ "$1" = "0" ] ; then # last uninstall
+        %{__rm} -rf /opt/caqtdm/bin
+
+        %{__rm} -f  /usr/local/bin/adl2ui
+        %{__rm} -f  /usr/local/bin/edl2ui
+        %{__rm} -f  /usr/local/bin/caqtdm
+        %{__rm} -f  /usr/local/bin/caQtDM
+        %{__rm} -f  /usr/local/bin/caqtdm_designer
+        assistant-qt6 -unregister /opt/caqtdm/doc/caQtDM.qch
+        if [ -z "$(ls -A /opt/caqtdm)" ]; then
+           %{__rm} -rf /opt/caqtdm
+        fi
+fi
+if [ "$1" = "1" ] ; then # last uninstall
+        %{__rm} -rf /opt/caqtdm/bin
+fi
+
+%postun bin-qt6
+if [ "$1" = "0" ] ; then # last uninstall
+        if [ -z "$(ls -A /opt/caqtdm/lib)" ]; then
+           %{__rm} -rf /opt/caqtdm/lib
+        fi
+        if [ -z "$(ls -A /opt/caqtdm)" ]; then
+           %{__rm} -rf /opt/caqtdm
+        fi
+fi
+%endif
 
 %changelog
 
