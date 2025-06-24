@@ -6,7 +6,7 @@ if [ "$1" == "--help" ]; then
   echo "" 
   echo "" 
   echo "Usage: realpackage.sh [OPTION...]"
-  echo "Buildscript for caQtDM on Redhat Linux 8/9 to RPM"
+  echo "Buildscript for caQtDM on Redhat Linux 8/9 or Fedora to RPM"
   echo "" 
   echo "Examples:" 
   echo "./realpackage.sh              # Normal git checkout + using spec file from git " 
@@ -52,8 +52,10 @@ fi
 
 rm -rf caqtdm-${PACKAGE_VERSION}
 
-export   EPICS_BASE_TARGET=/usr/local/epics/base-7.0.7;
+export   EPICS_BASE_TARGET=/usr/local/epics/base-7.0.9;
 
 mv caqtdm-${PACKAGE_VERSION}.tar.gz  ../rpmbuild/SOURCES/
+
+cp *patch* ../rpmbuild/SOURCES/
  
 rpmbuild -ba caqtdm.spec
