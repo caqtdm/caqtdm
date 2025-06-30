@@ -118,6 +118,8 @@ private:
     QString getStylesheetUpdate(QString styleSheet, bool resetBorder = false);
     void updateRoundColors(int i);
     void triggerRoundColorUpdate();
+    double transformNumberSpace(long long value, int dig);
+    long long transformNumberSpace(double value, int dig);
 
     int intDig;
     int decDig;

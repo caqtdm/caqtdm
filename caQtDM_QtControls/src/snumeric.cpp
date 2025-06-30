@@ -228,7 +228,7 @@ void SNumeric::init()
 
 void SNumeric::setValue(double v)
 {
-    long long temp = (long long) round(v * (long long) pow(10.0, decDig));
+    long long temp = transformNumberSpace(v, decDig);
     if ((temp >= minVal) && (temp <= maxVal))
     {
         bool valChanged = data != temp;
@@ -238,7 +238,7 @@ void SNumeric::setValue(double v)
          */
         showData();
         if (valChanged)
-            emit valueChanged(temp*pow(10.0, -decDig));
+            emit valueChanged(transformNumberSpace(temp, -decDig));
     }
 }
 
@@ -246,43 +246,58 @@ void SNumeric::setValue(double v)
 void SNumeric::silentSetValue(double v)
 {
     csValue = v;
-    long long temp = (long long)round(v * (long long)pow(10.0, decDig));
+    // shift digits around if max/minvalue get too big.
+    int ddig = digits;
+    while (ddig > 16) {
+        decDig--;
+        ddig--;
+    }
+    setDecDigits(decDig);
+    long long temp = (transformNumberSpace(v, decDig));
     data = temp;
     showData();
 }
 
 void SNumeric::setMaximum(double v)
 {
-    if (v >= d_minAsDouble)
-    {
+    if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
-        int firstDig = 0, secondDig = 0;
-        if(decDig > 10){
-            firstDig = 10;
-            secondDig = decDig - firstDig;
-        }else{
-            firstDig = decDig;
-        }
-
-        long long temp = 0;
-        if(secondDig > 0){
-            temp = (long long) round (v * (long long) pow(10.0, firstDig));
-            temp *= (long long) pow(10.0, secondDig);
-        }else{
-            temp = (long long) round(v* (long long)pow(10.0, firstDig));
-        }
-        maxVal = temp;
-
+        maxVal = transformNumberSpace(v, decDig);
     }
+    long long temp = (long long) round(csValue * pow(10.0, decDig));
+    data = temp;
 }
+
+long long SNumeric::transformNumberSpace(double value, int dig){
+    double f1;
+    double f = std::modf(value, &f1);
+    long long pw = f *pow(10.0, dig);
+    long long pw1 = f1 *pow(10.0, dig);
+
+    return pw+pw1;
+}
+
+double SNumeric::transformNumberSpace(long long value, int dig){
+    double pw = value;
+    while (dig > 10) {
+        dig -= 10;
+        pw *= pow(10.0, 10);
+    }
+
+    pw *= pow(10.0, dig);
+    return pw;
+}
+
 
 void SNumeric::setMinimum(double v)
 {
     if (v <= d_maxAsDouble)
     {
         d_minAsDouble = v;
-        minVal = (long long) round(v* (long long)pow(10.0, decDig));
+        minVal = transformNumberSpace(v, decDig);
     }
+    long long temp = (long long) round(csValue * pow(10.0, decDig));
+    data = temp;
 }
 
 void SNumeric::setIntDigits(int i)
@@ -302,7 +317,13 @@ void SNumeric::setDecDigits(int d)
     maxVal = (long long) (maxVal * pow(10.0, d - decDig));
     minVal = (long long) (minVal * pow(10.0, d - decDig));
     decDig = d;
-    digits = intDig + decDig;
+    // shift digits around if max/minvalue get too big.
+    int ddig = decDig + intDig;
+    while (ddig > 17) {
+        decDig--;
+        ddig--;
+    }
+    digits = decDig + intDig;
     /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
      * round issues. So, recalculating maximum and minimum is required  to obtain precision
      */
@@ -350,17 +371,19 @@ void SNumeric::downDataIndex(int id)
 {
     if(!_AccessW) return;
     if(id == -1) return;
-    double datad = (double) data;
-    double power =  pow(10.0, digits-id-1);
-    long long const curr_d = data;
+    long long datad = data;
+    long long const currentData = data;
+    long long power =  pow(10.0, digits-id-1);
     datad = datad - power;
-    qDebug() << curr_d << power << minVal;
-    if (datad >= (double) minVal) {
-        data = (long long) datad;
-        power = pow(10.0, -decDig);
-        datad = datad * power;
-        emit valueChanged(datad);
-        showData();
+    if (datad >= minVal) {
+        data = datad;
+        double dataDouble = (double) datad;
+        dataDouble *= pow(10.0, -decDig);
+
+        if(currentData >= datad){
+            emit valueChanged(dataDouble);
+            showData();
+        }
     }
     if (text != NULL) text->hide();
 }
@@ -405,21 +428,29 @@ void SNumeric::triggerRoundColorUpdate(){
 }
 
 void SNumeric::updateRoundColors(int i) {
-    int mantissaDigits = QString().number(data).length();
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
 
-    if (i - (digits - mantissaDigits) >= 15) {
+    QString valueString = "";
+    if(signLabel->text() == "-") valueString += signLabel->text();
+    for(int i = 0; i < digits; i++){
+        if(i == intDig) valueString += ".";
+        QString txt = labels[i]->text();
+        if(txt != " ") valueString += txt;
+
+    }
+    int digitsToColorFromEnd = (valueString.length() - 15);
+
+    if (i >= 15 ||  i >= (digits-digitsToColorFromEnd)) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
-            labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), c.name(), false));
-            labels[i]->setToolTip("digit affected by rounding errors due to technical limits");
+            labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
+            labels[i]->setToolTip("rounding errors possible");
         }else{
-            labels[i]->setStyleSheet(
-                getStylesheetUpdate(labels[i]->styleSheet(), currColor.name(), false));
+            labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
         }
     } else {
-        labels[i]->setStyleSheet(getStylesheetUpdate(labels[i]->styleSheet(), txtColor.name(), false));
+        labels[i]->setStyleSheet("QLabel {color:" + txtColor.name() + ";}");
     }
     update();
 }

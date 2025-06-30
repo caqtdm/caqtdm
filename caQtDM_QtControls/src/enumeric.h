@@ -114,7 +114,8 @@ private:
     void upDataIndex(int id);
     void updateRoundColors(int i);
     void triggerRoundColorUpdate();
-    double transformNumberSpace(double value, int dig);
+    double transformNumberSpace(long long value, int dig);
+    long long transformNumberSpace(double value, int dig);
 
     int idUpVuoto, idDownVuoto;
     int idUpPoint, idDownPoint;
@@ -135,7 +136,5 @@ private:
     bool _AccessW;
     int lastLabel, lastLabelOnTab;
     double csValue;
-
-    int original_digits;
 };
 #endif // EDIGIT_H

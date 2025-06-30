@@ -39,6 +39,11 @@
 #include <QtDebug>
 #include <QApplication>
 #include <QTime>
+#include <cmath>        //  For frexp.
+#include <iomanip>      //  For fixed and setprecision.
+#include <iostream>     //  For cout.
+#include <limits>
+
 
 #define MIN_FONT_SIZE 5
 
@@ -59,7 +64,6 @@ ENumeric::ENumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     intDig = id;
     decDig = dd;
     digits = id + dd;
-    original_digits = digits;
     data = 0;
     csValue = 0.0;
     minVal = (int) -pow(10.0, digits) + 1;
@@ -249,6 +253,7 @@ void ENumeric::setValue(double v)
          * in the labels of the TNumeric.
          */
         showData();
+
         if (valChanged) emit valueChanged(transformNumberSpace(temp, -decDig));
     }
 }
@@ -256,46 +261,38 @@ void ENumeric::setValue(double v)
 void ENumeric::silentSetValue(double v)
 {
     csValue = v;
-    qDebug() << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss::zzz") << "silentDig:" << digits << original_digits;
-
-    qDebug() << decDig << intDig;
+    // shift digits around if max/minvalue get too big.
+    int ddig = digits;
+    while (ddig > 16) {
+        decDig--;
+        ddig--;
+    }
+    setDecDigits(decDig);
     long long temp = transformNumberSpace(v, decDig);
     data = temp;
     showData();
+
 }
 
 void ENumeric::setMaximum(double v)
 {
     if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
-
-        int ddig = digits;
-        while (ddig > 18) {
-            decDig--;
-            ddig--;
-            intDig++;
-            digits = decDig + intDig;
-        }
-
-        // maxVal = (long long)round(v * (long long)pow(10.0, decDig));
         maxVal = transformNumberSpace(v, decDig);
     }
+    long long temp = (long long) round(csValue * pow(10.0, decDig));
+    data = temp;
 }
 
 void ENumeric::setMinimum(double v)
 {
-    if (v <= d_maxAsDouble) {
-        int ddig = digits;
-        while (ddig > 18) {
-            decDig--;
-            ddig--;
-            intDig++;
-            digits = decDig + intDig;
-        }
+    if (v <= d_maxAsDouble)
+    {
+        d_minAsDouble = v;
         minVal = transformNumberSpace(v, decDig);
-
-        // minVal = (long long)round(v * (long long)pow(10.0, decDig));
     }
+    long long temp = (long long) round(csValue * pow(10.0, decDig));
+    data = temp;
 }
 
 void ENumeric::setIntDigits(int i)
@@ -315,7 +312,13 @@ void ENumeric::setDecDigits(int d)
     maxVal = (long long) (maxVal * pow(10.0, d - decDig));
     minVal = (long long) (minVal * pow(10.0, d - decDig));
     decDig = d;
-    digits = intDig + decDig;
+    // shift digits around if max/minvalue get too big.
+    int ddig = decDig + intDig;
+    while (ddig > 17) {
+        decDig--;
+        ddig--;
+    }
+    digits = decDig + intDig;
     /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
      * round issues. So, recalculating maximum and minimum is required  to obtain precision
      */
@@ -339,9 +342,8 @@ void ENumeric::upDataIndex(int id)
     long long power =  qPow(10.0, digits-id-1);
     datad = datad + power;
     // (long long) power overflows between 10^18 and 10^19
-    if (datad <= ((double)maxVal) && digits-id-1 < 19) {
+    if (datad <= (maxVal) && digits-id-1 < 19) {
         data = datad;
-        power = pow(10.0, -decDig);
         double dataDouble = (double) datad;
         dataDouble *= pow(10.0, -decDig);
 
@@ -352,8 +354,16 @@ void ENumeric::upDataIndex(int id)
     }
     if (text != NULL) text->hide();
 }
+long long ENumeric::transformNumberSpace(double value, int dig){
+    double f1;
+    double f = std::modf(value, &f1);
+    long long pw = f *pow(10.0, dig);
+    long long pw1 = f1 *pow(10.0, dig);
 
-double ENumeric::transformNumberSpace(double value, int dig){
+    return pw+pw1;
+}
+
+double ENumeric::transformNumberSpace(long long value, int dig){
     double pw = value;
     while (dig > 10) {
         dig -= 10;
@@ -374,17 +384,17 @@ void ENumeric::downDataIndex(int id)
 {
     if(!_AccessW) return;
     if(id == -1) return;
-    double datad = (double) data;
+    long long datad = data;
     long long const currentData = data;
-    double power =  pow(10.0, digits-id-1);
+    long long power =  pow(10.0, digits-id-1);
     datad = datad - power;
-    if (datad >= (double) minVal && (digits)-id-1 < 19) {
-        data = (long long) datad;
-        power = pow(10.0, -decDig);
-        datad = datad * power;
+    if (datad >= minVal) {
+        data = datad;
+        double dataDouble = (double) datad;
+        dataDouble *= pow(10.0, -decDig);
 
-        if (currentData >= datad) {
-            emit valueChanged(datad);
+        if(currentData >= datad){
+            emit valueChanged(dataDouble);
             showData();
         }
     }
@@ -430,15 +440,24 @@ void ENumeric::triggerRoundColorUpdate(){
 }
 
 void ENumeric::updateRoundColors(int i) {
-    int mantissaDigits = digits;// QString().number(data).length();
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
 
-    if (i - ((digits) - mantissaDigits) >= 15) {
+    QString valueString = "";
+    if(signLabel->text() == "-") valueString += signLabel->text();
+    for(int i = 0; i < digits; i++){
+        if(i == intDig) valueString += ".";
+        QString txt = labels[i]->text();
+        if(txt != " ") valueString += txt;
+
+    }
+    int digitsToColorFromEnd = (valueString.length() - 15);
+
+    if (i >= 15 ||  i >= (digits-digitsToColorFromEnd)) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
-            labels[i]->setToolTip("rounding error may occur");
+            labels[i]->setToolTip("rounding errors possible");
         }else{
             labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
         }
@@ -481,9 +500,6 @@ void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
         QString txt = labels[i]->text();
         if(txt != " ") valueString += txt;
 
-    }
-    for(int i = 0;i < original_digits; i++){
-        valueString += "0";
     }
     text->setText(valueString);
 
