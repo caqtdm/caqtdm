@@ -1,0 +1,62 @@
+record(ao,"ACM:TEST:TEST_CANUM_NO") {
+    field(DESC,"normal value")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"5")
+    field(VAL, "1000.0001")
+}
+
+record(ao,"ACM:TEST:TEST_CANUM_NP") {
+    field(DESC,"value with no dec")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"0")
+    field(VAL, 2000)
+}
+
+record(ao,"ACM:TEST:TEST_CANUM_HV") {
+    field(DESC,"huge value with no dec")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"0")
+    field(VAL, "1234567890123")
+}
+
+record(ao,"ACM:TEST:TEST_CANUM_LV") {
+    field(DESC,"low value with no dec")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"15")
+    field(VAL, "0.000000000000009")
+}
+
+record(ao,"ACM:TEST:TEST_CANUM_HP1") {
+    field(DESC,"very high precision")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"15")
+    field(VAL, "1.0123456789012345")
+}
+
+record(ao,"ACM:TEST:TEST_CANUM_HP2") {
+    field(DESC,"precision bigger than possible")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"20")
+    field(VAL, "1.012345678901234567890")
+}
+
+record(ao,"ACM:TEST:TEST_CANUM_HPHV") {
+    field(DESC,"high precision high value")
+    field(SCAN,"Passive")
+    field(PINI,"YES")
+    field(DTYP,"Soft Channel")
+    field(PREC,"15")
+    field(VAL, "123456789.01234567890123456")
+}

@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1846</width>
+    <height>989</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>1801</width>
+      <height>940</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0" columnstretch="0,0,0,0,0">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+     <property name="spacing">
+      <number>30</number>
+     </property>
+     <item row="4" column="1">
+      <widget class="caNumeric" name="canumeric_4">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP1</string>
+       </property>
+       <property name="precisionMode">
+        <enum>caNumeric::Channel</enum>
+       </property>
+       <property name="limitsMode">
+        <enum>caNumeric::User</enum>
+       </property>
+       <property name="maxValue">
+        <double>2.000000000000000</double>
+       </property>
+       <property name="minValue">
+        <double>-2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="3">
+      <widget class="caSpinbox" name="caspinbox_7">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HPHV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="caNumeric" name="canumeric">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NO</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="caLabel" name="calabel_5">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string notr="true">HIGH PREC</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="caLabel" name="calabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>150</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="caNumeric" name="canumeric_3">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_LV</string>
+       </property>
+       <property name="limitsMode">
+        <enum>caNumeric::User</enum>
+       </property>
+       <property name="maxValue">
+        <double>2.000000000000000</double>
+       </property>
+       <property name="minValue">
+        <double>-2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric_5">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP1</string>
+       </property>
+       <property name="precisionMode">
+        <enum>caApplyNumeric::Channel</enum>
+       </property>
+       <property name="limitsMode">
+        <enum>caApplyNumeric::User</enum>
+       </property>
+       <property name="maxValue">
+        <double>2.000000000000000</double>
+       </property>
+       <property name="minValue">
+        <double>-2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="caNumeric" name="canumeric_5">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP2</string>
+       </property>
+       <property name="precisionMode">
+        <enum>caNumeric::Channel</enum>
+       </property>
+       <property name="limitsMode">
+        <enum>caNumeric::User</enum>
+       </property>
+       <property name="maxValue">
+        <double>2.000000000000000</double>
+       </property>
+       <property name="minValue">
+        <double>-2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="caSpinbox" name="caspinbox_4">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_LV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="caSpinbox" name="caspinbox_6">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP2</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="caLabel" name="calabel_7">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string notr="true">HIGH PREC, HIGH VALUE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="caSpinbox" name="caspinbox_2">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NP</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NO</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="caNumeric" name="canumeric_6">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NP</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric_7">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HPHV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="caLabel" name="calabel_6">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string notr="true">TOO HIGH PREC</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric_6">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP2</string>
+       </property>
+       <property name="precisionMode">
+        <enum>caApplyNumeric::Channel</enum>
+       </property>
+       <property name="limitsMode">
+        <enum>caApplyNumeric::User</enum>
+       </property>
+       <property name="maxValue">
+        <double>2.000000000000000</double>
+       </property>
+       <property name="minValue">
+        <double>-2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="caNumeric" name="canumeric_7">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HPHV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="caLabel" name="calabel_3">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string notr="true">HUGE VALUE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="caLabel" name="calabel_4">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string notr="true">LOW VALUE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3">
+      <widget class="caSpinbox" name="caspinbox_5">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric_2">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NP</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="caSpinbox" name="caspinbox">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NO</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="caSpinbox" name="caspinbox_3">
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric_4">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_LV</string>
+       </property>
+       <property name="limitsMode">
+        <enum>caApplyNumeric::User</enum>
+       </property>
+       <property name="maxValue">
+        <double>2.000000000000000</double>
+       </property>
+       <property name="minValue">
+        <double>-2.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="caNumeric" name="canumeric_2">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="caLabel" name="calabel_2">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>250</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>NO PREC</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="caApplyNumeric" name="caapplynumeric_3">
+       <property name="minimumSize">
+        <size>
+         <width>15</width>
+         <height>15</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>1500</width>
+         <height>80</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HV</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="caLineDraw" name="calinedraw">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NO</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="caLineDraw" name="calinedraw_2">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_NP</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="4">
+      <widget class="caLineDraw" name="calinedraw_3">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HV</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="4">
+      <widget class="caLineDraw" name="calinedraw_4">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_LV</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="4">
+      <widget class="caLineDraw" name="calinedraw_5">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP1</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="4">
+      <widget class="caLineDraw" name="calinedraw_6">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HP2</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="4">
+      <widget class="caLineDraw" name="calinedraw_7">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="channel" stdset="0">
+        <string>ACM:TEST:TEST_CANUM_HPHV</string>
+       </property>
+       <property name="formatType">
+        <enum>caLineDraw::decimal</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1846</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caApplyNumeric</class>
+   <extends>QWidget</extends>
+   <header>caApplyNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caSpinbox</class>
+   <extends>QFrame</extends>
+   <header>caSpinbox</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineDraw</class>
+   <extends>QWidget</extends>
+   <header>caLineDraw</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
