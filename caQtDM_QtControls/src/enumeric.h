@@ -116,6 +116,7 @@ private:
     void triggerRoundColorUpdate();
     double transformNumberSpace(long long value, int dig);
     long long transformNumberSpace(double value, int dig);
+    void setValuesFromChannel(double v);
 
     int idUpVuoto, idDownVuoto;
     int idUpPoint, idDownPoint;
@@ -136,5 +137,7 @@ private:
     bool _AccessW;
     int lastLabel, lastLabelOnTab;
     double csValue;
+
+    bool valueChangedByButton = false;
 };
 #endif // EDIGIT_H

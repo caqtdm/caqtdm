@@ -245,6 +245,7 @@ void ENumeric::init()
 
 void ENumeric::setValue(double v)
 {
+    qDebug() << "set" << v;
     long long temp = transformNumberSpace(v, decDig);
     if ((temp >= minVal) && (temp <= maxVal)) {
         bool valChanged = data != temp;
@@ -260,22 +261,45 @@ void ENumeric::setValue(double v)
 
 void ENumeric::silentSetValue(double v)
 {
+    if(!valueChangedByButton){
+        // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
+        int intDigits = QString().number((long long) v).length();
+        while (intDigits > intDig) {
+            intDig++;
+        }
+        // Shift back if the opposite is the case
+        while(intDigits < intDig){
+            intDig--;
+        }
+        digits = intDig + decDig;
+        qDebug() << intDigits << intDig << digits;
+    }
+
+    setValuesFromChannel(v);
+    valueChangedByButton = false;
+
+}
+
+void ENumeric::setValuesFromChannel(double v){
     csValue = v;
+
     // shift digits around if max/minvalue get too big.
     int ddig = digits;
     while (ddig > 16) {
-        decDig--;
+        if(decDig > 0) decDig--;
         ddig--;
+        digits = intDig + decDig;
     }
+    // Adjust min/max if set by channel
     setDecDigits(decDig);
     long long temp = transformNumberSpace(v, decDig);
     data = temp;
     showData();
-
 }
 
 void ENumeric::setMaximum(double v)
 {
+    qDebug() << "max" << v << decDig;
     if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
         maxVal = transformNumberSpace(v, decDig);
@@ -329,6 +353,7 @@ void ENumeric::setDecDigits(int d)
 
 void ENumeric::upData(QAbstractButton* b)
 {
+    valueChangedByButton = true;
     int id = b->objectName().remove("layoutmember").toInt();
     upDataIndex(id);
 }
@@ -376,6 +401,7 @@ double ENumeric::transformNumberSpace(long long value, int dig){
 
 void ENumeric::downData(QAbstractButton* b)
 {
+    valueChangedByButton = true;
     int id = b->objectName().remove("layoutmember").toInt();
     downDataIndex(id);
 }
@@ -442,6 +468,7 @@ void ENumeric::triggerRoundColorUpdate(){
 void ENumeric::updateRoundColors(int i) {
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
+    int maxBeforeLossOfPrec = 15;
 
     QString valueString = "";
     if(signLabel->text() == "-") valueString += signLabel->text();
@@ -451,9 +478,9 @@ void ENumeric::updateRoundColors(int i) {
         if(txt != " ") valueString += txt;
 
     }
-    int digitsToColorFromEnd = (valueString.length() - 15);
+    int digitsToColorFromEnd = (valueString.length() - maxBeforeLossOfPrec);
 
-    if (i >= 15 ||  i >= (digits-digitsToColorFromEnd)) {
+    if (i > maxBeforeLossOfPrec ||  (i >= (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
