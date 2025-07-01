@@ -430,6 +430,7 @@ void SNumeric::triggerRoundColorUpdate(){
 void SNumeric::updateRoundColors(int i) {
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
+    int maxBeforeLossOfPrec = 15;
 
     QString valueString = "";
     if(signLabel->text() == "-") valueString += signLabel->text();
@@ -439,9 +440,9 @@ void SNumeric::updateRoundColors(int i) {
         if(txt != " ") valueString += txt;
 
     }
-    int digitsToColorFromEnd = (valueString.length() - 15);
+    int digitsToColorFromEnd = (valueString.length() - maxBeforeLossOfPrec);
 
-    if (i >= 15 ||  i >= (digits-digitsToColorFromEnd)) {
+    if (i > maxBeforeLossOfPrec || (i >= (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
