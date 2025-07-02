@@ -261,20 +261,23 @@ void ENumeric::setValue(double v)
 
 void ENumeric::silentSetValue(double v)
 {
+    int intDigits = QString().number((long long) v).length();
+    if(orig_decDig == -1) orig_decDig = decDig;
+    if(orig_intDig == -1) orig_intDig = intDig;
+
     if(!valueChangedByButton){
         // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
-        int intDigits = QString().number((long long) v).length();
         while (intDigits > intDig) {
             intDig++;
         }
         // Shift back if the opposite is the case
         while(intDigits < intDig){
             intDig--;
+            if(orig_decDig > decDig) decDig++;
+            if(orig_decDig < decDig) decDig--;
         }
         digits = intDig + decDig;
-        qDebug() << intDigits << intDig << digits;
     }
-
     setValuesFromChannel(v);
     valueChangedByButton = false;
 
@@ -299,7 +302,6 @@ void ENumeric::setValuesFromChannel(double v){
 
 void ENumeric::setMaximum(double v)
 {
-    qDebug() << "max" << v << decDig;
     if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
         maxVal = transformNumberSpace(v, decDig);
@@ -480,7 +482,7 @@ void ENumeric::updateRoundColors(int i) {
     }
     int digitsToColorFromEnd = (valueString.length() - maxBeforeLossOfPrec);
 
-    if (i > maxBeforeLossOfPrec ||  (i >= (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
+    if (i > maxBeforeLossOfPrec ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
