@@ -40,6 +40,7 @@
 #include <QApplication>
 
 #define MIN_FONT_SIZE 3
+#define PREC_LIMIT_NUMERIC 15
 
 #if (_MSC_VER == 1600)
 extern int round (double x);
@@ -249,7 +250,8 @@ void SNumeric::silentSetValue(double v)
     if(orig_decDig == -1) orig_decDig = decDig;
     if(orig_intDig == -1) orig_intDig = intDig;
 
-    if(!valueChangedByButton){
+    // Only do after initialized (or above threshold) to avoid shortening digits when not needed
+    if(!valueChangedByButton && (isInitialized || digits > 15)){
         // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
         while (intDigits > intDig) {
             intDig++;
@@ -262,6 +264,8 @@ void SNumeric::silentSetValue(double v)
         }
         digits = intDig + decDig;
     }
+
+    if(!isInitialized) isInitialized = true;
     setValuesFromChannel(v);
     valueChangedByButton = false;
 }
@@ -456,7 +460,6 @@ void SNumeric::triggerRoundColorUpdate(){
 void SNumeric::updateRoundColors(int i) {
     QColor currColor = labels[i]->palette().color(QPalette::Text);
     QColor txtColor = labels[0]->palette().color(QPalette::Text);
-    int maxBeforeLossOfPrec = 15;
 
     QString valueString = "";
     if(signLabel->text() == "-") valueString += signLabel->text();
@@ -466,9 +469,9 @@ void SNumeric::updateRoundColors(int i) {
         if(txt != " ") valueString += txt;
 
     }
-    int digitsToColorFromEnd = (valueString.length() - maxBeforeLossOfPrec);
+    int digitsToColorFromEnd = (valueString.length() - PREC_LIMIT_NUMERIC);
 
-    if (i > maxBeforeLossOfPrec ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
+    if (i > PREC_LIMIT_NUMERIC ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (PREC_LIMIT_NUMERIC +1))) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");

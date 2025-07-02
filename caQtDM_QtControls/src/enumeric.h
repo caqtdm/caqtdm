@@ -139,6 +139,7 @@ private:
     double csValue;
 
     bool valueChangedByButton = false;
+    bool isInitialized = false;
     int orig_decDig = -1;
     int orig_intDig = -1;
 };

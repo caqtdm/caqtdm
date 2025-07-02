@@ -105,8 +105,6 @@
      bool doNothing;
      double channelLowerLimit, channelUpperLimit;
      int channelPrecision;
-
-     static const int PREC_LIMIT_NUMERIC = 15;
  };
 
  #endif
