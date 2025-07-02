@@ -140,6 +140,7 @@ private:
     int lastLabel, lastLabelOnTab;
     double csValue;
 
+    QColor roundingColor;
     bool valueChangedByButton = false;
     bool isInitialized = false;
     int orig_decDig = -1;

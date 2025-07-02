@@ -66,6 +66,8 @@ SNumeric::SNumeric(QWidget *parent, int id, int dd) : QFrame(parent), FloatDeleg
     d_maxAsDouble = (double) roundl(maxVal);
 #endif
 
+    QColor cText = this->palette().color(QPalette::Text);
+    roundingColor = QColor(180 - cText.red(), 180 - cText.green(), 180 - cText.blue(), 255);
     bup = NULL;
     bdown = NULL;
     box = NULL;
@@ -461,7 +463,6 @@ void SNumeric::triggerRoundColorUpdate(){
 
 void SNumeric::updateRoundColors(int i) {
     QColor currColor = labels[i]->palette().color(QPalette::Text);
-    QColor txtColor = labels[0]->palette().color(QPalette::Text);
 
     QString valueString = "";
     if(signLabel->text() == "-") valueString += signLabel->text();
@@ -472,17 +473,12 @@ void SNumeric::updateRoundColors(int i) {
 
     }
     int digitsToColorFromEnd = (valueString.length() - PREC_LIMIT_NUMERIC);
-
     if (i > PREC_LIMIT_NUMERIC ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (PREC_LIMIT_NUMERIC +1))) {
-        if(currColor == txtColor){
-            QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
-            labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
-            labels[i]->setToolTip("rounding errors possible");
+        if(currColor != roundingColor){
+            labels[i]->setStyleSheet("QLabel {color:" + roundingColor.name() + ";}");
         }else{
             labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
         }
-    } else {
-        labels[i]->setStyleSheet("QLabel {color:" + txtColor.name() + ";}");
     }
 }
 
