@@ -112,6 +112,11 @@ private:
     void reconstructGeometry();
     void downDataIndex(int id);
     void upDataIndex(int id);
+    void updateRoundColors(int i);
+    void triggerRoundColorUpdate();
+    double transformNumberSpace(long long value, int dig);
+    long long transformNumberSpace(double value, int dig);
+    void setValuesFromChannel(double v);
 
     int idUpVuoto, idDownVuoto;
     int idUpPoint, idDownPoint;
@@ -132,5 +137,9 @@ private:
     bool _AccessW;
     int lastLabel, lastLabelOnTab;
     double csValue;
+
+    bool valueChangedByButton = false;
+    int orig_decDig = -1;
+    int orig_intDig = -1;
 };
 #endif // EDIGIT_H

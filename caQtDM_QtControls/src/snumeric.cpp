@@ -228,7 +228,7 @@ void SNumeric::init()
 
 void SNumeric::setValue(double v)
 {
-    long long temp = (long long) round(v * pow(10.0, decDig));
+    long long temp = transformNumberSpace(v, decDig);
     if ((temp >= minVal) && (temp <= maxVal))
     {
         bool valChanged = data != temp;
@@ -238,35 +238,90 @@ void SNumeric::setValue(double v)
          */
         showData();
         if (valChanged)
-            emit valueChanged(temp*pow(10.0, -decDig));
+            emit valueChanged(transformNumberSpace(temp, -decDig));
     }
 }
 
 // written from CS
 void SNumeric::silentSetValue(double v)
 {
+    int intDigits = QString().number((long long) v).length();
+    if(orig_decDig == -1) orig_decDig = decDig;
+    if(orig_intDig == -1) orig_intDig = intDig;
+
+    if(!valueChangedByButton){
+        // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
+        while (intDigits > intDig) {
+            intDig++;
+        }
+        // Shift back if the opposite is the case
+        while(intDigits < intDig){
+            intDig--;
+            if(orig_decDig > decDig) decDig++;
+            if(orig_decDig < decDig) decDig--;
+        }
+        digits = intDig + decDig;
+    }
+    setValuesFromChannel(v);
+    valueChangedByButton = false;
+}
+
+void SNumeric::setValuesFromChannel(double v){
     csValue = v;
-    long long temp = (long long) round(v * pow(10.0, decDig));
+    // shift digits around if max/minvalue get too big.
+    int ddig = digits;
+    while (ddig > 16) {
+        if(decDig > 0) decDig--;
+        ddig--;
+        digits = intDig + decDig;
+    }
+    // Adjust min/max if set by channel
+    setDecDigits(decDig);
+    long long temp = transformNumberSpace(v, decDig);
     data = temp;
     showData();
 }
 
 void SNumeric::setMaximum(double v)
 {
-    if (v >= d_minAsDouble)
-    {
+    if (v >= d_minAsDouble) {
         d_maxAsDouble = v;
-        maxVal = (long long) round(v* (long)pow(10.0, decDig));
+        maxVal = transformNumberSpace(v, decDig);
     }
+    long long temp = (long long) round(csValue * pow(10.0, decDig));
+    data = temp;
 }
+
+long long SNumeric::transformNumberSpace(double value, int dig){
+    double f1;
+    double f = std::modf(value, &f1);
+    long long pw = f *pow(10.0, dig);
+    long long pw1 = f1 *pow(10.0, dig);
+
+    return pw+pw1;
+}
+
+double SNumeric::transformNumberSpace(long long value, int dig){
+    double pw = value;
+    while (dig > 10) {
+        dig -= 10;
+        pw *= pow(10.0, 10);
+    }
+
+    pw *= pow(10.0, dig);
+    return pw;
+}
+
 
 void SNumeric::setMinimum(double v)
 {
     if (v <= d_maxAsDouble)
     {
         d_minAsDouble = v;
-        minVal = (long long) round(v* (long)pow(10.0, decDig));
+        minVal = transformNumberSpace(v, decDig);
     }
+    long long temp = (long long) round(csValue * pow(10.0, decDig));
+    data = temp;
 }
 
 void SNumeric::setIntDigits(int i)
@@ -286,7 +341,13 @@ void SNumeric::setDecDigits(int d)
     maxVal = (long long) (maxVal * pow(10.0, d - decDig));
     minVal = (long long) (minVal * pow(10.0, d - decDig));
     decDig = d;
-    digits = intDig + decDig;
+    // shift digits around if max/minvalue get too big.
+    int ddig = decDig + intDig;
+    while (ddig > 17) {
+        decDig--;
+        ddig--;
+    }
+    digits = decDig + intDig;
     /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
      * round issues. So, recalculating maximum and minimum is required  to obtain precision
      */
@@ -297,6 +358,7 @@ void SNumeric::setDecDigits(int d)
 
 void SNumeric::upData(QAbstractButton* b)
 {
+    valueChangedByButton = true;
     Q_UNUSED(b);
     if(lastLabel > -1) upDataIndex(lastLabel);
 }
@@ -305,21 +367,28 @@ void SNumeric::upDataIndex(int id)
 {
     if(!_AccessW) return;
     if(id == -1) return;
-    double datad = (double) data;
-    double power =  pow(10.0, digits-id-1);
+    long long datad = data;
+    long long const currentData = data;
+    long long power =  qPow(10.0, digits-id-1);
     datad = datad + power;
-    if (datad <= (double) maxVal) {
-        data = (long long) datad;
+    // (long long) power overflows between 10^18 and 10^19
+    if (datad <= ((double)maxVal) && digits-id-1 < 19) {
+        data = datad;
         power = pow(10.0, -decDig);
-        datad = datad * power;
-        emit valueChanged(datad);
-        showData();
+        double dataDouble = (double) datad;
+        dataDouble *= pow(10.0, -decDig);
+
+        if (currentData <= datad) {
+            emit valueChanged(dataDouble);
+            showData();
+        }
     }
     if (text != NULL) text->hide();
 }
 
 void SNumeric::downData(QAbstractButton* b)
 {
+    valueChangedByButton = true;
     Q_UNUSED(b);
     if(lastLabel > -1) downDataIndex(lastLabel);
 }
@@ -328,15 +397,19 @@ void SNumeric::downDataIndex(int id)
 {
     if(!_AccessW) return;
     if(id == -1) return;
-    double datad = (double) data;
-    double power =  pow(10.0, digits-id-1);
+    long long datad = data;
+    long long const currentData = data;
+    long long power =  pow(10.0, digits-id-1);
     datad = datad - power;
-    if (datad >= (double) minVal) {
-        data = (long long) datad;
-        power = pow(10.0, -decDig);
-        datad = datad * power;
-        emit valueChanged(datad);
-        showData();
+    if (datad >= minVal) {
+        data = datad;
+        double dataDouble = (double) datad;
+        dataDouble *= pow(10.0, -decDig);
+
+        if(currentData >= datad){
+            emit valueChanged(dataDouble);
+            showData();
+        }
     }
     if (text != NULL) text->hide();
 }
@@ -369,9 +442,44 @@ void SNumeric::showData()
         prvDigit = thisDigit;
         if(thisDigit != 0) suppress = false;
         if(i >= intDig-1)  suppress = false;
-
     }
     QTimer::singleShot(1000, this, SLOT(valueUpdated()));
+    triggerRoundColorUpdate();
+}
+
+void SNumeric::triggerRoundColorUpdate(){
+    for(int i = 1; i < digits ; i++){
+        updateRoundColors(i);
+    }
+}
+
+void SNumeric::updateRoundColors(int i) {
+    QColor currColor = labels[i]->palette().color(QPalette::Text);
+    QColor txtColor = labels[0]->palette().color(QPalette::Text);
+    int maxBeforeLossOfPrec = 15;
+
+    QString valueString = "";
+    if(signLabel->text() == "-") valueString += signLabel->text();
+    for(int i = 0; i < digits; i++){
+        if(i == intDig) valueString += ".";
+        QString txt = labels[i]->text();
+        if(txt != " ") valueString += txt;
+
+    }
+    int digitsToColorFromEnd = (valueString.length() - maxBeforeLossOfPrec);
+
+    if (i > maxBeforeLossOfPrec ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
+        if(currColor == txtColor){
+            QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
+            labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");
+            labels[i]->setToolTip("rounding errors possible");
+        }else{
+            labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
+        }
+    } else {
+        labels[i]->setStyleSheet("QLabel {color:" + txtColor.name() + ";}");
+    }
+    update();
 }
 
 void SNumeric::valueUpdated()
@@ -379,6 +487,7 @@ void SNumeric::valueUpdated()
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
     delete re;
+    update();
 }
 
 bool SNumeric::eventFilter(QObject *obj, QEvent *event)
@@ -398,6 +507,7 @@ bool SNumeric::eventFilter(QObject *obj, QEvent *event)
         QApplication::restoreOverrideCursor();
         valueUpdated();
         updateGeometry();
+        triggerRoundColorUpdate();
     } else if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *ev = (QMouseEvent *) event;
         for (int i = 0; i < digits; i++) {
@@ -501,11 +611,11 @@ void SNumeric::resizeEvent(QResizeEvent *e)
 
         // put a border around selected digit
         for(int j=0; j< digits; j++) {
-            labels[j]->setStyleSheet("");
+            labels[j]->setStyleSheet(getStylesheetUpdate(labels[j]->styleSheet(), true));
         }
-        if(lastLabel != -1)
-            labels[lastLabel]->setStyleSheet("border: 2px solid red;");
-
+        if(lastLabel != -1){
+            labels[lastLabel]->setStyleSheet(getStylesheetUpdate(labels[lastLabel]->styleSheet(), false));
+        }
 
         foreach (QAbstractButton* but, bup->buttons()) {
             temp = qobject_cast<QPushButton *>(but);
@@ -572,6 +682,40 @@ void SNumeric::resizeEvent(QResizeEvent *e)
     QWidget::resizeEvent(e);
 }
 
+QString SNumeric::getStylesheetUpdate(QString styleSheet, QString color, bool reset){
+    // Remove Border
+    QColor currColor = this->palette().color(QPalette::Text);
+    QColor c = QColor(255 - currColor.red(), 255 - currColor.green(),
+                      255 - currColor.blue(), 255);
+
+    if (styleSheet.length() > 0) {
+        if (reset) {
+            QString borderStyle = "border: 2px solid red;";
+            styleSheet.replace(borderStyle, "");
+            return styleSheet;
+        } else {
+            if (color.length() == 0) {
+                color = c.name();
+            }
+            return "QLabel { Color:" + color + ";}";
+        }
+    }
+    return "QLabel { Color:" + c.name() + ";}";
+}
+
+QString SNumeric::getStylesheetUpdate(QString styleSheet, bool resetBorder){
+    if (styleSheet.length() > 0) {
+        if (resetBorder) {
+            QString borderStyle = "border: 2px solid red;";
+            styleSheet.replace(borderStyle, "");
+            return styleSheet;
+        } else {
+            styleSheet.replace("}", "border: 2px solid red; }");
+            return styleSheet;
+        }
+    }
+    return styleSheet;
+}
 
 void  SNumeric::formatButton(QPushButton *button) {
     button->setText("");

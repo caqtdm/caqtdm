@@ -114,6 +114,14 @@ private:
     void downDataIndex(int id);
     void upDataIndex(int id);
 
+    QString getStylesheetUpdate(QString styleSheet, QString color = "", bool reset = false);
+    QString getStylesheetUpdate(QString styleSheet, bool resetBorder = false);
+    void updateRoundColors(int i);
+    void triggerRoundColorUpdate();
+    double transformNumberSpace(long long value, int dig);
+    long long transformNumberSpace(double value, int dig);
+    void setValuesFromChannel(double v);
+
     int intDig;
     int decDig;
     int digits;
@@ -133,5 +141,9 @@ private:
     bool _AccessW;
     int lastLabel, lastLabelOnTab;
     double csValue;
+
+    bool valueChangedByButton = false;
+    int orig_decDig = -1;
+    int orig_intDig = -1;
 };
 #endif // EDIGIT_H

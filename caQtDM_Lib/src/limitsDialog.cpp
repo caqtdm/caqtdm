@@ -177,7 +177,8 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
     buttonBox->addButton(button, QDialogButtonBox::ApplyRole );
 
     if(className.contains("caNumeric") || className.contains("caApplyNumeric") || className.contains("caSpinbox")) {
-         Layout->addWidget(buttonBox, 5, 0, 1, -1);
+        precisionLineEdit->setMaximum(PREC_LIMIT_NUMERIC);
+        Layout->addWidget(buttonBox, 5, 0, 1, -1);
     }
     else if(className.contains("caSlider"))
     {
@@ -338,7 +339,7 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         QLabel *integerLabel = new QLabel("integer digits");
         integerLineEdit = new QSpinBox();
         integerLineEdit->setMinimum(0);
-        integerLineEdit->setMaximum(7);
+        integerLineEdit->setMaximum(PREC_LIMIT_NUMERIC);
         integerLineEdit->setSingleStep(1);
         Layout->addWidget(integerLabel, row, 2);
         Layout->addWidget(integerLineEdit, row, 3);
@@ -347,7 +348,7 @@ limitsDialog::limitsDialog(QWidget *w, MutexKnobData *data, const QString &title
         QLabel *decimalLabel = new QLabel("decimal digits");
         decimalLineEdit = new QSpinBox();
         decimalLineEdit->setMinimum(0);
-        decimalLineEdit->setMaximum(5);
+        decimalLineEdit->setMaximum(PREC_LIMIT_NUMERIC);
         decimalLineEdit->setSingleStep(1);
         Layout->addWidget(decimalLabel, row+1, 2);
         Layout->addWidget(decimalLineEdit, row+1, 3);
@@ -639,6 +640,8 @@ void limitsDialog::applyClicked()
 
         // ************* we have a caNumeric, caApplyNumeric or caSpinbox
     } else if(className.contains("caNumeric") || className.contains("caApplyNumeric")  || className.contains("caSpinbox")) {
+        if(prec > PREC_LIMIT_NUMERIC) prec = PREC_LIMIT_NUMERIC;
+        // qDebug() << "set precision to:"  << prec;
 
         if(limitsMode == Channel) {
             setLimitsModeChannel(thisWidget);

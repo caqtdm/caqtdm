@@ -8169,8 +8169,8 @@ void CaQtDM_Lib::ComputeNumericMaxMinPrec(QWidget* widget, const knobData& data)
         if(!fixedFormat) {
             if(precMode == caMode) {
                 prec = data.edata.precision;
-                if(prec < 0) prec = 0;
-                if(prec > 4) prec = 4;
+                 if(prec < 0) prec = 0;
+                 if(prec > 15) prec = 15;
                 maxAbsHoprLopr= qMax(fabs(maxValue), fabs(minValue));
                 if(maxAbsHoprLopr > 1.0) {
                     width = (int)log10(maxAbsHoprLopr) + 2 + prec;
