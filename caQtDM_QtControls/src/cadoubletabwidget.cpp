@@ -19,8 +19,10 @@
  *
  *  Author:
  *    Anton Mezger
+ *    Yannick Wernle
  *  Contact details:
  *    anton.mezger@psi.ch
+ *    yannick.wernle@psi.ch
  */
 
 #include <stdio.h>

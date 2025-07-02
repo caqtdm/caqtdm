@@ -19,8 +19,10 @@
  *
  *  Author:
  *    Anton Mezger
+ *    Yannick Wernle
  *  Contact details:
  *    anton.mezger@psi.ch
+ *    yannick.wernle@psi.ch
  */
 
 #include "snumeric.h"
@@ -482,7 +484,6 @@ void SNumeric::updateRoundColors(int i) {
     } else {
         labels[i]->setStyleSheet("QLabel {color:" + txtColor.name() + ";}");
     }
-    update();
 }
 
 void SNumeric::valueUpdated()
@@ -490,7 +491,6 @@ void SNumeric::valueUpdated()
     QResizeEvent *re = new QResizeEvent(size(), size());
     resizeEvent(re);
     delete re;
-    update();
 }
 
 bool SNumeric::eventFilter(QObject *obj, QEvent *event)
