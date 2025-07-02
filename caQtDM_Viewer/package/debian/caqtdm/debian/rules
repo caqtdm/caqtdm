@@ -3,16 +3,19 @@
 export QWTLIBNAME=qwt-qt5
 export QWTINCLUDE=/usr/include/qwt
 export PYTHONVERSION=$(shell python3 --version 2>&1 | cut -d ' ' -f 2 | cut -d '.' -f 1-2)
-export ZMQ=/usr
+export ZMQ=/usr/
 export ZMQINC=${ZMQ}/include
 export ZMQLIB=${ZMQ}/lib
 export QTDM_RPATH=/opt/caqtdm/lib/qt5
+export GCC_BUILD_ARCH=$(shell gcc -dumpmachine)
+export EPICS_HOST_ARCH=linux-$(shell uname -m)
 export QTHOME=/usr
 export QWTHOME=/usr
 export QWTLIB=${QWTHOME}/lib
 export QWTVERSION=6.1
-export EPICSINCLUDE=${EPICS_BASE}/include
-export EPICSLIB=${EPICS_BASE}/lib/${EPICS_HOST_ARCH}
+export EPICS_BASE=/usr
+export EPICSINCLUDE=${EPICS_BASE}/include/epics/include
+export EPICSLIB=${EPICS_BASE}/lib/epics/lib/${EPICS_HOST_ARCH}
 export EPICSEXTENSIONS=${EPICS_BASE}/extensions
 export QTCONTROLS_LIBS=$(shell pwd)/binaries
 export CAQTDM_COLLECT=$(shell pwd)/binaries
@@ -23,6 +26,8 @@ export QTDM_LIBINSTALL=${EPICSEXTENSIONS}/lib
 export QTDM_BININSTALL=${EPICSEXTENSIONS}/bin
 export PYTHONINCLUDE=/usr/include/python${PYTHONVERSION}
 export PYTHONLIB=/usr/local/lib
+export CAQTDM_MODBUS=1
+export CAQTDM_GPS=1
 
 %:
 	dh $@
@@ -48,7 +53,7 @@ override_dh_auto_install:
 	
 	# Create caqtdm script
 	echo "#!/bin/bash" > binaries/caqtdm
-	echo "caQtDM -style Fusion \"$$@\" &" >> binaries/caqtdm
+	echo "caQtDM -style Fusion \"\044\0100\" &" >> binaries/caqtdm
 
 	install -Dm755 binaries/caqtdm debian/caqtdm/opt/caqtdm/lib/qt5/caqtdm
 	
@@ -63,11 +68,11 @@ override_dh_auto_install:
 	echo "DIR=\"\$$( cd -P \"\$$( dirname \"\$$SOURCE\" )\" && pwd )\"" >> binaries/caqtdm_designer
 	echo "CAQTDM_HOME=\$$DIR/../.." >> binaries/caqtdm_designer
 	echo "# Register help" >> binaries/caqtdm_designer
-	echo "assistant6 -register \$$CAQTDM_HOME/doc/caQtDM.qch" >> binaries/caqtdm_designer
+	echo "assistant -register \$$CAQTDM_HOME/doc/caQtDM.qch" >> binaries/caqtdm_designer
 	echo "export QT_PLUGIN_PATH=\$$CAQTDM_HOME/lib/qt6" >> binaries/caqtdm_designer
-	echo "designer6 \$$@" >> binaries/caqtdm_designer
+	echo "designer \$$@" >> binaries/caqtdm_designer
 	
-	install -Dm755 binaries/caqtdm_designer debian/caqtdm/opt/caqtdm/lib/qt5/caQtDM_designer
+	install -Dm755 binaries/caqtdm_designer debian/caqtdm/opt/caqtdm/lib/qt5/caqtdm_designer
 
 	# Create symlinks
 	ln -sfv /opt/caqtdm/lib/qt5/caqtdm debian/caqtdm/usr/bin/caqtdm

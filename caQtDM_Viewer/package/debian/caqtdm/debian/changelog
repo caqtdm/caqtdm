@@ -1,0 +1,118 @@
+caqtdm (4.6.0-1) unstable; urgency=medium
+
+  * Dev TEST
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200
+
+caqtdm (4.5.0) stable; urgency=medium
+
+  * special character feature handling by CAQTDM_CUSTOM_UNIT_REPLACMETS
+  * caStripplot improved data handling
+  * optimized UI loading by reducing the load of incoming data (CAQTDM_SUPPRESS_UPDATES_ONLOAD)
+  * improved colors in caQtDM status window
+  * added UI loading benchmark
+  * added the new archiverhttp-protocol
+  * some code refurbishments
+  * RPM for RHEL9
+  * logfile generation for status window (CAQTDM_CREATE_LOGFILE,CAQTDM_LOGFILE_PATH)
+  * small documentation updates
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200
+
+caqtdm (4.4.1) stable; urgency=medium
+
+  * caQtDM can be compiled with Qt6
+  * new signals for caCartesianplot
+  * fix for caInclude with upscaling
+  * fix for undefined macros to define a standard value in macro
+  * fix for popup panels to get a panel without data monitors
+  * fix for caLineEdit and caTextEntry to handle strings with Signal/Slot
+  * fix for the start screen on some mobile iOS devices
+  * cleanup of data plugin messages
+  * fix for Qt6.4 compiler settings with EPICS4 header on Windows
+  * fix the PV data selector in designer, missed environment
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200
+
+caqtdm (4.4.0) stable; urgency=medium
+
+  * fileopenwindow: options changes
+  * fix for converted adl files
+  * fix for higher python versions
+  * fix cacartesianplot for minor ticks disappeared when changing number of ticks
+  * searchpaths handling for non ADL files
+  * catable fix for big numbers
+  * bsread fix null number counting messages
+  * epics3plugin fix for disconnected channels
+  * epics4plugin is now working with the epics 7 API and PVA can be used
+  * filter feature for epics 7 is now available
+  * caStripPlot: feature dynamic property "Legend" for rename the channel to a user defined
+  * PV-Editor for Designer with network based auto completion
+  * new commandline option [-savetoimage] to save screenshots as PNG files
+  * added C entry points for python
+  * new decoding functions for camera images (Mono8,Mono10p,Mono10packed,Mono12p,Mono12packed)
+  * future use of compression for camera images (zLib+jpg)
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200
+
+caqtdm (4.3.0) stable; urgency=medium
+
+  * POPUP status windows with possible delays
+  * dynamic Property caqtdmPopupUI and caqtdmPopupUI_Delay for POPUP windows (The filename must contain the word popup.ui)
+  * wmsignalpropergator can resize a panel
+  * fix for to long strings in channel names
+  * fix for some character problems
+  * fix for alarm status for caMenu
+  * fix for softPV Waveform Processing
+  * fix for softPV initialisation, wrong initial value, ui loader depending
+  * cleanup in the sf-archiver
+  * fix in caMenu, paintEvent removed
+  * more file status check before accessing (avoid AFS problems)
+  * fix the seg fault for the classname problem EPushButton
+  * softPV vector/scalar performance problem fixed
+  * start of EPICS 4 to EPICS 7 implementation
+  * fix for string length problems
+  * calinedraw emit textChanged
+  * optimized caCalc signal emitance
+  * caCamera add slots for zoom and position
+  * caQtDM can be compiled with VS2019
+  * Updates for Android and IOS
+  * fixes some problems with MOC and QWT
+  * build in ADL and EDL Parser
+  * shellcommand for Mac
+  * landscape version for Android
+  * fileopening with dynamic conversion causes problems using TEMP directory
+  * added for archivSF the redirection feature to access multiple data sources
+  * fix a floating point problem on RHL7 in the archiveSF
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200
+
+caqtdm (4.2.4) stable; urgency=medium
+
+  * fixed a exception in bsread at closing
+  * added a userdefined format to caLinEdit,caTextEntry and caTextEntry
+  * add macroreplacment for tooltip and statustip on: caLineEdit, caMultilineString, caGraphics, caPolyline, caMessageButton and caLed
+  * fix TLS problem in sf archiver for old Qt Versions
+  * buffer overflow in sf_archiver plugin corrected
+  * extend macro replacement for cascript button
+  * reusing connected channels in epics3 plugin for seting data
+  * borderWidth designer problem with numbers >1, fixed
+  * changes for python3
+  * fix for backend check. Backend property will generate a message that the backend name is not known. but it will use it.
+  * too strict check on RegEx match for visibility
+  * caTextEntry value could be set beyond channel hopr or lopr limits. this has been corrected
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200
+
+caqtdm (4.2.3) stable; urgency=medium
+
+  * focus can be kept now in caTextEntry even on pointer leave by specifying a property
+  * instead of exchanging through shared memory directly for -attach, a queue has been integrated for attaching
+  * for caLineEdit in case of bsread, the unit will be acquired automatically through epics (PSI special)
+  * remove extra white spaces and special characters (lf, cr) form macrodefs
+  * added for caTextEntry  a drop possibility when dragging into it.
+  * new bsread options
+  * in the unit, the u in uJ will be converted to a real mu
+
+
+ -- Helge Brands <helge.brands@psi.ch>  Thu, 12 Jun 2025 15:00:58 +0200

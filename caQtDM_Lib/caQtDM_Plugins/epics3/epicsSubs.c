@@ -1,3 +1,4 @@
+
 /*
  *  This file is part of the caQtDM Framework, developed at the Paul Scherrer Institut,
  *  Villigen, Switzerland
@@ -1356,7 +1357,7 @@ int EpicsGetTimeStamp_Connected(chid ch,char *pv, char *timestamp)
     status = ca_pend_io(CA_TIMEOUT/2);
     if (status == ECA_NORMAL) {
         epicsTimeToStrftime(tsString, 32, "%b %d, %Y %H:%M:%S.%09f", &ctrlS.stamp);
-        sprintf(timestamp, "TimeStamp: %s\n", tsString);
+        sprintf(timestamp, "TimeStamp: %s", tsString);
     } else {
         strcpy(timestamp, "-timestamp timeout-");
     }
@@ -1394,6 +1395,7 @@ int EpicsGetDescription(char *pv, char *description)
     chid     ch;
     int status;
     pv_desc pvDesc = {'\0'};
+    pv_desc pvDescTarget = {'\0'};
     char * pch;
     dbr_string_t value;
     strcpy(description, "");
@@ -1411,10 +1413,9 @@ int EpicsGetDescription(char *pv, char *description)
 
     if (pch) *pch='\0';
 
-    sprintf(pvDesc, "%s.DESC", pvDesc);
-
+    sprintf(pvDescTarget, "%s.DESC", pvDesc);
     // get description
-    status = ca_create_channel(pvDesc, Q_NULLPTR, 0, CA_PRIORITY, &ch);
+    status = ca_create_channel(pvDescTarget, Q_NULLPTR, 0, CA_PRIORITY, &ch);
     if (ch == (chid) 0) return !ECA_NORMAL;
 
     status = ca_pend_io(CA_TIMEOUT/2);
