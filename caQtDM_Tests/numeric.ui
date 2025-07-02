@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1866</width>
-    <height>1468</height>
+    <width>1973</width>
+    <height>795</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>0</x>
       <y>0</y>
-      <width>1801</width>
-      <height>1410</height>
+      <width>1951</width>
+      <height>750</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0" columnstretch="0,0,0,0,0">
@@ -46,15 +46,21 @@
       <widget class="caSpinbox" name="caspinbox_10">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>4</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>2</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_NO3</string>
@@ -65,15 +71,21 @@
       <widget class="caSpinbox" name="caspinbox_3">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>13</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>0</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HV</string>
@@ -84,14 +96,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_6">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -115,13 +127,13 @@
       <widget class="caNumeric" name="canumeric_3">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -143,18 +155,27 @@
       <widget class="caSpinbox" name="caspinbox_4">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
+       <property name="integerDigits" stdset="0">
+        <number>1</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>15</number>
+       </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_LV</string>
+       </property>
+       <property name="colorMode">
+        <enum>caSpinbox::Static</enum>
        </property>
       </widget>
      </item>
@@ -165,14 +186,14 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>150</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="text">
@@ -184,14 +205,14 @@
       <widget class="caLabel" name="calabel_4">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoFillBackground">
@@ -206,15 +227,21 @@
       <widget class="caSpinbox" name="caspinbox_9">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>4</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>8</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_NO2</string>
@@ -225,7 +252,7 @@
       <widget class="caLineDraw" name="calinedraw_6">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -247,14 +274,14 @@
       <widget class="caLabel" name="calabel_3">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoFillBackground">
@@ -269,14 +296,14 @@
       <widget class="caLabel" name="calabel_2">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="text">
@@ -288,14 +315,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_2">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -307,15 +334,21 @@
       <widget class="caSpinbox" name="caspinbox">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>4</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>5</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_NO</string>
@@ -329,14 +362,14 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>150</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="text">
@@ -348,7 +381,7 @@
       <widget class="caLineDraw" name="calinedraw_9">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -361,7 +394,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -384,13 +417,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -403,7 +436,7 @@
       <widget class="caLineDraw" name="calinedraw_8">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -416,7 +449,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -433,14 +466,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -452,14 +485,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_4">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -480,14 +513,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_3">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -505,13 +538,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -530,13 +563,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -549,15 +582,18 @@
       <widget class="caSpinbox" name="caspinbox_8">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>5</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_NO1</string>
@@ -568,14 +604,14 @@
       <widget class="caLabel" name="calabel_6">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoFillBackground">
@@ -590,7 +626,7 @@
       <widget class="caLineDraw" name="calinedraw_7">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -612,15 +648,21 @@
       <widget class="caSpinbox" name="caspinbox_7">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>9</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>9</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HPHL</string>
@@ -631,13 +673,13 @@
       <widget class="caNumeric" name="canumeric_5">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -662,14 +704,14 @@
       <widget class="caLabel" name="calabel_5">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoFillBackground">
@@ -684,14 +726,14 @@
       <widget class="caLabel" name="calabel_7">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoFillBackground">
@@ -706,15 +748,21 @@
       <widget class="caSpinbox" name="caspinbox_2">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>4</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>0</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_NP</string>
@@ -725,14 +773,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_7">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -744,14 +792,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_10">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -763,14 +811,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_8">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -782,13 +830,13 @@
       <widget class="caNumeric" name="canumeric_6">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -801,13 +849,13 @@
       <widget class="caNumeric" name="canumeric_2">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -820,7 +868,7 @@
       <widget class="caLineDraw" name="calinedraw_3">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -833,7 +881,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -850,7 +898,7 @@
       <widget class="caLineDraw" name="calinedraw_10">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -863,7 +911,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>61</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -880,15 +928,21 @@
       <widget class="caSpinbox" name="caspinbox_6">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>1</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>16</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HP2</string>
@@ -905,13 +959,13 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -924,14 +978,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_5">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -958,14 +1012,14 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>150</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="text">
@@ -977,13 +1031,13 @@
       <widget class="caNumeric" name="canumeric_4">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -1008,7 +1062,7 @@
       <widget class="caLineDraw" name="calinedraw">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -1021,7 +1075,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1041,14 +1095,14 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>150</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="text">
@@ -1060,7 +1114,7 @@
       <widget class="caLineDraw" name="calinedraw_2">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -1073,7 +1127,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1090,14 +1144,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_9">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -1109,13 +1163,13 @@
       <widget class="caNumeric" name="canumeric_7">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -1128,15 +1182,21 @@
       <widget class="caSpinbox" name="caspinbox_5">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>1</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>15</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HP1</string>
@@ -1147,7 +1207,7 @@
       <widget class="caLineDraw" name="calinedraw_4">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -1160,7 +1220,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1177,7 +1237,7 @@
       <widget class="caLineDraw" name="calinedraw_5">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -1190,7 +1250,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>68</pointsize>
+         <pointsize>26</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1207,14 +1267,14 @@
       <widget class="caLabel" name="calabel_11">
        <property name="minimumSize">
         <size>
-         <width>150</width>
-         <height>100</height>
+         <width>60</width>
+         <height>40</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>250</width>
-         <height>250</height>
+         <width>160</width>
+         <height>120</height>
         </size>
        </property>
        <property name="autoFillBackground">
@@ -1229,13 +1289,13 @@
       <widget class="caNumeric" name="canumeric_11">
        <property name="minimumSize">
         <size>
-         <width>15</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
        </property>
@@ -1248,14 +1308,14 @@
       <widget class="caApplyNumeric" name="caapplynumeric_11">
        <property name="minimumSize">
         <size>
-         <width>15</width>
-         <height>15</height>
+         <width>30</width>
+         <height>25</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
-         <height>80</height>
+         <width>450</width>
+         <height>100</height>
         </size>
        </property>
        <property name="channel" stdset="0">
@@ -1267,15 +1327,21 @@
       <widget class="caSpinbox" name="caspinbox_11">
        <property name="minimumSize">
         <size>
-         <width>45</width>
+         <width>30</width>
          <height>15</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>1500</width>
+         <width>450</width>
          <height>80</height>
         </size>
+       </property>
+       <property name="integerDigits" stdset="0">
+        <number>9</number>
+       </property>
+       <property name="decimalDigits" stdset="0">
+        <number>9</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HPLL</string>
@@ -1286,7 +1352,7 @@
       <widget class="caLineDraw" name="calinedraw_11">
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -1312,7 +1378,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1866</width>
+     <width>1973</width>
      <height>22</height>
     </rect>
    </property>

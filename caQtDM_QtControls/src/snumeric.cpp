@@ -245,15 +245,39 @@ void SNumeric::setValue(double v)
 // written from CS
 void SNumeric::silentSetValue(double v)
 {
+    int intDigits = QString().number((long long) v).length();
+    if(orig_decDig == -1) orig_decDig = decDig;
+    if(orig_intDig == -1) orig_intDig = intDig;
+
+    if(!valueChangedByButton){
+        // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
+        while (intDigits > intDig) {
+            intDig++;
+        }
+        // Shift back if the opposite is the case
+        while(intDigits < intDig){
+            intDig--;
+            if(orig_decDig > decDig) decDig++;
+            if(orig_decDig < decDig) decDig--;
+        }
+        digits = intDig + decDig;
+    }
+    setValuesFromChannel(v);
+    valueChangedByButton = false;
+}
+
+void SNumeric::setValuesFromChannel(double v){
     csValue = v;
     // shift digits around if max/minvalue get too big.
     int ddig = digits;
     while (ddig > 16) {
-        decDig--;
+        if(decDig > 0) decDig--;
         ddig--;
+        digits = intDig + decDig;
     }
+    // Adjust min/max if set by channel
     setDecDigits(decDig);
-    long long temp = (transformNumberSpace(v, decDig));
+    long long temp = transformNumberSpace(v, decDig);
     data = temp;
     showData();
 }
@@ -334,6 +358,7 @@ void SNumeric::setDecDigits(int d)
 
 void SNumeric::upData(QAbstractButton* b)
 {
+    valueChangedByButton = true;
     Q_UNUSED(b);
     if(lastLabel > -1) upDataIndex(lastLabel);
 }
@@ -363,6 +388,7 @@ void SNumeric::upDataIndex(int id)
 
 void SNumeric::downData(QAbstractButton* b)
 {
+    valueChangedByButton = true;
     Q_UNUSED(b);
     if(lastLabel > -1) downDataIndex(lastLabel);
 }
@@ -442,7 +468,7 @@ void SNumeric::updateRoundColors(int i) {
     }
     int digitsToColorFromEnd = (valueString.length() - maxBeforeLossOfPrec);
 
-    if (i > maxBeforeLossOfPrec || (i >= (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
+    if (i > maxBeforeLossOfPrec ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (maxBeforeLossOfPrec +1))) {
         if(currColor == txtColor){
             QColor c = QColor(180 - currColor.red(), 180 - currColor.green(), 180 - currColor.blue(), 255);
             labels[i]->setStyleSheet("QLabel {color:" + c.name() + ";}");

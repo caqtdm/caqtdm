@@ -245,7 +245,6 @@ void ENumeric::init()
 
 void ENumeric::setValue(double v)
 {
-    qDebug() << "set" << v;
     long long temp = transformNumberSpace(v, decDig);
     if ((temp >= minVal) && (temp <= maxVal)) {
         bool valChanged = data != temp;
@@ -283,9 +282,9 @@ void ENumeric::silentSetValue(double v)
 
 }
 
-void ENumeric::setValuesFromChannel(double v){
+void ENumeric::setValuesFromChannel(double v)
+{
     csValue = v;
-
     // shift digits around if max/minvalue get too big.
     int ddig = digits;
     while (ddig > 16) {
