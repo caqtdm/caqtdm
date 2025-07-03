@@ -155,15 +155,15 @@ void SNumeric::init()
     LeftClickWithModifiersEater *lCWME = findChild<LeftClickWithModifiersEater *>("leftClickWithModifiersEater");
     setFocusPolicy(Qt::StrongFocus);
 
-    box = new QGridLayout(this);
-    SETMARGIN_QT456(box,1);
-    SETSPACING_QT456(box,0);
+        if(box == NULL) box = new QGridLayout(this);
+        if(bup == NULL) bup = new QButtonGroup(this);
+        if(bdown == NULL) bdown = new QButtonGroup(this);
+        SETMARGIN_QT456(box,1);
+        SETSPACING_QT456(box,0);
 
-    box->setRowStretch(0,1);
-    //box->setRowStretch(1,1);
-    //box->setRowStretch(2,1);
-    bup = new QButtonGroup(this);
-    bdown = new QButtonGroup(this);
+        box->setRowStretch(0,1);
+        //box->setRowStretch(1,1);
+        //box->setRowStretch(2,1);
 
     for (int i = 0; i < digits; i++) {
         QLabel *l;
@@ -268,24 +268,17 @@ void SNumeric::silentSetValue(double v)
         }
         digits = intDig + decDig;
     }
-
-    if(!isInitialized) isInitialized = true;
     setValuesFromChannel(v);
     valueChangedByButton = false;
 }
 
-void SNumeric::setValuesFromChannel(double v){
+void SNumeric::setValuesFromChannel(double v)
+{
     csValue = v;
-    // shift digits around if max/minvalue get too big.
-    int ddig = digits;
-    while (ddig > 16) {
-        if(decDig > 0) decDig--;
-        ddig--;
-        digits = intDig + decDig;
-    }
     // Adjust min/max if set by channel
     setDecDigits(decDig);
     long long temp = transformNumberSpace(v, decDig);
+    if(!isInitialized) isInitialized = true;
     data = temp;
     showData();
 }
@@ -344,11 +337,11 @@ void SNumeric::setIntDigits(int i)
 void SNumeric::setDecDigits(int d)
 {
     if (d < 0) return;
-    clearContainers();
     data = (long long) (data * pow(10.0, d - decDig));
     maxVal = (long long) (maxVal * pow(10.0, d - decDig));
     minVal = (long long) (minVal * pow(10.0, d - decDig));
     decDig = d;
+
     // shift digits around if max/minvalue get too big.
     int ddig = decDig + intDig;
     while (ddig > 17) {
@@ -356,12 +349,17 @@ void SNumeric::setDecDigits(int d)
         ddig--;
     }
     digits = decDig + intDig;
-    /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
-     * round issues. So, recalculating maximum and minimum is required  to obtain precision
-     */
-    setMinimum(d_minAsDouble);
-    setMaximum(d_maxAsDouble);
-    init();
+
+    if(decDig != orig_decDig || intDig != orig_intDig){
+        clearContainers();
+        /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
+         * round issues. So, recalculating maximum and minimum is required  to obtain precision
+         */
+        setMinimum(d_minAsDouble);
+        setMaximum(d_maxAsDouble);
+
+        init();
+    }
 }
 
 void SNumeric::upData(QAbstractButton* b)
@@ -382,7 +380,6 @@ void SNumeric::upDataIndex(int id)
     // (long long) power overflows between 10^18 and 10^19
     if (datad <= ((double)maxVal) && digits-id-1 < 19) {
         data = datad;
-        power = pow(10.0, -decDig);
         double dataDouble = (double) datad;
         dataDouble *= pow(10.0, -decDig);
 
@@ -506,7 +503,6 @@ bool SNumeric::eventFilter(QObject *obj, QEvent *event)
         QApplication::restoreOverrideCursor();
         valueUpdated();
         updateGeometry();
-        triggerRoundColorUpdate();
     } else if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *ev = (QMouseEvent *) event;
         for (int i = 0; i < digits; i++) {
