@@ -116,7 +116,6 @@ private:
     void downDataIndex(int id);
     void upDataIndex(int id);
 
-    QString getStylesheetUpdate(QString styleSheet, QString color = "", bool reset = false);
     QString getStylesheetUpdate(QString styleSheet, bool resetBorder = false);
     void updateRoundColors(int i);
     void triggerRoundColorUpdate();

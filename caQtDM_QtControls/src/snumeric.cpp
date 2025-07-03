@@ -677,38 +677,15 @@ void SNumeric::resizeEvent(QResizeEvent *e)
     QWidget::resizeEvent(e);
 }
 
-QString SNumeric::getStylesheetUpdate(QString styleSheet, QString color, bool reset){
-    // Remove Border
-    QColor currColor = this->palette().color(QPalette::Text);
-    QColor c = QColor(255 - currColor.red(), 255 - currColor.green(),
-                      255 - currColor.blue(), 255);
-
-    if (styleSheet.length() > 0) {
-        if (reset) {
-            QString borderStyle = "border: 2px solid red;";
-            styleSheet.replace(borderStyle, "");
-            return styleSheet;
-        } else {
-            if (color.length() == 0) {
-                color = c.name();
-            }
-            return "QLabel { Color:" + color + ";}";
-        }
-    }
-    return "QLabel { Color:" + c.name() + ";}";
-}
-
 QString SNumeric::getStylesheetUpdate(QString styleSheet, bool resetBorder){
+    QString borderStyle = "border: 2px solid red;";
     if (styleSheet.length() > 0) {
         if (resetBorder) {
-            QString borderStyle = "border: 2px solid red;";
-            styleSheet.replace(borderStyle, "");
-            return styleSheet;
+            styleSheet = styleSheet.replace(borderStyle, "");
         } else {
-            styleSheet.replace("}", "border: 2px solid red; }");
-            return styleSheet;
+            if(styleSheet.contains("}")) styleSheet = styleSheet.replace("}", (borderStyle +" }"));
         }
-    }
+    }else if(!resetBorder) styleSheet = borderStyle;
     return styleSheet;
 }
 
