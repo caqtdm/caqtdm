@@ -262,7 +262,7 @@ void ENumeric::silentSetValue(double v)
     if(orig_intDig == -1) orig_intDig = intDig;
 
     // Only do after initialized (or above threshold) to avoid shortening digits when not needed
-    if(!valueChangedByButton && (isInitialized || digits > 15)){
+    if(!valueChangedByButton && (isInitialized) && (digits > PREC_LIMIT_NUMERIC)){
         // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
         while (intDigits > intDig) {
             intDig++;
@@ -446,7 +446,7 @@ void ENumeric::showData()
         temp = temp - (long long) numd;
 
         thisDigit = abs((int) num);
-        if(i>0 && prvDigit == 0 && suppress) labels[i-1]->setText(" ");
+        if(i>0 && prvDigit == 0 && suppress && labels.length() > 2) labels[i-1]->setText(" ");
         labels[i]->setText(QString().setNum(abs((int) num)));
         prvDigit = thisDigit;
         if(thisDigit != 0) suppress = false;
