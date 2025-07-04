@@ -2302,13 +2302,18 @@ is the equivalent of the Wheelswitch in MEDM
    selected digit. Clicking on an arrow button will increment or
    decrement the digit. The WheelSwitch will also accept input of a new
    value via the keyboard by double clicking on the value. Escape aborts
-   the input. Type Enter to finish the input. 
-   Due to type constraints rounding errors begin at 15 total digits, 
-   affected digits will be colored with a different color.
-   The constraints also affect the maximum and minimum values: 
-   the higher the precision used, the lower the maximum value  will be (and other way around) 
-   - these constraints depend on the maximum limit that set by either the EPICS channel or the user
-   by right-clicking on the widget. 
+   the input. Type Enter to finish the input. Inputs are restricted to Limits,
+   either set by channel or by the user. To correctly display a number, the number must be
+   between the upper and lower limits.
+   
+   Due to internal constraints, the maximum displayable digits are limited to 15:
+   Above this threshold, rounding errors can occur, which are colored in another color.
+   Those constraints affect large numbers as well - the more digits a number has before the comma, 
+   the less will be displayable after.
+   If a value is received by the channel that is above the implemented limits, the widget shifts the comma 
+   to correctly display the value received - if a number is very big, displayable precision can be lost.
+   To avoid any issues caused by this, make sure that your limit is set high enough that such a shift doesn't occur.
+
 
 --------------
 
@@ -2321,7 +2326,7 @@ is the equivalent of the Wheelswitch in MEDM
 
    :ref:`geometry` is used for any object
    **Description:**
-   The same behaviour as the Wheelswitch, with the difference that the
+   The same behaviour as the Wheelswitch/ :ref:`caNumeric`, with the difference that the
    value will be applied when pressing the apply button.
 
 --------------
@@ -2333,7 +2338,7 @@ is the equivalent of the Wheelswitch in MEDM
 
 has no equivalent in MEDM
 
-   <:ref:`geometry` is used for any object
+   :ref:`geometry` is used for any object
    **Description:**
 
 --------------
@@ -2479,6 +2484,13 @@ represents a simplified Wheelswitch
 
    :ref:`geometry` is used for any object
    **Description:**
+   The WheelSwitch has 2 arrow buttons to the side: One pointing up and one pointing down.
+   The up and down arrow buttons are the main feature of the
+   WheelSwitch. To change any digit, click the digit you want to change. 
+   The currently selected digit will be outlined by a red color. 
+   The up and down-buttons in- or decrement the selected digit by 1 unit.
+
+   Spinbox behaves in general very similar to :ref:`caNumeric`, including its digits-constraints. 
 
 --------------
 

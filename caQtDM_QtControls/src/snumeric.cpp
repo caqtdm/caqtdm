@@ -268,6 +268,7 @@ void SNumeric::silentSetValue(double v)
         }
         digits = intDig + decDig;
     }
+
     setValuesFromChannel(v);
     valueChangedByButton = false;
 }
@@ -344,13 +345,15 @@ void SNumeric::setDecDigits(int d)
 
     // shift digits around if max/minvalue get too big.
     int ddig = decDig + intDig;
+    int digShifted = 0;
     while (ddig > 17) {
         decDig--;
         ddig--;
+        digShifted++;
     }
     digits = decDig + intDig;
 
-    if(abs(decDig - orig_decDig) > 1 || abs(intDig - orig_intDig) > 1){
+    if(((decDig != orig_decDig || intDig != orig_intDig) && digShifted > 0) || !isInitialized){
         clearContainers();
         /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
          * round issues. So, recalculating maximum and minimum is required  to obtain precision
