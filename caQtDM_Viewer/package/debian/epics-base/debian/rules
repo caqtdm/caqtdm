@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-
+export EPICS_HOST_ARCH=$(shell perl -CSD src/tools/EpicsHostArch.pl)
 %:
 	dh $@
 
@@ -7,7 +7,7 @@
 EPICS_STAGING = $(CURDIR)/debian/staging
 EPICS_FINAL = /usr/lib/epics
 # Get EPICS_HOST_ARCH
-EPICS_HOST_ARCH=$$(perl -CSD src/tools/EpicsHostArch.pl)
+
 
 override_dh_auto_configure:
 	echo ${EPICS_HOST_ARCH} > EPICS_HOST_ARCH	
@@ -24,6 +24,7 @@ override_dh_auto_clean:
 override_dh_auto_build:
 	export EPICS_HOST_ARCH=$$(cat EPICS_HOST_ARCH)
 	export LD_LIBRARY_PATH=$(EPICS_STAGING)$(EPICS_FINAL)/lib/$$EPICS_HOST_ARCH
+
 	make -j$$(nproc)
 
 override_dh_auto_install:
@@ -36,6 +37,7 @@ override_dh_auto_install:
 	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/include debian/epics-base$(EPICS_FINAL)
 	cp -a $(EPICS_STAGING)$(EPICS_FINAL)/cfg $(EPICS_STAGING)$(EPICS_FINAL)/configure $(EPICS_STAGING)$(EPICS_FINAL)/db $(EPICS_STAGING)$(EPICS_FINAL)/dbd $(EPICS_STAGING)$(EPICS_FINAL)/templates debian/epics-base$(EPICS_FINAL)
 	
+
 	# Create symlinks
 	mkdir -p debian/epics-base/usr/bin
 	for bin in caget caput cainfo camonitor caRepeater casw pvget pvinfo pvlist pvput softIoc softIocPVA; do \
@@ -63,7 +65,3 @@ override_dh_auto_install:
 	echo "EPICS_HOST_ARCH=${EPICS_HOST_ARCH}" > debian/epics-base/usr/lib/environment.d/10-epics-base.conf
 	echo "EPICS_BASE=/usr/lib/epics" >> debian/epics-base/usr/lib/environment.d/10-epics-base.conf
 
-	# Create CONFIG_SITE.local
-	echo "EPICS_HOST_ARCH=${EPICS_HOST_ARCH}" > debian/epics-base$(EPICS_FINAL)/configure/CONFIG_SITE.local
-	echo "INSTALL_LOCATION=." >> debian/epics-base$(EPICS_FINAL)/configure/CONFIG_SITE.local
-	echo "FINAL_LOCATION=$(EPICS_FINAL)" >> debian/epics-base$(EPICS_FINAL)/configure/CONFIG_SITE.local

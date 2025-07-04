@@ -1,0 +1,11 @@
+--- caQtDM.pri	2018-03-21 10:35:43.000000002 +0100
++++ caQtDM.pri.old	2018-03-21 10:27:45.000000002 +0100
+@@ -733,7 +733,7 @@
+ 	INCLUDEPATH += $$(ZMQINC)
+         unix:!macx {
+ #                LIBS += -L$$(ZMQLIB) -Wl,-rpath,$$(ZMQLIB) -lzmq
+-                 LIBS += $$(ZMQLIB)/libzmq.so
++                 LIBS += $$(ZMQLIB)/libzmq.a
+ 	}
+         macx {
+                 LIBS += $$(ZMQLIB)/libzmq.5.dylib

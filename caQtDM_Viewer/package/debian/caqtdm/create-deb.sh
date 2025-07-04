@@ -58,7 +58,7 @@ pwd
 tar -xf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz
 pwd
 cp -rf ../debian/* debian/
-rm -f debian/*.ex debian/README.Debian debian/README.source
+rm -rf debian/*.ex debian/README.Debian debian/README.source
 pwd
 
 # Build the package

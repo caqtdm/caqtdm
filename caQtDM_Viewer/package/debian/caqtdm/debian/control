@@ -2,7 +2,7 @@ Source: caqtdm
 Section: science
 Priority: optional
 Maintainer: Helge Brands <helge.brands@psi.ch>
-Build-Depends: debhelper (>= 12), qtbase5-dev, qt5-qmake, libqwt-qt5-dev, epics-base, python3-dev, qttools5-dev, qttools5-dev, libqt5svg5-dev, libqt5x11extras5-dev, python3-dev, libzmq3-dev, qtpositioning5-dev, libqt5serialbus5-dev 
+Build-Depends: debhelper (>= 12), qtbase5-dev, qt5-qmake, libqwt-qt5-dev, epics-base, python3-dev, qttools5-dev, qttools5-dev, libqt5svg5-dev, libqt5x11extras5-dev, python3-dev, libzmq3-dev, qtpositioning5-dev [amd64] , libqt5serialbus5-dev [amd64]
 Standards-Version: 4.6.0
 Homepage: http://caqtdm.github.io/
 
