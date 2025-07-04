@@ -262,7 +262,7 @@ void ENumeric::silentSetValue(double v)
     if(orig_intDig == -1) orig_intDig = intDig;
 
     // Only do after initialized (or above threshold) to avoid shortening digits when not needed
-    if(!valueChangedByButton && (isInitialized) && (digits > PREC_LIMIT_NUMERIC)){
+    if(!valueChangedByButton && (digits > PREC_LIMIT_NUMERIC)){
         // Shift digits towards integers if the integer digits over EPICS is bigger than those displayed currently
         while (intDigits > intDig) {
             intDig++;
@@ -336,7 +336,7 @@ void ENumeric::setDecDigits(int d)
     }
     digits = decDig + intDig;
 
-    if(decDig != orig_decDig || intDig != orig_intDig){
+    if(abs(decDig - orig_decDig) > 1 || abs(intDig - orig_intDig) > 1){
         clearContainers();
         /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
          * round issues. So, recalculating maximum and minimum is required  to obtain precision
@@ -719,7 +719,7 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     QFont signFont("Monospace");  // + and - should have same size
     QFont labelFont;
     ESimpleLabel *l1 = findChild<ESimpleLabel *>();
-    labelFont = l1->font();
+    if(l1 != NULL)labelFont = l1->font();
     if(d_fontScaleEnabled && intDig > 0)
     {
         // this can not work correctly when resizing continously, characters will grow
