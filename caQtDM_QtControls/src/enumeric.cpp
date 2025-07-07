@@ -270,7 +270,7 @@ void ENumeric::suppressUserInput(){
             labels[i]->setStyleSheet("QLabel {color:red;}");
     }
     signLabel->setText("");
-    pointLabel->setText("");
+    // Crashes: pointLabel->setText("");
     this->setStyleSheet("* {color: red;}");
     this->setToolTip("input broke widget: awaiting processable input");
     update();

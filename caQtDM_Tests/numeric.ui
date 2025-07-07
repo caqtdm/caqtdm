@@ -394,7 +394,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -449,7 +449,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -662,7 +662,7 @@
         <number>9</number>
        </property>
        <property name="decimalDigits" stdset="0">
-        <number>9</number>
+        <number>8</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HPHL</string>
@@ -881,7 +881,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1075,7 +1075,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1127,7 +1127,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1220,7 +1220,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1250,7 +1250,7 @@
        <property name="font">
         <font>
          <family>Monospace</family>
-         <pointsize>26</pointsize>
+         <pointsize>24</pointsize>
          <stylestrategy>PreferDefault</stylestrategy>
          <kerning>true</kerning>
         </font>
@@ -1302,6 +1302,20 @@
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HPLL</string>
        </property>
+       <property name="foreground">
+        <color>
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+       <property name="background">
+        <color>
+         <red>230</red>
+         <green>230</green>
+         <blue>230</blue>
+        </color>
+       </property>
       </widget>
      </item>
      <item row="10" column="2">
@@ -1341,7 +1355,7 @@
         <number>9</number>
        </property>
        <property name="decimalDigits" stdset="0">
-        <number>9</number>
+        <number>8</number>
        </property>
        <property name="channel" stdset="0">
         <string>ACM:TEST:TEST_CANUM_HPLL</string>
