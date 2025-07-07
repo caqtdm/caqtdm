@@ -119,6 +119,8 @@ private:
     double transformNumberSpace(long long value, int dig);
     long long transformNumberSpace(double value, int dig);
     void setValuesFromChannel(double v);
+    bool canEdit();
+    void suppressUserInput();
 
     int idUpVuoto, idDownVuoto;
     int idUpPoint, idDownPoint;
@@ -145,5 +147,6 @@ private:
     bool isInitialized = false;
     int orig_decDig = -1;
     int orig_intDig = -1;
+    bool suppressInput = false;
 };
 #endif // EDIGIT_H

@@ -255,11 +255,33 @@ void ENumeric::setValue(double v)
     }
 }
 
+bool ENumeric::canEdit(){
+    QString dataString = QString().number(data);
+    if(((dataString.contains("922337")) && dataString.length() >= 19)){
+        return false;
+    }
+    return true;
+}
+
+void ENumeric::suppressUserInput(){
+    suppressInput = true;
+    for(int i = 0; i < digits; i++){
+        labels[i]->setText("§");
+            labels[i]->setStyleSheet("QLabel {color:red;}");
+    }
+    signLabel->setText("");
+    pointLabel->setText("");
+    this->setStyleSheet("* {color: red;}");
+    this->setToolTip("input broke widget: awaiting processable input");
+    update();
+}
+
 void ENumeric::silentSetValue(double v)
 {
     int intDigits = QString().number((long long) v).length();
     if(orig_decDig == -1) orig_decDig = decDig;
     if(orig_intDig == -1) orig_intDig = intDig;
+
 
     // Only do after initialized (or above threshold) to avoid shortening digits when not needed
     if(!valueChangedByButton && (digits > PREC_LIMIT_NUMERIC)){
@@ -278,6 +300,22 @@ void ENumeric::silentSetValue(double v)
 
     setValuesFromChannel(v);
     valueChangedByButton = false;
+
+    // Remove Suppression if values are working fine
+    if(suppressInput && canEdit()){
+        suppressInput = false;
+        isInitialized = false;
+
+        for(int i = 0; i < digits; i++){
+            labels[i]->setStyleSheet("");
+        }
+        this->setStyleSheet("");
+        clearContainers();
+        init();
+        showData();
+    }else if(!canEdit() && !suppressInput){
+        suppressUserInput();
+    }
 }
 
 void ENumeric::setValuesFromChannel(double v)
@@ -338,6 +376,7 @@ void ENumeric::setDecDigits(int d)
         digShifted++;
     }
     digits = decDig + intDig;
+
     if(((decDig != orig_decDig || intDig != orig_intDig) && digShifted > 0) || !isInitialized){
         clearContainers();
         /* when changing decimal digits, minimum and maximum need to be recalculated, to avoid
@@ -348,13 +387,18 @@ void ENumeric::setDecDigits(int d)
 
         init();
     }
+    if(!canEdit()){
+        suppressUserInput();
+    }
 }
 
 void ENumeric::upData(QAbstractButton* b)
 {
     valueChangedByButton = true;
-    int id = b->objectName().remove("layoutmember").toInt();
-    upDataIndex(id);
+    if(!suppressInput){
+        int id = b->objectName().remove("layoutmember").toInt();
+        upDataIndex(id);
+    }
 }
 
 void ENumeric::upDataIndex(int id)
@@ -401,8 +445,10 @@ double ENumeric::transformNumberSpace(long long value, int dig){
 void ENumeric::downData(QAbstractButton* b)
 {
     valueChangedByButton = true;
-    int id = b->objectName().remove("layoutmember").toInt();
-    downDataIndex(id);
+    if(!suppressInput){
+        int id = b->objectName().remove("layoutmember").toInt();
+        downDataIndex(id);
+    }
 }
 
 void ENumeric::downDataIndex(int id)
@@ -432,30 +478,34 @@ void ENumeric::showData()
     bool suppress = true;
     long long temp = data;
     double num = 0;
-    if (data < 0)
-        signLabel->setText(QString("-"));
-    else
-        signLabel->setText(QString("+"));
 
-    for (int i = 0; i < digits; i++) {
-        double power =  pow(10.0, digits-i-1);
-        double numd = (double) temp / power;
-        if(numd >=0)
-            num = floor(numd);
+    if(!suppressInput){
+        if (data < 0)
+            signLabel->setText(QString("-"));
         else
-            num = ceil(numd);
-        numd = num * power;
-        temp = temp - (long long) numd;
+            signLabel->setText(QString("+"));
 
-        thisDigit = abs((int) num);
-        if(i>0 && prvDigit == 0 && suppress && labels.length() > 2) labels[i-1]->setText(" ");
-        labels[i]->setText(QString().setNum(abs((int) num)));
-        prvDigit = thisDigit;
-        if(thisDigit != 0) suppress = false;
-        if(i >= intDig-1)  suppress = false;
+        for (int i = 0; i < digits; i++) {
+            double power =  pow(10.0, digits-i-1);
+            double numd = (double) temp / power;
+            if(numd >=0)
+                num = floor(numd);
+            else
+                num = ceil(numd);
+            numd = num * power;
+            temp = temp - (long long) numd;
+
+            thisDigit = abs((int) num);
+            if(i>0 && prvDigit == 0 && suppress && labels.length() > 2) labels[i-1]->setText(" ");
+            labels[i]->setText(QString().setNum(abs((int) num)));
+            prvDigit = thisDigit;
+            if(thisDigit != 0) suppress = false;
+            if(i >= intDig-1)  suppress = false;
+        }
+
+        QTimer::singleShot(1000, this, SLOT(valueUpdated()));
+        triggerRoundColorUpdate();
     }
-    QTimer::singleShot(1000, this, SLOT(valueUpdated()));
-    triggerRoundColorUpdate();
 }
 
 void ENumeric::triggerRoundColorUpdate(){
@@ -465,22 +515,24 @@ void ENumeric::triggerRoundColorUpdate(){
 }
 
 void ENumeric::updateRoundColors(int i) {
-    QColor currColor = labels[i]->palette().color(QPalette::Text);
+    if(!suppressInput){
+        QColor currColor = labels[i]->palette().color(QPalette::Text);
 
-    QString valueString = "";
-    if(signLabel->text() == "-") valueString += signLabel->text();
-    for(int i = 0; i < digits; i++){
-        if(i == intDig) valueString += ".";
-        QString txt = labels[i]->text();
-        if(txt != " ") valueString += txt;
+        QString valueString = "";
+        if(signLabel->text() == "-") valueString += signLabel->text();
+        for(int i = 0; i < digits; i++){
+            if(i == intDig) valueString += ".";
+            QString txt = labels[i]->text();
+            if(txt != " ") valueString += txt;
 
-    }
-    int digitsToColorFromEnd = (valueString.length() - PREC_LIMIT_NUMERIC);
-    if (i > PREC_LIMIT_NUMERIC ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (PREC_LIMIT_NUMERIC +1))) {
-        if(currColor != roundingColor){
-           labels[i]->setStyleSheet("QLabel {color:" + roundingColor.name() + ";}");
-        }else{
-           labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
+        }
+        int digitsToColorFromEnd = (valueString.length() - PREC_LIMIT_NUMERIC);
+        if (i > PREC_LIMIT_NUMERIC ||  (i > (digits-digitsToColorFromEnd) && valueString.length() > (PREC_LIMIT_NUMERIC +1))) {
+            if(currColor != roundingColor){
+               labels[i]->setStyleSheet("QLabel {color:" + roundingColor.name() + ";}");
+            }else{
+               labels[i]->setStyleSheet("QLabel {color:" + currColor.name() + ";}");
+            }
         }
     }
 }
@@ -505,32 +557,33 @@ void ENumeric::dataInput()
 
 void ENumeric::mouseDoubleClickEvent(QMouseEvent*)
 {
-    if (text == NULL) {
-        text = new QLineEdit(this);
-    } else {
-        text->raise();
-        text->show();
+    if(!suppressInput){
+        if (text == NULL) {
+            text = new QLineEdit(this);
+        } else {
+            text->raise();
+            text->show();
+        }
+        QString valueString = "";
+        if(signLabel->text() == "-") valueString += signLabel->text();
+        for(int i = 0; i < digits; i++){
+            if(i == intDig) valueString += ".";
+            QString txt = labels[i]->text();
+            if(txt != " ") valueString += txt;
+
+        }
+        text->setText(valueString);
+
+        connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
+        connect(text, SIGNAL(editingFinished()), text, SLOT(hide()));
+
+        text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
+        text->setFont(signLabel->font());
+        text->setAlignment(Qt::AlignRight);
+        text->setMaxLength(digits+2);
+        text->setSelection(0, valueString.length());
+        text->setFocus();
     }
-    QString valueString = "";
-    if(signLabel->text() == "-") valueString += signLabel->text();
-    for(int i = 0; i < digits; i++){
-        if(i == intDig) valueString += ".";
-        QString txt = labels[i]->text();
-        if(txt != " ") valueString += txt;
-
-    }
-    text->setText(valueString);
-
-    connect(text, SIGNAL(returnPressed()), this, SLOT(dataInput()));
-    connect(text, SIGNAL(editingFinished()), text, SLOT(hide()));
-
-    text->setGeometry(QRect(box->cellRect(1, 0).topLeft(), box->cellRect(1, box->columnCount() - 1).bottomRight()));
-    text->setFont(signLabel->font());
-    text->setAlignment(Qt::AlignRight);
-    text->setMaxLength(digits+2);
-    text->setSelection(0, valueString.length());
-    text->setFocus();
-
 }
 
 bool ENumeric::eventFilter(QObject *obj, QEvent *event)
@@ -541,7 +594,7 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
         } else {
             QApplication::restoreOverrideCursor();
         }
-    } else if(event->type() == QEvent::Leave) {
+    } else if(event->type() == QEvent::Leave && !suppressInput) {
         QString ParentClassName = parent()->metaObject()->className();
         if(ParentClassName.contains("caApplyNumeric")) {
             //printf("do nothing\n");
@@ -557,7 +610,7 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
         }
     } else if(event->type() == QEvent::MouseButtonDblClick) {
         if(!_AccessW) return true;
-    } else if (event->type() == QEvent::MouseButtonPress) {
+    } else if (event->type() == QEvent::MouseButtonPress && !suppressInput) {
         QMouseEvent *ev = (QMouseEvent *) event;
         for (int i = 0; i < digits; i++) {
             QRect widgetRect = labels[i]->geometry();
@@ -568,11 +621,11 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             }
         }
     // this prevents a parent scrollbar to react to the up/down keys
-    } else if (event->type() == QEvent::KeyPress) {
+    } else if (event->type() == QEvent::KeyPress && !suppressInput) {
          QKeyEvent *ev = (QKeyEvent*) event;
          if(ev->key() ==Qt::Key_Down || ev->key() ==Qt::Key_Up) return true;
 
-    } else if(event->type() == QEvent::KeyRelease)    {
+    } else if(event->type() == QEvent::KeyRelease && !suppressInput)    {
         QKeyEvent *ev = (QKeyEvent *) event;
         if(ev->key() == Qt::Key_Escape) if (text != NULL) text->hide();
         if(ev->key() == Qt::Key_Up) upDataIndex(lastLabel);
@@ -582,13 +635,13 @@ bool ENumeric::eventFilter(QObject *obj, QEvent *event)
             if(lastLabel < 0) lastLabel = 0;
             valueUpdated();
         }
-        if(ev->key() == Qt::Key_Right) {
+        if(ev->key() == Qt::Key_Right && !suppressInput) {
             lastLabel++;
             if(lastLabel > (digits-1)) lastLabel = digits-1;
             valueUpdated();
         }
         // move cursor with tab focus
-        if(ev->key() == Qt::Key_Tab) {
+        if(ev->key() == Qt::Key_Tab && !suppressInput) {
             QCursor *cur = new QCursor;
             QPoint p = QWidget::mapToGlobal(QPoint(this->width()/2, this->height()/2));
             lastLabel = lastLabelOnTab;
