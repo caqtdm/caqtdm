@@ -2354,7 +2354,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         // define the file to use
         QString providedFileName = includeWidget->getFileName().trimmed();
-        if (level>0){
+        if (level>0 and not providedFileName.startsWith('/')){
           providedFileName = cainclude_path + providedFileName;
         }
         reaffectText(map, &providedFileName, w1);
@@ -2636,6 +2636,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     //frame->setLayout(gridLayout);
                     //includeWidget->setLineSize(0);
                     level++;
+                    QString cainclude_path_stacked = cainclude_path;
 
                     // keep actual filename
                     savedFile[level] = fi.baseName();
@@ -2662,6 +2663,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     }
 
+                    cainclude_path = cainclude_path_stacked;
                     level--;
                     //qDebug() << "cainclude --"<< cainclude_path << level;
                 }
