@@ -207,7 +207,7 @@ contains(QWT_VER_MIN, 0) {
    HEADERS	+= src/qwt_thermo_marker.h
    SOURCES	+= src/qwt_thermo_marker.cpp
 }
-contains(QWT_VER_MIN, 1)|contains(QWT_VER_MIN, 2) {
+contains(QWT_VER_MIN, 1)|contains(QWT_VER_MIN, 2)|contains(QWT_VER_MIN, 3) {
    HEADERS	+= src/qwt_thermo_marker_61.h
    SOURCES	+= src/qwt_thermo_marker_61.cpp
 }
