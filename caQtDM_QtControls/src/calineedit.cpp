@@ -384,6 +384,7 @@ void caLineEdit::setFormat(int prec)
     if(thisPrecMode == User) {
         precision = getPrecision();
     }
+    usePrecision = precision;
     switch (thisFormatType) {
     case string:
     case decimal:
@@ -429,6 +430,102 @@ void caLineEdit::setFormat(int prec)
     }
 }
 
+/**
+ * Converts a double to engineering notation and writes to a char array
+ * 
+ * @param buffer    Destination char array
+ * @param bufferLen Size of the buffer (including space for null terminator)
+ * @param value     The double value to convert
+ * @param precision Number of digits after the decimal point
+ * @return          Number of characters written (excluding null), or -1 on error
+ */
+int toEngineeringNotation(char* buffer, size_t bufferLen, double value, int precision = 3) {
+    // Validate inputs
+    if (buffer == nullptr || bufferLen == 0) {
+        return -1;
+    }
+    
+    // Clamp precision to reasonable bounds
+    if (precision < 0) precision = 0;
+    if (precision > 15) precision = 15;
+    
+    // Handle special cases
+    if (std::isnan(value)) {
+        if (bufferLen < 4) { buffer[0] = '\0'; return -1; }
+        std::strcpy(buffer, "nan");
+        return 3;
+    }
+    
+    if (std::isinf(value)) {
+        const char* result = (value > 0) ? "inf" : "-inf";
+        size_t len = std::strlen(result);
+        if (bufferLen <= len) { buffer[0] = '\0'; return -1; }
+        std::strcpy(buffer, result);
+        return static_cast<int>(len);
+    }
+    
+    if (value == 0.0) {
+        int written = std::snprintf(buffer, bufferLen, " %.*fe+00", precision, 0.0);
+        if (written < 0 || static_cast<size_t>(written) >= bufferLen) {
+            buffer[0] = '\0';
+            return -1;
+        }
+        return written;
+    }
+    
+    // Handle negative numbers
+    bool negative = value < 0;
+    double absValue = std::fabs(value);
+    
+    // Calculate the exponent (power of 10)
+    int exponent = static_cast<int>(std::floor(std::log10(absValue)));
+    
+    // Adjust exponent to be a multiple of 3
+    int engExponent;
+    if (exponent >= 0) {
+        engExponent = exponent - (exponent % 3);
+    } else {
+        // Handle negative exponents correctly
+        int mod = exponent % 3;
+        engExponent = (mod == 0) ? exponent : exponent - (3 + mod);
+    }
+    
+    // Calculate the mantissa
+    double mantissa = absValue / std::pow(10.0, engExponent);
+    
+    // Handle floating point precision issues
+    // Mantissa should be in range [1, 1000)
+    if (mantissa >= 999.9999999999) {
+        mantissa /= 1000.0;
+        engExponent += 3;
+    } else if (mantissa < 1.0) {
+        mantissa *= 1000.0;
+        engExponent -= 3;
+    }
+    int written;
+
+    // Apply sign
+    // Format the output
+    // Format: [-]d.ddde±ee (sign + digits + decimal + precision + 'e' + sign + 2-3 digits)
+    if (negative) {
+      written = std::snprintf(buffer, bufferLen, "-%3.*fe%+03d", 
+                              precision - (exponent - engExponent), mantissa, engExponent);
+    }else{
+      written = std::snprintf(buffer, bufferLen, " %3.*fe%+03d", 
+                              precision - (exponent - engExponent), mantissa, engExponent);
+    }
+    
+    
+    if (written < 0 || static_cast<size_t>(written) >= bufferLen) {
+        buffer[0] = '\0';
+        return -1;
+    }
+    
+    return written;
+}
+
+
+
 void caLineEdit::setValue(double value, const QString& units)
 {
     char asc[MAX_STRING_LENGTH];
@@ -440,6 +537,11 @@ void caLineEdit::setValue(double value, const QString& units)
       } else {
         snprintf(asc, MAX_STRING_LENGTH, thisFormat, value);
       }
+    } else if(thisFormatType == engr_notation and thisDatatype == caDOUBLE)  {
+      // proper handling of engineering notation!
+      int precision = usePrecision;
+      if(precision > 17) precision = 17;
+      toEngineeringNotation(asc, MAX_STRING_LENGTH, value, precision);
     } else if (thisFormatType == user_defined_format) {
         QString pattern = QString("%[+\\- 0#]*[0-9]*([.][0-9]+)?[aefgAEFG]");
         bool isDouble=false;

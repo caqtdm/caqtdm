@@ -184,6 +184,7 @@ private:
     colMode oldColorMode;
 
     int thisPrecision;
+    int usePrecision;
     SourceMode thisPrecMode;
     SourceMode thisLimitsMode;
 
