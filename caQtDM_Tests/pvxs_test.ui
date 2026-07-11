@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1010</width>
+    <height>740</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>pvxs plugin tests</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QGroupBox" name="groupBox_1">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>15</y>
+      <width>200</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://ACM:TEST:AO</string>
+    </property>
+    <widget class="caTextEntry" name="catextentry_1">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>29</y>
+       <width>100</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>200</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://float03</string>
+    </property>
+    <widget class="caTextEntry" name="catextentry_2">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>29</y>
+       <width>100</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://float03</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>165</y>
+      <width>200</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://enum01</string>
+    </property>
+    <widget class="caTextEntry" name="catextentry_3">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>29</y>
+       <width>100</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://enum01</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>240</y>
+      <width>200</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://bigstring01</string>
+    </property>
+    <widget class="caTextEntry" name="catextentry_4">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>29</y>
+       <width>160</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://bigstring01</string>
+     </property>
+     <property name="formatType">
+      <enum>caLineEdit::FormatType::string</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>315</y>
+      <width>200</width>
+      <height>88</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://float03</string>
+    </property>
+    <widget class="caNumeric" name="canumeric_1">
+     <property name="geometry">
+      <rect>
+       <x>24</x>
+       <y>27</y>
+       <width>100</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://float03</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_6">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>411</y>
+      <width>200</width>
+      <height>88</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://int01</string>
+    </property>
+    <widget class="caNumeric" name="canumeric_2">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>27</y>
+       <width>145</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="integerDigits" stdset="0">
+      <number>10</number>
+     </property>
+     <property name="decimalDigits" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://int01</string>
+     </property>
+     <property name="precisionMode">
+      <enum>caNumeric::SourceMode::User</enum>
+     </property>
+     <property name="limitsMode">
+      <enum>caNumeric::SourceMode::User</enum>
+     </property>
+     <property name="maxValue">
+      <double>999999999.000000000000000</double>
+     </property>
+     <property name="minValue">
+      <double>-999999999.000000000000000</double>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_7">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>507</y>
+      <width>200</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://ACM:COUNT:1</string>
+    </property>
+    <widget class="caLineEdit" name="calineedit_1">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>29</y>
+       <width>100</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:COUNT:1</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_8">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>15</y>
+      <width>240</width>
+      <height>193</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://enum01</string>
+    </property>
+    <widget class="caMenu" name="camenu_1">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>25</y>
+       <width>122</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://enum01</string>
+     </property>
+    </widget>
+    <widget class="caChoice" name="cachoice_1">
+     <property name="geometry">
+      <rect>
+       <x>7</x>
+       <y>70</y>
+       <width>125</width>
+       <height>114</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://enum01</string>
+     </property>
+     <property name="endBit">
+      <number>3</number>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_9">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>216</y>
+      <width>240</width>
+      <height>97</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pvxs://float03</string>
+    </property>
+    <widget class="caSlider" name="caslider_1">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>29</y>
+       <width>211</width>
+       <height>53</height>
+      </rect>
+     </property>
+     <property name="scalePosition">
+      <enum>QwtSlider::ScalePosition::TrailingScale</enum>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://float03</string>
+     </property>
+     <property name="direction">
+      <enum>caSlider::Direction::Right</enum>
+     </property>
+     <property name="scaleValueEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_10">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>321</y>
+      <width>240</width>
+      <height>67</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pva://float03 (epics4 compare)</string>
+    </property>
+    <widget class="caTextEntry" name="catextentry_5">
+     <property name="geometry">
+      <rect>
+       <x>12</x>
+       <y>29</y>
+       <width>100</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pva://float03</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_11">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>396</y>
+      <width>240</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>pva://enum01 (epics4 compare)</string>
+    </property>
+    <widget class="caMenu" name="camenu_2">
+     <property name="geometry">
+      <rect>
+       <x>9</x>
+       <y>30</y>
+       <width>122</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pva://enum01</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_12">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>484</y>
+      <width>240</width>
+      <height>240</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>alarm colors (colorMode=Alarm)</string>
+    </property>
+    <widget class="caLineEdit" name="calineedit_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>25</y>
+       <width>105</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO</string>
+     </property>
+     <property name="colorMode">
+      <enum>caLineEdit::colMode::Alarm_Default</enum>
+     </property>
+    </widget>
+    <widget class="caLineEdit" name="calineedit_3">
+     <property name="geometry">
+      <rect>
+       <x>125</x>
+       <y>25</y>
+       <width>105</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://float03</string>
+     </property>
+     <property name="colorMode">
+      <enum>caLineEdit::colMode::Alarm_Default</enum>
+     </property>
+    </widget>
+    <widget class="caLabel" name="calabel_1">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>55</y>
+       <width>220</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>severity</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+     <property name="colorMode">
+      <enum>caLabel::colMode::Alarm</enum>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO</string>
+     </property>
+    </widget>
+    <widget class="caMenu" name="camenu_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>122</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://enum01</string>
+     </property>
+     <property name="colorMode">
+      <enum>caMenu::colMode::Alarm</enum>
+     </property>
+    </widget>
+    <widget class="caChoice" name="cachoice_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>125</y>
+       <width>125</width>
+       <height>108</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://enum01</string>
+     </property>
+     <property name="colorMode">
+      <enum>caChoice::colMode::Alarm</enum>
+     </property>
+     <property name="endBit">
+      <number>3</number>
+     </property>
+    </widget>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_1">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>15</y>
+      <width>480</width>
+      <height>130</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">pvxs://floatArray01</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string notr="true">;pvxs://floatArray01</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::curvStyle::FillUnder</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::curvSymbol::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="XaxisType">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_2">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>155</y>
+      <width>480</width>
+      <height>130</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">pvxs://doubleArray01</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string notr="true">;pvxs://doubleArray01</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::curvStyle::FillUnder</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::curvSymbol::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>170</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="XaxisType">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_3">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>295</y>
+      <width>480</width>
+      <height>130</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">pvxs://intArray01</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string notr="true">;pvxs://intArray01</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::curvStyle::FillUnder</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::curvSymbol::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>255</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="XaxisType">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_4">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>435</y>
+      <width>480</width>
+      <height>130</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">pvxs://shortArray01</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string notr="true">;pvxs://shortArray01</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::curvStyle::FillUnder</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::curvSymbol::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>170</green>
+      <blue>127</blue>
+     </color>
+    </property>
+    <property name="XaxisType">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+   </widget>
+   <widget class="caCartesianPlot" name="cacartesianplot_5">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>575</y>
+      <width>480</width>
+      <height>130</height>
+     </rect>
+    </property>
+    <property name="Title" stdset="0">
+     <string notr="true">pvxs://byteArray01</string>
+    </property>
+    <property name="channels_1" stdset="0">
+     <string notr="true">;pvxs://byteArray01</string>
+    </property>
+    <property name="Style_1">
+     <enum>caCartesianPlot::curvStyle::FillUnder</enum>
+    </property>
+    <property name="symbol_1">
+     <enum>caCartesianPlot::curvSymbol::NoSymbol</enum>
+    </property>
+    <property name="color_1">
+     <color>
+      <red>255</red>
+      <green>85</green>
+      <blue>255</blue>
+     </color>
+    </property>
+    <property name="XaxisType">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+    <property name="YAxisType" stdset="0">
+     <enum>caCartesianPlot::axisType::linear</enum>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
+  </customwidget>
+  <customwidget>
+   <class>caMenu</class>
+   <extends>QComboBox</extends>
+   <header>caMenu</header>
+  </customwidget>
+  <customwidget>
+   <class>caChoice</class>
+   <extends>QWidget</extends>
+   <header>caChoice</header>
+  </customwidget>
+  <customwidget>
+   <class>caNumeric</class>
+   <extends>QFrame</extends>
+   <header>caNumeric</header>
+  </customwidget>
+  <customwidget>
+   <class>caSlider</class>
+   <extends>QWidget</extends>
+   <header>caSlider</header>
+  </customwidget>
+  <customwidget>
+   <class>caCartesianPlot</class>
+   <extends>QFrame</extends>
+   <header>caCartesianPlot</header>
+  </customwidget>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

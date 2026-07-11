@@ -34,6 +34,10 @@ epics4: {
   SUBDIRS += epics4
 }
 
+pvxs: {
+  SUBDIRS += pvxs
+}
+
 !MOBILE {
     bsread: {
       SUBDIRS += bsread

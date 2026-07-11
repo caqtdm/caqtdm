@@ -5,3 +5,7 @@ TEMPLATE = subdirs
 bsread: {
     SUBDIRS += tst_bsread
 }
+
+pvxs: {
+    SUBDIRS += tst_pvxs
+}

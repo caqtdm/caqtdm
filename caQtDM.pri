@@ -544,6 +544,52 @@ epics4_plugin {
 	}
 }
 
+#==========================================================================================================
+# pvxs_plugin: optional plugin (pvxs:// prefix), opt-in via CAQTDM_PVXS (see qtdefs.pri)
+pvxs_plugin {
+        CONFIG += caQtDM_Plugin
+        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs
+
+        unix:!macx:!ios:!android:!freebsd {
+                message("pvxs_plugin configuration unix:!macx:!ios:!android:!freebsd")
+                INCLUDEPATH += $(PVXS)/include
+                INCLUDEPATH += $(EPICSINCLUDE)
+                INCLUDEPATH += $(EPICSINCLUDE)/os/Linux
+                INCLUDEPATH += $(EPICSINCLUDE)/compiler/gcc
+
+                LIBS += -L$(PVXS)/lib/$(EPICS_HOST_ARCH) -lpvxs -levent_core -levent_pthreads
+                LIBS += -L$(EPICSLIB) -lCom
+                LIBS += -L$(QTBASE) -lcaQtDM_Lib
+                LIBS += -lpthread
+                caqtdm_rpath {
+                    LIBS += -Wl,-rpath,$(PVXS)/lib/$(EPICS_HOST_ARCH)
+                    LIBS += -Wl,-rpath,$(EPICSLIB)
+                    LIBS += -Wl,-rpath,$(QTDM_RPATH)
+                }
+                CONFIG += release
+        }
+
+        macx:!ios {
+                message("pvxs_plugin configuration macx")
+                INCLUDEPATH += $(PVXS)/include
+                INCLUDEPATH += $(EPICSINCLUDE)
+                INCLUDEPATH += $(EPICSINCLUDE)/os/Darwin
+                INCLUDEPATH += $(EPICSINCLUDE)/compiler/clang
+
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                LIBS += $$(PVXS)/lib/$$(EPICS_HOST_ARCH)/libpvxs.dylib
+                LIBS += $$(PVXS)/lib/$$(EPICS_HOST_ARCH)/libevent_core.dylib
+                LIBS += $$(PVXS)/lib/$$(EPICS_HOST_ARCH)/libevent_pthreads.dylib
+                LIBS += $$(EPICSLIB)/libCom.dylib
+                CONFIG += release
+        }
+
+        ios | android | win32 {
+                message("pvxs_plugin: not supported for this platform in v1 - skip building this plugin for ios/android/win32")
+        }
+}
+#==========================================================================================================
+
 caQtDM_Plugin {
         win32-msvc* || msvc {
                 DEFINES += CAQTDM_PLUGIN_LIBRARY
@@ -845,6 +891,18 @@ caQtDM_Viewer {
                                     plugins_opcua.path = Contents/PlugIns/controlsystems
                                     plugins_opcua.files += $$(CAQTDM_COLLECT)/controlsystems/libopcua_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_opcua
+                                }
+
+                pvxs: {
+                                    plugins_pvxs.path = Contents/PlugIns/controlsystems
+                                    plugins_pvxs.files += $$(CAQTDM_COLLECT)/controlsystems/libpvxs_plugin.dylib
+                                    QMAKE_BUNDLE_DATA += plugins_pvxs
+                                    PVXSLIBDIR = $$(PVXS)/lib/$$(EPICS_HOST_ARCH)
+                                    pvxslibrary.path = Contents/Frameworks
+                                    pvxslibrary.files += $$files($$PVXSLIBDIR/libpvxs*.dylib)
+                                    pvxslibrary.files += $$files($$PVXSLIBDIR/libevent_core*.dylib)
+                                    pvxslibrary.files += $$files($$PVXSLIBDIR/libevent_pthreads*.dylib)
+                                    QMAKE_BUNDLE_DATA += pvxslibrary
                                 }
 
         }

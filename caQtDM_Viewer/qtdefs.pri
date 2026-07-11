@@ -209,6 +209,25 @@ isEmpty(_CAQTDM_OPCUA) {
 	}
 }
 
+# optional pvxs-based plugin (pvxs:// prefix), opt-in like modbus/gps/opcua
+_CAQTDM_PVXS = $$(CAQTDM_PVXS)
+isEmpty(_CAQTDM_PVXS) {
+    message("PVXS Plugin not selected, will not be built.")
+} else {
+    PVXS_HEADER = $$(PVXS)/include/pvxs/client.h
+    PVXS_LIBDIR = $$(PVXS)/lib/$$(EPICS_HOST_ARCH)
+    !exists($$PVXS_HEADER) {
+        error("CAQTDM_PVXS is set but $$PVXS_HEADER was not found - check the PVXS env var (must point at one central pvxs build/install tree)")
+    }
+    !exists($$PVXS_LIBDIR) {
+        error("CAQTDM_PVXS is set but $$PVXS_LIBDIR was not found - check the PVXS env var and EPICS_HOST_ARCH")
+    }
+    CONFIG += pvxs
+    pvxs {
+        message("Configuring build for pvxs plugin (PVXS=$$(PVXS))")
+    }
+}
+
 # undefine CONFIG epics4 for epics4 plugin support with epics version 4 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)
 # the main work for this plugin was done by Marty Kraimer
