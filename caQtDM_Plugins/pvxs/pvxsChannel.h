@@ -39,7 +39,6 @@ public:
     // Guards the shared_ptrs below: written from the GUI thread, read from the drain thread.
     std::mutex opMutex;
     std::shared_ptr<pvxs::client::Subscription> subscription;
-    std::shared_ptr<pvxs::client::Operation> pendingDisplayGetOp;
     std::shared_ptr<pvxs::client::Operation> pendingPutOp;
 
     std::atomic<short> fieldtype{-1};

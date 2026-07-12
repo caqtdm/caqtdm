@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1010</width>
-    <height>740</height>
+    <height>790</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -376,6 +376,230 @@
      </property>
      <property name="channel" stdset="0">
       <string notr="true">pva://enum01</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_13">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>582</y>
+      <width>200</width>
+      <height>190</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>ACM:TEST:AO limits</string>
+    </property>
+    <widget class="QLabel" name="label_hihi">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>25</y>
+       <width>40</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>HIHI</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_hihi">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>25</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.HIHI</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_hopr">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>25</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>HOPR</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_hopr">
+     <property name="geometry">
+      <rect>
+       <x>145</x>
+       <y>25</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.HOPR</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_high">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>65</y>
+       <width>40</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>HIGH</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_high">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>65</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.HIGH</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_lopr">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>65</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LOPR</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_lopr">
+     <property name="geometry">
+      <rect>
+       <x>145</x>
+       <y>65</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.LOPR</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_low">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>105</y>
+       <width>40</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LOW</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_low">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>105</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.LOW</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_drvh">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>105</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DRVH</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_drvh">
+     <property name="geometry">
+      <rect>
+       <x>145</x>
+       <y>105</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.DRVH</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_lolo">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>145</y>
+       <width>40</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LOLO</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_lolo">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>145</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.LOLO</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_drvl">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>145</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DRVL</string>
+     </property>
+    </widget>
+    <widget class="caTextEntry" name="catextentry_drvl">
+     <property name="geometry">
+      <rect>
+       <x>145</x>
+       <y>145</y>
+       <width>45</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="channel" stdset="0">
+      <string notr="true">pvxs://ACM:TEST:AO.DRVL</string>
      </property>
     </widget>
    </widget>

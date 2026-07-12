@@ -86,12 +86,13 @@ void PvxsPlugin::startMonitor(const PvxsChannelPtr &ch)
 {
     qCDebug(pvxsLog) << "startMonitor" << QString::fromStdString(ch->pvName) << "index" << ch->index;
 
-    // weak capture: the channel holds the Subscription/Operation which stores the
+    // weak capture: the channel holds the Subscription which stores the
     // lambda - a strong capture would create a reference cycle
     std::weak_ptr<PvxsChannel> wch(ch);
 
+    // monitor the full structure (no pvRequest restriction): display/control/valueAlarm
+    // limit changes then arrive as PROPERTY deltas, like DBE_PROPERTY with epics3
     auto sub = ctxt.monitor(ch->pvName)
-                   .pvRequest("field(value,alarm,timeStamp)")
                    .maskConnected(false)
                    .maskDisconnected(false)
                    .event([this, wch](client::Subscription &) {
@@ -99,16 +100,8 @@ void PvxsPlugin::startMonitor(const PvxsChannelPtr &ch)
                    })
                    .exec();
 
-    auto getOp = ctxt.get(ch->pvName)
-                     .pvRequest("field(display,control)")
-                     .result([this, wch](client::Result &&res) {
-                         if (PvxsChannelPtr c = wch.lock()) handleDisplayControlResult(c, std::move(res));
-                     })
-                     .exec();
-
     std::lock_guard<std::mutex> lk(ch->opMutex);
     ch->subscription = sub;
-    ch->pendingDisplayGetOp = getOp;
 }
 
 void PvxsPlugin::stopMonitor(const PvxsChannelPtr &ch)
@@ -116,19 +109,15 @@ void PvxsPlugin::stopMonitor(const PvxsChannelPtr &ch)
     qCDebug(pvxsLog) << "stopMonitor" << QString::fromStdString(ch->pvName);
 
     std::shared_ptr<client::Subscription> sub;
-    std::shared_ptr<client::Operation> getOp;
     std::shared_ptr<client::Operation> putOp;
     {
         std::lock_guard<std::mutex> lk(ch->opMutex);
         sub = ch->subscription;
         ch->subscription.reset();
-        getOp = ch->pendingDisplayGetOp;
-        ch->pendingDisplayGetOp.reset();
         putOp = ch->pendingPutOp;
         ch->pendingPutOp.reset();
     }
     if (sub) sub->cancel();
-    if (getOp) getOp->cancel();
     if (putOp) putOp->cancel();
 }
 
@@ -365,28 +354,6 @@ int PvxsPlugin::TerminateIO()
     return true;
 }
 
-void PvxsPlugin::handleDisplayControlResult(const PvxsChannelPtr &ch, client::Result &&res)
-{
-    Value val;
-    try {
-        val = res();
-    } catch (std::exception &e) {
-        qCDebug(pvxsLog) << "display/control get failed for" << QString::fromStdString(ch->pvName) << e.what();
-        return;
-    }
-
-    knobData kData = mutexKnobData->GetMutexKnobData(ch->index);
-    if (kData.index == -1) return;
-    mutexKnobData->DataLock(&kData);
-    pvxsValueMapping::fillLimitsFromDisplayControl(val, kData.edata);
-    qCDebug(pvxsLog) << "display/control for" << QString::fromStdString(ch->pvName)
-                     << "units" << kData.edata.units << "precision" << kData.edata.precision
-                     << "disp" << kData.edata.lower_disp_limit << ".." << kData.edata.upper_disp_limit
-                     << "ctrl" << kData.edata.lower_ctrl_limit << ".." << kData.edata.upper_ctrl_limit;
-    mutexKnobData->SetMutexKnobDataReceived(&kData);
-    mutexKnobData->DataUnlock(&kData);
-}
-
 void PvxsPlugin::handleMonitorValue(const PvxsChannelPtr &ch, const Value &val)
 {
     knobData kData = mutexKnobData->GetMutexKnobData(ch->index);
@@ -394,15 +361,19 @@ void PvxsPlugin::handleMonitorValue(const PvxsChannelPtr &ch, const Value &val)
     mutexKnobData->DataLock(&kData);
     bool ok = pvxsValueMapping::fillValue(val, kData.edata);
     if (ok) {
+        // full-structure monitor: limits/units/precision come with the value updates
+        pvxsValueMapping::fillLimitsFromDisplayControl(val, kData.edata);
         kData.edata.connected = true;
-        // not gated on the display/control get succeeding (some servers reject that request)
-        kData.edata.accessR = 1;
-        kData.edata.accessW = 1;
         if (ch->fieldtype == -1) {
             qCDebug(pvxsLog) << "first update" << QString::fromStdString(ch->pvName)
                              << "fieldtype" << kData.edata.fieldtype
                              << "isEnum" << (kData.edata.fieldtype == DBF_ENUM)
-                             << "valueCount" << kData.edata.valueCount;
+                             << "valueCount" << kData.edata.valueCount
+                             << "units" << kData.edata.units << "precision" << kData.edata.precision
+                             << "disp" << kData.edata.lower_disp_limit << ".." << kData.edata.upper_disp_limit
+                             << "ctrl" << kData.edata.lower_ctrl_limit << ".." << kData.edata.upper_ctrl_limit
+                             << "warn" << kData.edata.lower_warning_limit << ".." << kData.edata.upper_warning_limit
+                             << "alarm" << kData.edata.lower_alarm_limit << ".." << kData.edata.upper_alarm_limit;
         }
         ch->fieldtype = kData.edata.fieldtype;
         ch->isEnum = (kData.edata.fieldtype == DBF_ENUM);
@@ -413,9 +384,20 @@ void PvxsPlugin::handleMonitorValue(const PvxsChannelPtr &ch, const Value &val)
     mutexKnobData->DataUnlock(&kData);
 }
 
-void PvxsPlugin::handleMonitorConnected(const PvxsChannelPtr &ch)
+void PvxsPlugin::handleMonitorConnected(const PvxsChannelPtr &ch, const std::string &peerName)
 {
-    qCDebug(pvxsLog) << "connected" << QString::fromStdString(ch->pvName);
+    qCDebug(pvxsLog) << "connected" << QString::fromStdString(ch->pvName)
+                     << "from" << QString::fromStdString(peerName);
+    // peer address feeds the "IOC:" line of caQtDM's info dialog (edata.fec)
+    if (!peerName.empty()) {
+        knobData kData = mutexKnobData->GetMutexKnobData(ch->index);
+        if (kData.index != -1) {
+            mutexKnobData->DataLock(&kData);
+            qstrncpy(kData.edata.fec, peerName.c_str(), caqtdm_string_t_length);
+            mutexKnobData->SetMutexKnobDataReceived(&kData);
+            mutexKnobData->DataUnlock(&kData);
+        }
+    }
     mutexKnobData->SetMutexKnobDataConnected(ch->index, true);
 }
 
@@ -445,8 +427,8 @@ void PvxsPlugin::drainLoop()
                     break;
                 }
                 handleMonitorValue(ch, val);
-            } catch (client::Connected &) {
-                handleMonitorConnected(ch);
+            } catch (client::Connected &c) {
+                handleMonitorConnected(ch, c.peerName);
             } catch (client::Finished &) {
                 more = false;
             } catch (client::Disconnect &) {

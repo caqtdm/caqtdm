@@ -185,13 +185,17 @@ void TestPvxsValueMapping::alarmSeverity()
 
 void TestPvxsValueMapping::displayControlLimits()
 {
-    Value val = nt::NTScalar{TypeCode::Float64, true, true, false, true}.create();
-    val["display.limitLow"] = -10.0;
-    val["display.limitHigh"] = 10.0;
-    val["display.precision"] = 3;
+    Value val = nt::NTScalar{TypeCode::Float64, true, true, true, true}.create();
+    val["display.limitLow"] = -10.0;   // LOPR
+    val["display.limitHigh"] = 10.0;   // HOPR
+    val["display.precision"] = 3;      // PREC
     val["display.units"] = std::string("mA");
-    val["control.limitLow"] = -5.0;
-    val["control.limitHigh"] = 5.0;
+    val["control.limitLow"] = -5.0;    // DRVL
+    val["control.limitHigh"] = 5.0;    // DRVH
+    val["valueAlarm.lowAlarmLimit"] = -4.0;    // LOLO
+    val["valueAlarm.lowWarningLimit"] = -3.0;  // LOW
+    val["valueAlarm.highWarningLimit"] = 3.0;  // HIGH
+    val["valueAlarm.highAlarmLimit"] = 4.0;    // HIHI
 
     epicsData edata = freshEdata();
     pvxsValueMapping::fillLimitsFromDisplayControl(val, edata);
@@ -202,6 +206,10 @@ void TestPvxsValueMapping::displayControlLimits()
     QCOMPARE(QString::fromLatin1(edata.units), QString("mA"));
     QCOMPARE(edata.lower_ctrl_limit, -5.0);
     QCOMPARE(edata.upper_ctrl_limit, 5.0);
+    QCOMPARE(edata.lower_alarm_limit, -4.0);
+    QCOMPARE(edata.lower_warning_limit, -3.0);
+    QCOMPARE(edata.upper_warning_limit, 3.0);
+    QCOMPARE(edata.upper_alarm_limit, 4.0);
     QCOMPARE(edata.accessR, 1);
     QCOMPARE(edata.accessW, 1);
 

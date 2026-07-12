@@ -222,6 +222,7 @@ bool fillValue(const Value &val, epicsData &edata)
 void fillLimitsFromDisplayControl(const Value &val, epicsData &edata)
 {
     double limitLow = 0.0, limitHigh = 0.0, controlLow = 0.0, controlHigh = 0.0;
+    double alarmLow = 0.0, alarmHigh = 0.0, warnLow = 0.0, warnHigh = 0.0;
     int32_t precision = 0;
     std::string units;
 
@@ -231,11 +232,20 @@ void fillLimitsFromDisplayControl(const Value &val, epicsData &edata)
     val["display.units"].as<std::string>(units);
     val["control.limitLow"].as<double>(controlLow);
     val["control.limitHigh"].as<double>(controlHigh);
+    // QSRV maps LOLO/LOW/HIGH/HIHI onto valueAlarm (see pva2pva pvif.cpp)
+    val["valueAlarm.lowAlarmLimit"].as<double>(alarmLow);
+    val["valueAlarm.lowWarningLimit"].as<double>(warnLow);
+    val["valueAlarm.highWarningLimit"].as<double>(warnHigh);
+    val["valueAlarm.highAlarmLimit"].as<double>(alarmHigh);
 
     edata.lower_disp_limit = limitLow;
     edata.upper_disp_limit = limitHigh;
     edata.lower_ctrl_limit = controlLow;
     edata.upper_ctrl_limit = controlHigh;
+    edata.lower_alarm_limit = alarmLow;
+    edata.lower_warning_limit = warnLow;
+    edata.upper_warning_limit = warnHigh;
+    edata.upper_alarm_limit = alarmHigh;
     edata.precision = (short) precision;
 
     int len = int(units.size());

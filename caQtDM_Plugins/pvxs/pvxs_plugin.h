@@ -92,9 +92,8 @@ private:
 
     void drainLoop();
     void handleMonitorValue(const PvxsChannelPtr &ch, const pvxs::Value &val);
-    void handleMonitorConnected(const PvxsChannelPtr &ch);
+    void handleMonitorConnected(const PvxsChannelPtr &ch, const std::string &peerName);
     void handleMonitorDisconnected(const PvxsChannelPtr &ch);
-    void handleDisplayControlResult(const PvxsChannelPtr &ch, pvxs::client::Result &&res);
 
     void startMonitor(const PvxsChannelPtr &ch);
     void stopMonitor(const PvxsChannelPtr &ch);
