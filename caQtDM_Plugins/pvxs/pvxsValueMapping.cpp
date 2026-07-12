@@ -53,6 +53,22 @@ void ensureCapacity(epicsData &edata, int bytes)
     }
 }
 
+// packs strings ESC-separated + NUL into dataB (the layout caChoice/caMenu and
+// the string-array display expect), without any raw pointer stepping
+void packEscSeparated(const shared_array<const std::string> &items, epicsData &edata)
+{
+    std::string packed;
+    size_t total = 1;
+    for (const auto &s : items) total += s.size() + 1;
+    packed.reserve(total);
+    for (const auto &s : items) {
+        if (!packed.empty()) packed += '\033';
+        packed += s;
+    }
+    ensureCapacity(edata, int(packed.size()) + 1);
+    memcpy(edata.dataB, packed.c_str(), packed.size() + 1); // c_str() guarantees the NUL
+}
+
 void fillScalar(const Value &valueField, epicsData &edata)
 {
     TypeCode code = valueField.type();
@@ -89,17 +105,7 @@ void fillScalarArray(const Value &valueField, epicsData &edata)
         valueField.as<shared_array<const void>>(raw);
         shared_array<const std::string> arr(raw.castTo<const std::string>());
         edata.valueCount = int(arr.size());
-        int numBytes = 1;
-        for (auto &s : arr) numBytes += int(s.size()) + 1;
-        ensureCapacity(edata, numBytes);
-        char *ptr = static_cast<char *>(edata.dataB);
-        for (auto &s : arr) {
-            memcpy(ptr, s.data(), s.size());
-            ptr += s.size();
-            *ptr++ = '\033';
-        }
-        if (!arr.empty()) --ptr;
-        *ptr = '\0';
+        packEscSeparated(arr, edata);
         return;
     }
 
@@ -138,20 +144,9 @@ void fillEnum(const Value &val, epicsData &edata)
     edata.rvalue = index;
     edata.valueCount = 1;
 
-    // choices go into dataB, ESC-separated, as caChoice/caMenu expect (like epics4 gotEnum)
     shared_array<const std::string> choices;
     if (!val["value.choices"].as(choices) || choices.empty()) return;
-    int numBytes = 1;
-    for (auto &s : choices) numBytes += int(s.size()) + 1;
-    ensureCapacity(edata, numBytes);
-    char *ptr = static_cast<char *>(edata.dataB);
-    for (auto &s : choices) {
-        memcpy(ptr, s.data(), s.size());
-        ptr += s.size();
-        *ptr++ = '\033';
-    }
-    --ptr;
-    *ptr = '\0';
+    packEscSeparated(choices, edata);
     edata.enumCount = int(choices.size());
 }
 
