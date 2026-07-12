@@ -97,6 +97,7 @@ private:
 
     void startMonitor(const PvxsChannelPtr &ch);
     void stopMonitor(const PvxsChannelPtr &ch);
+    void fetchNelm(const PvxsChannelPtr &ch);
 
     void logError(const QString &msg);
 

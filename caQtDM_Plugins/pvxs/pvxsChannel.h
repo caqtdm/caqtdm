@@ -40,9 +40,12 @@ public:
     std::mutex opMutex;
     std::shared_ptr<pvxs::client::Subscription> subscription;
     std::shared_ptr<pvxs::client::Operation> pendingPutOp;
+    // one-shot <record>.NELM get for char arrays (long-string capacity, like ca_element_count)
+    std::shared_ptr<pvxs::client::Operation> pendingNelmGetOp;
 
     std::atomic<short> fieldtype{-1};
     std::atomic<bool> isEnum{false};
+    std::atomic<bool> isArray{false};
 };
 
 using PvxsChannelPtr = std::shared_ptr<PvxsChannel>;

@@ -18,6 +18,7 @@
 #include "pvxs_plugin.h"
 
 #include <cstdlib>
+#include <cstring>
 
 #include <db_access.h>
 
@@ -110,15 +111,19 @@ void PvxsPlugin::stopMonitor(const PvxsChannelPtr &ch)
 
     std::shared_ptr<client::Subscription> sub;
     std::shared_ptr<client::Operation> putOp;
+    std::shared_ptr<client::Operation> nelmOp;
     {
         std::lock_guard<std::mutex> lk(ch->opMutex);
         sub = ch->subscription;
         ch->subscription.reset();
         putOp = ch->pendingPutOp;
         ch->pendingPutOp.reset();
+        nelmOp = ch->pendingNelmGetOp;
+        ch->pendingNelmGetOp.reset();
     }
     if (sub) sub->cancel();
     if (putOp) putOp->cancel();
+    if (nelmOp) nelmOp->cancel();
 }
 
 int PvxsPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
@@ -215,6 +220,13 @@ bool PvxsPlugin::pvSetValue(knobData *kData, double rdata, int32_t idata, char *
     } else if (ch->fieldtype == DBF_STRING) {
         qCDebug(pvxsLog) << "pvSetValue: string put";
         op = ctxt.put(ch->pvName).set("value", std::string(sdata ? sdata : "")).result(resultCb).exec();
+    } else if (ch->isArray && ch->fieldtype == DBF_CHAR) {
+        // long string: write the text bytes (incl. NUL) into the char/byte waveform
+        size_t len = strlen(sdata ? sdata : "") + 1;
+        qCDebug(pvxsLog) << "pvSetValue: long-string put, length" << (int) len;
+        shared_array<uint8_t> bytes(len);
+        memcpy(bytes.data(), sdata ? sdata : "", len);
+        op = ctxt.put(ch->pvName).set("value", bytes.freeze()).result(resultCb).exec();
     } else if (ch->fieldtype == DBF_DOUBLE) {
         qCDebug(pvxsLog) << "pvSetValue: double put" << rdata;
         op = ctxt.put(ch->pvName).set("value", rdata).result(resultCb).exec();
@@ -235,7 +247,7 @@ bool PvxsPlugin::pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t
     Q_UNUSED(errmess);
 
     qCDebug(pvxsLog) << "pvSetWave" << kData->pv << "nelm" << nelm
-                     << "source" << (ddata ? "double" : fdata ? "float" : data32 ? "int32" : data16 ? "int16" : "none");
+                     << "source" << (ddata ? "double" : fdata ? "float" : data32 ? "int32" : data16 ? "int16" : sdata ? "string" : "none");
 
     PvxsChannelPtr ch = channelFor(kData);
     if (!ch) {
@@ -243,22 +255,8 @@ bool PvxsPlugin::pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t
         return false;
     }
 
-    if (sdata || ch->fieldtype == DBF_STRING) {
-        logError(QString("pvxs put %1: string waveform put not supported").arg(QString::fromStdString(ch->pvName)));
-        return false;
-    }
-
-    shared_array<double> arr(nelm);
-    if (ddata) {
-        for (int i = 0; i < nelm; i++) arr[i] = ddata[i];
-    } else if (fdata) {
-        for (int i = 0; i < nelm; i++) arr[i] = fdata[i];
-    } else if (data32) {
-        for (int i = 0; i < nelm; i++) arr[i] = data32[i];
-    } else if (data16) {
-        for (int i = 0; i < nelm; i++) arr[i] = data16[i];
-    } else {
-        qCWarning(pvxsLog) << "pvSetWave: no source array for" << kData->pv;
+    if (ch->fieldtype == DBF_STRING) {
+        logError(QString("pvxs put %1: string array put not supported").arg(QString::fromStdString(ch->pvName)));
         return false;
     }
 
@@ -273,7 +271,31 @@ bool PvxsPlugin::pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t
         }
     };
 
-    auto op = ctxt.put(ch->pvName).set("value", arr.freeze()).result(resultCb).exec();
+    std::shared_ptr<client::Operation> op;
+    if (ddata || fdata || data32 || data16) {
+        shared_array<double> arr(nelm);
+        if (ddata) {
+            for (int i = 0; i < nelm; i++) arr[i] = ddata[i];
+        } else if (fdata) {
+            for (int i = 0; i < nelm; i++) arr[i] = fdata[i];
+        } else if (data32) {
+            for (int i = 0; i < nelm; i++) arr[i] = data32[i];
+        } else {
+            for (int i = 0; i < nelm; i++) arr[i] = data16[i];
+        }
+        op = ctxt.put(ch->pvName).set("value", arr.freeze()).result(resultCb).exec();
+    } else if (sdata) {
+        // text into a char/byte (or other integer) waveform - long-string write
+        size_t len = strlen(sdata) + 1;
+        if (nelm > 0 && (size_t) nelm < len) len = (size_t) nelm;
+        qCDebug(pvxsLog) << "pvSetWave: long-string put, length" << (int) len;
+        shared_array<uint8_t> bytes(len);
+        memcpy(bytes.data(), sdata, len);
+        op = ctxt.put(ch->pvName).set("value", bytes.freeze()).result(resultCb).exec();
+    } else {
+        qCWarning(pvxsLog) << "pvSetWave: no source array for" << kData->pv;
+        return false;
+    }
 
     std::lock_guard<std::mutex> lk(ch->opMutex);
     ch->pendingPutOp = op;
@@ -358,30 +380,69 @@ void PvxsPlugin::handleMonitorValue(const PvxsChannelPtr &ch, const Value &val)
 {
     knobData kData = mutexKnobData->GetMutexKnobData(ch->index);
     if (kData.index == -1) return;
+    bool wantNelm = false;
     mutexKnobData->DataLock(&kData);
     bool ok = pvxsValueMapping::fillValue(val, kData.edata);
     if (ok) {
         // full-structure monitor: limits/units/precision come with the value updates
         pvxsValueMapping::fillLimitsFromDisplayControl(val, kData.edata);
         kData.edata.connected = true;
+        bool valueIsArray = val["value"].type().isarray();
         if (ch->fieldtype == -1) {
             qCDebug(pvxsLog) << "first update" << QString::fromStdString(ch->pvName)
                              << "fieldtype" << kData.edata.fieldtype
                              << "isEnum" << (kData.edata.fieldtype == DBF_ENUM)
+                             << "isArray" << valueIsArray
                              << "valueCount" << kData.edata.valueCount
                              << "units" << kData.edata.units << "precision" << kData.edata.precision
                              << "disp" << kData.edata.lower_disp_limit << ".." << kData.edata.upper_disp_limit
                              << "ctrl" << kData.edata.lower_ctrl_limit << ".." << kData.edata.upper_ctrl_limit
                              << "warn" << kData.edata.lower_warning_limit << ".." << kData.edata.upper_warning_limit
                              << "alarm" << kData.edata.lower_alarm_limit << ".." << kData.edata.upper_alarm_limit;
+            // char arrays double as long strings; caqtdm routes the string write
+            // path on edata.nelm > 1, so fetch the record's real capacity once
+            wantNelm = valueIsArray && (kData.edata.fieldtype == DBF_CHAR);
         }
         ch->fieldtype = kData.edata.fieldtype;
         ch->isEnum = (kData.edata.fieldtype == DBF_ENUM);
+        ch->isArray = valueIsArray;
         mutexKnobData->SetMutexKnobDataReceived(&kData);
     } else {
         qCWarning(pvxsLog) << "monitor update without value field for" << QString::fromStdString(ch->pvName);
     }
     mutexKnobData->DataUnlock(&kData);
+    if (wantNelm) fetchNelm(ch);
+}
+
+void PvxsPlugin::fetchNelm(const PvxsChannelPtr &ch)
+{
+    std::string base(ch->pvName.substr(0, ch->pvName.find('.')));
+    qCDebug(pvxsLog) << "fetching" << QString::fromStdString(base) << ".NELM";
+    std::weak_ptr<PvxsChannel> wch(ch);
+    auto op = ctxt.get(base + ".NELM")
+                  .result([this, wch](client::Result &&res) {
+                      PvxsChannelPtr c = wch.lock();
+                      if (!c) return;
+                      int32_t nelm = 0;
+                      try {
+                          res()["value"].as<int32_t>(nelm);
+                      } catch (std::exception &e) {
+                          // no record behind the pv (e.g. plain pvxs server) - keep nelm 0
+                          qCDebug(pvxsLog) << "NELM get failed for" << QString::fromStdString(c->pvName) << e.what();
+                          return;
+                      }
+                      qCDebug(pvxsLog) << "NELM for" << QString::fromStdString(c->pvName) << "=" << nelm;
+                      if (nelm <= 0) return;
+                      knobData kData = mutexKnobData->GetMutexKnobData(c->index);
+                      if (kData.index == -1) return;
+                      mutexKnobData->DataLock(&kData);
+                      kData.edata.nelm = nelm;
+                      mutexKnobData->SetMutexKnobDataReceived(&kData);
+                      mutexKnobData->DataUnlock(&kData);
+                  })
+                  .exec();
+    std::lock_guard<std::mutex> lk(ch->opMutex);
+    ch->pendingNelmGetOp = op;
 }
 
 void PvxsPlugin::handleMonitorConnected(const PvxsChannelPtr &ch, const std::string &peerName)

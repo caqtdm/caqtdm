@@ -128,6 +128,26 @@ void TestPvxsValueMapping::scalarArrayInt()
     freeEdata(edata);
 }
 
+void TestPvxsValueMapping::charArrayAsLongString()
+{
+    // char waveform carrying text (EPICS long-string convention)
+    const char text[] = "long string";
+    Value val = nt::NTScalar{TypeCode::Int8A}.create();
+    shared_array<int8_t> chars(sizeof(text));
+    memcpy(chars.data(), text, sizeof(text));
+    val["value"] = chars.freeze();
+
+    epicsData edata = freshEdata();
+    QVERIFY(pvxsValueMapping::fillValue(val, edata));
+
+    QCOMPARE(edata.fieldtype, (short) DBF_CHAR);
+    QCOMPARE(edata.valueCount, (int) sizeof(text));
+    QCOMPARE(QString::fromLatin1(static_cast<char *>(edata.dataB)), QString("long string"));
+    QCOMPARE(edata.nelm, 0); // capacity comes from the separate <record>.NELM get, never from the data
+
+    freeEdata(edata);
+}
+
 void TestPvxsValueMapping::enumValue()
 {
     Value val = nt::NTEnum{}.create();

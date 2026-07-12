@@ -34,6 +34,7 @@ private slots:
     void scalarString();
     void scalarArrayDouble();
     void scalarArrayInt();
+    void charArrayAsLongString();
     void enumValue();
     void enumIndexLookup();
     void alarmSeverity();
