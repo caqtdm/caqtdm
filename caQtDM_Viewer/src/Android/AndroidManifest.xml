@@ -5,7 +5,14 @@
     android:versionCode="-- %%INSERT_VERSION_CODE%% --"
     android:versionName="-- %%INSERT_VERSION_NAME%% --">
     <!-- %%INSERT_PERMISSIONS -->
+    <!-- bleacon plugin: BLE scan; BLUETOOTH_SCAN deliberately without neverForLocation,
+         beacon ranging is location inference and would lose the iBeacon frames otherwise -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- %%INSERT_FEATURES -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"

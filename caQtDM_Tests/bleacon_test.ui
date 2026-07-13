@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>820</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>bleacon plugin test</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="caLabel" name="calabel_title">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>400</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>bleacon plugin test (Simulation: CAQTDM_BLEACON_SIM=1)</string>
+    </property>
+   </widget>
+   <widget class="caMenu" name="camenu_scan">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>45</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://scan.enable</string>
+    </property>
+   </widget>
+   <widget class="caMessageButton" name="camessagebutton_reset">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>45</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>reset list</string>
+    </property>
+    <property name="label" stdset="0">
+     <string notr="true">reset list</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://beacons.reset</string>
+    </property>
+    <property name="pressMessage" stdset="0">
+     <string notr="true">1</string>
+    </property>
+   </widget>
+   <widget class="caMessageButton" name="camessagebutton_config">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>45</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>write config</string>
+    </property>
+    <property name="label" stdset="0">
+     <string notr="true">write config</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://beacons.config</string>
+    </property>
+    <property name="pressMessage" stdset="0">
+     <string notr="true">1</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_list">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>45</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>beacons.list (sighted beacons)</string>
+    </property>
+   </widget>
+   <widget class="caMultiLineString" name="camultilinestring_list">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>70</y>
+      <width>221</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://beacons.list</string>
+    </property>
+    <property name="colorMode">
+     <enum>caMultiLineString::colMode::Default</enum>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_id">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>95</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>id</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_status">
+    <property name="geometry">
+     <rect>
+      <x>55</x>
+      <y>95</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>status</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_rssi">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>95</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>rssi</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_distance">
+    <property name="geometry">
+     <rect>
+      <x>225</x>
+      <y>95</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>distance</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_age">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>95</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>age</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_read">
+    <property name="geometry">
+     <rect>
+      <x>355</x>
+      <y>95</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>readcounter</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_lost">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>95</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>lostcounter</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_row1">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>120</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1:1</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_11_status">
+    <property name="geometry">
+     <rect>
+      <x>55</x>
+      <y>120</y>
+      <width>91</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:1.status</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_11_rssi">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>120</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:1.rssi</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_11_distance">
+    <property name="geometry">
+     <rect>
+      <x>225</x>
+      <y>120</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:1.distance</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_11_age">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>120</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:1.age</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_11_read">
+    <property name="geometry">
+     <rect>
+      <x>355</x>
+      <y>120</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:1.readcounter</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_11_lost">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>120</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:1.lostcounter</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_row2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>155</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1:2</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_12_status">
+    <property name="geometry">
+     <rect>
+      <x>55</x>
+      <y>155</y>
+      <width>91</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:2.status</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_12_rssi">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>155</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:2.rssi</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_12_distance">
+    <property name="geometry">
+     <rect>
+      <x>225</x>
+      <y>155</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:2.distance</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_12_age">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>155</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:2.age</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_12_read">
+    <property name="geometry">
+     <rect>
+      <x>355</x>
+      <y>155</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:2.readcounter</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_12_lost">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>155</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://1:2.lostcounter</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_row3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>190</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>2:1</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_21_status">
+    <property name="geometry">
+     <rect>
+      <x>55</x>
+      <y>190</y>
+      <width>91</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://2:1.status</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_21_rssi">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>190</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://2:1.rssi</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_21_distance">
+    <property name="geometry">
+     <rect>
+      <x>225</x>
+      <y>190</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://2:1.distance</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_21_age">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>190</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://2:1.age</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_21_read">
+    <property name="geometry">
+     <rect>
+      <x>355</x>
+      <y>190</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://2:1.readcounter</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_21_lost">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>190</y>
+      <width>71</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://2:1.lostcounter</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_nearest">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>250</y>
+      <width>200</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>nearest beacon</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_nearest_id">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>275</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>id</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_nearest_id">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>295</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://nearest.id</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_nearest_distance">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>275</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>distance</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_nearest_distance">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>295</y>
+      <width>81</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://nearest.distance</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_nearest_rssi">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>275</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>rssi</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_nearest_rssi">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>295</y>
+      <width>81</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://nearest.rssi</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_nearest_valid">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>275</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>valid</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_nearest_valid">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>295</y>
+      <width>51</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://nearest.valid</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_dose">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>350</y>
+      <width>400</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>simulated instrument reading 100/(d*d) of nearest source</string>
+    </property>
+   </widget>
+   <widget class="caCalc" name="cacalc_dose">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>350</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="variable">
+     <string notr="true">SIM:DOSE</string>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://nearest.distance</string>
+    </property>
+    <property name="calc" stdset="0">
+     <string notr="true">100/(A*A)</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_dose">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>375</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">SIM:DOSE</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caLabel</class>
+   <extends>QLabel</extends>
+   <header>caLabel</header>
+  </customwidget>
+  <customwidget>
+   <class>caLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caMultiLineString</class>
+   <extends>QPlainTextEdit</extends>
+   <header>caMultiLineString</header>
+  </customwidget>
+  <customwidget>
+   <class>caMenu</class>
+   <extends>QComboBox</extends>
+   <header>caMenu</header>
+  </customwidget>
+  <customwidget>
+   <class>caMessageButton</class>
+   <extends>QPushButton</extends>
+   <header>caMessageButton</header>
+  </customwidget>
+  <customwidget>
+   <class>caCalc</class>
+   <extends>QLabel</extends>
+   <header>caCalc</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

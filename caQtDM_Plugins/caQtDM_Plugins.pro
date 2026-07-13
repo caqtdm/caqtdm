@@ -19,6 +19,12 @@ contains(QT_VER_MAJ, 5) {
           SUBDIRS += gps
         }
     }
+    greaterThan(QT_VER_MIN, 11){
+        # manufacturerData needs Qt >= 5.12
+        bleacon{
+          SUBDIRS += bleacon
+        }
+    }
 
 }
 contains(QT_VER_MAJ, 6) {
@@ -27,6 +33,9 @@ contains(QT_VER_MAJ, 6) {
     }
     gps{
       SUBDIRS += gps
+    }
+    bleacon{
+      SUBDIRS += bleacon
     }
 }
 

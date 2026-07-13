@@ -35,9 +35,9 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>Paul Scherrer Institut</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>needs only access for GPS channels</string>
+	<string>needs access for GPS channels and iBeacon ranging (bleacon plugin)</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>needs only access for GPS channels</string>
+	<string>needs access for GPS channels and iBeacon ranging (bleacon plugin)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>caQtDM don&apos;t need to access any photos</string>
 	<key>NSSupportsSuddenTermination</key>

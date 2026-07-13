@@ -129,6 +129,9 @@ Q_IMPORT_PLUGIN(modbusPlugin);
 #ifdef CAQTDM_GPS
 Q_IMPORT_PLUGIN(gpsPlugin);
 #endif
+#ifdef CAQTDM_BLEACON
+Q_IMPORT_PLUGIN(bleaconPlugin);
+#endif
 #endif
 #ifdef CAQTDM_OPCUA
 Q_IMPORT_PLUGIN(OPCUAPlugin);

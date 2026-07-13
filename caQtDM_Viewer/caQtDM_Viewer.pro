@@ -19,6 +19,12 @@ contains(QT_VER_MAJ, 5) {
       QT += positioning
       DEFINES += CAQTDM_GPS
    }
+   bleacon{
+      !ios {
+         QT += bluetooth
+      }
+      DEFINES += CAQTDM_BLEACON
+   }
 
    !ios:!android {
        QT     += printsupport
@@ -43,6 +49,12 @@ contains(QT_VER_MAJ, 6) {
     gps{
        QT += positioning
        DEFINES += CAQTDM_GPS
+    }
+    bleacon{
+       !ios {
+          QT += bluetooth
+       }
+       DEFINES += CAQTDM_BLEACON
     }
     opcua {
        MOBILE {

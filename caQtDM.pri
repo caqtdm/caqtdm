@@ -203,6 +203,56 @@ gps_plugin {
         }
 }
 #==========================================================================================================
+bleacon_plugin {
+        CONFIG += caQtDM_Plugin
+        CONFIG += Define_ControlsysTargetDir Define_Build_objDirs
+
+        unix:!macx:!ios:!android {
+                message("bleacon_plugin configuration unix:!macx:!ios:!android")
+                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
+                LIBS += -L$(CAQTDM_COLLECT) -lcaQtDM_Lib -lqtcontrols
+                caqtdm_norpath {
+                    LIBS += -Wl,-rpath,$(QTDM_RPATH)
+                }
+                CONFIG += release
+        }
+
+        macx {
+                message("bleacon_plugin configuration macx")
+                INCLUDEPATH   += $(EPICSINCLUDE)/os/Linux
+                LIBS += $$(CAQTDM_COLLECT)/libcaQtDM_Lib.dylib
+                # searchFile/fileFunctions (config file handling) live in qtcontrols
+                LIBS += $$(CAQTDM_COLLECT)/libqtcontrols.dylib
+                CONFIG += release
+        }
+
+        ios | android {
+                message("bleacon_plugin configuration : ios or android")
+                message( $$OUT_PWD )
+                CONFIG += staticlib
+                android {
+                    LIBS += $$OUT_PWD/../../libcaQtDM_Lib_$${QT_ARCH}.a
+                }
+                ios {
+                    LIBS += $$OUT_PWD/../../libcaQtDM_Lib.a
+                }
+        }
+
+        win32 {
+                message("bleacon_plugin configuration win32")
+                INCLUDEPATH  += $$(EPICS_BASE)/include/os/win32
+
+                win32-msvc* || msvc{
+                        CONFIG += Define_Build_caQtDM_Lib Define_Build_qtcontrols Define_Symbols
+                }
+
+                win32-g++ {
+                        EPICS_LIBS=$$(EPICS_BASE)/lib/win32-x86-mingw
+                        LIBS += ../caQtDM_Lib/release/libcaQtDM_Lib.a
+                }
+        }
+}
+#==========================================================================================================
 bsread_Plugin {
         CONFIG += caQtDM_Plugin
         message(“bsread_plugin configuration”)
@@ -359,6 +409,10 @@ environment_Plugin {
                 gps: {
                     plugins.path = Contents/PlugIns/controlsystems
                     plugins.files += $$(CAQTDM_COLLECT)/controlsystems/libgps_plugin.dylib
+                }
+                bleacon: {
+                    plugins.path = Contents/PlugIns/controlsystems
+                    plugins.files += $$(CAQTDM_COLLECT)/controlsystems/libbleacon_plugin.dylib
                 }
 
                 CONFIG += release
@@ -846,6 +900,11 @@ caQtDM_Viewer {
                                     plugins_opcua.files += $$(CAQTDM_COLLECT)/controlsystems/libopcua_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_opcua
                                 }
+                bleacon: {
+                                    plugins_bleacon.path = Contents/PlugIns/controlsystems
+                                    plugins_bleacon.files += $$(CAQTDM_COLLECT)/controlsystems/libbleacon_plugin.dylib
+                                    QMAKE_BUNDLE_DATA += plugins_bleacon
+                                }
 
         }
 
@@ -874,6 +933,10 @@ caQtDM_Viewer {
                     }
                     gps {
 					    LIBS += $$OUT_PWD/../caQtDM_Plugins/gps/libgps_plugin.a
+                    }
+                    bleacon {
+					    LIBS += $$OUT_PWD/../caQtDM_Plugins/bleacon/libbleacon_plugin.a
+                        LIBS += -framework CoreLocation
                     }
                     epics7{
 					    LIBS += $$OUT_PWD/../caQtDM_Plugins/epics4/libepics4_plugin.a
@@ -1044,6 +1107,9 @@ caQtDM_Viewer {
                         }
                         gps {
                             LIBS += $(CAQTDM_COLLECT)/controlsystems/libgps_plugin_$${QT_ARCH}.a
+                        }
+                        bleacon {
+                            LIBS += $(CAQTDM_COLLECT)/controlsystems/libbleacon_plugin_$${QT_ARCH}.a
                         }
                         opcua {
                             LIBS += $(CAQTDM_COLLECT)/controlsystems/libopcua_plugin_$${QT_ARCH}.a

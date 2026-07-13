@@ -164,6 +164,17 @@ else {
       message( "Configuring build for GPS plugin" )
     }
 }
+
+_CAQTDM_BLEACON = $$(CAQTDM_BLEACON)
+isEmpty(_CAQTDM_BLEACON) {
+message("BLEACON Plugin will not be build")
+}
+else {
+    CONFIG += bleacon
+    bleacon {
+      message( "Configuring build for BLEACON plugin" )
+    }
+}
 # Unittests at the moment not in the homebrew build
 _HOMEBREWMAKEJOBS = $$(HOMEBREW_MAKE_JOBS)
 isEmpty(_HOMEBREWMAKEJOBS) {
