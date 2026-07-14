@@ -20,9 +20,7 @@ contains(QT_VER_MAJ, 5) {
       DEFINES += CAQTDM_GPS
    }
    bleacon{
-      !ios {
-         QT += bluetooth
-      }
+      QT += bluetooth
       DEFINES += CAQTDM_BLEACON
    }
 
@@ -51,9 +49,7 @@ contains(QT_VER_MAJ, 6) {
        DEFINES += CAQTDM_GPS
     }
     bleacon{
-       !ios {
-          QT += bluetooth
-       }
+       QT += bluetooth
        DEFINES += CAQTDM_BLEACON
     }
     opcua {

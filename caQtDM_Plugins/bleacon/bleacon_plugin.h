@@ -36,28 +36,56 @@
 #include "controlsinterface.h"
 #include "beaconscanner.h"
 
-// iBeacon data plugin.
+// BLE beacon data plugin (iBeacon and Eddystone).
 //
-// channels (prefix bleacon://):
-//   <major>:<minor>.rssi         smoothed rssi [dBm]                    (caDOUBLE)
-//   <major>:<minor>.distance     estimated distance [m]                 (caDOUBLE)
-//   <major>:<minor>.txpower      advertised power at 1m [dBm]           (caLONG, 0 on ios)
-//   <major>:<minor>.age          seconds since last sighting            (caDOUBLE)
-//   <major>:<minor>.status       neverseen/lost/weak/present            (caENUM)
-//   <major>:<minor>.readcounter  number of received sightings           (caLONG)
-//   <major>:<minor>.lostcounter  number of present->lost transitions    (caLONG)
-//   nearest.id                   "major:minor" of the nearest beacon    (caSTRING)
-//   nearest.major/.minor         numeric id of the nearest beacon       (caLONG)
-//   nearest.distance/.rssi       values of the nearest beacon           (caDOUBLE)
-//   nearest.valid                1 = a beacon is currently present      (caLONG)
-//   beacons.list                 discovered beacons, one channel base per line (caSTRING)
-//   beacons.reset                write 1 to clear the discovery list    (caLONG, write)
-//   beacons.config               write 1 to generate the config file    (caLONG, write)
-//   scan.enable                  stop/start scanning                    (caENUM, write)
+// beacon addresses carry the protocol, so displays and the discovery list say
+// what to listen to and the backends know how to convert the parameters.
+// all ids are hexadecimal:
+//   ibeacon:<major>:<minor>      major/minor 4 hex digits, e.g. bleacon://ibeacon:0001:001A.distance
+//   eddystone:<instance 12 hex>  e.g. bleacon://eddystone:AABBCCDDEE21.distance
+//   <major>:<minor>              shorthand, normalized to ibeacon:<major>:<minor>
+//   <alias>                      human readable name from the config file (like the
+//                                modbus/opcua translation): Quelle1=eddystone:7CD9F4099CA4
+//                                -> bleacon://Quelle1.distance
+// unpadded/lowercase input is accepted and normalized (1:a -> ibeacon:0001:000A)
+//
+// channels (prefix bleacon://, <addr> = protocol tagged address):
+//   <addr>.rssi          smoothed rssi [dBm]                    (caDOUBLE)
+//   <addr>.distance      estimated distance [m]                 (caDOUBLE)
+//   <addr>.txpower       power at 1m [dBm], eddystone converted (caLONG, 0 on ios ibeacon)
+//   <addr>.age           seconds since last sighting            (caDOUBLE)
+//   <addr>.status        neverseen/lost/weak/present            (caENUM)
+//   <addr>.readcounter   number of received sightings           (caLONG)
+//   <addr>.lostcounter   number of present->lost transitions    (caLONG)
+//   <addr>.battery       eddystone TLM battery [V]              (caDOUBLE)
+//   <addr>.temperature   eddystone TLM temperature [degC]       (caDOUBLE)
+//   <addr>.name          alias from the config file, "" if none (caSTRING)
+//   nearest.id           address of the nearest beacon          (caSTRING)
+//   nearest.name         alias of the nearest beacon (address if none) (caSTRING)
+//   nearest.major/.minor numeric id (ibeacon only, else 0)      (caLONG)
+//   nearest.distance/.rssi values of the nearest beacon         (caDOUBLE)
+//   nearest.valid        1 = a beacon is currently present      (caLONG)
+//   beacons.list         discovered beacons, one address per line (caSTRING)
+//   beacons.reset        write 1 to clear the discovery list    (caLONG, write)
+//   beacons.config       write 1 to generate the config file    (caLONG, write)
+//   beacons.writepath    directory the config file is written to (caSTRING, write; desktop use)
+//   scan.enable          stop/start/known                       (caENUM, write)
+//                        known = keep scanning but process only beacons already
+//                        known from the config file or from monitors; unknown
+//                        tags are ignored completely
+//
+// the config file stores the groups (uuids/namespaces, used as scan filter) AND the
+// discovered beacon addresses, optionally with a human readable alias (Name=Adresse);
+// on load the addresses are pre-created (status neverseen), so beacons.list is
+// populated right after the start.
 //
 // configuration (environment, mobile .config file sets these too):
-//   CAQTDM_BLEACON_UUIDS       proximity uuids, ';' separated (mandatory on ios)
-//   CAQTDM_BLEACON_CONFIG     config file name (default bleacon.config, one uuid per line)
+//   CAQTDM_BLEACON_UUIDS      ';' separated: iBeacon proximity uuids (mandatory for ios iBeacon)
+//                             and/or eddystone namespaces (20 hex chars), auto-detected by format
+//   CAQTDM_BLEACON_CONFIG     config file name (default bleacon.config; uuids, namespaces
+//                             and beacon addresses, one per line, auto-detected by format)
+//   CAQTDM_BLEACON_WRITEPATH  directory beacons.config writes to (default: found config
+//                             file location, else current directory)
 //   CAQTDM_BLEACON_PATHLOSS_N path loss exponent for the distance estimate (default 2.2)
 //   CAQTDM_BLEACON_TIMEOUT    seconds without sighting until a beacon is lost (default 10)
 //   CAQTDM_BLEACON_WEAK_RSSI  rssi threshold for status weak (default -90)
@@ -93,34 +121,42 @@ public:
 protected:
 
 private slots:
-    void beaconSighting(QUuid uuid, quint16 major, quint16 minor, int rssi, int txPower, double accuracyMeters);
+    void beaconSighting(QString protocol, QString beaconId, QString groupId, int rssi, int txPowerAt1m, double accuracyMeters);
+    void beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC);
     void scannerMessage(QString message, bool isError);
     void sweep();
 
 private:
     enum BeaconStatus { StatusNeverseen = 0, StatusLost, StatusWeak, StatusPresent };
+    enum ScanMode { ScanStop = 0, ScanStart, ScanKnown };
 
     struct BeaconState {
-        quint16 major;
+        QString protocol;     // "ibeacon" or "eddystone"
+        QString id;           // "major:minor" or instance hex
+        QString groupId;      // proximity uuid or namespace hex
+        QString name;         // human readable alias from the config file, "" if none
+        quint16 major;        // ibeacon only, 0 otherwise
         quint16 minor;
-        QUuid uuid;
         double ewmaRssi;      // NaN until the first sighting
         double distance;      // NaN until the first sighting
-        int txPower;
+        int txPower;          // at 1m, 0 = unknown
+        double battery;       // NaN until TLM received
+        double temperature;   // NaN until TLM received
         qint64 lastSeenMs;
         qint64 readCounter;
         qint64 lostCounter;
         int status;
     };
 
-    static QString beaconKey(quint16 major, quint16 minor);
-    BeaconState *findOrCreateBeacon(quint16 major, quint16 minor, const QUuid &uuid);
+    static QString beaconKey(const QString &protocol, const QString &beaconId);
+    static QString normalizeIBeaconId(const QString &beaconId);
+    BeaconState *findOrCreateBeacon(const QString &protocol, const QString &beaconId, const QString &groupId);
 
     void loadConfiguration(QMap<QString, QString> options);
     void writeConfigFile();
+    void addConfigEntry(const QString &entry);
 
-    void startScanning();
-    void stopScanning();
+    void applyScanMode(int mode);
 
     void updateChannelDouble(const QString &pv, double value);
     void updateChannelLong(const QString &pv, qint64 value);
@@ -140,9 +176,11 @@ private:
 
     BeaconScannerBase *scanner;
     QTimer *sweepTimer;
-    bool scanning;
+    bool scanning;            // backend active
+    int scanMode;             // ScanStop / ScanStart / ScanKnown
 
     QMap<QString, BeaconState> beacons;
+    QMap<QString, QString> keyByAlias;   // alias -> canonical beacon key
     QMultiMap<QString, int> monitorsByPv;
 
     QString nearestKey;
@@ -150,7 +188,9 @@ private:
 
     // configuration
     QList<QUuid> uuidList;
+    QStringList namespaceList;
     QString configFileName;
+    QString configWritePath;
     double pathLossExponent;
     int staleTimeoutSec;
     int weakRssiThreshold;

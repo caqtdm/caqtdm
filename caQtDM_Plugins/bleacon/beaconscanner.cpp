@@ -26,11 +26,10 @@
 
 #include "beaconscanner.h"
 #include "beaconscanner_sim.h"
+#include "beaconscanner_qtble.h"
 
 #ifdef Q_OS_IOS
   #include "beaconscanner_ios.h"
-#else
-  #include "beaconscanner_qtble.h"
 #endif
 
 BeaconScannerBase *BeaconScannerBase::createScanner(QObject *parent)
@@ -39,8 +38,38 @@ BeaconScannerBase *BeaconScannerBase::createScanner(QObject *parent)
         return new BeaconScannerSim(parent);
     }
 #ifdef Q_OS_IOS
-    return new BeaconScannerIos(parent);
+    // ios: iBeacon only through CoreLocation ranging, eddystone (service data,
+    // not filtered by ios) through Qt Bluetooth - both in parallel
+    BeaconScannerComposite *composite = new BeaconScannerComposite(parent);
+    composite->addScanner(new BeaconScannerIos(composite));
+    composite->addScanner(new BeaconScannerQtBle(composite));
+    return composite;
 #else
     return new BeaconScannerQtBle(parent);
 #endif
+}
+
+BeaconScannerComposite::BeaconScannerComposite(QObject *parent) : BeaconScannerBase(parent)
+{
+}
+
+void BeaconScannerComposite::addScanner(BeaconScannerBase *scanner)
+{
+    scanners.append(scanner);
+    connect(scanner, SIGNAL(beaconSighting(QString,QString,QString,int,int,double)),
+            this, SIGNAL(beaconSighting(QString,QString,QString,int,int,double)));
+    connect(scanner, SIGNAL(beaconTelemetry(QString,QString,double,double)),
+            this, SIGNAL(beaconTelemetry(QString,QString,double,double)));
+    connect(scanner, SIGNAL(scannerMessage(QString,bool)),
+            this, SIGNAL(scannerMessage(QString,bool)));
+}
+
+void BeaconScannerComposite::startScan(const QList<QUuid> &uuids, const QStringList &eddystoneNamespaces)
+{
+    foreach (BeaconScannerBase *scanner, scanners) scanner->startScan(uuids, eddystoneNamespaces);
+}
+
+void BeaconScannerComposite::stopScan()
+{
+    foreach (BeaconScannerBase *scanner, scanners) scanner->stopScan();
 }

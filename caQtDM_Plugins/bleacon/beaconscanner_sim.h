@@ -30,14 +30,15 @@
 #include "beaconscanner.h"
 
 // synthetic beacons for display development without hardware (CAQTDM_BLEACON_SIM=1):
-// 1:1 near (~2m), 1:2 far (~8m), 2:1 (~4m) disappears every 15s to exercise lost/present
+// ibeacon:0001:0001 near (~2m), ibeacon:0001:0002 far (~8m),
+// eddystone:AABBCCDDEE21 (~4m, with TLM telemetry) disappears every 15s to exercise lost/present
 class BeaconScannerSim : public BeaconScannerBase
 {
     Q_OBJECT
 public:
     explicit BeaconScannerSim(QObject *parent = Q_NULLPTR);
 
-    void startScan(const QList<QUuid> &uuids);
+    void startScan(const QList<QUuid> &uuids, const QStringList &eddystoneNamespaces);
     void stopScan();
 
 private slots:
@@ -45,13 +46,14 @@ private slots:
 
 private:
     struct SimBeacon {
-        quint16 major;
-        quint16 minor;
+        QString protocol;     // "ibeacon" or "eddystone"
+        QString id;           // "major:minor" or instance hex
+        QString group;        // proximity uuid or namespace hex
         double distance;      // simulated true distance in m
         bool intermittent;    // toggles visibility every 15s
+        bool telemetry;       // emits TLM battery/temperature
     };
 
-    QUuid simUuid;
     QVector<SimBeacon> simBeacons;
     QTimer *timer;
     int tickCounter;

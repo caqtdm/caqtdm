@@ -28,8 +28,9 @@
 #include "beaconscanner.h"
 
 // iBeacon ranging through CoreLocation (CLLocationManager / CLBeaconIdentityConstraint).
-// ios strips iBeacon frames from CoreBluetooth scans, so Qt Bluetooth cannot be used here.
-// ranging is per proximity uuid: the uuid list is mandatory on ios.
+// ios strips iBeacon frames from CoreBluetooth scans, so Qt Bluetooth cannot be used
+// for iBeacon here (eddystone runs through the parallel BeaconScannerQtBle).
+// ranging is per proximity uuid: without a uuid list iBeacon stays disabled on ios.
 // txPower is not exposed by CoreLocation; the accuracy (meters) is delivered instead.
 class BeaconScannerIos : public BeaconScannerBase
 {
@@ -38,11 +39,11 @@ public:
     explicit BeaconScannerIos(QObject *parent = Q_NULLPTR);
     ~BeaconScannerIos();
 
-    void startScan(const QList<QUuid> &uuids);
+    void startScan(const QList<QUuid> &uuids, const QStringList &eddystoneNamespaces);
     void stopScan();
 
     // called by the objective-c delegate (queued into the qt thread)
-    Q_INVOKABLE void onRangedBeacon(QUuid uuid, quint16 major, quint16 minor, int rssi, double accuracyMeters);
+    Q_INVOKABLE void onRangedBeacon(QString uuid, quint16 major, quint16 minor, int rssi, double accuracyMeters);
     Q_INVOKABLE void onRangingError(QString message);
 
 private:

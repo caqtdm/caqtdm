@@ -50,11 +50,10 @@
     if (owner == Q_NULLPTR) return;
 
     for (CLBeacon *beacon in beacons) {
-        QUuid uuid = QUuid(QString::fromNSString(beacon.UUID.UUIDString));
         // accuracy < 0 means unknown
         double accuracy = (beacon.accuracy < 0.0) ? qQNaN() : beacon.accuracy;
         QMetaObject::invokeMethod(owner, "onRangedBeacon", Qt::QueuedConnection,
-                                  Q_ARG(QUuid, uuid),
+                                  Q_ARG(QString, QString::fromNSString(beacon.UUID.UUIDString)),
                                   Q_ARG(quint16, beacon.major.unsignedShortValue),
                                   Q_ARG(quint16, beacon.minor.unsignedShortValue),
                                   Q_ARG(int, (int) beacon.rssi),
@@ -77,8 +76,7 @@ didFailRangingBeaconsForConstraint:(CLBeaconIdentityConstraint *)beaconConstrain
 
 BeaconScannerIos::BeaconScannerIos(QObject *parent) : BeaconScannerBase(parent)
 {
-    // metatypes for the queued invocations from the delegate
-    qRegisterMetaType<QUuid>("QUuid");
+    // metatype for the queued invocations from the delegate
     qRegisterMetaType<quint16>("quint16");
 
     CLLocationManager *manager = [[CLLocationManager alloc] init];
@@ -101,11 +99,13 @@ BeaconScannerIos::~BeaconScannerIos()
     [delegate release];
 }
 
-void BeaconScannerIos::startScan(const QList<QUuid> &uuids)
+void BeaconScannerIos::startScan(const QList<QUuid> &uuids, const QStringList &eddystoneNamespaces)
 {
+    Q_UNUSED(eddystoneNamespaces);   // eddystone runs through the parallel Qt Bluetooth scanner
+
     if (uuids.isEmpty()) {
-        emit scannerMessage("bleacon: set CAQTDM_BLEACON_UUIDS (or a bleacon config file) - "
-                            "ios cannot scan for unknown iBeacon uuids", true);
+        emit scannerMessage("bleacon: no CAQTDM_BLEACON_UUIDS configured - "
+                            "iBeacon ranging disabled on ios (eddystone still active)", false);
         return;
     }
 
@@ -142,10 +142,11 @@ void BeaconScannerIos::stopScan()
     rangedUuids.clear();
 }
 
-void BeaconScannerIos::onRangedBeacon(QUuid uuid, quint16 major, quint16 minor, int rssi, double accuracyMeters)
+void BeaconScannerIos::onRangedBeacon(QString uuid, quint16 major, quint16 minor, int rssi, double accuracyMeters)
 {
-    // CoreLocation does not expose the advertised txpower, the accuracy estimate is used instead
-    emit beaconSighting(uuid, major, minor, rssi, 0, accuracyMeters);
+    // CoreLocation does not expose the advertised txpower (0), the accuracy estimate is used instead
+    emit beaconSighting("ibeacon", ibeaconId(major, minor),
+                        uuid.toUpper(), rssi, 0, accuracyMeters);
 }
 
 void BeaconScannerIos::onRangingError(QString message)

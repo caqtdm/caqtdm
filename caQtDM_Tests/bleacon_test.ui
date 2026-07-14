@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
+    <width>840</width>
     <height>560</height>
    </rect>
   </property>
@@ -19,12 +19,12 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>400</width>
+      <width>500</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>bleacon plugin test (Simulation: CAQTDM_BLEACON_SIM=1)</string>
+     <string>bleacon plugin test - ibeacon + eddystone (Simulation: CAQTDM_BLEACON_SIM=1)</string>
     </property>
    </widget>
    <widget class="caMenu" name="camenu_scan">
@@ -84,52 +84,49 @@
      <string notr="true">1</string>
     </property>
    </widget>
-   <widget class="caLabel" name="calabel_list">
+   <widget class="caLabel" name="calabel_writepath">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>45</y>
-      <width>221</width>
+      <x>410</x>
+      <y>50</y>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>beacons.list (sighted beacons)</string>
+     <string>writepath</string>
     </property>
    </widget>
-   <widget class="caMultiLineString" name="camultilinestring_list">
+   <widget class="caTextEntry" name="catextentry_writepath">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>70</y>
-      <width>221</width>
-      <height>171</height>
+      <x>495</x>
+      <y>45</y>
+      <width>306</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://beacons.list</string>
-    </property>
-    <property name="colorMode">
-     <enum>caMultiLineString::colMode::Default</enum>
+     <string notr="true">bleacon://beacons.writepath</string>
     </property>
    </widget>
-   <widget class="caLabel" name="calabel_col_id">
+   <widget class="caLabel" name="calabel_col_addr">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>95</y>
-      <width>41</width>
+      <width>155</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>id</string>
+     <string>address</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_col_status">
     <property name="geometry">
      <rect>
-      <x>55</x>
+      <x>170</x>
       <y>95</y>
       <width>91</width>
       <height>20</height>
@@ -142,7 +139,7 @@
    <widget class="caLabel" name="calabel_col_rssi">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>265</x>
       <y>95</y>
       <width>71</width>
       <height>20</height>
@@ -155,7 +152,7 @@
    <widget class="caLabel" name="calabel_col_distance">
     <property name="geometry">
      <rect>
-      <x>225</x>
+      <x>340</x>
       <y>95</y>
       <width>71</width>
       <height>20</height>
@@ -168,7 +165,7 @@
    <widget class="caLabel" name="calabel_col_age">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>415</x>
       <y>95</y>
       <width>51</width>
       <height>20</height>
@@ -181,27 +178,53 @@
    <widget class="caLabel" name="calabel_col_read">
     <property name="geometry">
      <rect>
-      <x>355</x>
+      <x>470</x>
       <y>95</y>
       <width>71</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>readcounter</string>
+     <string>readcnt</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_col_lost">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>545</x>
       <y>95</y>
       <width>71</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>lostcounter</string>
+     <string>lostcnt</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_battery">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>95</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>battery</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_temp">
+    <property name="geometry">
+     <rect>
+      <x>685</x>
+      <y>95</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>temp</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_row1">
@@ -209,90 +232,90 @@
      <rect>
       <x>10</x>
       <y>120</y>
-      <width>41</width>
+      <width>155</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>1:1</string>
+     <string>ibeacon:0001:0001</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_11_status">
+   <widget class="caLineEdit" name="calineedit_b1_status">
     <property name="geometry">
      <rect>
-      <x>55</x>
+      <x>170</x>
       <y>120</y>
       <width>91</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:1.status</string>
+     <string notr="true">bleacon://ibeacon:0001:0001.status</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_11_rssi">
+   <widget class="caLineEdit" name="calineedit_b1_rssi">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>265</x>
       <y>120</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:1.rssi</string>
+     <string notr="true">bleacon://ibeacon:0001:0001.rssi</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_11_distance">
+   <widget class="caLineEdit" name="calineedit_b1_distance">
     <property name="geometry">
      <rect>
-      <x>225</x>
+      <x>340</x>
       <y>120</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:1.distance</string>
+     <string notr="true">bleacon://ibeacon:0001:0001.distance</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_11_age">
+   <widget class="caLineEdit" name="calineedit_b1_age">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>415</x>
       <y>120</y>
       <width>51</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:1.age</string>
+     <string notr="true">bleacon://ibeacon:0001:0001.age</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_11_read">
+   <widget class="caLineEdit" name="calineedit_b1_read">
     <property name="geometry">
      <rect>
-      <x>355</x>
+      <x>470</x>
       <y>120</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:1.readcounter</string>
+     <string notr="true">bleacon://ibeacon:0001:0001.readcounter</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_11_lost">
+   <widget class="caLineEdit" name="calineedit_b1_lost">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>545</x>
       <y>120</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:1.lostcounter</string>
+     <string notr="true">bleacon://ibeacon:0001:0001.lostcounter</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_row2">
@@ -300,90 +323,90 @@
      <rect>
       <x>10</x>
       <y>155</y>
-      <width>41</width>
+      <width>155</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>1:2</string>
+     <string>ibeacon:0001:0002</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_12_status">
+   <widget class="caLineEdit" name="calineedit_b2_status">
     <property name="geometry">
      <rect>
-      <x>55</x>
+      <x>170</x>
       <y>155</y>
       <width>91</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:2.status</string>
+     <string notr="true">bleacon://ibeacon:0001:0002.status</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_12_rssi">
+   <widget class="caLineEdit" name="calineedit_b2_rssi">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>265</x>
       <y>155</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:2.rssi</string>
+     <string notr="true">bleacon://ibeacon:0001:0002.rssi</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_12_distance">
+   <widget class="caLineEdit" name="calineedit_b2_distance">
     <property name="geometry">
      <rect>
-      <x>225</x>
+      <x>340</x>
       <y>155</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:2.distance</string>
+     <string notr="true">bleacon://ibeacon:0001:0002.distance</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_12_age">
+   <widget class="caLineEdit" name="calineedit_b2_age">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>415</x>
       <y>155</y>
       <width>51</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:2.age</string>
+     <string notr="true">bleacon://ibeacon:0001:0002.age</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_12_read">
+   <widget class="caLineEdit" name="calineedit_b2_read">
     <property name="geometry">
      <rect>
-      <x>355</x>
+      <x>470</x>
       <y>155</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:2.readcounter</string>
+     <string notr="true">bleacon://ibeacon:0001:0002.readcounter</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_12_lost">
+   <widget class="caLineEdit" name="calineedit_b2_lost">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>545</x>
       <y>155</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://1:2.lostcounter</string>
+     <string notr="true">bleacon://ibeacon:0001:0002.lostcounter</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_row3">
@@ -391,90 +414,116 @@
      <rect>
       <x>10</x>
       <y>190</y>
-      <width>41</width>
+      <width>155</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>2:1</string>
+     <string>eddystone:AABBCCDDEE21</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_21_status">
+   <widget class="caLineEdit" name="calineedit_b3_status">
     <property name="geometry">
      <rect>
-      <x>55</x>
+      <x>170</x>
       <y>190</y>
       <width>91</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://2:1.status</string>
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.status</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_21_rssi">
+   <widget class="caLineEdit" name="calineedit_b3_rssi">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>265</x>
       <y>190</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://2:1.rssi</string>
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.rssi</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_21_distance">
+   <widget class="caLineEdit" name="calineedit_b3_distance">
     <property name="geometry">
      <rect>
-      <x>225</x>
+      <x>340</x>
       <y>190</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://2:1.distance</string>
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.distance</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_21_age">
+   <widget class="caLineEdit" name="calineedit_b3_age">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>415</x>
       <y>190</y>
       <width>51</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://2:1.age</string>
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.age</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_21_read">
+   <widget class="caLineEdit" name="calineedit_b3_read">
     <property name="geometry">
      <rect>
-      <x>355</x>
+      <x>470</x>
       <y>190</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://2:1.readcounter</string>
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.readcounter</string>
     </property>
    </widget>
-   <widget class="caLineEdit" name="calineedit_21_lost">
+   <widget class="caLineEdit" name="calineedit_b3_lost">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>545</x>
       <y>190</y>
       <width>71</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
-     <string notr="true">bleacon://2:1.lostcounter</string>
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.lostcounter</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_b3_battery">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>190</y>
+      <width>61</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.battery</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_b3_temp">
+    <property name="geometry">
+     <rect>
+      <x>685</x>
+      <y>190</y>
+      <width>61</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://eddystone:AABBCCDDEE21.temperature</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_nearest">
@@ -495,7 +544,7 @@
      <rect>
       <x>10</x>
       <y>275</y>
-      <width>111</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -508,7 +557,7 @@
      <rect>
       <x>10</x>
       <y>295</y>
-      <width>111</width>
+      <width>141</width>
       <height>26</height>
      </rect>
     </property>
@@ -516,12 +565,38 @@
      <string notr="true">bleacon://nearest.id</string>
     </property>
    </widget>
+   <widget class="caLabel" name="calabel_nearest_name">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>275</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>name</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_nearest_name">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>295</y>
+      <width>101</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://nearest.name</string>
+    </property>
+   </widget>
    <widget class="caLabel" name="calabel_nearest_distance">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>270</x>
       <y>275</y>
-      <width>81</width>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -532,9 +607,9 @@
    <widget class="caLineEdit" name="calineedit_nearest_distance">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>270</x>
       <y>295</y>
-      <width>81</width>
+      <width>71</width>
       <height>26</height>
      </rect>
     </property>
@@ -545,9 +620,9 @@
    <widget class="caLabel" name="calabel_nearest_rssi">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>350</x>
       <y>275</y>
-      <width>81</width>
+      <width>61</width>
       <height>20</height>
      </rect>
     </property>
@@ -558,9 +633,9 @@
    <widget class="caLineEdit" name="calineedit_nearest_rssi">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>350</x>
       <y>295</y>
-      <width>81</width>
+      <width>61</width>
       <height>26</height>
      </rect>
     </property>
@@ -571,9 +646,9 @@
    <widget class="caLabel" name="calabel_nearest_valid">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>420</x>
       <y>275</y>
-      <width>51</width>
+      <width>41</width>
       <height>20</height>
      </rect>
     </property>
@@ -584,14 +659,43 @@
    <widget class="caLineEdit" name="calineedit_nearest_valid">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>420</x>
       <y>295</y>
-      <width>51</width>
+      <width>41</width>
       <height>26</height>
      </rect>
     </property>
     <property name="channel" stdset="0">
      <string notr="true">bleacon://nearest.valid</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_list">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>250</y>
+      <width>331</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>beacons.list (discovered addresses)</string>
+    </property>
+   </widget>
+   <widget class="caMultiLineString" name="camultilinestring_list">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>270</y>
+      <width>331</width>
+      <height>136</height>
+     </rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://beacons.list</string>
+    </property>
+    <property name="colorMode">
+     <enum>caMultiLineString::colMode::Default</enum>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_dose">
@@ -610,7 +714,7 @@
    <widget class="caCalc" name="cacalc_dose">
     <property name="geometry">
      <rect>
-      <x>420</x>
+      <x>410</x>
       <y>350</y>
       <width>51</width>
       <height>20</height>
@@ -651,6 +755,11 @@
    <class>caLineEdit</class>
    <extends>QLineEdit</extends>
    <header>caLineEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>caTextEntry</class>
+   <extends>caLineEdit</extends>
+   <header>caTextEntry</header>
   </customwidget>
   <customwidget>
    <class>caMultiLineString</class>

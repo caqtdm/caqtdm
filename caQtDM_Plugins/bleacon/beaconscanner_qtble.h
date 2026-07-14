@@ -26,20 +26,22 @@
 #define BEACONSCANNER_QTBLE_H
 
 #include <QTimer>
+#include <QHash>
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QBluetoothDeviceInfo>
 #include "beaconscanner.h"
 
-// iBeacon reception through Qt Bluetooth (android, linux; macx best effort since newer
-// macOS strips the apple manufacturer data like ios does - use the simulation there).
-// note: ios cannot see iBeacon frames through CoreBluetooth at all, it uses BeaconScannerIos.
+// beacon reception through Qt Bluetooth (android, linux, ios, macx):
+//   ibeacon   - apple manufacturer data 0x004C (not delivered on ios and newer macx,
+//               there CoreLocation/the simulation take over)
+//   eddystone - service data 0xFEAA: UID frames (identity) and TLM frames (telemetry)
 class BeaconScannerQtBle : public BeaconScannerBase
 {
     Q_OBJECT
 public:
     explicit BeaconScannerQtBle(QObject *parent = Q_NULLPTR);
 
-    void startScan(const QList<QUuid> &uuids);
+    void startScan(const QList<QUuid> &uuids, const QStringList &eddystoneNamespaces);
     void stopScan();
 
 private slots:
@@ -53,10 +55,16 @@ private slots:
 private:
     void reallyStart();
     void handleDeviceInfo(const QBluetoothDeviceInfo &info);
+    void handleIBeacon(const QBluetoothDeviceInfo &info);
+    void handleEddystone(const QBluetoothDeviceInfo &info);
+    static QString deviceKey(const QBluetoothDeviceInfo &info);
 
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
     QTimer *restartTimer;
     QList<QUuid> uuidFilter;
+    QStringList namespaceFilter;
+    // TLM frames carry no beacon id: remember the last UID instance per device
+    QHash<QString, QString> instanceByDevice;
     bool scanEnabled;
 };
 

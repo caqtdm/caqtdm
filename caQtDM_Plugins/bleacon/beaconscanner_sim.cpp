@@ -33,11 +33,9 @@
 
 BeaconScannerSim::BeaconScannerSim(QObject *parent) : BeaconScannerBase(parent)
 {
-    simUuid = QUuid("{FDA50693-A4E2-4FB1-AFCF-C6EB07647825}");
-
-    SimBeacon b1 = {1, 1, 2.0, false};
-    SimBeacon b2 = {1, 2, 8.0, false};
-    SimBeacon b3 = {2, 1, 4.0, true};
+    SimBeacon b1 = {"ibeacon", ibeaconId(1, 1), "FDA50693A4E24FB1AFCFC6EB07647825", 2.0, false, false};
+    SimBeacon b2 = {"ibeacon", ibeaconId(1, 2), "FDA50693A4E24FB1AFCFC6EB07647825", 8.0, false, false};
+    SimBeacon b3 = {"eddystone", "AABBCCDDEE21", "0102030405060708090A", 4.0, true, true};
     simBeacons << b1 << b2 << b3;
 
     tickCounter = 0;
@@ -45,9 +43,10 @@ BeaconScannerSim::BeaconScannerSim(QObject *parent) : BeaconScannerBase(parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(emitSightings()));
 }
 
-void BeaconScannerSim::startScan(const QList<QUuid> &uuids)
+void BeaconScannerSim::startScan(const QList<QUuid> &uuids, const QStringList &eddystoneNamespaces)
 {
     Q_UNUSED(uuids);
+    Q_UNUSED(eddystoneNamespaces);
     emit scannerMessage("bleacon: simulation backend active (CAQTDM_BLEACON_SIM=1)", false);
     timer->start(500);
 }
@@ -75,6 +74,13 @@ void BeaconScannerSim::emitSightings()
         double noise = (QRandomGenerator::global()->generateDouble() - 0.5) * 6.0;
         int rssi = qRound(SIM_TXPOWER - 10.0 * SIM_PATHLOSS_N * log10(b.distance) + noise);
 
-        emit beaconSighting(simUuid, b.major, b.minor, rssi, SIM_TXPOWER, qQNaN());
+        emit beaconSighting(b.protocol, b.id, b.group, rssi, SIM_TXPOWER, qQNaN());
+
+        // TLM telemetry every 5s: slowly draining battery, wandering temperature
+        if (b.telemetry && (tickCounter % 10 == 0)) {
+            double battery = 3.05 - 0.00005 * tickCounter;
+            double temperature = 21.5 + (QRandomGenerator::global()->generateDouble() - 0.5);
+            emit beaconTelemetry(b.protocol, b.id, battery, temperature);
+        }
     }
 }
