@@ -33,6 +33,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QUuid>
+#include <QVector>
 #include "controlsinterface.h"
 #include "beaconscanner.h"
 
@@ -52,8 +53,19 @@
 // channels (prefix bleacon://, <addr> = protocol tagged address):
 //   <addr>.rssi          smoothed rssi [dBm]                    (caDOUBLE)
 //   <addr>.distance      estimated distance [m]                 (caDOUBLE)
-//   <addr>.txpower       power at 1m [dBm], eddystone converted (caLONG, 0 on ios ibeacon)
+//   <addr>.txpower       rssi@1m used in the distance formula [dBm] (caLONG, write:
+//                        manual calibration; persisted into the config file)
+//   <addr>.pathloss      environment scenario (caENUM, write; persisted); the n of
+//                        the distance formula is part of the string:
+//                        Freigelaende (n=2.0) / Gebaeude Holz (n=2.5) /
+//                        Gebaeude Beton (n=3.0) / Bunker (n=3.5)
+//   <addr>.calibrate     1m calibration: write 1 to start, 0 to cancel (caENUM
+//                        idle/running/done/failed) - put the token at 1m, press
+//                        calibrate, wait; the plugin collects sightings, takes the
+//                        median rssi as txpower and saves the config file
+//   <addr>.calprogress   calibration progress 0..100            (caLONG, %)
 //   <addr>.age           seconds since last sighting            (caDOUBLE)
+//   <addr>.interval      observed advertising interval [s]      (caDOUBLE)
 //   <addr>.status        neverseen/lost/weak/present            (caENUM)
 //   <addr>.readcounter   number of received sightings           (caLONG)
 //   <addr>.lostcounter   number of present->lost transitions    (caLONG)
@@ -78,6 +90,16 @@
 // discovered beacon addresses, optionally with a human readable alias (Name=Adresse);
 // on load the addresses are pre-created (status neverseen), so beacons.list is
 // populated right after the start.
+// address lines accept optional calibration parameters, comma separated:
+//   Quelle1=eddystone:7CD9F4099CA4,txpower=-59,n=2.5
+//   txpower = measured rssi at 1m [dBm] (overrides the advertised ranging byte -
+//             vendor tools disagree whether their calibration value is at 0m or 1m)
+//   n       = per beacon path loss exponent
+//
+// robustness for slow advertisers (e.g. 5s interval): the advertising interval is
+// measured per beacon (channel .interval); a beacon goes lost only after
+// max(CAQTDM_BLEACON_TIMEOUT, 3 x interval), and the rssi/distance smoothing is
+// time based (alpha = 1 - exp(-dt/tau)), so slow beacons react as fast as quick ones.
 //
 // configuration (environment, mobile .config file sets these too):
 //   CAQTDM_BLEACON_UUIDS      ';' separated: iBeacon proximity uuids (mandatory for ios iBeacon)
@@ -87,7 +109,9 @@
 //   CAQTDM_BLEACON_WRITEPATH  directory beacons.config writes to (default: found config
 //                             file location, else current directory)
 //   CAQTDM_BLEACON_PATHLOSS_N path loss exponent for the distance estimate (default 2.2)
-//   CAQTDM_BLEACON_TIMEOUT    seconds without sighting until a beacon is lost (default 10)
+//   CAQTDM_BLEACON_TIMEOUT    minimum seconds without sighting until a beacon is lost
+//                             (default 10; automatically raised to 3 x advertising interval)
+//   CAQTDM_BLEACON_TAU        smoothing time constant for rssi/distance in seconds (default 10)
 //   CAQTDM_BLEACON_WEAK_RSSI  rssi threshold for status weak (default -90)
 //   CAQTDM_BLEACON_SIM        1 = simulated beacons instead of real hardware
 class Q_DECL_EXPORT bleaconPlugin : public QObject, ControlsInterface
@@ -137,24 +161,46 @@ private:
         QString name;         // human readable alias from the config file, "" if none
         quint16 major;        // ibeacon only, 0 otherwise
         quint16 minor;
-        double ewmaRssi;      // NaN until the first sighting
-        double distance;      // NaN until the first sighting
-        int txPower;          // at 1m, 0 = unknown
+        // measurement relation (log-distance path loss model):
+        //   distance = 10 ^ ((txPower - ewmaRssi) / (10 * n))
+        //   txPower = expected rssi at 1m distance [dBm]
+        //   n       = path loss exponent: 2.0 free field, 2.5..3.5 indoor;
+        //             larger n -> shorter computed distance
+        // calibration recipe: put the beacon at exactly 1m, wait ~15s, read the
+        // .rssi channel and write it as txpower=<value> into the config line
+        double ewmaRssi;      // smoothed rssi [dBm], NaN until the first sighting
+        double distance;      // estimated distance [m], NaN until the first sighting
+        int txPower;          // effective rssi@1m used in the formula, 0 = unknown
+        int txPowerOverride;  // calibration from the config file (txpower=...), 0 = none;
+                              // wins over the advertised ranging byte because vendor
+                              // tools define their calibration value at 0m OR at 1m
+        double pathLossN;     // per beacon n from the config file (n=...), NaN = global value
+        double avgIntervalS;  // observed advertising interval [s], NaN until measurable;
+                              // a beacon counts as lost only after
+                              // max(staleTimeoutSec, 3 * avgIntervalS) without sighting
         double battery;       // NaN until TLM received
         double temperature;   // NaN until TLM received
         qint64 lastSeenMs;
         qint64 readCounter;
         qint64 lostCounter;
         int status;
+        // 1m calibration (channel .calibrate): raw rssi samples collected while the
+        // token lies at 1m; the median becomes txPowerOverride
+        bool calibrating;
+        qint64 calStartMs;
+        QVector<int> calSamples;
     };
 
     static QString beaconKey(const QString &protocol, const QString &beaconId);
     static QString normalizeIBeaconId(const QString &beaconId);
+    QString resolveBeaconKey(const QString &addressOrAlias);
     BeaconState *findOrCreateBeacon(const QString &protocol, const QString &beaconId, const QString &groupId);
+    void finishCalibration(const QString &key, BeaconState &beacon);
 
     void loadConfiguration(QMap<QString, QString> options);
     void writeConfigFile();
     void addConfigEntry(const QString &entry);
+    void applyBeaconParams(BeaconState *beacon, const QStringList &params);
 
     void applyScanMode(int mode);
 
@@ -191,12 +237,16 @@ private:
     QStringList namespaceList;
     QString configFileName;
     QString configWritePath;
-    double pathLossExponent;
-    int staleTimeoutSec;
-    int weakRssiThreshold;
+    double pathLossExponent;  // global n of the distance formula (see BeaconState), default 2.2
+    int staleTimeoutSec;      // minimum lost timeout [s]; raised per beacon to 3 x .interval
+    int weakRssiThreshold;    // ewmaRssi below this [dBm] -> status weak (distance unreliable)
+    double smoothingTauS;     // smoothing time constant [s]: alpha = 1 - exp(-dt/tau) per
+                              // sighting, so slow advertisers (5s) react as fast as quick ones
 
     QStringList statusStrings;
     QStringList scanStrings;
+    QStringList calStrings;      // idle/running/done/failed of the 1m calibration
+    QStringList pathLossStrings; // environment scenarios of the .pathloss enum
 };
 
 #endif // BLEACONPLUGIN_H

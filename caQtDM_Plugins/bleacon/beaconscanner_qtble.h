@@ -50,6 +50,7 @@ private slots:
     void deviceUpdated(const QBluetoothDeviceInfo &info, QBluetoothDeviceInfo::Fields updatedFields);
 #endif
     void scanFinished();
+    void scanError(QBluetoothDeviceDiscoveryAgent::Error error);
     void restartScan();
 
 private:
@@ -66,6 +67,7 @@ private:
     // TLM frames carry no beacon id: remember the last UID instance per device
     QHash<QString, QString> instanceByDevice;
     bool scanEnabled;
+    bool errorReported;   // de-spam: one message per error series
 };
 
 #endif // BEACONSCANNER_QTBLE_H

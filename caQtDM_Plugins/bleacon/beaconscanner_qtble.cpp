@@ -44,10 +44,15 @@
 // advertisements without hitting the scan throttling of long running scans
 #define SCAN_CYCLE_MS 20000
 #define SCAN_PAUSE_MS 1000
+// retry pause after a scan error (e.g. bluetooth powered down during standby);
+// the agent stops with errorOccurred WITHOUT finished(), so the normal cycle
+// would never restart - keep retrying until the adapter is back
+#define ERROR_RETRY_MS 5000
 
 BeaconScannerQtBle::BeaconScannerQtBle(QObject *parent) : BeaconScannerBase(parent)
 {
     scanEnabled = false;
+    errorReported = false;
 
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
@@ -64,6 +69,15 @@ BeaconScannerQtBle::BeaconScannerQtBle(QObject *parent) : BeaconScannerBase(pare
 #endif
     connect(discoveryAgent, SIGNAL(finished()), this, SLOT(scanFinished()));
     connect(discoveryAgent, SIGNAL(canceled()), this, SLOT(scanFinished()));
+    // error paths (bluetooth off, standby, missing adapter) end WITHOUT finished():
+    // without this connection the scan cycle would die permanently after a wake up
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+    connect(discoveryAgent, SIGNAL(errorOccurred(QBluetoothDeviceDiscoveryAgent::Error)),
+            this, SLOT(scanError(QBluetoothDeviceDiscoveryAgent::Error)));
+#else
+    connect(discoveryAgent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
+            this, SLOT(scanError(QBluetoothDeviceDiscoveryAgent::Error)));
+#endif
 
     restartTimer = new QTimer(this);
     restartTimer->setSingleShot(true);
@@ -130,8 +144,21 @@ void BeaconScannerQtBle::stopScan()
 
 void BeaconScannerQtBle::scanFinished()
 {
+    errorReported = false;
     // cycle the scan while enabled, with a short pause between the cycles
     if (scanEnabled) restartTimer->start(SCAN_PAUSE_MS);
+}
+
+// the agent stopped with an error (bluetooth powered down in standby, adapter gone):
+// report once and keep retrying until scanning is possible again
+void BeaconScannerQtBle::scanError(QBluetoothDeviceDiscoveryAgent::Error error)
+{
+    if (!errorReported) {
+        errorReported = true;
+        emit scannerMessage(QString("bleacon: scan error (%1) : %2 - retrying every %3s")
+                            .arg((int) error).arg(discoveryAgent->errorString()).arg(ERROR_RETRY_MS / 1000), true);
+    }
+    if (scanEnabled) restartTimer->start(ERROR_RETRY_MS);
 }
 
 void BeaconScannerQtBle::restartScan()
@@ -141,6 +168,7 @@ void BeaconScannerQtBle::restartScan()
 
 void BeaconScannerQtBle::deviceDiscovered(const QBluetoothDeviceInfo &info)
 {
+    errorReported = false;
     handleDeviceInfo(info);
 }
 
