@@ -76,11 +76,13 @@ void BeaconScannerSim::emitSightings()
 
         emit beaconSighting(b.protocol, b.id, b.group, rssi, SIM_TXPOWER, qQNaN());
 
-        // TLM telemetry every 5s: slowly draining battery, wandering temperature
+        // TLM telemetry every 5s: slowly draining battery, wandering temperature,
+        // advertisement counter and uptime like a real token
         if (b.telemetry && (tickCounter % 10 == 0)) {
             double battery = 3.05 - 0.00005 * tickCounter;
             double temperature = 21.5 + (QRandomGenerator::global()->generateDouble() - 0.5);
-            emit beaconTelemetry(b.protocol, b.id, battery, temperature);
+            emit beaconTelemetry(b.protocol, b.id, battery, temperature,
+                                 (qint64) tickCounter, tickCounter * 0.5);
         }
     }
 }

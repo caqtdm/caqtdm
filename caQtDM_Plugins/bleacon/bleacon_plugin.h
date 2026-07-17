@@ -71,6 +71,8 @@
 //   <addr>.lostcounter   number of present->lost transitions    (caLONG)
 //   <addr>.battery       eddystone TLM battery [V]              (caDOUBLE)
 //   <addr>.temperature   eddystone TLM temperature [degC]       (caDOUBLE)
+//   <addr>.advcount      eddystone TLM: advertisements sent since power on (caLONG)
+//   <addr>.uptime        eddystone TLM: seconds since power on  (caDOUBLE)
 //   <addr>.name          alias from the config file, "" if none (caSTRING)
 //   nearest.id           address of the nearest beacon          (caSTRING)
 //   nearest.name         alias of the nearest beacon (address if none) (caSTRING)
@@ -146,7 +148,8 @@ protected:
 
 private slots:
     void beaconSighting(QString protocol, QString beaconId, QString groupId, int rssi, int txPowerAt1m, double accuracyMeters);
-    void beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC);
+    void beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC,
+                         qint64 advCount, double uptimeS);
     void scannerMessage(QString message, bool isError);
     void sweep();
 
@@ -180,6 +183,8 @@ private:
                               // max(staleTimeoutSec, 3 * avgIntervalS) without sighting
         double battery;       // NaN until TLM received
         double temperature;   // NaN until TLM received
+        qint64 advCount;      // TLM: advertisements sent since power on, -1 = unknown
+        double uptimeS;       // TLM: seconds since power on, NaN = unknown
         qint64 lastSeenMs;
         qint64 readCounter;
         qint64 lostCounter;

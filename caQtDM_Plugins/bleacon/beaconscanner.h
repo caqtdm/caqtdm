@@ -63,8 +63,10 @@ public:
 signals:
     // txPowerAt1m = 0 when unknown (CoreLocation); accuracyMeters = backend distance estimate, NaN when not available
     void beaconSighting(QString protocol, QString beaconId, QString groupId, int rssi, int txPowerAt1m, double accuracyMeters);
-    // eddystone TLM telemetry; NaN for fields the beacon does not deliver
-    void beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC);
+    // eddystone TLM telemetry; NaN (-1 for advCount) for fields the beacon does not deliver.
+    // advCount = advertisements sent since power on, uptimeS = seconds since power on
+    void beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC,
+                         qint64 advCount, double uptimeS);
     void scannerMessage(QString message, bool isError);
 };
 

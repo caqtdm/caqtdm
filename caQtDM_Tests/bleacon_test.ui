@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>840</width>
+    <width>1010</width>
     <height>900</height>
    </rect>
   </property>
@@ -240,6 +240,22 @@
      <string>temp</string>
     </property>
    </widget>
+   <widget class="caLabel" name="calabel_col_advcnt">
+    <property name="geometry">
+     <rect><x>750</x><y>95</y><width>81</width><height>20</height></rect>
+    </property>
+    <property name="text">
+     <string>advcnt</string>
+    </property>
+   </widget>
+   <widget class="caLabel" name="calabel_col_uptime">
+    <property name="geometry">
+     <rect><x>835</x><y>95</y><width>91</width><height>20</height></rect>
+    </property>
+    <property name="text">
+     <string>uptime</string>
+    </property>
+   </widget>
    <widget class="caLabel" name="calabel_row1">
     <property name="geometry">
      <rect>
@@ -368,6 +384,22 @@
     </property>
     <property name="channel" stdset="0">
      <string notr="true">bleacon://Quelle1.temperature</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_q1_advcnt">
+    <property name="geometry">
+     <rect><x>750</x><y>120</y><width>81</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle1.advcount</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_q1_uptime">
+    <property name="geometry">
+     <rect><x>835</x><y>120</y><width>91</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle1.uptime</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_row2">
@@ -500,6 +532,22 @@
      <string notr="true">bleacon://Quelle2.temperature</string>
     </property>
    </widget>
+   <widget class="caLineEdit" name="calineedit_q2_advcnt">
+    <property name="geometry">
+     <rect><x>750</x><y>155</y><width>81</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle2.advcount</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_q2_uptime">
+    <property name="geometry">
+     <rect><x>835</x><y>155</y><width>91</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle2.uptime</string>
+    </property>
+   </widget>
    <widget class="caLabel" name="calabel_row3">
     <property name="geometry">
      <rect>
@@ -630,6 +678,22 @@
      <string notr="true">bleacon://Quelle3.temperature</string>
     </property>
    </widget>
+   <widget class="caLineEdit" name="calineedit_q3_advcnt">
+    <property name="geometry">
+     <rect><x>750</x><y>190</y><width>81</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle3.advcount</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_q3_uptime">
+    <property name="geometry">
+     <rect><x>835</x><y>190</y><width>91</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle3.uptime</string>
+    </property>
+   </widget>
    <widget class="caLabel" name="calabel_row4">
     <property name="geometry">
      <rect>
@@ -758,6 +822,22 @@
     </property>
     <property name="channel" stdset="0">
      <string notr="true">bleacon://Quelle4.temperature</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_q4_advcnt">
+    <property name="geometry">
+     <rect><x>750</x><y>225</y><width>81</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle4.advcount</string>
+    </property>
+   </widget>
+   <widget class="caLineEdit" name="calineedit_q4_uptime">
+    <property name="geometry">
+     <rect><x>835</x><y>225</y><width>91</width><height>26</height></rect>
+    </property>
+    <property name="channel" stdset="0">
+     <string notr="true">bleacon://Quelle4.uptime</string>
     </property>
    </widget>
    <widget class="caLabel" name="calabel_nearest">

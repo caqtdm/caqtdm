@@ -58,8 +58,8 @@ void BeaconScannerComposite::addScanner(BeaconScannerBase *scanner)
     scanners.append(scanner);
     connect(scanner, SIGNAL(beaconSighting(QString,QString,QString,int,int,double)),
             this, SIGNAL(beaconSighting(QString,QString,QString,int,int,double)));
-    connect(scanner, SIGNAL(beaconTelemetry(QString,QString,double,double)),
-            this, SIGNAL(beaconTelemetry(QString,QString,double,double)));
+    connect(scanner, SIGNAL(beaconTelemetry(QString,QString,double,double,qint64,double)),
+            this, SIGNAL(beaconTelemetry(QString,QString,double,double,qint64,double)));
     connect(scanner, SIGNAL(scannerMessage(QString,bool)),
             this, SIGNAL(scannerMessage(QString,bool)));
 }

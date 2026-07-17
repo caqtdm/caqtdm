@@ -167,6 +167,8 @@ bleaconPlugin::BeaconState *bleaconPlugin::findOrCreateBeacon(const QString &pro
         b.avgIntervalS = qQNaN();
         b.battery = qQNaN();
         b.temperature = qQNaN();
+        b.advCount = -1;
+        b.uptimeS = qQNaN();
         b.lastSeenMs = 0;
         b.readCounter = 0;
         b.lostCounter = 0;
@@ -656,7 +658,8 @@ void bleaconPlugin::beaconSighting(QString protocol, QString beaconId, QString g
 }
 
 // eddystone TLM telemetry
-void bleaconPlugin::beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC)
+void bleaconPlugin::beaconTelemetry(QString protocol, QString beaconId, double batteryVolts, double temperatureC,
+                                    qint64 advCount, double uptimeS)
 {
     QMutexLocker locker(&mutex);
     if (!scanning) return;
@@ -665,6 +668,15 @@ void bleaconPlugin::beaconTelemetry(QString protocol, QString beaconId, double b
     if (!beacons.contains(key)) return;
     BeaconState &beacon = beacons[key];
 
+    // a TLM frame is proof of life like a UID sighting: refresh the age (Qt reports
+    // only CHANGED advertisements, between two TLM frames a static beacon may be silent)
+    beacon.lastSeenMs = QDateTime::currentMSecsSinceEpoch();
+    updateChannelDouble(key + ".age", 0.0);
+    if (beacon.status == StatusLost) {
+        beacon.status = StatusPresent;
+        updateChannelEnum(key + ".status", beacon.status, statusStrings);
+    }
+
     if (!qIsNaN(batteryVolts)) {
         beacon.battery = batteryVolts;
         updateChannelDouble(key + ".battery", beacon.battery);
@@ -672,6 +684,14 @@ void bleaconPlugin::beaconTelemetry(QString protocol, QString beaconId, double b
     if (!qIsNaN(temperatureC)) {
         beacon.temperature = temperatureC;
         updateChannelDouble(key + ".temperature", beacon.temperature);
+    }
+    if (advCount >= 0) {
+        beacon.advCount = advCount;
+        updateChannelLong(key + ".advcount", beacon.advCount);
+    }
+    if (!qIsNaN(uptimeS)) {
+        beacon.uptimeS = uptimeS;
+        updateChannelDouble(key + ".uptime", beacon.uptimeS);
     }
 }
 
@@ -799,8 +819,8 @@ int bleaconPlugin::initCommunicationLayer(MutexKnobData *data, MessageWindow *me
     scanner = BeaconScannerBase::createScanner(this);
     connect(scanner, SIGNAL(beaconSighting(QString,QString,QString,int,int,double)),
             this, SLOT(beaconSighting(QString,QString,QString,int,int,double)));
-    connect(scanner, SIGNAL(beaconTelemetry(QString,QString,double,double)),
-            this, SLOT(beaconTelemetry(QString,QString,double,double)));
+    connect(scanner, SIGNAL(beaconTelemetry(QString,QString,double,double,qint64,double)),
+            this, SLOT(beaconTelemetry(QString,QString,double,double,qint64,double)));
     connect(scanner, SIGNAL(scannerMessage(QString,bool)),
             this, SLOT(scannerMessage(QString,bool)));
 
@@ -827,11 +847,11 @@ int bleaconPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     // protocol tagged beacon address (ids hexadecimal); plain <major>:<minor> is an ibeacon shorthand
     static const QRegularExpression beaconRegex("^(?:(ibeacon):([0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4})|(eddystone):([0-9A-Fa-f]{12})|([0-9A-Fa-f]{1,4}:[0-9A-Fa-f]{1,4}))"
-                                                "\\.(rssi|distance|txpower|pathloss|age|interval|status|readcounter|lostcounter|battery|temperature|name|calibrate|calprogress)$");
+                                                "\\.(rssi|distance|txpower|pathloss|age|interval|status|readcounter|lostcounter|battery|temperature|advcount|uptime|name|calibrate|calprogress)$");
     static const QRegularExpression nearestRegex("^nearest\\.(id|name|major|minor|distance|rssi|valid)$");
     static const QRegularExpression beaconsRegex("^beacons\\.(list|reset|config|writepath)$");
     static const QRegularExpression aliasRegex("^([A-Za-z_][A-Za-z0-9_-]*)"
-                                               "\\.(rssi|distance|txpower|pathloss|age|interval|status|readcounter|lostcounter|battery|temperature|name|calibrate|calprogress)$");
+                                               "\\.(rssi|distance|txpower|pathloss|age|interval|status|readcounter|lostcounter|battery|temperature|advcount|uptime|name|calibrate|calprogress)$");
 
     // resolve a human readable alias from the config file to its canonical address
     QRegularExpressionMatch aliasMatch = aliasRegex.match(pv);
@@ -924,6 +944,15 @@ int bleaconPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
             kData->edata.precision = 1;
             qstrncpy(kData->edata.units, "C", 39);
             kData->edata.rvalue = qIsNaN(beacon->temperature) ? 0.0 : beacon->temperature;
+        } else if (field == "advcount") {
+            kData->edata.fieldtype = caLONG;
+            kData->edata.ivalue = (long) qMax((qint64) 0, beacon->advCount);
+            kData->edata.rvalue = (double) kData->edata.ivalue;
+        } else if (field == "uptime") {
+            kData->edata.fieldtype = caDOUBLE;
+            kData->edata.precision = 0;
+            qstrncpy(kData->edata.units, "s", 39);
+            kData->edata.rvalue = qIsNaN(beacon->uptimeS) ? 0.0 : beacon->uptimeS;
         } else if (field == "name") {
             fillStringData(kData, beacon->name);
         }

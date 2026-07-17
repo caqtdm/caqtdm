@@ -31,6 +31,7 @@
 #endif
 
 #include "beaconscanner_qtble.h"
+#include "caQtDM_Plugins_global.h"
 
 // apple company id carrying the iBeacon frame in the manufacturer specific data
 #define APPLE_COMPANY_ID 0x004C
@@ -40,9 +41,16 @@
 #define EDDYSTONE_FRAME_TLM 0x20
 // eddystone txPower is calibrated at 0m; the power at 1m is ~41dB lower
 #define EDDYSTONE_0M_TO_1M_DB 41
-// scan cycle: restart every 20s (plus 1s pause) so android keeps delivering
-// advertisements without hitting the scan throttling of long running scans
+// scan cycle (restart plus a short pause): Qt only reports CHANGED advertisements
+// (rssi/manufacturer/service data, see deviceFound in the darwin backend) - a static
+// beacon sending identical frames stays silent until the scan restart clears the
+// duplicate cache. a short cycle therefore keeps .age truthful on the desktop;
+// android throttles apps starting >5 scans/30s, so the cycle stays long there
+#ifdef Q_OS_ANDROID
 #define SCAN_CYCLE_MS 20000
+#else
+#define SCAN_CYCLE_MS 8000
+#endif
 #define SCAN_PAUSE_MS 1000
 // retry pause after a scan error (e.g. bluetooth powered down during standby);
 // the agent stops with errorOccurred WITHOUT finished(), so the normal cycle
@@ -238,7 +246,8 @@ void BeaconScannerQtBle::handleEddystone(const QBluetoothDeviceInfo &info)
             instanceByDevice.insert(deviceKey(info), instance);
             emit beaconSighting("eddystone", instance, ns, info.rssi(), txPowerAt1m, qQNaN());
         } else if (frameType == EDDYSTONE_FRAME_TLM && frame.size() >= 14) {
-            // plain TLM frame (version 0): uint16 battery [mV], int16 temperature [8.8 fixed]
+            // plain TLM frame (version 0): uint16 battery [mV], int16 temperature [8.8 fixed],
+            // uint32 ADV_CNT (advertisements since power on), uint32 SEC_CNT (uptime, 0.1s)
             if ((quint8) frame.at(1) != 0x00) continue;
 
             // TLM carries no beacon id: associate through the UID frame of the same device
@@ -247,11 +256,47 @@ void BeaconScannerQtBle::handleEddystone(const QBluetoothDeviceInfo &info)
 
             quint16 batteryMv = (quint16) (((quint8) frame.at(2) << 8) | (quint8) frame.at(3));
             qint16 temperatureRaw = (qint16) (((quint8) frame.at(4) << 8) | (quint8) frame.at(5));
+            quint32 advCount = ((quint32) (quint8) frame.at(6) << 24) | ((quint32) (quint8) frame.at(7) << 16)
+                             | ((quint32) (quint8) frame.at(8) << 8) | (quint32) (quint8) frame.at(9);
+            quint32 secCount = ((quint32) (quint8) frame.at(10) << 24) | ((quint32) (quint8) frame.at(11) << 16)
+                             | ((quint32) (quint8) frame.at(12) << 8) | (quint32) (quint8) frame.at(13);
 
             double battery = (batteryMv == 0) ? qQNaN() : batteryMv / 1000.0;
             double temperature = (temperatureRaw == (qint16) 0x8000) ? qQNaN() : temperatureRaw / 256.0;
 
-            emit beaconTelemetry("eddystone", instance, battery, temperature);
+            emit beaconTelemetry("eddystone", instance, battery, temperature,
+                                 (qint64) advCount, secCount / 10.0);
+        } else if (frameType != EDDYSTONE_FRAME_UID && frameType != EDDYSTONE_FRAME_TLM) {
+            // unknown eddystone frame type (url, eid, vendor extension)
+            qCDebug(bleaconLog) << "bleacon: unknown eddystone frame" << deviceKey(info)
+                                << "type" << Qt::hex << frameType << "data" << frame.toHex(' ');
+        }
+    }
+
+    // frame discovery for vendor sensor extensions (magnet, button, accelerometer):
+    // sensors usually advertise under an own service data uuid or manufacturer id -
+    // enable with QT_LOGGING_RULES="caqtdm.plugins.bleacon.debug=true" and watch the
+    // hexdump change while triggering the sensor. frames from devices that also sent
+    // an eddystone UID are annotated with the instance - grep for your token
+    // (everything without annotation is foreign traffic: switchbot, phones, tags, ...)
+    if (bleaconLog().isDebugEnabled()) {
+        QString device = deviceKey(info);
+        QString knownInstance = instanceByDevice.value(device);
+        if (!knownInstance.isEmpty()) device += " [eddystone:" + knownInstance + "]";
+
+        const QMultiHash<QBluetoothUuid, QByteArray> allServiceData = info.serviceData();
+        for (QMultiHash<QBluetoothUuid, QByteArray>::const_iterator it = allServiceData.constBegin();
+             it != allServiceData.constEnd(); ++it) {
+            if (it.key() == QBluetoothUuid((quint16) EDDYSTONE_SERVICE_UUID)) continue;
+            qCDebug(bleaconLog) << "bleacon: service data" << device
+                                << "uuid" << it.key() << "data" << it.value().toHex(' ');
+        }
+        const QMultiHash<quint16, QByteArray> allManufacturerData = info.manufacturerData();
+        for (QMultiHash<quint16, QByteArray>::const_iterator it = allManufacturerData.constBegin();
+             it != allManufacturerData.constEnd(); ++it) {
+            if (it.key() == APPLE_COMPANY_ID) continue;
+            qCDebug(bleaconLog) << "bleacon: manufacturer data" << device
+                                << "id" << Qt::hex << it.key() << "data" << it.value().toHex(' ');
         }
     }
 #else
