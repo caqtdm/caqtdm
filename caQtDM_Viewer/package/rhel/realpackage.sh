@@ -21,8 +21,7 @@ fi
 REPOSITORY_NAME=caqtdm
 PACKAGE_VERSION=4.6.1
 REPOSITORY=https://github.com/caqtdm/$REPOSITORY_NAME.git
-# BRANCH_OR_TAG=V${PACKAGE_VERSION}
-BRANCH_OR_TAG=Development
+BRANCH_OR_TAG=${CAQTDM_BUILD_REF:-Development}
 
 #### Clone and build caqtdm sources
 git clone $REPOSITORY
