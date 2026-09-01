@@ -48,7 +48,6 @@ InternalPlugin::InternalPlugin()
 
 InternalPlugin::~InternalPlugin()
 {
-    if(timer) timer->deleteLater();
     qDeleteAll(channels);
     channels.clear();
 }

@@ -75,21 +75,8 @@ void TestGeneralLogHandler::cleanup()
 {
     // code to be executed after each test function
 
-    // Reverse everything done in GeneralLogHandler::initialize()
+    GeneralLogHandler::shutdown();
     qInstallMessageHandler(nullptr);
-
-    QMutexLocker locker(&GeneralLogHandler::s_mutex);
-    for (auto existingLogHandler : GeneralLogHandler::s_logHandlers) {
-        delete existingLogHandler;
-    }
-    GeneralLogHandler::s_logHandlers.clear();
-
-    if (GeneralLogHandler::s_logHandlersThread) {
-        GeneralLogHandler::s_logHandlersThread->quit();
-        GeneralLogHandler::s_logHandlersThread->wait();
-        delete GeneralLogHandler::s_logHandlersThread;
-        GeneralLogHandler::s_logHandlersThread = Q_NULLPTR;
-    }
 }
 
 void TestGeneralLogHandler::injectsMessageHandlerAndReturnsPrevious()
@@ -167,6 +154,24 @@ void TestGeneralLogHandler::fatalMessageFlushesHandler()
     GeneralLogHandler::messageHandler(QtFatalMsg, {}, "fatal");
 
     QCOMPARE(handler->flushCalls, 1);
+}
+
+void TestGeneralLogHandler::shutdownRestoresPreviousHandlerAndIsIdempotent()
+{
+    qInstallMessageHandler(mockMessageHandler);
+    GeneralLogHandler::initialize();
+
+    GeneralLogHandler::shutdown();
+
+    QtMessageHandler currentHandler = qInstallMessageHandler(nullptr);
+    QVERIFY(currentHandler == mockMessageHandler);
+    QVERIFY(GeneralLogHandler::s_logHandlers.isEmpty());
+    QVERIFY(GeneralLogHandler::s_logHandlersThread == Q_NULLPTR);
+    QVERIFY(!GeneralLogHandler::s_isInitialized);
+
+    GeneralLogHandler::shutdown();
+    QVERIFY(GeneralLogHandler::s_logHandlers.isEmpty());
+    QVERIFY(GeneralLogHandler::s_logHandlersThread == Q_NULLPTR);
 }
 
 void TestGeneralLogHandler::logHandlersAreInitializedFromEnv()

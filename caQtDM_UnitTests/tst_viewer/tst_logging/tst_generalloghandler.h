@@ -44,6 +44,7 @@ private slots:
     void callsHandler();
     void fatalMessageFlushesHandler();
     void logHandlersAreInitializedFromEnv();
+    void shutdownRestoresPreviousHandlerAndIsIdempotent();
 };
 
 #endif // TST_GENERALLOGHANDLER_H

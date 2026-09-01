@@ -48,6 +48,11 @@ public:
      */
     static QtMessageHandler initialize();
     /**
+     * @brief Restores the previous Qt message handler and releases all logging resources.
+     * This function is idempotent and thread-safe.
+     */
+    static void shutdown();
+    /**
      * @brief The messageHandler called by Qt (after injected) to handle all qDebugs and similar.
      * This function is thread-safe.
      * @param type: The log level
@@ -74,6 +79,8 @@ private:
     static QMutex s_mutex;
     static QList<AbstractLogHandler *> s_logHandlers;
     static QThread *s_logHandlersThread;
+    static QtMessageHandler s_previousMessageHandler;
+    static bool s_isInitialized;
     static qint64 s_processId;
 };
 

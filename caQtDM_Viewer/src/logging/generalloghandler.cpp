@@ -43,6 +43,8 @@
 QMutex GeneralLogHandler::s_mutex;
 QList<AbstractLogHandler *> GeneralLogHandler::s_logHandlers;
 QThread *GeneralLogHandler::s_logHandlersThread = Q_NULLPTR;
+QtMessageHandler GeneralLogHandler::s_previousMessageHandler = Q_NULLPTR;
+bool GeneralLogHandler::s_isInitialized = false;
 qint64 GeneralLogHandler::s_processId = -1;
 
 Q_LOGGING_CATEGORY(generalLogHandlerLog, "caqtdm.logging.general")
@@ -56,6 +58,8 @@ QtMessageHandler GeneralLogHandler::initialize()
         // Was already initialized
         return previousHandler;
     }
+
+    s_previousMessageHandler = previousHandler;
 
     // Re-install previous handler for initialization logs
     qInstallMessageHandler(previousHandler);
@@ -128,8 +132,40 @@ QtMessageHandler GeneralLogHandler::initialize()
 
     // Now the custom handler is ready to accept logs, so install it again
     qInstallMessageHandler(GeneralLogHandler::messageHandler);
+    s_isInitialized = true;
 
     return previousHandler;
+}
+
+void GeneralLogHandler::shutdown()
+{
+    QMutexLocker locker(&s_mutex);
+
+    if (!s_isInitialized) {
+        return;
+    }
+
+    // Remove this handler before destroying objects which may emit Qt messages.
+    qInstallMessageHandler(s_previousMessageHandler);
+
+    for (auto logHandler : s_logHandlers) {
+        if (logHandler) {
+            logHandler->flush();
+            delete logHandler;
+        }
+    }
+    s_logHandlers.clear();
+
+    if (s_logHandlersThread) {
+        s_logHandlersThread->quit();
+        s_logHandlersThread->wait();
+        delete s_logHandlersThread;
+        s_logHandlersThread = Q_NULLPTR;
+    }
+
+    s_previousMessageHandler = Q_NULLPTR;
+    s_isInitialized = false;
+    s_processId = -1;
 }
 
 QStringList GeneralLogHandler::selectedLogHandlersFromEnv(const QString &defaultConfig)
