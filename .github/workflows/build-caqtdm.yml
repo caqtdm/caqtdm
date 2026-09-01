@@ -54,7 +54,9 @@ jobs:
           qt6-5compat \
           cmake \
           ninja \
-          openssl
+          openssl \
+          devtools \
+          nvchecker
 
     - name: Checkout repository
       uses: actions/checkout@v6
@@ -78,19 +80,43 @@ jobs:
         echo "Current MAKEFLAGS in /etc/makepkg.conf:"
         grep "MAKEFLAGS" /etc/makepkg.conf
 
+    - name: Self-upgrade qt6-opcua and epics-base (pkgctl version upgrade)
+      id: dep_versions
+      run: |
+        set -euo pipefail
+        WORKSPACE_DIR="${GITHUB_WORKSPACE:-$PWD}"
+        VERSIONS_FILE="$(mktemp)"
+        touch "$VERSIONS_FILE" && chmod 666 "$VERSIONS_FILE"
+
+        sudo -u builder env WORKSPACE_DIR="$WORKSPACE_DIR" VERSIONS_FILE="$VERSIONS_FILE" bash -lc '
+          set -euo pipefail
+          export TERM=xterm
+          ARCH_DIR="$WORKSPACE_DIR/caQtDM_Viewer/package/archlinux"
+          for pkg in qt6-opcua epics-base; do
+            cd "$ARCH_DIR/$pkg"
+            echo "::group::pkgctl version upgrade ${pkg}"
+            pkgctl version upgrade
+            echo "::endgroup::"
+            makepkg --printsrcinfo | awk "\$1 == \"pkgver\" {print \"${pkg}=\" \$3}" >> "$VERSIONS_FILE"
+          done
+        '
+
+        cat "$VERSIONS_FILE" | tee -a "$GITHUB_OUTPUT"
+        rm -f "$VERSIONS_FILE"
+
     - name: Cache epics-base package
       id: cache-epics-base
       uses: actions/cache@v5
       with:
         path: caQtDM_Viewer/package/archlinux/epics-base/*.pkg.tar.*
-        key: epics-base-pkg-${{ runner.os }}-${{ hashFiles('caQtDM_Viewer/package/archlinux/epics-base/PKGBUILD', 'caQtDM_Viewer/package/archlinux/epics-base/*.patch') }}
+        key: epics-base-pkg-${{ runner.os }}-v${{ steps.dep_versions.outputs.epics-base }}-${{ hashFiles('caQtDM_Viewer/package/archlinux/epics-base/PKGBUILD', 'caQtDM_Viewer/package/archlinux/epics-base/*.patch') }}
 
     - name: Cache qt6-opcua package
       id: cache-qt6-opcua
       uses: actions/cache@v5
       with:
         path: caQtDM_Viewer/package/archlinux/qt6-opcua/*.pkg.tar.*
-        key: qt6-opcua-pkg-${{ runner.os }}-${{ hashFiles('caQtDM_Viewer/package/archlinux/qt6-opcua/PKGBUILD') }}
+        key: qt6-opcua-pkg-${{ runner.os }}-v${{ steps.dep_versions.outputs.qt6-opcua }}-${{ hashFiles('caQtDM_Viewer/package/archlinux/qt6-opcua/PKGBUILD') }}
 
     - name: Build and install dependency packages
       run: |

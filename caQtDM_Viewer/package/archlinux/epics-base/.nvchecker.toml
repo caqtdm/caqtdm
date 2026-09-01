@@ -1,0 +1,5 @@
+[epics-base]
+source = "git"
+git = "https://github.com/epics-base/epics-base.git"
+prefix = "R"
+
