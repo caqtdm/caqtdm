@@ -27,6 +27,7 @@
 #include "searchfile.h"
 #include "fileFunctions.h"
 #include <QPainter>
+#include <QResizeEvent>
 //#include <QElapsedTimer>
 
 Q_LOGGING_CATEGORY(caImageLog, "caqtdm.widgets.caimage")
@@ -41,6 +42,7 @@ caImage::caImage(QWidget* parent) : QWidget(parent)
     setVisibility(StaticV);
     timerId = 0;
     thisDelay = 500;
+    thisSmoothScaling = false;
 }
 
 caImage::~caImage() {
@@ -90,6 +92,7 @@ void caImage::init(const QString& filename, const bool isProvisional) {
         return;
     }
 
+    sourcePixmap = QPixmap();
     _animation = new QMovie(fileNameFound, 0, this);
     _animation->setCacheMode(QMovie::CacheAll);
     _animation->jumpToFrame(0);
@@ -97,18 +100,12 @@ void caImage::init(const QString& filename, const bool isProvisional) {
     delete s;
     if( _animation.isNull()) return;
     // display the movie
-    _container->setScaledContents(true);
-    _container->setMovie(_animation);
-
-    pixmap = _animation->currentPixmap();
-    pix    = _animation->currentPixmap();
-
-    if(thisAngle != 0) OnFrameChanged(0);
-
     _layout->setSpacing(0);
     SETMARGIN_QT456(_layout,0);
     _layout->addWidget(_container);
     setLayout(_layout);
+
+    renderCurrentFrame();
 
     setHidden(false);
 }
@@ -147,7 +144,7 @@ void caImage::setInvalid(QColor c)
       QString style = "color: rgb(%1, %2, %3); background-color: rgb(%4, %5, %6);";
       style = style.arg(c.red()).arg(c.green()).arg(c.blue()).arg(c.red()).arg(c.green()).arg(c.blue());
       _container->setStyleSheet(style);
-      _container->setMovie(NULL);
+      _container->clear();
       oldColor = c;
     }
 }
@@ -156,11 +153,11 @@ void caImage::setValid()
 {
     QColor c;
     if(oldColor == Qt::gray) return;
-    _container->setMovie(_animation);
     c = oldColor = Qt::gray;
     QString style = "color: rgb(%1, %2, %3); background-color: rgba(%4, %5, %6, %7);";
     style = style.arg(c.red()).arg(c.green()).arg(c.blue()).arg(c.red()).arg(c.green()).arg(c.blue()).arg(0);
     _container->setStyleSheet(style);
+    renderCurrentFrame();
 }
 
 void caImage::setFileName(QString filename, bool isProvisional)
@@ -199,29 +196,48 @@ void caImage::OnFrameChanged(int frame)
 {
     Q_UNUSED(frame)
     if( _animation.isNull()) return;
-    pixmap = pixmap.scaled(width(), height());
-    pixmap = _animation->currentPixmap();
-    if(thisAngle == 0) {
-        _container->setPixmap (pixmap);
-        return;
+    sourcePixmap = _animation->currentPixmap();
+    renderFrame(sourcePixmap);
+}
+
+void caImage::resizeEvent(QResizeEvent *e)
+{
+    QWidget::resizeEvent(e);
+    renderCurrentFrame();
+}
+
+void caImage::renderCurrentFrame()
+{
+    if(sourcePixmap.isNull()) {
+        if(_animation.isNull()) return;
+        sourcePixmap = _animation->currentPixmap();
+    }
+    renderFrame(sourcePixmap);
+}
+
+void caImage::renderFrame(const QPixmap &frame)
+{
+    if(_container.isNull() || frame.isNull()) return;
+
+    const QSize targetSize = contentsRect().size();
+    const QSize sourceSize = frame.size();
+    if(targetSize.isEmpty() || sourceSize.isEmpty()) return;
+
+    QPixmap rendered(targetSize);
+    rendered.fill(QColor::fromRgb(0, 0, 0, 0));
+
+    QPainter painter(&rendered);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, thisSmoothScaling);
+    painter.scale((qreal) targetSize.width() / sourceSize.width(),
+                  (qreal) targetSize.height() / sourceSize.height());
+
+    if(thisAngle != 0) {
+        // Keep the historical source-canvas pivot and clipping behaviour.
+        painter.translate(sourceSize.height()/2, sourceSize.height()/2);
+        painter.rotate(thisAngle);
+        painter.translate(-sourceSize.height()/2, -sourceSize.height()/2);
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QMatrix rm;
-#else
-    QTransform rm;
-#endif
-
-
-    pix.scaled(width(), height());
-    pix.fill(QColor::fromRgb(0, 0, 0, 0)); //pixmap transparent.
-    QPainter* p = new QPainter(&pix);
-    QSize size = pixmap.size();
-    p->translate(size.height()/2,size.height()/2);
-    p->rotate(thisAngle);
-    p->translate(-size.height()/2,-size.height()/2);
-    p->drawPixmap(0, 0, pixmap);
-    p->end();
-    delete p;
-    _container->setPixmap(pix);
+    painter.drawPixmap(0, 0, frame);
+    _container->setPixmap(rendered);
 }

@@ -2241,7 +2241,10 @@ is the equivalent of image in MEDM.
    channel specified. A multiple-frame Image updates with some
    speed even with no process variables specified for the Dynamic Attribute.
    Use the Image Calc expression and the process variables in the
-   Dynamic Attribute to specify when to display each color. 
+   Dynamic Attribute to specify when to display each color. Images are scaled
+   with nearest-neighbor sampling by default, which keeps low-resolution
+   graphics sharp. Enable the ``smoothScaling`` property in Designer for
+   filtered scaling of photographic or high-resolution images.
    
    .. caution: SGA is 20 years old and may be archaic.  ImageMagick?
 
@@ -4381,4 +4384,3 @@ When running caQtDM Web in a Docker container, you can use the following additio
 
    "``ENTRY_PANEL``", "Path to the main caQtDM UI file that should be served by default", "Required, default is the test panel if not specified"
    "``EXTRA_ARGS``", "Additional command line arguments to pass to caQtDM, as docker would not allow passing them directly", "Optional, default is empty"
-
