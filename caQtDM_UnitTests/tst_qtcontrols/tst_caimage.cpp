@@ -84,6 +84,32 @@ QImage renderedImage(caImage &image)
     return label->grab().toImage().convertToFormat(QImage::Format_ARGB32);
 }
 
+QPixmap labelPixmap(const QLabel *label)
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    const QPixmap *pixmap = label->pixmap();
+    return pixmap == Q_NULLPTR ? QPixmap() : *pixmap;
+#else
+    return label->pixmap(Qt::ReturnByValue);
+#endif
+}
+
+bool hasVisiblePixels(const QImage &image)
+{
+    for(int y = 0; y < image.height(); ++y) {
+        for(int x = 0; x < image.width(); ++x) {
+            if(qAlpha(image.pixel(x, y)) != 0) return true;
+        }
+    }
+    return false;
+}
+
+void verifyScalingMode(const QImage &image, const QSet<QRgb> &palette, bool smoothScaling)
+{
+    if(smoothScaling) QVERIFY(containsInterpolatedPixel(image, palette));
+    else QVERIFY(usesOnlyPalette(image, palette));
+}
+
 }
 
 void TestCaImage::smoothScalingPropertyAndPixels()
@@ -118,9 +144,143 @@ void TestCaImage::smoothScalingPropertyAndPixels()
     QCoreApplication::processEvents();
     const QImage smoothImage = renderedImage(image);
     QVERIFY(containsInterpolatedPixel(smoothImage, palette));
+
+    image.setSmoothScaling(false);
+    QCoreApplication::processEvents();
+    QVERIFY(usesOnlyPalette(renderedImage(image), palette));
 }
 
-void TestCaImage::resizeKeepsNearestNeighborRendering()
+void TestCaImage::smoothScalingBeforeLoad()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    QSet<QRgb> palette;
+    const QString fileName = createScalingFixture(directory, palette);
+    QVERIFY(!fileName.isEmpty());
+
+    caImage image;
+    image.setSmoothScaling(true);
+    image.resize(7, 5);
+    image.show();
+    image.setFileName(fileName, false);
+    QCoreApplication::processEvents();
+
+    QVERIFY(image.getSmoothScaling());
+    QVERIFY(containsInterpolatedPixel(renderedImage(image), palette));
+}
+
+void TestCaImage::resizeKeepsSelectedRendering_data()
+{
+    QTest::addColumn<bool>("smoothScaling");
+    QTest::newRow("nearest") << false;
+    QTest::newRow("smooth") << true;
+}
+
+void TestCaImage::resizeKeepsSelectedRendering()
+{
+    QFETCH(bool, smoothScaling);
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    QSet<QRgb> palette;
+    const QString fileName = createScalingFixture(directory, palette);
+    QVERIFY(!fileName.isEmpty());
+
+    caImage image;
+    image.setSmoothScaling(smoothScaling);
+    image.resize(7, 5);
+    image.show();
+    image.setFileName(fileName, false);
+    QCoreApplication::processEvents();
+
+    image.resize(13, 11);
+    QCoreApplication::processEvents();
+    const QImage resizedImage = renderedImage(image);
+    QCOMPARE(resizedImage.size(), image.contentsRect().size());
+    QCOMPARE(image.getSmoothScaling(), smoothScaling);
+    verifyScalingMode(resizedImage, palette, smoothScaling);
+}
+
+void TestCaImage::setFrameUpdatesAnimatedImage_data()
+{
+    QTest::addColumn<bool>("smoothScaling");
+    QTest::newRow("nearest") << false;
+    QTest::newRow("smooth") << true;
+}
+
+void TestCaImage::setFrameUpdatesAnimatedImage()
+{
+    QFETCH(bool, smoothScaling);
+    const QString fileName = QFINDTESTDATA("../../caQtDM_Tests/pacman-eating.gif");
+    QVERIFY2(!fileName.isEmpty(), "pacman-eating.gif fixture not found");
+
+    caImage image;
+    image.setSmoothScaling(smoothScaling);
+    image.resize(70, 70);
+    image.show();
+    image.setFileName(fileName, false);
+    QCoreApplication::processEvents();
+    QVERIFY(image.getFrameCount() > 1);
+
+    image.setFrame(0);
+    QCoreApplication::processEvents();
+    const QImage firstFrame = renderedImage(image);
+    QCOMPARE(image.getFrame(), 0);
+    QCOMPARE(firstFrame.size(), image.contentsRect().size());
+
+    image.resize(83, 71);
+    QCoreApplication::processEvents();
+    const QImage resizedFirstFrame = renderedImage(image);
+    QCOMPARE(resizedFirstFrame.size(), image.contentsRect().size());
+
+    image.setFrame(1);
+    QCoreApplication::processEvents();
+    const QImage secondFrame = renderedImage(image);
+    QCOMPARE(image.getFrame(), 1);
+    QCOMPARE(image.getSmoothScaling(), smoothScaling);
+    QCOMPARE(secondFrame.size(), image.contentsRect().size());
+    QVERIFY(resizedFirstFrame != secondFrame);
+}
+
+void TestCaImage::invalidStateRestoresCurrentFrame_data()
+{
+    QTest::addColumn<bool>("smoothScaling");
+    QTest::newRow("nearest") << false;
+    QTest::newRow("smooth") << true;
+}
+
+void TestCaImage::invalidStateRestoresCurrentFrame()
+{
+    QFETCH(bool, smoothScaling);
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    QSet<QRgb> palette;
+    const QString fileName = createScalingFixture(directory, palette);
+    QVERIFY(!fileName.isEmpty());
+
+    caImage image;
+    image.setSmoothScaling(smoothScaling);
+    image.resize(7, 5);
+    image.show();
+    image.setFileName(fileName, false);
+    QCoreApplication::processEvents();
+
+    QLabel *label = image.findChild<QLabel *>();
+    QVERIFY(label != Q_NULLPTR);
+    const QImage rendered = renderedImage(image);
+    verifyScalingMode(rendered, palette, smoothScaling);
+    QVERIFY(!labelPixmap(label).isNull());
+
+    image.setInvalid(Qt::magenta);
+    QCoreApplication::processEvents();
+    QVERIFY(labelPixmap(label).isNull());
+
+    image.setValid();
+    QCoreApplication::processEvents();
+    QCOMPARE(image.getSmoothScaling(), smoothScaling);
+    QCOMPARE(renderedImage(image), rendered);
+}
+
+void TestCaImage::tiltAngleRerendersCurrentFrame()
 {
     QTemporaryDir directory;
     QVERIFY(directory.isValid());
@@ -133,35 +293,20 @@ void TestCaImage::resizeKeepsNearestNeighborRendering()
     image.show();
     image.setFileName(fileName, false);
     QCoreApplication::processEvents();
+    const QImage unrotated = renderedImage(image);
 
-    image.resize(13, 11);
+    image.setAngle(90);
     QCoreApplication::processEvents();
-    const QImage resizedImage = renderedImage(image);
-    QCOMPARE(resizedImage.size(), image.contentsRect().size());
-    QVERIFY(!image.getSmoothScaling());
-    QVERIFY(usesOnlyPalette(resizedImage, palette));
-}
+    const QImage rotated = renderedImage(image);
+    QCOMPARE(image.getAngle(), 90);
+    QVERIFY(hasVisiblePixels(rotated));
+    QVERIFY(rotated != unrotated);
 
-void TestCaImage::setFrameUpdatesAnimatedImage()
-{
-    const QString fileName = QFINDTESTDATA("../../caQtDM_Tests/pacman-eating.gif");
-    QVERIFY2(!fileName.isEmpty(), "pacman-eating.gif fixture not found");
-
-    caImage image;
-    image.resize(70, 70);
-    image.show();
-    image.setFileName(fileName, false);
+    image.setSmoothScaling(true);
     QCoreApplication::processEvents();
-    QVERIFY(image.getFrameCount() > 1);
-
-    image.setFrame(0);
-    QCoreApplication::processEvents();
-    const QImage firstFrame = renderedImage(image);
-    QCOMPARE(image.getFrame(), 0);
-
-    image.setFrame(1);
-    QCoreApplication::processEvents();
-    const QImage secondFrame = renderedImage(image);
-    QCOMPARE(image.getFrame(), 1);
-    QVERIFY(firstFrame != secondFrame);
+    const QImage smoothRotated = renderedImage(image);
+    QCOMPARE(image.getAngle(), 90);
+    QVERIFY(image.getSmoothScaling());
+    QVERIFY(hasVisiblePixels(smoothRotated));
+    QVERIFY(smoothRotated != rotated);
 }

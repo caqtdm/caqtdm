@@ -35,8 +35,14 @@ class TestCaImage : public QObject
 
 private slots:
     void smoothScalingPropertyAndPixels();
-    void resizeKeepsNearestNeighborRendering();
+    void smoothScalingBeforeLoad();
+    void resizeKeepsSelectedRendering_data();
+    void resizeKeepsSelectedRendering();
+    void setFrameUpdatesAnimatedImage_data();
     void setFrameUpdatesAnimatedImage();
+    void invalidStateRestoresCurrentFrame_data();
+    void invalidStateRestoresCurrentFrame();
+    void tiltAngleRerendersCurrentFrame();
 };
 
 #endif // TST_CAIMAGE_H
