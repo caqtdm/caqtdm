@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: caqtdm
 
@@ -63,9 +63,26 @@ jobs:
           # fixes bug to allow downloading newer qt
           aqtsource: 'git+https://github.com/miurahr/aqtinstall.git@9e49c82edc6d946db376dec907cca5b4b486eec5'
 
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+
+      - name: Determine MSVC toolset cache key
+        id: msvc-toolset
+        shell: pwsh
+        run: |
+          $vcToolsVersion = if ($env:VCToolsVersion) { $env:VCToolsVersion } else { $env:VC_TOOLS_VERSION }
+          Write-Host "VCToolsVersion=$env:VCToolsVersion"
+          Write-Host "VC_TOOLS_VERSION=$env:VC_TOOLS_VERSION"
+          Write-Host "VisualStudioVersion=$env:VisualStudioVersion"
+          $toolsetCacheKey = if ($vcToolsVersion) { $vcToolsVersion } elseif ($env:VisualStudioVersion) { $env:VisualStudioVersion } else { "unknown" }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "cache-key=$toolsetCacheKey"
+          Write-Host "Using MSVC toolset cache key: $toolsetCacheKey"
+
       - name: Cache Qwt
         id: cache-qwt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QWT_INSTALL_DIR }}
           key: qwt-${{ matrix.qwt-version }}-qt${{ matrix.qt-version }}-${{ matrix.windows-version }}-${{ runner.arch }}
@@ -74,16 +91,14 @@ jobs:
 
       - name: Cache ZeroMQ
         id: cache-zeromq
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.ZEROMQ_INSTALL_DIR }}
-          key: zeromq-${{ matrix.zeromq-version }}-${{ matrix.windows-version }}-${{ runner.arch }}
-          restore-keys: |
-            zeromq-${{ matrix.zeromq-version }}-${{ matrix.windows-version }}-
+          key: zeromq-${{ matrix.zeromq-version }}-${{ matrix.windows-version }}-${{ runner.arch }}-${{ steps.msvc-toolset.outputs.cache-key }}
 
       - name: Cache EPICS Base
         id: cache-epics
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.EPICS_BASE_DIR }}
           key: epics-${{ matrix.epics-version }}-${{ matrix.windows-version }}-${{ runner.arch }}
@@ -92,15 +107,15 @@ jobs:
 
       - name: Cache JOM
         id: cache-jom
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}\jom
-          key: jom-1.1.4-${{ runner.os }}
+          key: jom-1.1.6-${{ runner.os }}
 
       - name: Download jom & set up JOM
         if: steps.cache-jom.outputs.cache-hit != 'true'
         run: |
-          curl -L -o jom.zip https://download.qt.io/official_releases/jom/jom_1_1_4.zip
+          curl -L -o jom.zip https://download.qt.io/official_releases/jom/jom_1_1_6.zip
           mkdir ${{ github.workspace }}\jom
           tar -xf jom.zip -C ${{ github.workspace }}\jom
 
@@ -112,11 +127,6 @@ jobs:
         run: |
           jom.exe /VERSION || echo "Error: JOM not found or not in PATH"
 
-      - name: Set up Visual Studio shell
-        uses: egor-tensin/vs-shell@v2
-        with:
-          arch: x64
-      
       - name: Create retry function script
         shell: pwsh
         run: |
@@ -257,36 +267,43 @@ jobs:
         working-directory: ${{ github.workspace }}\libzmq-src
         run: |
           mkdir build && cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{ env.ZEROMQ_INSTALL_DIR }} -DZMQ_BUILD_PROGRAMS=OFF -D WITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DCMAKE_GENERATOR_PLATFORM=x64 -DBUILD_SHARED=ON -DBUILD_STATIC=OFF
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{ env.ZEROMQ_INSTALL_DIR }} -DZMQ_BUILD_PROGRAMS=OFF -D WITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DCMAKE_GENERATOR_PLATFORM=x64 -DBUILD_SHARED=ON -DBUILD_STATIC=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           cmake --build . --config Release
           cmake --install . --config Release
 
-      - name: Set MSVC_SUFFIX environment variable
+      - name: Verify ZeroMQ artifacts
         shell: pwsh
         run: |
-          $MSVC_SUFFIX = ""
-          if ($env:VC_TOOLS_VERSION) {
-            $vcToolParts = $env:VC_TOOLS_VERSION.Split('.'); if ($vcToolParts.Length -ge 2 -and $vcToolParts[0] -eq "14") {
-            if ($vcToolParts[1] -eq "2") { $MSVC_SUFFIX = "v142" } elseif ($vcToolParts[1] -eq "3") { $MSVC_SUFFIX = "v143" }
+          $libraryDirectory = Join-Path $env:ZEROMQ_INSTALL_DIR "lib"
+          $binaryDirectory = Join-Path $env:ZEROMQ_INSTALL_DIR "bin"
+          $importLibraries = @(Get-ChildItem -Path $libraryDirectory -Filter "libzmq-*.lib" -File -ErrorAction SilentlyContinue)
+          if ($importLibraries.Count -ne 1) {
+            Write-Host "Expected one ZeroMQ import library; found: $($importLibraries.Name -join ', ')"
+            foreach ($directory in @($libraryDirectory, $binaryDirectory)) {
+              Write-Host "Contents of $directory:"
+              if (Test-Path $directory) {
+                Get-ChildItem -Path $directory -File | Select-Object Name, Length | Format-Table -AutoSize | Out-String | Write-Host
+              } else {
+                Write-Host "Directory does not exist"
+              }
             }
+            throw "ZeroMQ import library discovery failed"
           }
-          if (-not $MSVC_SUFFIX) {
-            if ($env:VisualStudioVersion) {
-            if ($env:VisualStudioVersion -like "17.*") { $MSVC_SUFFIX = "v143" } elseif ($env:VisualStudioVersion -like "16.*") { $MSVC_SUFFIX = "v142" }
+          $importLibrary = $importLibraries[0]
+          $dll = Join-Path $binaryDirectory "$($importLibrary.BaseName).dll"
+          if (-not (Test-Path $dll)) {
+            Write-Host "Missing ZeroMQ DLL: $dll"
+            if (Test-Path $binaryDirectory) {
+              Get-ChildItem -Path $binaryDirectory -File | Select-Object Name, Length | Format-Table -AutoSize | Out-String | Write-Host
+            } else {
+              Write-Host "Directory does not exist: $binaryDirectory"
             }
+            throw "ZeroMQ DLL verification failed"
           }
-          if (-not $MSVC_SUFFIX) {
-            Write-Warning "Could not determine MSVC suffix. Defaulting to v143."; $MSVC_SUFFIX = "v143"
-          }
-          Add-Content -Path $env:GITHUB_ENV -Value "MSVC_SUFFIX=$MSVC_SUFFIX"
-          Write-Host "Exported MSVC_SUFFIX=$MSVC_SUFFIX to GITHUB_ENV"
-
-      - name: Set ZeroMQ environment variables
-        shell: pwsh
-        run : |
-          $zmqVersionUnderscore = "${{ matrix.zeromq-version }}".Replace(".", "_")
-          Add-Content -Path $env:GITHUB_ENV -Value "ZMQLIBRARY=libzmq-${{ env.MSVC_SUFFIX }}-mt-$zmqVersionUnderscore.dll"
-          Add-Content -Path $env:GITHUB_ENV -Value "ZMQ_LIB_NAME=libzmq-${{ env.MSVC_SUFFIX }}-mt-$zmqVersionUnderscore.lib"
+          Add-Content -Path $env:GITHUB_ENV -Value "ZMQ_LIB_NAME=$($importLibrary.Name)"
+          Add-Content -Path $env:GITHUB_ENV -Value "ZMQLIBRARY=$([IO.Path]::GetFileName($dll))"
+          Write-Host "Using ZeroMQ import library: $($importLibrary.Name)"
+          Write-Host "Using ZeroMQ DLL: $([IO.Path]::GetFileName($dll))"
 
       - name: Create EPICS Base directory
         if: steps.cache-epics.outputs.cache-hit != 'true'
