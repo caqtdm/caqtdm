@@ -127,38 +127,6 @@ jobs:
         run: |
           jom.exe /VERSION || echo "Error: JOM not found or not in PATH"
 
-      - name: Create retry function script
-        shell: pwsh
-        run: |
-          @'
-          function Invoke-WithRetry {
-              param(
-                  [scriptblock]$ScriptBlock,
-                  [int]$MaxAttempts = 5,
-                  [string]$Operation
-              )
-              
-              for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
-                  try {
-                      Write-Host "Attempt $attempt of $MaxAttempts for $Operation"
-                      & $ScriptBlock
-                      Write-Host "$Operation succeeded on attempt $attempt"
-                      return
-                  }
-                  catch {
-                      Write-Warning "$Operation failed on attempt $attempt`: $($_.Exception.Message)"
-                      if ($attempt -eq $MaxAttempts) {
-                          Write-Error "$Operation failed after $MaxAttempts attempts"
-                          throw
-                      }
-                      $delay = [math]::Pow(2, $attempt - 1) * 5
-                      Write-Host "Waiting $delay seconds before retry..."
-                      Start-Sleep -Seconds $delay
-                  }
-              }
-          }
-          '@ | Out-File -FilePath "${{ github.workspace }}\retry-helper.ps1" -Encoding utf8
-
       - name: Create dependencies install directory
         run: if not exist ${{ env.DEPS_INSTALL_ROOT }} mkdir ${{ env.DEPS_INSTALL_ROOT }}
 
@@ -227,8 +195,6 @@ jobs:
         working-directory: ${{ github.workspace }}/qwt-src
         shell: pwsh
         run: |
-          . "${{ github.workspace }}\retry-helper.ps1"
-
           (Get-Content qwtbuild.pri) -replace '^#CONFIG.*debug_and_release.*$', 'CONFIG += debug_and_release' | Set-Content qwtbuild.pri
           (Get-Content qwtbuild.pri) -replace '^#CONFIG.*build_all.*$', 'CONFIG += build_all' | Set-Content qwtbuild.pri
           (Get-Content qwtconfig.pri) -replace '^\s*QWT_INSTALL_PREFIX\s*=.*$', '    QWT_INSTALL_PREFIX = ${{ env.QWT_INSTALL_DIR }}' | Set-Content qwtconfig.pri
@@ -242,11 +208,9 @@ jobs:
           
           qmake qwt.pro
 
-          Invoke-WithRetry -Operation "Qwt build" -ScriptBlock {
-              $buildProcess = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
-              if ($buildProcess.ExitCode -ne 0) {
-                  throw "Qwt build failed with exit code $($buildProcess.ExitCode)"
-              }
+          $buildProcess = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
+          if ($buildProcess.ExitCode -ne 0) {
+            throw "Qwt build failed with exit code $($buildProcess.ExitCode)"
           }
 
           $installProcess = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "install" -Wait -PassThru -NoNewWindow
@@ -365,16 +329,12 @@ jobs:
         working-directory: ${{ env.CAQTDM_DIR }}
         shell: pwsh
         run: |
-          . "${{ github.workspace }}\retry-helper.ps1"
-
           $timerstart = Get-Date
           qmake all.pro
           
-          Invoke-WithRetry -Operation "caQtDM build" -ScriptBlock {
-              $process = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
-              if ($process.ExitCode -ne 0) {
-                  throw "Build failed with exit code $($process.ExitCode)"
-              }
+          $process = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
+          if ($process.ExitCode -ne 0) {
+            throw "Build failed with exit code $($process.ExitCode)"
           }
           
           $timerstop = Get-Date
