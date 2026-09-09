@@ -22,8 +22,7 @@ HEADERS += tst_pvdialog.h \
 
 # --- Tested classes below ---
 
-HEADERS += ../../caQtDM_QtControls/src/pvdialog.h \
-    ../../caQtDM_QtControls/src/caimage.h
+HEADERS += ../../caQtDM_QtControls/src/pvdialog.h
 
 SOURCES += ../../caQtDM_QtControls/src/pvdialog.cpp
 
