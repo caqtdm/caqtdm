@@ -20,6 +20,7 @@ env:
   CAQTDM_DIR: ${{ github.workspace }}\caqtdm
 
   OPENSSL_ROOT: C:\Program Files\OpenSSL
+  OPENSSL_LTS_SERIES: '3.5'
 
   CAQTDM_OPCUA: 1
 
@@ -31,10 +32,10 @@ jobs:
       fail-fast: false
       matrix:
         windows-version: ['windows-2025']
-        qt-version: ['6.9.3', '6.10.0']
+        qt-version: ['6.10.3', '6.11.2']
         qwt-version: ['6.3']
         zeromq-version: ['4.3.5']
-        epics-version: ['R7.0.9','R7.0.10']
+        epics-version: ['R7.0.10']
         
     defaults:
       run:
@@ -59,6 +60,8 @@ jobs:
           target: desktop
           set-env: true
           cache: true
+          # fixes bug to allow downloading newer qt
+          aqtsource: 'git+https://github.com/miurahr/aqtinstall.git@9e49c82edc6d946db376dec907cca5b4b486eec5'
 
       - name: Cache Qwt
         id: cache-qwt
@@ -153,7 +156,22 @@ jobs:
         shell: pwsh
         run: |
           choco feature enable -n=allowGlobalConfirmation
-          choco install openssl --version=3.6.2 -y --no-progress
+          $opensslPackages = @(
+            choco search openssl --exact --all-versions --limit-output |
+              ConvertFrom-Csv -Delimiter '|' -Header 'Name', 'Version' |
+              Where-Object {
+                $_.Name -eq 'openssl' -and
+                $_.Version -match "^$([regex]::Escape($env:OPENSSL_LTS_SERIES))\.\d+$"
+              }
+          )
+          if ($LASTEXITCODE -ne 0 -or $opensslPackages.Count -eq 0) {
+            throw "No OpenSSL $env:OPENSSL_LTS_SERIES.x package is available from Chocolatey"
+          }
+          $opensslVersion = $opensslPackages |
+            Sort-Object { [version]$_.Version } -Descending |
+            Select-Object -First 1 -ExpandProperty Version
+          Write-Host "Installing latest OpenSSL $env:OPENSSL_LTS_SERIES.x LTS package: $opensslVersion"
+          choco install openssl --version=$opensslVersion -y --no-progress
           Write-Host "OPENSSL_ROOT: $env:OPENSSL_ROOT"
           $defaultPaths = @(
             "C:\Program Files\OpenSSL-Win64",
