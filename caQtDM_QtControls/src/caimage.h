@@ -31,6 +31,7 @@
 #include <QMovie>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QResizeEvent>
 #include <qtcontrols_global.h>
 #include "messageQueue.h"
 
@@ -44,6 +45,7 @@ class QTCON_EXPORT caImage : public QWidget
     Q_PROPERTY(int frame READ getFrame WRITE setFrame)
     Q_PROPERTY(int delayMilliseconds READ getDelay WRITE setDelay)
     Q_PROPERTY(int tiltAngle READ getAngle WRITE setAngle)
+    Q_PROPERTY(bool smoothScaling READ getSmoothScaling WRITE setSmoothScaling)
 
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
@@ -71,6 +73,14 @@ public:
     void setAngle( int angle );
     int getAngle() {return thisAngle;}
 
+    bool getSmoothScaling() const {return thisSmoothScaling;}
+    void setSmoothScaling(bool smoothScaling) {
+        if(thisSmoothScaling != smoothScaling) {
+            thisSmoothScaling = smoothScaling;
+            renderCurrentFrame();
+        }
+    }
+
     int getFrameCount();
     void startMovie();
     void setInvalid(QColor c);
@@ -96,22 +106,26 @@ private slots:
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
+    virtual void resizeEvent(QResizeEvent *e);
 
 private:
     void init(const QString& filename, const bool isProvisional);
+    void renderCurrentFrame();
+    void renderFrame(const QPixmap &frame);
 
     messageQueue *messagequeue;
     QPointer<QLabel> _container;
     QPointer<QMovie> _animation;
     QVBoxLayout* _layout;
     QString thisFileName;
-    QPixmap pixmap, pix;
+    QPixmap sourcePixmap;
     int thisFrame, thisDelay;
     int prevFrame;
     QString thisImageCalc;
     int timerId;
     QColor oldColor;
     int thisAngle;
+    bool thisSmoothScaling;
 };
 
 #endif
