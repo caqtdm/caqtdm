@@ -19,7 +19,9 @@ env:
   EPICS_BASE_DIR: ${{ github.workspace }}\deps\epics-base
   CAQTDM_DIR: ${{ github.workspace }}\caqtdm
 
-  OPENSSL_ROOT: C:\Program Files\OpenSSL
+  OPENSSL_LTS_SERIES: '3.5'
+  OPENSSL_INSTALL_ROOT: ${{ github.workspace }}\deps\openssl
+  QTOPCUA_INSTALL_ROOT: ${{ github.workspace }}\deps\qtopcua
 
   CAQTDM_OPCUA: 1
 
@@ -31,10 +33,10 @@ jobs:
       fail-fast: false
       matrix:
         windows-version: ['windows-2025']
-        qt-version: ['6.9.3', '6.10.0']
+        qt-version: ['6.10.3', '6.11.2']
         qwt-version: ['6.3']
         zeromq-version: ['4.3.5']
-        epics-version: ['R7.0.9','R7.0.10']
+        epics-version: ['R7.0.10']
         
     defaults:
       run:
@@ -46,7 +48,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: caqtdm
 
@@ -59,10 +61,29 @@ jobs:
           target: desktop
           set-env: true
           cache: true
+          # fixes bug to allow downloading newer qt
+          aqtsource: 'git+https://github.com/miurahr/aqtinstall.git@9e49c82edc6d946db376dec907cca5b4b486eec5'
+
+      - name: Set up Visual Studio shell
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+
+      - name: Determine MSVC toolset cache key
+        id: msvc-toolset
+        shell: pwsh
+        run: |
+          $vcToolsVersion = if ($env:VCToolsVersion) { $env:VCToolsVersion } else { $env:VC_TOOLS_VERSION }
+          Write-Host "VCToolsVersion=$env:VCToolsVersion"
+          Write-Host "VC_TOOLS_VERSION=$env:VC_TOOLS_VERSION"
+          Write-Host "VisualStudioVersion=$env:VisualStudioVersion"
+          $toolsetCacheKey = if ($vcToolsVersion) { $vcToolsVersion } elseif ($env:VisualStudioVersion) { $env:VisualStudioVersion } else { "unknown" }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "cache-key=$toolsetCacheKey"
+          Write-Host "Using MSVC toolset cache key: $toolsetCacheKey"
 
       - name: Cache Qwt
         id: cache-qwt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QWT_INSTALL_DIR }}
           key: qwt-${{ matrix.qwt-version }}-qt${{ matrix.qt-version }}-${{ matrix.windows-version }}-${{ runner.arch }}
@@ -71,16 +92,14 @@ jobs:
 
       - name: Cache ZeroMQ
         id: cache-zeromq
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.ZEROMQ_INSTALL_DIR }}
-          key: zeromq-${{ matrix.zeromq-version }}-${{ matrix.windows-version }}-${{ runner.arch }}
-          restore-keys: |
-            zeromq-${{ matrix.zeromq-version }}-${{ matrix.windows-version }}-
+          key: zeromq-${{ matrix.zeromq-version }}-${{ matrix.windows-version }}-${{ runner.arch }}-${{ steps.msvc-toolset.outputs.cache-key }}
 
       - name: Cache EPICS Base
         id: cache-epics
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.EPICS_BASE_DIR }}
           key: epics-${{ matrix.epics-version }}-${{ matrix.windows-version }}-${{ runner.arch }}
@@ -89,15 +108,51 @@ jobs:
 
       - name: Cache JOM
         id: cache-jom
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}\jom
-          key: jom-1.1.4-${{ runner.os }}
+          key: jom-1.1.6-${{ runner.os }}
+
+      - name: Determine latest OpenSSL LTS release
+        id: openssl-version
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tagPages = gh api --paginate --slurp "repos/openssl/openssl/tags?per_page=100" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not retrieve OpenSSL tags from GitHub"
+          }
+          $tags = @(
+            foreach ($page in $tagPages) {
+              foreach ($tag in $page) { $tag }
+            }
+          )
+          $matchingTags = @($tags | Where-Object { $_.name -match "^openssl-$([regex]::Escape($env:OPENSSL_LTS_SERIES))\.\d+$" })
+          if ($matchingTags.Count -eq 0) {
+            throw "No OpenSSL $env:OPENSSL_LTS_SERIES.x release tags were found"
+          }
+          $latestTag = $matchingTags | Sort-Object { [version]($_.name -replace '^openssl-', '') } -Descending | Select-Object -First 1
+          $opensslVersion = $latestTag.name -replace '^openssl-', ''
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$opensslVersion"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "tag=$($latestTag.name)"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "tag-sha=$($latestTag.commit.sha)"
+          Add-Content -Path $env:GITHUB_ENV -Value "OPENSSL_VERSION=$opensslVersion"
+          Add-Content -Path $env:GITHUB_ENV -Value "OPENSSL_TAG=$($latestTag.name)"
+          Add-Content -Path $env:GITHUB_ENV -Value "OPENSSL_TAG_SHA=$($latestTag.commit.sha)"
+          Write-Host "Using OpenSSL LTS tag $($latestTag.name) at $($latestTag.commit.sha)"
+
+      - name: Cache OpenSSL
+        id: cache-openssl
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.OPENSSL_INSTALL_ROOT }}\${{ steps.openssl-version.outputs.version }}
+          key: openssl-${{ steps.openssl-version.outputs.version }}-${{ matrix.windows-version }}-${{ runner.arch }}-${{ steps.msvc-toolset.outputs.cache-key }}
 
       - name: Download jom & set up JOM
         if: steps.cache-jom.outputs.cache-hit != 'true'
         run: |
-          curl -L -o jom.zip https://download.qt.io/official_releases/jom/jom_1_1_4.zip
+          curl -L -o jom.zip https://download.qt.io/official_releases/jom/jom_1_1_6.zip
           mkdir ${{ github.workspace }}\jom
           tar -xf jom.zip -C ${{ github.workspace }}\jom
 
@@ -109,85 +164,111 @@ jobs:
         run: |
           jom.exe /VERSION || echo "Error: JOM not found or not in PATH"
 
-      - name: Set up Visual Studio shell
-        uses: egor-tensin/vs-shell@v2
-        with:
-          arch: x64
-      
-      - name: Create retry function script
-        shell: pwsh
-        run: |
-          @'
-          function Invoke-WithRetry {
-              param(
-                  [scriptblock]$ScriptBlock,
-                  [int]$MaxAttempts = 5,
-                  [string]$Operation
-              )
-              
-              for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
-                  try {
-                      Write-Host "Attempt $attempt of $MaxAttempts for $Operation"
-                      & $ScriptBlock
-                      Write-Host "$Operation succeeded on attempt $attempt"
-                      return
-                  }
-                  catch {
-                      Write-Warning "$Operation failed on attempt $attempt`: $($_.Exception.Message)"
-                      if ($attempt -eq $MaxAttempts) {
-                          Write-Error "$Operation failed after $MaxAttempts attempts"
-                          throw
-                      }
-                      $delay = [math]::Pow(2, $attempt - 1) * 5
-                      Write-Host "Waiting $delay seconds before retry..."
-                      Start-Sleep -Seconds $delay
-                  }
-              }
-          }
-          '@ | Out-File -FilePath "${{ github.workspace }}\retry-helper.ps1" -Encoding utf8
-
       - name: Create dependencies install directory
         run: if not exist ${{ env.DEPS_INSTALL_ROOT }} mkdir ${{ env.DEPS_INSTALL_ROOT }}
 
-      - name: Install openssl for qt opcua
+      - name: Build OpenSSL from source
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
-          choco feature enable -n=allowGlobalConfirmation
-          choco install openssl --version=3.6.2 -y --no-progress
-          Write-Host "OPENSSL_ROOT: $env:OPENSSL_ROOT"
-          $defaultPaths = @(
-            "C:\Program Files\OpenSSL-Win64",
-            "C:\Program Files (x86)\OpenSSL-Win32"
-          )
-          foreach ($path in $defaultPaths) {
-            if (Test-Path $path) {
-              Write-Host "OpenSSL installation detected at: $path"
-            }
+          $requiredCommands = @('perl', 'nmake', 'nasm')
+          $missingCommands = @($requiredCommands | Where-Object { -not (Get-Command $_ -ErrorAction SilentlyContinue) })
+          if ($missingCommands.Count -gt 0) {
+            throw "OpenSSL build prerequisites are unavailable: $($missingCommands -join ', ')"
           }
-          
-          Get-Command openssl.exe | ForEach-Object {
-            Write-Host "openssl.exe found at: $($_.Source)"
-            & $_.Source version
+          $archive = Join-Path $env:RUNNER_TEMP "openssl-$env:OPENSSL_VERSION.tar.gz"
+          Invoke-WebRequest -Uri "https://github.com/openssl/openssl/archive/refs/tags/$env:OPENSSL_TAG.tar.gz" -OutFile $archive -ErrorAction Stop
+          $archiveContents = tar -tf $archive
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not inspect the downloaded OpenSSL source archive"
           }
+          $sourceDirectoryName = ($archiveContents | Select-Object -First 1).TrimEnd('/')
+          if (-not $sourceDirectoryName) {
+            throw "The OpenSSL source archive is empty"
+          }
+          tar -xf $archive -C $env:RUNNER_TEMP
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not extract the OpenSSL source archive"
+          }
+          $sourceDirectory = Join-Path $env:RUNNER_TEMP $sourceDirectoryName
+          if (-not (Test-Path $sourceDirectory)) {
+            throw "OpenSSL source directory was not created: $sourceDirectory"
+          }
+          $installDirectory = Join-Path $env:OPENSSL_INSTALL_ROOT $env:OPENSSL_VERSION
+          New-Item -ItemType Directory -Path $installDirectory -Force | Out-Null
+          Push-Location $sourceDirectory
+          try {
+            & perl Configure VC-WIN64A shared "--prefix=$installDirectory" "--openssldir=$installDirectory\ssl"
+            if ($LASTEXITCODE -ne 0) { throw "OpenSSL Configure failed with exit code $LASTEXITCODE" }
+            & nmake
+            if ($LASTEXITCODE -ne 0) { throw "OpenSSL build failed with exit code $LASTEXITCODE" }
+            & nmake install_sw
+            if ($LASTEXITCODE -ne 0) { throw "OpenSSL installation failed with exit code $LASTEXITCODE" }
+          } finally {
+            Pop-Location
+          }
+          Set-Content -Path "$installDirectory\build-info.txt" -Value "tag=$env:OPENSSL_TAG`nsha=$env:OPENSSL_TAG_SHA"
 
-      - name: Clone and build Qt OPC UA 
+      - name: Configure OpenSSL paths
+        shell: pwsh
+        run: |
+          $opensslRoot = Join-Path $env:OPENSSL_INSTALL_ROOT $env:OPENSSL_VERSION
+          $requiredArtifacts = @(
+            "$opensslRoot\include\openssl\ssl.h",
+            "$opensslRoot\lib\libssl.lib",
+            "$opensslRoot\lib\libcrypto.lib",
+            "$opensslRoot\bin\libssl-3-x64.dll",
+            "$opensslRoot\bin\libcrypto-3-x64.dll"
+          )
+          $missingArtifacts = @($requiredArtifacts | Where-Object { -not (Test-Path $_) })
+          if ($missingArtifacts.Count -gt 0) {
+            throw "OpenSSL installation is incomplete: $($missingArtifacts -join ', ')"
+          }
+          Add-Content -Path $env:GITHUB_ENV -Value "OPENSSL_ROOT=$opensslRoot"
+          Write-Host "Using OpenSSL $env:OPENSSL_VERSION from $opensslRoot"
+
+      - name: Cache Qt OPC UA
+        id: cache-qtopcua
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.QTOPCUA_INSTALL_ROOT }}\qt${{ matrix.qt-version }}-openssl${{ steps.openssl-version.outputs.version }}
+          key: qtopcua-qt${{ matrix.qt-version }}-openssl${{ steps.openssl-version.outputs.version }}-${{ matrix.windows-version }}-${{ runner.arch }}-${{ steps.msvc-toolset.outputs.cache-key }}
+
+      - name: Build Qt OPC UA
+        if: steps.cache-qtopcua.outputs.cache-hit != 'true'
         shell: cmd
         run: |
           setlocal
           set QT6_DIR=%QT_ROOT_DIR%\lib\cmake\Qt6
           set CMAKE_PREFIX_PATH=%QT_ROOT_DIR%
+          set QTOPCUA_INSTALL_DIR=${{ env.QTOPCUA_INSTALL_ROOT }}\qt${{ matrix.qt-version }}-openssl${{ steps.openssl-version.outputs.version }}
       
           set QTOPCUA_SRC=%GITHUB_WORKSPACE%\qtopcua-src
           if exist "%QTOPCUA_SRC%" rmdir /s /q "%QTOPCUA_SRC%"
           git clone https://code.qt.io/qt/qtopcua.git "%QTOPCUA_SRC%"
           cd "%QTOPCUA_SRC%"
           git checkout v${{ matrix.qt-version }}
-      
+
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DQt6_DIR=%QT6_DIR% -DOPENSSL_ROOT_DIR="%OPENSSL_ROOT%" -DCMAKE_INSTALL_PREFIX=%QT_ROOT_DIR%
+          cmake .. -G "Ninja" -DQt6_DIR=%QT6_DIR% -DOPENSSL_ROOT_DIR="%OPENSSL_ROOT%" -DCMAKE_INSTALL_PREFIX=%QTOPCUA_INSTALL_DIR%
           cmake --build . --config Release --target install
           endlocal
+
+      - name: Install Qt OPC UA into Qt
+        shell: pwsh
+        run: |
+          $qtOpcUaInstallDirectory = Join-Path $env:QTOPCUA_INSTALL_ROOT "qt${{ matrix.qt-version }}-openssl$env:OPENSSL_VERSION"
+          $requiredArtifacts = @(
+            "$qtOpcUaInstallDirectory\lib\Qt6OpcUa.lib",
+            "$qtOpcUaInstallDirectory\lib\cmake\Qt6OpcUa\Qt6OpcUaConfig.cmake"
+          )
+          $missingArtifacts = @($requiredArtifacts | Where-Object { -not (Test-Path $_) })
+          if ($missingArtifacts.Count -gt 0) {
+            throw "Qt OPC UA installation is incomplete: $($missingArtifacts -join ', ')"
+          }
+          Copy-Item -Path "$qtOpcUaInstallDirectory\*" -Destination $env:QT_ROOT_DIR -Recurse -Force
+          Write-Host "Installed cached Qt OPC UA into $env:QT_ROOT_DIR"
 
       - name: Clone Qwt
         if: steps.cache-qwt.outputs.cache-hit != 'true'
@@ -199,8 +280,6 @@ jobs:
         working-directory: ${{ github.workspace }}/qwt-src
         shell: pwsh
         run: |
-          . "${{ github.workspace }}\retry-helper.ps1"
-
           (Get-Content qwtbuild.pri) -replace '^#CONFIG.*debug_and_release.*$', 'CONFIG += debug_and_release' | Set-Content qwtbuild.pri
           (Get-Content qwtbuild.pri) -replace '^#CONFIG.*build_all.*$', 'CONFIG += build_all' | Set-Content qwtbuild.pri
           (Get-Content qwtconfig.pri) -replace '^\s*QWT_INSTALL_PREFIX\s*=.*$', '    QWT_INSTALL_PREFIX = ${{ env.QWT_INSTALL_DIR }}' | Set-Content qwtconfig.pri
@@ -214,11 +293,9 @@ jobs:
           
           qmake qwt.pro
 
-          Invoke-WithRetry -Operation "Qwt build" -ScriptBlock {
-              $buildProcess = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
-              if ($buildProcess.ExitCode -ne 0) {
-                  throw "Qwt build failed with exit code $($buildProcess.ExitCode)"
-              }
+          $buildProcess = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
+          if ($buildProcess.ExitCode -ne 0) {
+            throw "Qwt build failed with exit code $($buildProcess.ExitCode)"
           }
 
           $installProcess = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "install" -Wait -PassThru -NoNewWindow
@@ -239,36 +316,43 @@ jobs:
         working-directory: ${{ github.workspace }}\libzmq-src
         run: |
           mkdir build && cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=${{ env.ZEROMQ_INSTALL_DIR }} -DZMQ_BUILD_PROGRAMS=OFF -D WITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DCMAKE_GENERATOR_PLATFORM=x64 -DBUILD_SHARED=ON -DBUILD_STATIC=OFF
+          cmake .. -DCMAKE_INSTALL_PREFIX=${{ env.ZEROMQ_INSTALL_DIR }} -DZMQ_BUILD_PROGRAMS=OFF -D WITH_PERF_TOOL=OFF -DZMQ_BUILD_TESTS=OFF -DCMAKE_GENERATOR_PLATFORM=x64 -DBUILD_SHARED=ON -DBUILD_STATIC=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           cmake --build . --config Release
           cmake --install . --config Release
 
-      - name: Set MSVC_SUFFIX environment variable
+      - name: Verify ZeroMQ artifacts
         shell: pwsh
         run: |
-          $MSVC_SUFFIX = ""
-          if ($env:VC_TOOLS_VERSION) {
-            $vcToolParts = $env:VC_TOOLS_VERSION.Split('.'); if ($vcToolParts.Length -ge 2 -and $vcToolParts[0] -eq "14") {
-            if ($vcToolParts[1] -eq "2") { $MSVC_SUFFIX = "v142" } elseif ($vcToolParts[1] -eq "3") { $MSVC_SUFFIX = "v143" }
+          $libraryDirectory = Join-Path $env:ZEROMQ_INSTALL_DIR "lib"
+          $binaryDirectory = Join-Path $env:ZEROMQ_INSTALL_DIR "bin"
+          $importLibraries = @(Get-ChildItem -Path $libraryDirectory -Filter "libzmq-*.lib" -File -ErrorAction SilentlyContinue)
+          if ($importLibraries.Count -ne 1) {
+            Write-Host "Expected one ZeroMQ import library; found: $($importLibraries.Name -join ', ')"
+            foreach ($directory in @($libraryDirectory, $binaryDirectory)) {
+              Write-Host "Contents of ${directory}:"
+              if (Test-Path $directory) {
+                Get-ChildItem -Path $directory -File | Select-Object Name, Length | Format-Table -AutoSize | Out-String | Write-Host
+              } else {
+                Write-Host "Directory does not exist"
+              }
             }
+            throw "ZeroMQ import library discovery failed"
           }
-          if (-not $MSVC_SUFFIX) {
-            if ($env:VisualStudioVersion) {
-            if ($env:VisualStudioVersion -like "17.*") { $MSVC_SUFFIX = "v143" } elseif ($env:VisualStudioVersion -like "16.*") { $MSVC_SUFFIX = "v142" }
+          $importLibrary = $importLibraries[0]
+          $dll = Join-Path $binaryDirectory "$($importLibrary.BaseName).dll"
+          if (-not (Test-Path $dll)) {
+            Write-Host "Missing ZeroMQ DLL: $dll"
+            if (Test-Path $binaryDirectory) {
+              Get-ChildItem -Path $binaryDirectory -File | Select-Object Name, Length | Format-Table -AutoSize | Out-String | Write-Host
+            } else {
+              Write-Host "Directory does not exist: $binaryDirectory"
             }
+            throw "ZeroMQ DLL verification failed"
           }
-          if (-not $MSVC_SUFFIX) {
-            Write-Warning "Could not determine MSVC suffix. Defaulting to v143."; $MSVC_SUFFIX = "v143"
-          }
-          Add-Content -Path $env:GITHUB_ENV -Value "MSVC_SUFFIX=$MSVC_SUFFIX"
-          Write-Host "Exported MSVC_SUFFIX=$MSVC_SUFFIX to GITHUB_ENV"
-
-      - name: Set ZeroMQ environment variables
-        shell: pwsh
-        run : |
-          $zmqVersionUnderscore = "${{ matrix.zeromq-version }}".Replace(".", "_")
-          Add-Content -Path $env:GITHUB_ENV -Value "ZMQLIBRARY=libzmq-${{ env.MSVC_SUFFIX }}-mt-$zmqVersionUnderscore.dll"
-          Add-Content -Path $env:GITHUB_ENV -Value "ZMQ_LIB_NAME=libzmq-${{ env.MSVC_SUFFIX }}-mt-$zmqVersionUnderscore.lib"
+          Add-Content -Path $env:GITHUB_ENV -Value "ZMQ_LIB_NAME=$($importLibrary.Name)"
+          Add-Content -Path $env:GITHUB_ENV -Value "ZMQLIBRARY=$([IO.Path]::GetFileName($dll))"
+          Write-Host "Using ZeroMQ import library: $($importLibrary.Name)"
+          Write-Host "Using ZeroMQ DLL: $([IO.Path]::GetFileName($dll))"
 
       - name: Create EPICS Base directory
         if: steps.cache-epics.outputs.cache-hit != 'true'
@@ -330,16 +414,12 @@ jobs:
         working-directory: ${{ env.CAQTDM_DIR }}
         shell: pwsh
         run: |
-          . "${{ github.workspace }}\retry-helper.ps1"
-
           $timerstart = Get-Date
           qmake all.pro
           
-          Invoke-WithRetry -Operation "caQtDM build" -ScriptBlock {
-              $process = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
-              if ($process.ExitCode -ne 0) {
-                  throw "Build failed with exit code $($process.ExitCode)"
-              }
+          $process = Start-Process -FilePath "jom.exe" -ArgumentList "-j$env:NUMBER_OF_PROCESSORS", "release" -Wait -PassThru -NoNewWindow
+          if ($process.ExitCode -ne 0) {
+            throw "Build failed with exit code $($process.ExitCode)"
           }
           
           $timerstop = Get-Date
