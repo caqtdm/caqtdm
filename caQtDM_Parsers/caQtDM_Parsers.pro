@@ -6,10 +6,12 @@ error("Use at least Qt 4.6.")
 include (../caQtDM_Viewer/qtdefs.pri)
 
 TEMPLATE = subdirs
-# MSVC emits a .lib import library for the shared parsers, which would
-# conflict with the static parser libraries of the same target name.
+# The ADL static library is linked by caQtDM_xdl2ui_Lib on Windows.
+SUBDIRS += adlParserStaticLib
+# MSVC emits prcParser.lib as the shared PRC parser's import library,
+# which conflicts with the static library of the same target name.
 !win32-msvc*:!msvc {
-    SUBDIRS += adlParserStaticLib prcParserStaticLib
+    SUBDIRS += prcParserStaticLib
 }
 !MOBILE:{
     SUBDIRS += adlParserSharedLib prcParserSharedLib
