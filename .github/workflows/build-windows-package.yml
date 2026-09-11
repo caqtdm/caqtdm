@@ -21,6 +21,7 @@ env:
 
   OPENSSL_LTS_SERIES: '3.5'
   OPENSSL_INSTALL_ROOT: ${{ github.workspace }}\deps\openssl
+  QTOPCUA_INSTALL_ROOT: ${{ github.workspace }}\deps\qtopcua
 
   CAQTDM_OPCUA: 1
 
@@ -226,24 +227,48 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value "OPENSSL_ROOT=$opensslRoot"
           Write-Host "Using OpenSSL $env:OPENSSL_VERSION from $opensslRoot"
 
-      - name: Clone and build Qt OPC UA 
+      - name: Cache Qt OPC UA
+        id: cache-qtopcua
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.QTOPCUA_INSTALL_ROOT }}\qt${{ matrix.qt-version }}-openssl${{ steps.openssl-version.outputs.version }}
+          key: qtopcua-qt${{ matrix.qt-version }}-openssl${{ steps.openssl-version.outputs.version }}-${{ matrix.windows-version }}-${{ runner.arch }}-${{ steps.msvc-toolset.outputs.cache-key }}
+
+      - name: Build Qt OPC UA
+        if: steps.cache-qtopcua.outputs.cache-hit != 'true'
         shell: cmd
         run: |
           setlocal
           set QT6_DIR=%QT_ROOT_DIR%\lib\cmake\Qt6
           set CMAKE_PREFIX_PATH=%QT_ROOT_DIR%
+          set QTOPCUA_INSTALL_DIR=${{ env.QTOPCUA_INSTALL_ROOT }}\qt${{ matrix.qt-version }}-openssl${{ steps.openssl-version.outputs.version }}
       
           set QTOPCUA_SRC=%GITHUB_WORKSPACE%\qtopcua-src
           if exist "%QTOPCUA_SRC%" rmdir /s /q "%QTOPCUA_SRC%"
           git clone https://code.qt.io/qt/qtopcua.git "%QTOPCUA_SRC%"
           cd "%QTOPCUA_SRC%"
           git checkout v${{ matrix.qt-version }}
-      
+
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DQt6_DIR=%QT6_DIR% -DOPENSSL_ROOT_DIR="%OPENSSL_ROOT%" -DCMAKE_INSTALL_PREFIX=%QT_ROOT_DIR%
+          cmake .. -G "Ninja" -DQt6_DIR=%QT6_DIR% -DOPENSSL_ROOT_DIR="%OPENSSL_ROOT%" -DCMAKE_INSTALL_PREFIX=%QTOPCUA_INSTALL_DIR%
           cmake --build . --config Release --target install
           endlocal
+
+      - name: Install Qt OPC UA into Qt
+        shell: pwsh
+        run: |
+          $qtOpcUaInstallDirectory = Join-Path $env:QTOPCUA_INSTALL_ROOT "qt${{ matrix.qt-version }}-openssl$env:OPENSSL_VERSION"
+          $requiredArtifacts = @(
+            "$qtOpcUaInstallDirectory\lib\Qt6OpcUa.lib",
+            "$qtOpcUaInstallDirectory\lib\cmake\Qt6OpcUa\Qt6OpcUaConfig.cmake"
+          )
+          $missingArtifacts = @($requiredArtifacts | Where-Object { -not (Test-Path $_) })
+          if ($missingArtifacts.Count -gt 0) {
+            throw "Qt OPC UA installation is incomplete: $($missingArtifacts -join ', ')"
+          }
+          Copy-Item -Path "$qtOpcUaInstallDirectory\*" -Destination $env:QT_ROOT_DIR -Recurse -Force
+          Write-Host "Installed cached Qt OPC UA into $env:QT_ROOT_DIR"
 
       - name: Clone Qwt
         if: steps.cache-qwt.outputs.cache-hit != 'true'
