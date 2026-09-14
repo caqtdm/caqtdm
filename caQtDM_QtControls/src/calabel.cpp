@@ -26,7 +26,6 @@
 #include "calabel.h"
 #include "alarmdefs.h"
 #include <QEvent>
-#include <QPainter>
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 {
@@ -53,6 +52,8 @@ void caLabel::setColors(QColor bg, QColor fg)
     if(thisColorMode == Default) {
         setPalette(QPalette());
         setAutoFillBackground(false);
+        if (!styleSheet().isEmpty()) setStyleSheet("");
+        thisBackgroundStyle.clear();
         update();
         return;
     }
@@ -65,6 +66,21 @@ void caLabel::setColors(QColor bg, QColor fg)
     labelPalette.setColor(QPalette::ButtonText, fg);
     setPalette(labelPalette);
     setAutoFillBackground(bg.alpha() > 0);
+
+    // Keep the designer's transparent background transparent. QLabel's
+    // default base brush is otherwise painted white when a parent uses QSS.
+    // Text deliberately remains palette-driven so alarm and contrast colors
+    // do not need an inline stylesheet.
+    const QString backgroundStyle =
+        QStringLiteral("background-color: rgba(%1, %2, %3, %4); border: %5px solid rgba(%6, %7, %8, %9);")
+            .arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha())
+            .arg(thisBorderWidth)
+            .arg(thisBorderColor.red()).arg(thisBorderColor.green())
+            .arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
+    if (backgroundStyle != thisBackgroundStyle) {
+        setStyleSheet(backgroundStyle);
+        thisBackgroundStyle = backgroundStyle;
+    }
 
     update();
 }
@@ -104,17 +120,4 @@ void caLabel::setAlarmColors(short status)
         break;
     }
     setColors(thisBackColor, c);
-}
-
-void caLabel::paintEvent(QPaintEvent *event)
-{
-    ESimpleLabel::paintEvent(event);
-
-    if (thisBorderWidth <= 0) return;
-
-    QPainter painter(this);
-    painter.setPen(QPen(thisBorderColor, thisBorderWidth, Qt::SolidLine,
-                        Qt::SquareCap, Qt::MiterJoin));
-    const int inset = thisBorderWidth / 2;
-    painter.drawRect(rect().adjusted(inset, inset, -inset - 1, -inset - 1));
 }

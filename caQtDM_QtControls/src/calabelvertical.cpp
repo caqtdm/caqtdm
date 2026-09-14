@@ -147,7 +147,12 @@ void caLabelVertical::paintEvent(QPaintEvent *)
     int w = QMETRIC_QT456_FONT_WIDTH(fm,thisText);
     int h = fm.height();
     QPainter painter(this);
-    QBrush brush = QBrush(palette().color(QPalette::Window));
+    // A transparent designer background must remain transparent when the
+    // parent panel switches palettes.  Otherwise it resolves to the light
+    // fallback's Window color and produces an unintended white rectangle.
+    const QColor background = thisBackColor.alpha() == 0
+        ? thisBackColor : palette().color(QPalette::Window);
+    QBrush brush = QBrush(background);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
     painter.fillRect(0,0, width(), height(), brush);

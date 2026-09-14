@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QColor>
+#include <QHash>
 #include <QPalette>
 
 class QWidget;
@@ -33,6 +34,7 @@ private:
     QColor foregroundFor(QWidget *widget) const;
     QColor backgroundFor(QWidget *widget, const QImage &image) const;
     bool isCandidate(QWidget *widget) const;
+    bool isAlarmControlled(QWidget *widget) const;
     bool belongsToThisPanel(QWidget *widget) const;
     bool systemPaletteIsDark() const;
     void setLightFallback(bool enabled);
@@ -41,6 +43,7 @@ private:
 
     QWidget *m_root;
     QPalette m_originalPalette;
+    QHash<QWidget *, QPalette> m_originalChildPalettes;
     bool m_hasOriginalPalette;
     bool m_lightFallback;
     bool m_evaluationPending;

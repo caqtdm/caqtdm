@@ -87,15 +87,13 @@ public slots:
 #include "hideobjectcode.h"
     }
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
-
 private:
     QColor thisForeColor;
     QColor thisBackColor;
     QColor thisBorderColor;
     int thisBorderWidth;
     colMode thisColorMode;
+    QString thisBackgroundStyle;
 };
 
 #endif
