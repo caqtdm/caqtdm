@@ -40,6 +40,8 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
 
+    // this will prevent user interference
+    Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
     Q_PROPERTY(Shape frameShape READ frameShape WRITE setFrameShape DESIGNABLE false)
     Q_PROPERTY(Shadow frameShadow READ frameShadow WRITE setFrameShadow DESIGNABLE false)
     Q_PROPERTY(int lineWidth READ lineWidth WRITE setLineWidth DESIGNABLE false)
@@ -54,6 +56,8 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
 
 
 public:
+    void noStyle(QString style) {Q_UNUSED(style);}
+
     caLabel( QWidget *parent = 0 );
 
     QColor getForeground() const {return thisForeColor;}
@@ -77,7 +81,8 @@ public:
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
                                           setBackground(thisBackColor);
-                                          setForeground(thisForeColor);}
+                                          setForeground(thisForeColor);
+                                          oldColorMode = thisColorMode;}
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -88,12 +93,14 @@ public slots:
     }
 
 private:
-    QColor thisForeColor;
-    QColor thisBackColor;
-    QColor thisBorderColor;
-    int thisBorderWidth;
+    QColor thisForeColor, thisForeColorOld;
+    QColor thisBackColor, thisBackColorOld;
+    QColor thisBorderColor, thisBorderColorOld;
+    int thisBorderWidth, thisBorderWidthOld;
     colMode thisColorMode;
-    QString thisBackgroundStyle;
+    colMode oldColorMode;
+    QString thisStyle, oldStyle;
+    bool renewStyleSheet;
 };
 
 #endif

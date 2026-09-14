@@ -16,12 +16,10 @@ HEADERS += tst_caqtdm_lib.h \
 # --- Tested classes below ---
 
 HEADERS += ../../caQtDM_Lib/src/caqtdm_lib.h \
-    ../../caQtDM_Lib/src/panelcontrastcontroller.h \
     ../../caQtDM_Plugins/internal/internal_channel.h \
     ../../caQtDM_Plugins/internal/internal_plugin.h
 
 SOURCES += ../../caQtDM_Lib/src/caqtdm_lib.cpp \
-    ../../caQtDM_Lib/src/panelcontrastcontroller.cpp \
     ../../caQtDM_Plugins/internal/internal_channel.cpp \
     ../../caQtDM_Plugins/internal/internal_plugin.cpp
 

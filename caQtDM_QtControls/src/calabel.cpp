@@ -29,12 +29,21 @@
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 {
+    // to start with, clear the stylesheet, so that playing around
+    // is not possible.
+    setStyleSheet("");
+
     setFontScaleMode(WidthAndHeight);
     thisBackColor = QColor(255,255,255,0);
     thisForeColor = Qt::black;
-    thisBorderColor = Qt::black;
-    thisColorMode=Static;
+    thisBackColorOld = QColor(255,255,255,0);
+    thisForeColorOld = Qt::black;
 
+    thisBorderWidthOld = 0;
+    thisColorMode=Static;
+    oldColorMode =Static;
+
+    renewStyleSheet = true;
     setBorderWidth (0);
     setColorMode(Static);
     thisVisibility = StaticV;
@@ -50,39 +59,30 @@ void caLabel::setBorderColor(QColor c)
 void caLabel::setColors(QColor bg, QColor fg)
 {
     if(thisColorMode == Default) {
-        setPalette(QPalette());
-        setAutoFillBackground(false);
-        if (!styleSheet().isEmpty()) setStyleSheet("");
-        thisBackgroundStyle.clear();
-        update();
+        if(!styleSheet().isEmpty()) {
+            setStyleSheet("");
+            renewStyleSheet = true;
+        }
         return;
     }
 
-    QPalette labelPalette = palette();
-    labelPalette.setColor(QPalette::Window, bg);
-    labelPalette.setColor(QPalette::Base, bg);
-    labelPalette.setColor(QPalette::WindowText, fg);
-    labelPalette.setColor(QPalette::Text, fg);
-    labelPalette.setColor(QPalette::ButtonText, fg);
-    setPalette(labelPalette);
-    setAutoFillBackground(bg.alpha() > 0);
-
-    // Keep the designer's transparent background transparent. QLabel's
-    // default base brush is otherwise painted white when a parent uses QSS.
-    // Text deliberately remains palette-driven so alarm and contrast colors
-    // do not need an inline stylesheet.
-    const QString backgroundStyle =
-        QStringLiteral("background-color: rgba(%1, %2, %3, %4); border: %5px solid rgba(%6, %7, %8, %9);")
-            .arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha())
-            .arg(thisBorderWidth)
-            .arg(thisBorderColor.red()).arg(thisBorderColor.green())
-            .arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
-    if (backgroundStyle != thisBackgroundStyle) {
-        setStyleSheet(backgroundStyle);
-        thisBackgroundStyle = backgroundStyle;
+    if((bg != thisBackColorOld) || (fg != thisForeColorOld) || renewStyleSheet || styleSheet().isEmpty() || thisBorderWidth != thisBorderWidthOld ||
+        thisBorderColor != thisBorderColorOld) {
+        thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border: %9px solid rgba(%10, %11, %12, %13)";
+        thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
+                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).arg(thisBorderWidth).
+                arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
+        thisBackColorOld = bg;
+        thisForeColorOld = fg;
+        thisBorderColorOld = thisBorderColor;
+        thisBorderWidthOld = thisBorderWidth;
     }
 
-    update();
+    if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
+        setStyleSheet(thisStyle);
+        oldStyle = thisStyle;
+        update();
+    }
 }
 
 void caLabel::setBackground(QColor c)
@@ -121,3 +121,4 @@ void caLabel::setAlarmColors(short status)
     }
     setColors(thisBackColor, c);
 }
+

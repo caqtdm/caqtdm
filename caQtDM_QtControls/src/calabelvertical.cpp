@@ -68,21 +68,12 @@ void caLabelVertical::setAlignment(const Alignment &alignment)
 void caLabelVertical::setBackground(QColor c)
 {
     thisBackColor = c;
-    QPalette labelPalette = palette();
-    labelPalette.setColor(QPalette::Window, c);
-    labelPalette.setColor(QPalette::Base, c);
-    setPalette(labelPalette);
     update();
 }
 
 void caLabelVertical::setForeground(QColor c)
 {
     thisForeColor = c;
-    QPalette labelPalette = palette();
-    labelPalette.setColor(QPalette::WindowText, c);
-    labelPalette.setColor(QPalette::Text, c);
-    labelPalette.setColor(QPalette::ButtonText, c);
-    setPalette(labelPalette);
     update();
 }
 
@@ -96,13 +87,6 @@ void caLabelVertical::setColors(QColor bg, QColor fg)
 {
     thisBackColor = bg;
     thisForeColor = fg;
-    QPalette labelPalette = palette();
-    labelPalette.setColor(QPalette::Window, bg);
-    labelPalette.setColor(QPalette::Base, bg);
-    labelPalette.setColor(QPalette::WindowText, fg);
-    labelPalette.setColor(QPalette::Text, fg);
-    labelPalette.setColor(QPalette::ButtonText, fg);
-    setPalette(labelPalette);
     update();
 }
 
@@ -147,12 +131,7 @@ void caLabelVertical::paintEvent(QPaintEvent *)
     int w = QMETRIC_QT456_FONT_WIDTH(fm,thisText);
     int h = fm.height();
     QPainter painter(this);
-    // A transparent designer background must remain transparent when the
-    // parent panel switches palettes.  Otherwise it resolves to the light
-    // fallback's Window color and produces an unintended white rectangle.
-    const QColor background = thisBackColor.alpha() == 0
-        ? thisBackColor : palette().color(QPalette::Window);
-    QBrush brush = QBrush(background);
+    QBrush brush = QBrush(thisBackColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
     painter.fillRect(0,0, width(), height(), brush);
@@ -160,7 +139,7 @@ void caLabelVertical::paintEvent(QPaintEvent *)
         painter.setPen( QPen( thisBorderColor, thisBorderWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
         painter.drawRect(thisBorderWidth, thisBorderWidth, width()- 2*thisBorderWidth, height() - 2*thisBorderWidth);
     }
-    painter.setPen(palette().color(QPalette::WindowText));
+    painter.setPen(thisForeColor);
     painter.rotate(rotation);
     switch (thisDirection) {
     case Up:
@@ -244,3 +223,4 @@ QSize caLabelVertical::minimumSizeHint() const
         size = sizeHint();
     return size;
 }
+
