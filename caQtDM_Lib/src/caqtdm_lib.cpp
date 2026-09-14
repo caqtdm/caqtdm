@@ -81,6 +81,7 @@
 #endif
 
 #include "caqtdm_lib.h"
+#include "panelcontrastcontroller.h"
 #include "uiconverter.h"
 #include "fileFunctions.h"
 
@@ -462,6 +463,7 @@ static QString webOpenPathFromDisplayPath(const QString &path)
 #endif
 
 Q_LOGGING_CATEGORY(caQtDMLibLog, "caqtdm.lib.lib")
+Q_LOGGING_CATEGORY(panelContrastLog, "caqtdm.lib.panelcontrast")
 Q_LOGGING_CATEGORY(fileIOLog, "caqtdm.lib.fileio")
 Q_LOGGING_CATEGORY(caHMILog, "caqtdm.lib.cahmi")
 Q_LOGGING_CATEGORY(caRelatedDisplayLog, "caqtdm.widgets.carelateddisplay")
@@ -849,6 +851,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     savedMacro[0] = macro;
 
     scanWidgets(myWidget->findChildren<QWidget *>(), macro);
+    new PanelContrastController(myWidget);
 
     // build a list for getting all soft pv
     mutexKnobDataP->BuildSoftPVList(myWidget);
@@ -3013,6 +3016,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     // recurse (DFS) to lower widgets
                     scanWidgets(thisW->findChildren<QWidget *>(), macroS);
+                    new PanelContrastController(thisW);
 
                     cainclude_path = cainclude_path_stacked;
                     level--;
@@ -11309,6 +11313,9 @@ void CaQtDM_Lib::themeChanged() {
     QString oldColorDebugHex = m_debugTextColorHex;
     m_normalTextColorHex = palette.color(QPalette::Active, QPalette::Text).name();
     m_debugTextColorHex = palette.color(QPalette::Active, QPalette::Link).name();
+
+    const QList<PanelContrastController *> controllers = findChildren<PanelContrastController *>();
+    for (PanelContrastController *controller : controllers) controller->scheduleEvaluation();
 
  }
 

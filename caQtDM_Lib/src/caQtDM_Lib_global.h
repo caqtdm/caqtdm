@@ -80,6 +80,7 @@ typedef struct MutexKnobData MutexKnobData;
 #include <QLoggingCategory>
 
 Q_DECLARE_LOGGING_CATEGORY(caQtDMLibLog)
+Q_DECLARE_LOGGING_CATEGORY(panelContrastLog)
 Q_DECLARE_LOGGING_CATEGORY(fileIOLog)
 Q_DECLARE_LOGGING_CATEGORY(mutexKnobDataLog)
 Q_DECLARE_LOGGING_CATEGORY(messageWindowLog)

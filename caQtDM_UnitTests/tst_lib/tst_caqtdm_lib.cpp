@@ -24,6 +24,7 @@
  */
 
 #include "tst_caqtdm_lib.h"
+#include "panelcontrastcontroller.h"
 
 #include <caapplynumeric.h>
 #include <cainclude.h>
@@ -33,6 +34,9 @@
 
 #include <cfloat>
 #include <climits>
+#include <QLabel>
+#include <QTabBar>
+#include <QVBoxLayout>
 
 // registers a genSoftPV-defined internal channel and pumps one publish cycle
 static genSoftPV *registerInternalGenSoftPV(CaQtDM_Lib *lib, InternalPlugin *plugin, QWidget *host,
@@ -713,4 +717,73 @@ void TestCaQtDM_Lib::computeNumericMaxMinPrecUpdatesWhenChannelChanges()
                                              "T_Numeric_Live");
     checkWidgetPicksUpFieldWrite<caSpinbox>(m_caQtDM_Lib, m_internalPlugin, m_parentAS,
                                              "T_Spinbox_Live");
+}
+
+void TestCaQtDM_Lib::panelContrastMathWorks()
+{
+    QCOMPARE(PanelContrastController::contrastRatio(Qt::black, Qt::white), 21.0);
+    QVERIFY(PanelContrastController::contrastRatio(QColor(120, 120, 120), Qt::white) < 4.5);
+    QVERIFY(!PanelContrastController::needsLightFallback(1, 2));
+    QVERIFY(PanelContrastController::needsLightFallback(2, 3));
+}
+
+void TestCaQtDM_Lib::panelContrastFallbackAndOverrideWork()
+{
+    const QPalette originalApplicationPalette = qApp->palette();
+    QPalette darkPalette = originalApplicationPalette;
+    darkPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::ButtonText, Qt::white);
+    qApp->setPalette(darkPalette);
+
+    QWidget panel;
+    QVBoxLayout layout(&panel);
+    QLabel first(QStringLiteral("first"));
+    QLabel second(QStringLiteral("second"));
+    first.setStyleSheet(QStringLiteral("background: white; color: white;"));
+    second.setStyleSheet(QStringLiteral("background: white; color: white;"));
+    layout.addWidget(&first);
+    layout.addWidget(&second);
+    panel.resize(180, 80);
+    panel.show();
+    PanelContrastController controller(&panel);
+
+    QTRY_COMPARE(first.property("caqtdm_panel_contrast_override").toString(), QStringLiteral("#000000"));
+    QTRY_COMPARE(second.property("caqtdm_panel_contrast_override").toString(), QStringLiteral("#000000"));
+
+    first.setStyleSheet(QStringLiteral("background: white; color: black;"));
+    second.setStyleSheet(QStringLiteral("background: white; color: black;"));
+    QTRY_VERIFY(!first.property("caqtdm_panel_contrast_override").isValid());
+    QTRY_VERIFY(!second.property("caqtdm_panel_contrast_override").isValid());
+
+    qApp->setPalette(originalApplicationPalette);
+}
+
+void TestCaQtDM_Lib::panelContrastRepairsLightTabsWithoutChangingDarkSurfaceText()
+{
+    const QPalette originalApplicationPalette = qApp->palette();
+    QPalette darkPalette = originalApplicationPalette;
+    darkPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::ButtonText, Qt::white);
+    qApp->setPalette(darkPalette);
+
+    QWidget panel;
+    QVBoxLayout layout(&panel);
+    QTabBar tabs;
+    tabs.addTab(QStringLiteral("legacy tab"));
+    tabs.setStyleSheet(QStringLiteral("QTabBar::tab { background: #e1e1e1; }"));
+    QLabel darkSurfaceText(QStringLiteral("keep me white"));
+    darkSurfaceText.setStyleSheet(QStringLiteral("background: #3a5eab; color: white;"));
+    layout.addWidget(&tabs);
+    layout.addWidget(&darkSurfaceText);
+    panel.resize(220, 90);
+    panel.show();
+    PanelContrastController controller(&panel);
+
+    QTRY_COMPARE(tabs.property("caqtdm_panel_contrast_override").toString(), QStringLiteral("#000000"));
+    QVERIFY(!darkSurfaceText.property("caqtdm_panel_contrast_override").isValid());
+
+    qApp->setPalette(originalApplicationPalette);
 }
