@@ -26,24 +26,16 @@
 #include "calabel.h"
 #include "alarmdefs.h"
 #include <QEvent>
+#include <QPainter>
 
 caLabel::caLabel(QWidget *parent) : ESimpleLabel(parent)
 {
-    // to start with, clear the stylesheet, so that playing around
-    // is not possible.
-    setStyleSheet("");
-
     setFontScaleMode(WidthAndHeight);
     thisBackColor = QColor(255,255,255,0);
     thisForeColor = Qt::black;
-    thisBackColorOld = QColor(255,255,255,0);
-    thisForeColorOld = Qt::black;
-
-    thisBorderWidthOld = 0;
+    thisBorderColor = Qt::black;
     thisColorMode=Static;
-    oldColorMode =Static;
 
-    renewStyleSheet = true;
     setBorderWidth (0);
     setColorMode(Static);
     thisVisibility = StaticV;
@@ -59,30 +51,22 @@ void caLabel::setBorderColor(QColor c)
 void caLabel::setColors(QColor bg, QColor fg)
 {
     if(thisColorMode == Default) {
-        if(!styleSheet().isEmpty()) {
-            setStyleSheet("");
-            renewStyleSheet = true;
-        }
+        setPalette(QPalette());
+        setAutoFillBackground(false);
+        update();
         return;
     }
 
-    if((bg != thisBackColorOld) || (fg != thisForeColorOld) || renewStyleSheet || styleSheet().isEmpty() || thisBorderWidth != thisBorderWidthOld ||
-        thisBorderColor != thisBorderColorOld) {
-        thisStyle = "background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8); border: %9px solid rgba(%10, %11, %12, %13)";
-        thisStyle = thisStyle.arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                arg(fg.red()).arg(fg.green()).arg(fg.blue()).arg(fg.alpha()).arg(thisBorderWidth).
-                arg(thisBorderColor.red()).arg(thisBorderColor.green()).arg(thisBorderColor.blue()).arg(thisBorderColor.alpha());
-        thisBackColorOld = bg;
-        thisForeColorOld = fg;
-        thisBorderColorOld = thisBorderColor;
-        thisBorderWidthOld = thisBorderWidth;
-    }
+    QPalette labelPalette = palette();
+    labelPalette.setColor(QPalette::Window, bg);
+    labelPalette.setColor(QPalette::Base, bg);
+    labelPalette.setColor(QPalette::WindowText, fg);
+    labelPalette.setColor(QPalette::Text, fg);
+    labelPalette.setColor(QPalette::ButtonText, fg);
+    setPalette(labelPalette);
+    setAutoFillBackground(bg.alpha() > 0);
 
-    if(thisStyle != oldStyle || thisColorMode != oldColorMode) {
-        setStyleSheet(thisStyle);
-        oldStyle = thisStyle;
-        update();
-    }
+    update();
 }
 
 void caLabel::setBackground(QColor c)
@@ -122,3 +106,15 @@ void caLabel::setAlarmColors(short status)
     setColors(thisBackColor, c);
 }
 
+void caLabel::paintEvent(QPaintEvent *event)
+{
+    ESimpleLabel::paintEvent(event);
+
+    if (thisBorderWidth <= 0) return;
+
+    QPainter painter(this);
+    painter.setPen(QPen(thisBorderColor, thisBorderWidth, Qt::SolidLine,
+                        Qt::SquareCap, Qt::MiterJoin));
+    const int inset = thisBorderWidth / 2;
+    painter.drawRect(rect().adjusted(inset, inset, -inset - 1, -inset - 1));
+}

@@ -51,7 +51,7 @@ QPalette lightPalette()
 
 PanelContrastController::PanelContrastController(QWidget *root)
     : QObject(root), m_root(root), m_hasOriginalPalette(false), m_lightFallback(false),
-      m_evaluationPending(false), m_generatedObjectName(0)
+      m_evaluationPending(false)
 {
     m_root->setProperty("caqtdm_panel_contrast_root", true);
     qApp->installEventFilter(this);
@@ -126,6 +126,10 @@ bool PanelContrastController::isCandidate(QWidget *widget) const
 
 QColor PanelContrastController::foregroundFor(QWidget *widget) const
 {
+    if (widget->styleSheet().contains(QLatin1String(OverrideMarker))) {
+        const QColor override = QColor(widget->property("caqtdm_panel_contrast_override").toString());
+        if (override.isValid()) return override;
+    }
     const int foregroundProperty = widget->metaObject()->indexOfProperty("foreground");
     if (foregroundProperty >= 0) {
         const QColor foreground = widget->property("foreground").value<QColor>();
@@ -192,15 +196,22 @@ void PanelContrastController::applyOverride(QWidget *widget, const QColor &color
     QString stylesheet = widget->styleSheet();
     const int marker = stylesheet.indexOf(QLatin1String(OverrideMarker));
     if (marker >= 0) stylesheet.truncate(marker);
-    QString objectName = widget->objectName();
-    if (objectName.isEmpty()) {
-        objectName = QStringLiteral("caqtdm_panelcontrast_%1").arg(++m_generatedObjectName);
-        widget->setObjectName(objectName);
+    stylesheet = stylesheet.trimmed();
+    // Some legacy widgets omit the final semicolon in a generated stylesheet.
+    // Add it before the temporary declaration so Qt parses the two rules apart.
+    if (!stylesheet.isEmpty() && !stylesheet.endsWith(QLatin1Char(';')) &&
+        !stylesheet.endsWith(QLatin1Char('}')))
+        stylesheet += QLatin1Char(';');
+
+    // The stylesheet is installed directly on the widget, so an object-ID
+    // selector is redundant and avoids nested-panel parser ambiguity.
+    if (qobject_cast<QTabBar *>(widget)) {
+        stylesheet += QStringLiteral("\n%1\nQTabBar::tab { color: %2; }\n")
+            .arg(QLatin1String(OverrideMarker), color.name());
+    } else {
+        stylesheet += QStringLiteral("\n%1\ncolor: %2;\n")
+            .arg(QLatin1String(OverrideMarker), color.name());
     }
-    const QString selector = qobject_cast<QTabBar *>(widget)
-        ? QStringLiteral("QTabBar#%1::tab").arg(objectName)
-        : QStringLiteral("QWidget#%1").arg(objectName);
-    stylesheet += QStringLiteral("\n%1\n%2 { color: %3; }\n").arg(QLatin1String(OverrideMarker), selector, color.name());
     widget->setStyleSheet(stylesheet);
     widget->setProperty("caqtdm_panel_contrast_override", color.name());
     qCDebug(panelContrastLog) << "applied contrast override" << color << "to" << widget;

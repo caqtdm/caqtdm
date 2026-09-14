@@ -44,7 +44,6 @@ private:
     bool m_hasOriginalPalette;
     bool m_lightFallback;
     bool m_evaluationPending;
-    int m_generatedObjectName;
 };
 
 #endif // PANELCONTRASTCONTROLLER_H
