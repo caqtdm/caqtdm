@@ -749,8 +749,8 @@ void TestCaQtDM_Lib::panelContrastFallbackAndOverrideWork()
     panel.show();
     PanelContrastController controller(&panel);
 
-    QTRY_COMPARE(first.property("caqtdm_panel_contrast_override").toString(), QStringLiteral("#000000"));
-    QTRY_COMPARE(second.property("caqtdm_panel_contrast_override").toString(), QStringLiteral("#000000"));
+    QTRY_COMPARE(first.palette().color(QPalette::WindowText), QColor(Qt::black));
+    QTRY_COMPARE(second.palette().color(QPalette::WindowText), QColor(Qt::black));
 
     first.setStyleSheet(QStringLiteral("background: white; color: black;"));
     second.setStyleSheet(QStringLiteral("background: white; color: black;"));

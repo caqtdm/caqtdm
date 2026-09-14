@@ -91,7 +91,6 @@ bool PanelContrastController::eventFilter(QObject *watched, QEvent *event)
 
     switch (event->type()) {
     case QEvent::Show:
-    case QEvent::Paint:
     case QEvent::Resize:
     case QEvent::StyleChange:
     case QEvent::PaletteChange:
@@ -210,6 +209,22 @@ bool PanelContrastController::systemPaletteIsDark() const
     return luminance(qApp->palette().color(QPalette::Window)) < 0.5;
 }
 
+bool PanelContrastController::renderedPanelLooksLight(const QImage &image) const
+{
+    if (image.isNull()) return false;
+
+    int samples = 0;
+    int lightSamples = 0;
+    for (int y = 0; y < image.height(); y += 8) {
+        for (int x = 0; x < image.width(); x += 8) {
+            const QColor color = QColor::fromRgb(image.pixel(x, y));
+            ++samples;
+            if (luminance(color) >= 0.7) ++lightSamples;
+        }
+    }
+    return samples > 0 && lightSamples * 2 > samples;
+}
+
 void PanelContrastController::setLightFallback(bool enabled)
 {
     if (enabled == m_lightFallback) return;
@@ -226,8 +241,37 @@ void PanelContrastController::setLightFallback(bool enabled)
             });
         }
         m_root->setPalette(compatibilityPalette);
-        for (auto it = m_originalChildPalettes.cbegin(); it != m_originalChildPalettes.cend(); ++it)
-            it.key()->setPalette(it.value().resolve(compatibilityPalette));
+        for (auto it = m_originalChildPalettes.cbegin(); it != m_originalChildPalettes.cend(); ++it) {
+            QWidget *widget = it.key();
+            QPalette palette = it.value();
+
+            const QColor authoredBackground = widget->property("background").value<QColor>();
+            const QColor authoredForeground = widget->property("foreground").value<QColor>();
+            const bool preserveBackground = authoredBackground.isValid() && authoredBackground.alpha() > 0;
+            const bool preserveForeground = isAlarmControlled(widget) ||
+                (authoredForeground.isValid() && authoredForeground.alpha() > 0);
+
+            for (int group = QPalette::Active; group <= QPalette::Inactive; ++group) {
+                const QPalette::ColorGroup colorGroup = static_cast<QPalette::ColorGroup>(group);
+                if (!preserveBackground) {
+                    palette.setColor(colorGroup, QPalette::Window,
+                                     compatibilityPalette.color(colorGroup, QPalette::Window));
+                    palette.setColor(colorGroup, QPalette::Base,
+                                     compatibilityPalette.color(colorGroup, QPalette::Base));
+                    palette.setColor(colorGroup, QPalette::AlternateBase,
+                                     compatibilityPalette.color(colorGroup, QPalette::AlternateBase));
+                }
+                if (!preserveForeground) {
+                    palette.setColor(colorGroup, QPalette::WindowText,
+                                     compatibilityPalette.color(colorGroup, QPalette::WindowText));
+                    palette.setColor(colorGroup, QPalette::Text,
+                                     compatibilityPalette.color(colorGroup, QPalette::Text));
+                    palette.setColor(colorGroup, QPalette::ButtonText,
+                                     compatibilityPalette.color(colorGroup, QPalette::ButtonText));
+                }
+            }
+            widget->setPalette(palette);
+        }
     } else if (m_hasOriginalPalette) {
         m_root->setPalette(m_originalPalette);
         for (auto it = m_originalChildPalettes.cbegin(); it != m_originalChildPalettes.cend(); ++it)
@@ -309,7 +353,12 @@ void PanelContrastController::evaluate()
         ++eligible;
         if (contrastRatio(foregroundFor(widget), backgroundFor(widget, image)) < ContrastThreshold) ++failing;
     }
-    const bool useFallback = systemPaletteIsDark() && needsLightFallback(failing, eligible);
+    const bool lightCanvas = renderedPanelLooksLight(image);
+    // This is a decision for the loaded panel, not for its currently visible
+    // tab. A tab containing gauges may have no text candidates at all; do not
+    // let it undo the legacy-light classification made from another tab.
+    const bool useFallback = systemPaletteIsDark() &&
+        (m_lightFallback || needsLightFallback(failing, eligible) || lightCanvas);
     setLightFallback(useFallback);
     if (useFallback) image = m_root->grab().toImage();
 
@@ -332,5 +381,5 @@ void PanelContrastController::evaluate()
         }
     }
     qCDebug(panelContrastLog) << "panel contrast" << m_root << "failing" << failing << "of" << eligible
-                              << "light fallback" << useFallback;
+                              << "light canvas" << lightCanvas << "light fallback" << useFallback;
 }

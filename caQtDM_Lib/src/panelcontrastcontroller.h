@@ -36,6 +36,7 @@ private:
     bool isCandidate(QWidget *widget) const;
     bool isAlarmControlled(QWidget *widget) const;
     bool belongsToThisPanel(QWidget *widget) const;
+    bool renderedPanelLooksLight(const QImage &image) const;
     bool systemPaletteIsDark() const;
     void setLightFallback(bool enabled);
     void applyOverride(QWidget *widget, const QColor &color);
