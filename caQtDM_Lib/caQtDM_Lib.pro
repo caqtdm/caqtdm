@@ -74,6 +74,7 @@ android {
 RC_FILE = ./src/caQtDM_Lib.rc
 
 SOURCES += caqtdm_lib.cpp \
+    panelthemeapplier.cpp \
     mutexKnobData.cpp \
     MessageWindow.cpp \
     src/causerid.cpp \
@@ -102,6 +103,7 @@ SOURCES +=\
 
 
 HEADERS += caqtdm_lib.h\
+        panelthemeapplier.h \
         caQtDM_Lib_global.h \
     mutexKnobDataWrapper.h \
     mutexKnobData.h \

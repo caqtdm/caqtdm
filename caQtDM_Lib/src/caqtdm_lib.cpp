@@ -81,6 +81,7 @@
 #endif
 
 #include "caqtdm_lib.h"
+#include "panelthemeapplier.h"
 #include "uiconverter.h"
 #include "fileFunctions.h"
 
@@ -956,6 +957,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
             qCInfo(fileIOLog) << "caQtDM -- custom stylesheet file data:" << printdata;
         }
     }
+
+    PanelThemeApplier::apply(myWidget);
 
     // add a reload action
     QAction *ReloadWindowAction = new QAction(this);
@@ -3013,6 +3016,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     // recurse (DFS) to lower widgets
                     scanWidgets(thisW->findChildren<QWidget *>(), macroS);
+                    PanelThemeApplier::apply(thisW);
 
                     cainclude_path = cainclude_path_stacked;
                     level--;
@@ -11309,6 +11313,12 @@ void CaQtDM_Lib::themeChanged() {
     QString oldColorDebugHex = m_debugTextColorHex;
     m_normalTextColorHex = palette.color(QPalette::Active, QPalette::Text).name();
     m_debugTextColorHex = palette.color(QPalette::Active, QPalette::Link).name();
+
+    const QList<QWidget *> roots = findChildren<QWidget *>();
+    for (QWidget *root : roots) {
+        if (root->property("caqtdm_panel_theme_root").toBool())
+            PanelThemeApplier::apply(root);
+    }
 
  }
 

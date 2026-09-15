@@ -2240,12 +2240,12 @@ bool FileOpenWindow::event(QEvent *e)
 #else
 bool FileOpenWindow::event(QEvent *e)
 {
-    if (e->type() == QEvent::ThemeChange) {
+    const bool themeChangeEvent = e->type() == QEvent::ThemeChange;
+    const bool handled = QWidget::event(e);
+    if (themeChangeEvent) {
         emit themeChanged();
-        // we don't retun true here, because we want the base implementation and
-        // all child items to also receive the ThemeChange event, so they can correctly change to the new theme.
     }
-    return QWidget::event(e);
+    return handled;
 }
 #endif
 

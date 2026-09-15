@@ -198,8 +198,6 @@ caCartesianPlot::~caCartesianPlot()
 void caCartesianPlot::updateLegendsPV() {
     if(thisLegendshow) {
         insertLegend(lgd, QwtPlot::BottomLegend);
-        // set color on legend texts
-        setLegendAttribute(thisScaleColor, QFont("arial",7), COLOR);
 
         for(int index=0; index < curveCount; index++) {
             curve[index].setItemAttribute(QwtPlotItem::Legend, false);
@@ -213,6 +211,10 @@ void caCartesianPlot::updateLegendsPV() {
                 }
             }
         }
+
+        // Qwt rebuilds legend labels when a curve title changes.  Apply the
+        // configured colour only after the final labels exist.
+        setLegendAttribute(thisScaleColor, QFont("arial",7), COLOR);
     }
 }
 
@@ -1280,6 +1282,27 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
         }
     }
     updateLegend();
+    if (SW == COLOR) {
+        QwtLegend *lgd = qobject_cast<QwtLegend *>(legend());
+        if (lgd != (QwtLegend *) Q_NULLPTR) {
+            const QPalette::ColorGroup groups[] = {
+                QPalette::Active, QPalette::Inactive, QPalette::Disabled
+            };
+            foreach (QwtPlotItem *plt_item, itemList()) {
+                if (plt_item->rtti() != QwtPlotItem::Rtti_PlotCurve) continue;
+                const QList<QWidget *> labels = lgd->legendWidgets(itemToInfo(plt_item));
+                for (QWidget *label : labels) {
+                    QPalette palette = label->palette();
+                    for (QPalette::ColorGroup group : groups) {
+                        palette.setColor(group, QPalette::WindowText, c);
+                        palette.setColor(group, QPalette::Text, c);
+                    }
+                    label->setPalette(palette);
+                    label->update();
+                }
+            }
+        }
+    }
 #endif
 
 }

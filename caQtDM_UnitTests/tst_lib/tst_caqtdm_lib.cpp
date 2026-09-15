@@ -24,12 +24,19 @@
  */
 
 #include "tst_caqtdm_lib.h"
+#include "panelthemeapplier.h"
 
 #include <caapplynumeric.h>
 #include <cainclude.h>
 #include <canumeric.h>
 #include <caspinbox.h>
 #include <gensoftpv.h>
+
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QTabBar>
+#include <QTabWidget>
 
 #include <cfloat>
 #include <climits>
@@ -713,4 +720,76 @@ void TestCaQtDM_Lib::computeNumericMaxMinPrecUpdatesWhenChannelChanges()
                                              "T_Numeric_Live");
     checkWidgetPicksUpFieldWrite<caSpinbox>(m_caQtDM_Lib, m_internalPlugin, m_parentAS,
                                              "T_Spinbox_Live");
+}
+
+void TestCaQtDM_Lib::panelThemeDefaultsToLegacyLight()
+{
+    const QPalette applicationPalette = QApplication::palette();
+    QPalette darkPalette = applicationPalette;
+    darkPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, QColor(20, 20, 20));
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    QApplication::setPalette(darkPalette);
+
+    QMainWindow panel;
+    QLineEdit inherited(&panel);
+    QLineEdit authored(&panel);
+    QTabWidget tabs(&panel);
+    tabs.addTab(new QWidget(&tabs), "first");
+    panel.menuBar()->addMenu("File");
+    const QString authoredStyle = "QLineEdit { color: rgb(255, 0, 0); }";
+    authored.setStyleSheet(authoredStyle);
+    QPalette authoredPalette = authored.palette();
+    authoredPalette.setColor(QPalette::Text, Qt::red);
+    authored.setPalette(authoredPalette);
+
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(inherited.palette().color(QPalette::Text), QColor(Qt::black));
+    // A palette set while the dark application palette was active must not
+    // retain that old effective role in a LegacyLight panel.
+    QCOMPARE(authored.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(authored.styleSheet(), authoredStyle);
+    QCOMPARE(tabs.tabBar()->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(panel.menuBar()->palette().color(QPalette::Window),
+             QApplication::palette().color(QPalette::Window));
+    QCOMPARE(panel.menuBar()->palette().color(QPalette::WindowText),
+             QApplication::palette().color(QPalette::WindowText));
+    QCOMPARE(panel.menuBar()->palette().color(QPalette::Text),
+             QApplication::palette().color(QPalette::Text));
+
+    QApplication::setPalette(applicationPalette);
+}
+
+void TestCaQtDM_Lib::panelThemeSystemModeDoesNotChangePalette()
+{
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "System");
+    const QPalette before = panel.palette();
+
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(panel.palette(), before);
+}
+
+void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
+{
+    QWidget panel;
+    QWidget included(&panel);
+    included.setProperty("caqtdmThemeMode", "System");
+
+    PanelThemeApplier::apply(&included);
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(included.palette().color(QPalette::Window),
+             QApplication::palette().color(QPalette::Window));
+    QCOMPARE(included.palette().color(QPalette::WindowText),
+             QApplication::palette().color(QPalette::WindowText));
+    QCOMPARE(included.palette().color(QPalette::Base),
+             QApplication::palette().color(QPalette::Base));
+    QCOMPARE(included.palette().color(QPalette::Text),
+             QApplication::palette().color(QPalette::Text));
 }
