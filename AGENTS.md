@@ -240,7 +240,7 @@ always on.
   conversion; plugins are imported statically (DEFINES
   BSREAD/EPICS4/ARCHIVE* in `qtdefs.pri`).
 
-### macOS recipe (working, July 2026)
+### macOS recipe 
 
 - Qt `/usr/local/Qt-6.10.1/bin` in PATH (Homebrew Qt 6.11 lacks
   Qt5Compat/QTextCodec); Qwt 6.3.0 as a framework build:
@@ -351,12 +351,8 @@ Consequence for work here: feature work belongs on Development (or a
 branch off it); fixes that surface during the test phase land on Release
 first and may need to be carried back to Development.
 
-## Ongoing work / branches (as of July 2026 — verify branch state)
+## Ongoing work / branches 
 
-- **`feature/caNumeric`**: major rework of ENumeric/SNumeric (pow10ll,
-  transformNumberSpace, suppression, auto digit shift) + test suite
-  `tst_qtcontrols/tst_numeric_suite.h`. Numeric work only against this
-  state, not against Development.
 - **`feature/internalChannel`**: internal plugin with caSTRING support;
   intended to replace softPVs in the long run. Core is already on
   Development (`caQtDM_Plugins/internal/internal_channel.{h,cpp}`):
