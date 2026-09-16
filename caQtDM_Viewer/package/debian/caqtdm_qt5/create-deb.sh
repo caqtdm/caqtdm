@@ -2,7 +2,21 @@
 echo "" 
 echo "     caQtDM BuildScript2DEB  "
 echo "" 
-if [ "$1" == "--help" ]; then
+NO_CHECKOUT=0
+DEBDEV=0
+NO_PARENT_ORIG=0
+SHOW_HELP=0
+for option in "$@"; do
+  case "$option" in
+    --no-checkout) NO_CHECKOUT=1 ;;
+    --debdev) DEBDEV=1 ;;
+    --no-parent-orig) NO_PARENT_ORIG=1 ;;
+    --help) SHOW_HELP=1 ;;
+    *) echo "Unknown option: $option"; exit 1 ;;
+  esac
+done
+
+if [ "$SHOW_HELP" -eq 1 ]; then
   echo "" 
   echo "" 
   echo "Usage: create-deb.sh [OPTION...]"
@@ -12,6 +26,7 @@ if [ "$1" == "--help" ]; then
   echo "./create-deb.sh               # Normal git checkout + using debian config file from git " 
   echo "./create-deb.sh --debdev      # use the current debian config in this directory " 
   echo "./create-deb.sh --no-checkout # use the current directory as source, do not checkout from git "
+  echo "./create-deb.sh --no-parent-orig # keep the orig archive in this directory "
   echo "" 
   echo "" 
   echo "" 
@@ -36,10 +51,10 @@ PACKAGE_VERSION=${CAQTDM_VERSION}
 echo "PACKAGE_VERSION=${PACKAGE_VERSION}"
 
 rm -rf caqtdm-${PACKAGE_VERSION}  || true
-if [ "$1" != "--no-checkout" ]; then
+if [ "$NO_CHECKOUT" -eq 0 ]; then
 
 
-if [ "$1" != "--debdev" ]; then
+if [ "$DEBDEV" -eq 0 ]; then
   #### Clone and build caqtdm sources
   git clone $REPOSITORY
   cd $REPOSITORY_NAME
@@ -59,9 +74,16 @@ else
   echo "Using current directory as source, not checking out from git"
   currentdir=$(pwd)
   cd ../../../../
-  tar -czf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz  --exclude=.git . 
-  mv ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz ${currentdir}/caqtdm_${PACKAGE_VERSION}.orig.tar.gz
-  cd ${currentdir}
+  if [ "$NO_PARENT_ORIG" -eq 1 ]; then
+    tar -czf "${currentdir}/caqtdm_${PACKAGE_VERSION}.orig.tar.gz" \
+      --exclude=.git \
+      --exclude="./caQtDM_Viewer/package/debian/caqtdm_qt5/caqtdm_${PACKAGE_VERSION}.orig.tar.gz" \
+      .
+  else
+    tar -czf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz --exclude=.git .
+    mv ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz "${currentdir}/caqtdm_${PACKAGE_VERSION}.orig.tar.gz"
+  fi
+  cd "${currentdir}"
   mkdir -p caqtdm_${PACKAGE_VERSION}
   cd caqtdm_${PACKAGE_VERSION}
   tar -xf ../caqtdm_${PACKAGE_VERSION}.orig.tar.gz

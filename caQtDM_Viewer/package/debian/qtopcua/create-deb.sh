@@ -24,5 +24,3 @@ cd $STAGING_DIR
 
 chmod 0755 "DEBIAN/postinst"
 dpkg-deb --build "$STAGING_DIR" "$STAGING_DIR/qtopcua_amd64.deb"
-
-echo "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH" >> $GITHUB_ENV

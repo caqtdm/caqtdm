@@ -1,0 +1,8 @@
+Package: libqt6opcua6-dev
+Version: 0
+Section: libdevel
+Priority: optional
+Architecture: amd64
+Depends: libc6, libqt6core6 | libqt6core6t64, libqt6network6 | libqt6network6t64, libssl3 | libssl3t64
+Maintainer: Helge Brands <helge.brands@psi.ch>
+Description: Qt 6 OPC UA library and headers (Custom Build)
