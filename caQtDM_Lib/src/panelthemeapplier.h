@@ -6,6 +6,7 @@ class QWidget;
 class PanelThemeApplier
 {
 public:
+    static bool resolveLegacyLightTheme(bool panelLegacyLight);
     static void seed(QWidget *contentRoot, bool legacyLight);
     static void seed(QWidget *contentRoot, const QWidget *themeRoot);
     static void apply(QWidget *root);

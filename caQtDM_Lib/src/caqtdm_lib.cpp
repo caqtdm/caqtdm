@@ -707,7 +707,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
                     QBuffer *buffer = new QBuffer();
                     buffer->open(QIODevice::ReadWrite);
                     const QByteArray ui = file->readAll();
-                    loader.beginPanel(uiUsesLegacyLightTheme(ui));
+                    loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(
+                        uiUsesLegacyLightTheme(ui)));
                     buffer->write(ui);
 
                     buffer->seek(0);
@@ -741,7 +742,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
             QBuffer *buffer = new QBuffer();
             buffer->open(QIODevice::ReadWrite);
-            loader.beginPanel(true);
+            loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(true));
             buffer->write(*array);
             delete array;
 
@@ -2947,7 +2948,8 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                                 QBuffer *buffer = new QBuffer();
                                 buffer->open(QIODevice::ReadWrite);
                                 const QByteArray ui = file->readAll();
-                                loader.beginPanel(uiUsesLegacyLightTheme(ui));
+                                loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(
+                                    uiUsesLegacyLightTheme(ui)));
                                 buffer->write(ui);
 
                                 //QCryptographicHash md5Gen(QCryptographicHash::Md5);

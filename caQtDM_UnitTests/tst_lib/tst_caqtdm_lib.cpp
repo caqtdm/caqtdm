@@ -804,3 +804,24 @@ void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
     QVERIFY(panel.testAttribute(Qt::WA_SetPalette));
     QVERIFY(included.testAttribute(Qt::WA_SetPalette));
 }
+
+void TestCaQtDM_Lib::panelThemeEnvironmentOverrideWins()
+{
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "System");
+
+    qputenv("CAQTDM_PANEL_THEME_MODE", "LegacyLight");
+    QVERIFY(PanelThemeApplier::usesLegacyLightTheme(&panel));
+
+    qputenv("CAQTDM_PANEL_THEME_MODE", "System");
+    QVERIFY(!PanelThemeApplier::usesLegacyLightTheme(&panel));
+
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    QVERIFY(!PanelThemeApplier::usesLegacyLightTheme(&panel));
+
+    if (originalOverride.isEmpty())
+        qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else
+        qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}

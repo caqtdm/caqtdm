@@ -11,6 +11,7 @@ Q_LOGGING_CATEGORY(panelThemeLog, "caqtdm.lib.paneltheme")
 
 namespace {
 const char ThemeModeProperty[] = "caqtdmThemeMode";
+const char ThemeModeOverrideEnvironment[] = "CAQTDM_PANEL_THEME_MODE";
 
 QPalette createLegacyLightPalette()
 {
@@ -88,7 +89,17 @@ void logPalette(const char *label, const QWidget *widget)
 bool PanelThemeApplier::usesLegacyLightTheme(const QWidget *root)
 {
     if (!root) return false;
-    return root->property(ThemeModeProperty).toString().compare("System", Qt::CaseInsensitive) != 0;
+    return resolveLegacyLightTheme(
+        root->property(ThemeModeProperty).toString().compare("System", Qt::CaseInsensitive) != 0);
+}
+
+bool PanelThemeApplier::resolveLegacyLightTheme(bool panelLegacyLight)
+{
+    const QString overrideMode =
+        QString::fromLocal8Bit(qgetenv(ThemeModeOverrideEnvironment)).trimmed();
+    if (overrideMode.compare("System", Qt::CaseInsensitive) == 0) return false;
+    if (overrideMode.compare("LegacyLight", Qt::CaseInsensitive) == 0) return true;
+    return panelLegacyLight;
 }
 
 void PanelThemeApplier::apply(QWidget *root)

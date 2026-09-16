@@ -61,6 +61,7 @@ private slots:
     void panelThemeDefaultsToLegacyLight();
     void panelThemeSystemModeDoesNotChangePalette();
     void panelThemeIncludesRemainIndependent();
+    void panelThemeEnvironmentOverrideWins();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

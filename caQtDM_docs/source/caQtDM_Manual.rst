@@ -2902,6 +2902,14 @@ gateway or panel repository.
 Description Files
 -----------------
 
+Panel theme override
+~~~~~~~~~~~~~~~~~~~~
+
+``CAQTDM_PANEL_THEME_MODE`` overrides ``caqtdmThemeMode`` for every loaded
+panel and include. Set it to ``System`` to force the application palette, or
+to ``LegacyLight`` to force the light compatibility palette. When it is unset
+or has any other value, each panel uses its own ``caqtdmThemeMode`` property.
+
 With the Qt designer, you produce xml files with the extension ``.ui``.
 These files are used as input for the synoptic viewer caQtDM. These
 xml ascii file can be edited by hand, but care has to be taken because
@@ -4381,4 +4389,3 @@ When running caQtDM Web in a Docker container, you can use the following additio
 
    "``ENTRY_PANEL``", "Path to the main caQtDM UI file that should be served by default", "Required, default is the test panel if not specified"
    "``EXTRA_ARGS``", "Additional command line arguments to pass to caQtDM, as docker would not allow passing them directly", "Optional, default is empty"
-
