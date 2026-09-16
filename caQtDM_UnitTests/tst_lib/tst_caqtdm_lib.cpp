@@ -733,11 +733,16 @@ void TestCaQtDM_Lib::panelThemeDefaultsToLegacyLight()
     QApplication::setPalette(darkPalette);
 
     QMainWindow panel;
-    QLineEdit inherited(&panel);
-    QLineEdit authored(&panel);
-    QTabWidget tabs(&panel);
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    QLineEdit inherited(content);
+    QLineEdit authored(content);
+    QTabWidget tabs(content);
     tabs.addTab(new QWidget(&tabs), "first");
     panel.menuBar()->addMenu("File");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    panel.setStyleSheet("QTabBar::tab { background: #eeeeee; }");
+#endif
     const QString authoredStyle = "QLineEdit { color: rgb(255, 0, 0); }";
     authored.setStyleSheet(authoredStyle);
     QPalette authoredPalette = authored.palette();
@@ -746,11 +751,12 @@ void TestCaQtDM_Lib::panelThemeDefaultsToLegacyLight()
 
     PanelThemeApplier::apply(&panel);
 
-    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QVERIFY(!panel.testAttribute(Qt::WA_SetPalette));
+    QVERIFY(content->testAttribute(Qt::WA_SetPalette));
+    QVERIFY(!inherited.testAttribute(Qt::WA_SetPalette));
     QCOMPARE(inherited.palette().color(QPalette::Text), QColor(Qt::black));
-    // A palette set while the dark application palette was active must not
-    // retain that old effective role in a LegacyLight panel.
-    QCOMPARE(authored.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(authored.palette().color(QPalette::Text), QColor(Qt::red));
     QCOMPARE(authored.styleSheet(), authoredStyle);
     QCOMPARE(tabs.tabBar()->palette().color(QPalette::WindowText), QColor(Qt::black));
     QCOMPARE(panel.menuBar()->palette().color(QPalette::Window),
@@ -767,11 +773,14 @@ void TestCaQtDM_Lib::panelThemeSystemModeDoesNotChangePalette()
 {
     QWidget panel;
     panel.setProperty("caqtdmThemeMode", "System");
-    const QPalette before = panel.palette();
 
     PanelThemeApplier::apply(&panel);
 
-    QCOMPARE(panel.palette(), before);
+    QVERIFY(panel.testAttribute(Qt::WA_SetPalette));
+    QCOMPARE(panel.palette().color(QPalette::Window),
+             QApplication::palette().color(QPalette::Window));
+    QCOMPARE(panel.palette().color(QPalette::Text),
+             QApplication::palette().color(QPalette::Text));
 }
 
 void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
@@ -792,4 +801,6 @@ void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
              QApplication::palette().color(QPalette::Base));
     QCOMPARE(included.palette().color(QPalette::Text),
              QApplication::palette().color(QPalette::Text));
+    QVERIFY(panel.testAttribute(Qt::WA_SetPalette));
+    QVERIFY(included.testAttribute(Qt::WA_SetPalette));
 }

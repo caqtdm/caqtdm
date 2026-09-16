@@ -1,11 +1,8 @@
 #include "panelthemeapplier.h"
 
 #include <QApplication>
-#include <QMenu>
-#include <QMenuBar>
+#include <QMainWindow>
 #include <QPalette>
-#include <QStatusBar>
-#include <QToolBar>
 #include <QWidget>
 
 #include "caQtDM_Lib_global.h"
@@ -14,7 +11,6 @@ Q_LOGGING_CATEGORY(panelThemeLog, "caqtdm.lib.paneltheme")
 
 namespace {
 const char ThemeModeProperty[] = "caqtdmThemeMode";
-const char ThemeRootProperty[] = "caqtdm_panel_theme_root";
 
 QPalette createLegacyLightPalette()
 {
@@ -62,22 +58,30 @@ QPalette resolvedApplicationPalette()
     return palette;
 }
 
-bool isWindowChrome(const QWidget *widget)
+QPalette paletteFor(bool legacyLight)
 {
-    return qobject_cast<const QMenuBar *>(widget) ||
-        qobject_cast<const QMenu *>(widget) ||
-        qobject_cast<const QStatusBar *>(widget) ||
-        qobject_cast<const QToolBar *>(widget);
+    return legacyLight ? legacyLightPalette() : resolvedApplicationPalette();
 }
 
-bool belongsToRoot(const QWidget *root, const QWidget *widget)
+QWidget *contentRoot(QWidget *root)
 {
-    if (widget != root && !root->isAncestorOf(widget)) return false;
-    for (const QWidget *parent = widget; parent && parent != root; parent = parent->parentWidget()) {
-        if (isWindowChrome(parent)) return false;
-        if (parent->property(ThemeRootProperty).toBool()) return false;
-    }
-    return true;
+    if (QMainWindow *window = qobject_cast<QMainWindow *>(root))
+        return window->centralWidget();
+    return root;
+}
+
+void logPalette(const char *label, const QWidget *widget)
+{
+    if (!widget) return;
+    const QPalette palette = widget->palette();
+    qCDebug(panelThemeLog).nospace() << label << ' ' << widget
+        << " parent=" << widget->parentWidget()
+        << " paletteSet=" << widget->testAttribute(Qt::WA_SetPalette)
+        << " styleSheet=" << !widget->styleSheet().isEmpty()
+        << " text=" << palette.color(QPalette::Active, QPalette::Text).name()
+        << " windowText=" << palette.color(QPalette::Active, QPalette::WindowText).name()
+        << " base=" << palette.color(QPalette::Active, QPalette::Base).name()
+        << " buttonText=" << palette.color(QPalette::Active, QPalette::ButtonText).name();
 }
 }
 
@@ -90,36 +94,30 @@ bool PanelThemeApplier::usesLegacyLightTheme(const QWidget *root)
 void PanelThemeApplier::apply(QWidget *root)
 {
     if (!root) return;
-    root->setProperty(ThemeRootProperty, true);
-    const bool legacyLight = usesLegacyLightTheme(root);
-    const QPalette palette = legacyLight ? legacyLightPalette()
-                                         : resolvedApplicationPalette();
-    const bool updatesEnabled = root->updatesEnabled();
-    root->setUpdatesEnabled(false);
-    root->setPalette(palette);
+    QWidget *const target = contentRoot(root);
+    if (!target) return;
+    seed(target, root);
+    if (qobject_cast<QMainWindow *>(root))
+        root->setPalette(QPalette());
+    target->update();
+    qCDebug(panelThemeLog) << (usesLegacyLightTheme(root)
+                                 ? "applied legacy-light palette to content root"
+                                 : "applied system palette to content root")
+                            << target;
+    if (!panelThemeLog().isDebugEnabled()) return;
 
-    const QList<QWidget *> widgets = root->findChildren<QWidget *>();
-    QList<QWidget *> chrome;
-    for (QWidget *widget : widgets) {
-        if (isWindowChrome(widget)) {
-            chrome.append(widget);
-            continue;
-        }
-        if (!belongsToRoot(root, widget)) continue;
-        // QWidget::palette() is an *effective* palette.  Resolving that
-        // value keeps the dark application roles which were inherited when
-        // the panel was loaded, so a compatibility palette never reaches
-        // custom-painted and stylesheet-backed descendants.  Apply the
-        // selected panel palette as one deterministic subtree operation.
-        // Explicit QSS and widget painting remain authoritative.
-        widget->setPalette(palette);
-    }
-    for (QWidget *widget : chrome)
-        widget->setPalette(QApplication::palette());
+    logPalette("panel root", root);
+    logPalette("panel content root", target);
+}
 
-    root->setUpdatesEnabled(updatesEnabled);
-    root->update();
-    qCDebug(panelThemeLog) << (legacyLight ? "applied legacy-light palette to"
-                                           : "applied system palette to")
-                            << root << "widgets" << widgets.size();
+void PanelThemeApplier::seed(QWidget *contentRoot, const QWidget *themeRoot)
+{
+    if (!contentRoot || !themeRoot) return;
+    seed(contentRoot, usesLegacyLightTheme(themeRoot));
+}
+
+void PanelThemeApplier::seed(QWidget *contentRoot, bool legacyLight)
+{
+    if (!contentRoot) return;
+    contentRoot->setPalette(paletteFor(legacyLight));
 }

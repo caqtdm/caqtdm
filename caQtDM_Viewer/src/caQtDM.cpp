@@ -46,6 +46,7 @@
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QApplication>
+#include <QCoreApplication>
 
 #ifndef CAQTDM_NO_CUSTOM_LOGHANDLER
 #include <logging/generalloghandler.h>
@@ -499,6 +500,10 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
+    // Let panel palettes propagate through authored QSS.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
+#endif
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
