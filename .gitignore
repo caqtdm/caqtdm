@@ -18,6 +18,7 @@ moc_*
 # Generated files
 ui_main.h
 caQtDM_Binaries/
+caQtDM_Binaries_IOS/
 qrc_qtcontrols.cpp
 qrc_qtcontrolsplugin.cpp
 qrc_caQtDM.cpp
@@ -30,12 +31,23 @@ qrc_caQtDM.cpp
 *.EXP
 *.OBJ
 *.PDB
+*.a
 *.o
 *.so
 
 #Tools
 .vs
 .qtc_clangd
+asset_catalog_compiler.Info.plist
+*.orig
+
+# Transient object files
+*.o.tmp
+
+
+#EPICS
+*.iocsh_history
+
 
 # Unit tests
 caQtDM_UnitTests/**/target_wrapper.sh
