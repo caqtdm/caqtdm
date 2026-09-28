@@ -1331,7 +1331,7 @@ Define_Build_Python {
                     message("using MAC python settings")
                     DEFINES += PYTHON
                     LIBS += -L$(PYTHONLIB)  -lpython$(PYTHONVERSION)
-                    INCLUDEPATH += += $(PYTHONINCLUDE)
+                    INCLUDEPATH += $(PYTHONINCLUDE)
                 }
             }
         }
