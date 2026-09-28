@@ -239,12 +239,24 @@ jobs:
           PYTHONLIB="$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')"
           test -f "${PYTHONINCLUDE}/Python.h"
           test -f "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib"
+          # The toolcache Python is a framework build: libpython<ver>.dylib is only a
+          # symlink to Python.framework/Versions/<ver>/Python, whose install name
+          # (/Library/Frameworks/...) macdeployqt cannot resolve. Create a real,
+          # relocatable copy with an @rpath install name and link against that one.
+          PYTHON_DEPLOY_LIB="${{ env.DEPS_INSTALL_ROOT }}/python/lib"
+          mkdir -p "${PYTHON_DEPLOY_LIB}"
+          cp -L "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib" "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          chmod u+w "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          install_name_tool -id "@rpath/libpython${PYTHONVERSION}.dylib" "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          codesign --force --sign - "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          file "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          otool -D -L "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
           {
             echo "PYTHONVERSION=${PYTHONVERSION}"
             echo "PYTHONINCLUDE=${PYTHONINCLUDE}"
-            echo "PYTHONLIB=${PYTHONLIB}"
+            echo "PYTHONLIB=${PYTHON_DEPLOY_LIB}"
           } >> "$GITHUB_ENV"
-          echo "Using Python ${PYTHONVERSION}: include=${PYTHONINCLUDE} lib=${PYTHONLIB}"
+          echo "Using Python ${PYTHONVERSION}: include=${PYTHONINCLUDE} lib=${PYTHON_DEPLOY_LIB} (copied from ${PYTHONLIB})"
 
       # -------------------------------------------------------------------
       # caQtDM build environment
@@ -316,7 +328,7 @@ jobs:
           set -euo pipefail
 
           export PATH="${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${QTHOME}/bin:${PATH}"
-          export DYLD_LIBRARY_PATH="${EPICSLIB}:${ZMQLIB}:${QWTLIB}:${CAQTDM_COLLECT}:${CAQTDM_COLLECT}/controlsystems:${DYLD_LIBRARY_PATH:-}"
+          export DYLD_LIBRARY_PATH="${EPICSLIB}:${ZMQLIB}:${QWTLIB}:${PYTHONLIB}:${CAQTDM_COLLECT}:${CAQTDM_COLLECT}/controlsystems:${DYLD_LIBRARY_PATH:-}"
           export QT_FORCE_STDERR_LOGGING=1
           export QT_LOGGING_TO_CONSOLE=1
 
@@ -372,7 +384,18 @@ jobs:
             -libpath="${{ env.CAQTDM_DIR }}/caQtDM_Binaries" \
             -libpath="${EPICSLIB}" \
             -libpath="${QWTLIB}" \
-            -libpath="${ZMQLIB}" || true
+            -libpath="${ZMQLIB}" \
+            -libpath="${PYTHONLIB}" || true
+
+          # Python must have been deployed next to the other libraries (PYTHONCALC)
+          PYLIB="$APP/Contents/Frameworks/libpython${PYTHONVERSION}.dylib"
+          if [ ! -f "$PYLIB" ]; then
+            echo "libpython${PYTHONVERSION}.dylib was not deployed into $APP/Contents/Frameworks" >&2
+            otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib" || true
+            exit 1
+          fi
+          echo "Python deployed: $PYLIB"
+          otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib" | grep -i python || true
 
           codesign --force --sign - "$APP/Contents/Frameworks/qwt.framework" 2>/dev/null || true
           find "$APP/Contents/PlugIns" -name '*.dylib' -exec codesign --force --sign - {} \; 2>/dev/null || true
