@@ -1084,3 +1084,290 @@ void TestInternalChannel::setWaveWorks()
     QCOMPARE(values[2], 9.0);
     freeKnobData(&kData);
 }
+
+void TestInternalChannel::unconfiguredChannelIsNotConnected()
+{
+    InternalChannel channel;
+    knobData kData = makeKnobData();
+    kData.edata.connected = true; // stale state from a previous use
+
+    // before any configuration the channel presents itself disconnected,
+    // for the value monitor and for every field monitor
+    channel.fillKnobData(&kData);
+    QCOMPARE(kData.edata.connected, 0);
+    QCOMPARE(kData.edata.valueCount, 0);
+    kData.edata.connected = true;
+    channel.fillKnobDataField(&kData, InternalChannel::FieldSevr);
+    QCOMPARE(kData.edata.connected, 0);
+
+    // the successful configuration is the connect
+    QString error;
+    QVERIFY2(channel.configure(R"({"type":"double","val":5})", &error), qPrintable(error));
+    QVERIFY(channel.controlInfoChanged); // forces initialize on the next publish
+    channel.fillKnobData(&kData);
+    QCOMPARE(kData.edata.connected, 1);
+    QCOMPARE(kData.edata.rvalue, 5.0);
+    freeKnobData(&kData);
+}
+
+void TestInternalChannel::configureMatrixWorks()
+{
+    QString error;
+
+    // dim fixes the element count, a square matrix starts as the identity
+    {
+        InternalChannel channel;
+        QVERIFY2(channel.configure(R"({"type":"double","dim":[3,3]})", &error), qPrintable(error));
+        QVERIFY(channel.isMatrix());
+        QCOMPARE(channel.dimRows, 3);
+        QCOMPARE(channel.dimCols, 3);
+        QCOMPARE(channel.fieldtype, (short) caDOUBLE);
+        QCOMPARE(channel.nelm, 9);
+        QCOMPARE(channel.nord, 9);
+        QCOMPARE(channel.currentValue(), 1.0); // element 0 of the identity
+        knobData kData = makeKnobData();
+        channel.fillKnobData(&kData);
+        double *values = (double *) kData.edata.dataB;
+        for(int i = 0; i < 9; i++) QCOMPARE(values[i], (i % 4 == 0) ? 1.0 : 0.0);
+        freeKnobData(&kData);
+    }
+
+    // a non square matrix starts with zeros, any numeric element type works
+    {
+        InternalChannel channel;
+        QVERIFY2(channel.configure(R"({"type":"float","dim":[2,3]})", &error), qPrintable(error));
+        QCOMPARE(channel.nelm, 6);
+        knobData kData = makeKnobData();
+        channel.fillKnobData(&kData);
+        float *values = (float *) kData.edata.dataB;
+        for(int i = 0; i < 6; i++) QCOMPARE(values[i], 0.0f);
+        freeKnobData(&kData);
+    }
+
+    // an array initialization is taken row-major and padded with zeros
+    {
+        InternalChannel channel;
+        QVERIFY(channel.configure(R"({"type":"double","dim":[2,2],"val":[1.5,0.1,7]})", &error));
+        knobData kData = makeKnobData();
+        channel.fillKnobData(&kData);
+        double *values = (double *) kData.edata.dataB;
+        QCOMPARE(values[0], 1.5);
+        QCOMPARE(values[1], 0.1);
+        QCOMPARE(values[2], 7.0);
+        QCOMPARE(values[3], 0.0);
+        QCOMPARE(channel.currentValue(), 1.5); // scalar mirror is element 0
+        freeKnobData(&kData);
+    }
+
+    // a scalar initialization targets element 0, no identity
+    {
+        InternalChannel channel;
+        QVERIFY(channel.configure(R"({"type":"double","dim":[4,4],"val":9})", &error));
+        knobData kData = makeKnobData();
+        channel.fillKnobData(&kData);
+        double *values = (double *) kData.edata.dataB;
+        QCOMPARE(values[0], 9.0);
+        QCOMPARE(values[5], 0.0);
+        freeKnobData(&kData);
+    }
+
+    // configuration errors
+    {
+        InternalChannel channel;
+        QVERIFY(!channel.configure(R"({"type":"enum","dim":[2,2]})", &error));
+        QVERIFY(!channel.configure(R"({"type":"string","dim":[2,2]})", &error));
+        QVERIFY(!channel.configure(R"({"type":"double","dim":[0,4]})", &error));
+        QVERIFY(!channel.configure(R"({"type":"double","dim":[4]})", &error));
+        QVERIFY(!channel.configure(R"({"type":"double","dim":[2,2],"nelm":5})", &error));
+        QVERIFY(!channel.configure(R"({"type":"double","dim":[2,2],"nord":2})", &error));
+        QVERIFY(!channel.configure(R"({"type":"double","dim":[4,4],"val":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]})", &error));
+    }
+
+    // matching nelm/nord are accepted, a reconfiguration without dim drops the shape
+    {
+        InternalChannel channel;
+        QVERIFY2(channel.configure(R"({"type":"double","dim":[4,4],"nelm":16,"nord":16})", &error), qPrintable(error));
+        QCOMPARE(channel.nelm, 16);
+        QVERIFY(channel.configure(R"({"type":"double","val":3})", &error));
+        QVERIFY(!channel.isMatrix());
+    }
+}
+
+void TestInternalChannel::matrixWritesKeepShape()
+{
+    QString error;
+    InternalChannel channel;
+    QVERIFY(channel.configure(R"({"type":"double","dim":[2,2],"val":[1,2,3,4]})", &error));
+    knobData kData = makeKnobData();
+
+    // a scalar VAL write targets element 0, the other elements stay
+    channel.setValue(10.0, 0, QString());
+    QCOMPARE(channel.currentValue(), 10.0);
+    channel.fillKnobData(&kData);
+    double *values = (double *) kData.edata.dataB;
+    QCOMPARE(values[0], 10.0);
+    QCOMPARE(values[3], 4.0);
+    QCOMPARE(channel.nord, 4);
+
+    // a full wave write replaces everything, double values read back exactly
+    QVector<double> wave;
+    wave << 0.1 << 6.0 << 7.0 << 8.0;
+    channel.setWave(wave);
+    channel.fillKnobData(&kData);
+    values = (double *) kData.edata.dataB;
+    QCOMPARE(values[0], 0.1);
+    QCOMPARE(channel.currentValue(), 0.1);
+    QCOMPARE(values[3], 8.0);
+
+    // a partial write keeps the remaining elements and never shrinks the count
+    QVector<double> partial;
+    partial << 50.0 << 60.0;
+    channel.setWave(partial);
+    channel.fillKnobData(&kData);
+    values = (double *) kData.edata.dataB;
+    QCOMPARE(values[0], 50.0);
+    QCOMPARE(values[1], 60.0);
+    QCOMPARE(values[2], 7.0);
+    QCOMPARE(kData.edata.valueCount, 4);
+    QCOMPARE(channel.nord, 4);
+
+    // NORD stays fixed on a matrix
+    channel.setFieldValue(InternalChannel::FieldNord, 0.0, 2, QString());
+    QCOMPARE(channel.nord, 4);
+    freeKnobData(&kData);
+
+    // the scalar write is clamped to the drive limits
+    {
+        InternalChannel limited;
+        QVERIFY(limited.configure(R"({"type":"double","dim":[1,2],"drvl":-1,"drvh":1})", &error));
+        limited.setValue(5.0, 0, QString());
+        QCOMPARE(limited.currentValue(), 1.0);
+    }
+
+    // an int16 matrix truncates and wraps like the scalar type and takes
+    // idata for scalar writes
+    {
+        InternalChannel intChannel;
+        QVERIFY(intChannel.configure(R"({"type":"int","dim":[1,3]})", &error));
+        QVector<double> ints;
+        ints << 1.7 << 2.2 << 70000.0;
+        intChannel.setWave(ints);
+        knobData k = makeKnobData();
+        intChannel.fillKnobData(&k);
+        qint16 *iv = (qint16 *) k.edata.dataB;
+        QCOMPARE(iv[0], (qint16) 1);
+        QCOMPARE(iv[1], (qint16) 2);
+        QCOMPARE(iv[2], (qint16) 70000);
+        QCOMPARE(k.edata.rvalue, 1.0);
+        intChannel.setValue(0.0, 5, QString());
+        intChannel.fillKnobData(&k);
+        iv = (qint16 *) k.edata.dataB;
+        QCOMPARE(iv[0], (qint16) 5);
+        QCOMPARE(iv[1], (qint16) 2);
+        freeKnobData(&k);
+    }
+}
+
+void TestInternalChannel::matrixCounterTicks()
+{
+    QString error;
+    InternalChannel channel;
+    QVERIFY(channel.configure(R"({"type":"double","dim":[1,3],"mode":"counter","val":[0,10,20],"step":1})", &error));
+
+    channel.tick();
+    knobData kData = makeKnobData();
+    channel.fillKnobData(&kData);
+    double *values = (double *) kData.edata.dataB;
+    QCOMPARE(values[0], 1.0);
+    QCOMPARE(values[1], 11.0);
+    QCOMPARE(values[2], 21.0);
+    QCOMPARE(channel.currentValue(), 1.0); // scalar mirror follows element 0
+    QCOMPARE(kData.edata.dimCount, 2);     // dim travels with every publish
+    freeKnobData(&kData);
+}
+
+void TestInternalChannel::fillKnobDataMatrixWorks()
+{
+    QString error;
+    InternalChannel channel;
+    QVERIFY(channel.configure(R"({"type":"double","dim":[4,4],"val":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]})", &error));
+
+    knobData kData = makeKnobData();
+    channel.fillKnobData(&kData);
+    QCOMPARE(kData.edata.fieldtype, (short) caDOUBLE);
+    QCOMPARE(kData.edata.ntType, (int) NT_MATRIX);
+    QCOMPARE(kData.edata.dimCount, 2);
+    QCOMPARE(kData.edata.dim[0], 4);
+    QCOMPARE(kData.edata.dim[1], 4);
+    QCOMPARE(kData.edata.nelm, 16);
+    QCOMPARE(kData.edata.valueCount, 16);
+    QCOMPARE(kData.edata.dataSize, (int) (16 * sizeof(double)));
+    QCOMPARE(kData.edata.rvalue, 1.0); // element 0
+    double *values = (double *) kData.edata.dataB;
+    for(int i = 0; i < 16; i++) QCOMPARE(values[i], (double) (i + 1));
+    QCOMPARE(values[1 * 4 + 2], 7.0);  // row 1, column 2 in row-major order
+    freeKnobData(&kData);
+
+    // an int16 matrix carries the same metadata with its native element type
+    {
+        InternalChannel intChannel;
+        QVERIFY(intChannel.configure(R"({"type":"int","dim":[2,3]})", &error));
+        knobData k = makeKnobData();
+        intChannel.fillKnobData(&k);
+        QCOMPARE(k.edata.fieldtype, (short) caINT);
+        QCOMPARE(k.edata.ntType, (int) NT_MATRIX);
+        QCOMPARE(k.edata.dim[0], 2);
+        QCOMPARE(k.edata.dim[1], 3);
+        QCOMPARE(k.edata.dataSize, (int) (6 * sizeof(qint16)));
+        freeKnobData(&k);
+    }
+
+    // a plain waveform carries no dim, stale metadata is cleared
+    {
+        InternalChannel wave;
+        QVERIFY(wave.configure(R"({"type":"double","nelm":16})", &error));
+        knobData k = makeKnobData();
+        k.edata.dimCount = 2;
+        k.edata.dim[0] = 4;
+        wave.fillKnobData(&k);
+        QCOMPARE(k.edata.ntType, (int) NT_NONE);
+        QCOMPARE(k.edata.dimCount, 0);
+        QCOMPARE(k.edata.dim[0], 0);
+        freeKnobData(&k);
+    }
+
+    // the NELM/NORD field monitors report the fixed count and no dim
+    knobData fieldData = makeKnobData();
+    fieldData.edata.dimCount = 2;
+    channel.fillKnobDataField(&fieldData, InternalChannel::FieldNelm);
+    QCOMPARE(fieldData.edata.ivalue, (long) 16);
+    QCOMPARE(fieldData.edata.dimCount, 0);
+    channel.fillKnobDataField(&fieldData, InternalChannel::FieldNord);
+    QCOMPARE(fieldData.edata.ivalue, (long) 16);
+    freeKnobData(&fieldData);
+
+    // an unconfigured channel reports no dim either
+    {
+        InternalChannel none;
+        knobData k = makeKnobData();
+        k.edata.dimCount = 2;
+        none.fillKnobData(&k);
+        QCOMPARE(k.edata.dimCount, 0);
+        freeKnobData(&k);
+    }
+}
+
+void TestInternalChannel::configJsonIsStoredNormalized()
+{
+    QString error;
+    InternalChannel channel;
+    QVERIFY(channel.configure(R"({ "val": 3,  "type": "long" })", &error));
+    QCOMPARE(channel.configJson, QString(R"({"type":"long","val":3})"));
+    QVERIFY(channel.definedBy.isEmpty()); // the plugin sets the origin
+
+    // whitespace and key order do not matter, invalid text stays as written
+    QCOMPARE(InternalChannel::normalizedJson(R"({"type":"long","val":3})"), channel.configJson);
+    QCOMPARE(InternalChannel::normalizedJson(R"({"type":"long","val":4})") == channel.configJson, false);
+    QCOMPARE(InternalChannel::normalizedJson("  not json "), QString("not json"));
+}
+

@@ -59,6 +59,12 @@ private slots:
     void nordAndNelmWorkLikeEpics();
     void setValueWorks();
     void setWaveWorks();
+    void unconfiguredChannelIsNotConnected();
+    void configureMatrixWorks();
+    void matrixWritesKeepShape();
+    void matrixCounterTicks();
+    void fillKnobDataMatrixWorks();
+    void configJsonIsStoredNormalized();
 };
 
 #endif // TST_INTERNAL_CHANNEL_H

@@ -63,6 +63,10 @@ class QTCON_EXPORT genSoftPV : public ESimpleLabel
     Q_PROPERTY(int nelm READ getNelm WRITE setNelm)
     Q_PROPERTY(int nord READ getNord WRITE setNord)
 
+    // matrix shape (dim = [rows, cols], row-major); 0 = plain scalar/waveform
+    Q_PROPERTY(int matrixRows READ getMatrixRows WRITE setMatrixRows)
+    Q_PROPERTY(int matrixColumns READ getMatrixColumns WRITE setMatrixColumns)
+
     Q_PROPERTY(QString units READ getUnits WRITE setUnits)
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(QStringList enumStrings READ getEnumStrings WRITE setEnumStrings)
@@ -78,6 +82,7 @@ class QTCON_EXPORT genSoftPV : public ESimpleLabel
     Q_ENUMS(Mode)
 
 public:
+    // append only, .ui files store the enum by name but the config dialog maps by index
     enum DataType { Double = 0, Float, Int, Long, Enum, String, Char };
     enum Mode { Constant = 0, Counter };
 
@@ -129,6 +134,10 @@ public:
     void setNelm(int nelm) {thisNelm = nelm;}
     int getNord() const {return thisNord;}
     void setNord(int nord) {thisNord = nord;}
+    int getMatrixRows() const {return thisMatrixRows;}
+    void setMatrixRows(int rows) {thisMatrixRows = rows;}
+    int getMatrixColumns() const {return thisMatrixColumns;}
+    void setMatrixColumns(int columns) {thisMatrixColumns = columns;}
 
     QString getUnits() const {return thisUnits;}
     void setUnits(QString const &units) {thisUnits = units;}
@@ -138,6 +147,9 @@ public:
     void setEnumStrings(QStringList const &strings) {thisEnumStrings = strings;}
     QString getRegex() const {return thisRegex;}
     void setRegex(QString const &regex) {thisRegex = regex;}
+
+    // matrix: fixed element count rows*cols, the plugin derives nelm/nord itself
+    bool isMatrix() const {return thisMatrixRows > 0 && thisMatrixColumns > 0;}
 
     // the JSON configuration for the internal plugin, only set fields appear
     QString buildConfigJSON() const;
@@ -157,6 +169,8 @@ private:
     bool thisPersistent;
     int thisNelm;
     int thisNord;
+    int thisMatrixRows;
+    int thisMatrixColumns;
     QString thisUnits;
     int thisPrecision;
     QStringList thisEnumStrings;

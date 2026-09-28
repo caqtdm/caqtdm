@@ -96,9 +96,16 @@ void InternalPlugin::publishChannel(const QString &key, InternalChannel *channel
     foreach(int index, monitorIndexes.value(key)) {
         InternalChannel::Field field = monitorFields.value(index, InternalChannel::FieldVal);
         if(field != InternalChannel::FieldVal) {
-            QVariant current = channel->fieldVariant(field);
-            if(lastPublishedField.contains(index) && (lastPublishedField.value(index) == current)) continue;
-            lastPublishedField.insert(index, current);
+            if(channel->isConfigured()) {
+                QVariant current = channel->fieldVariant(field);
+                if(lastPublishedField.contains(index) && (lastPublishedField.value(index) == current)) continue;
+                lastPublishedField.insert(index, current);
+            } else {
+                // unconfigured publishes are the disconnected state; without a
+                // baseline every field monitor republishes once the
+                // configuration (the channel's connect) arrives
+                lastPublishedField.remove(index);
+            }
         }
         publishIndex(channel, index);
     }
@@ -126,6 +133,15 @@ void InternalPlugin::publishIndex(InternalChannel *channel, int index)
     mutexknobdataP->SetMutexKnobData(kData->index, *kData);
     mutexknobdataP->SetMutexKnobDataReceived(kData);
     if(lockable) mutexknobdataP->DataUnlock(kData);
+}
+
+// where a channel definition comes from, for the duplicate definition message
+static QString definitionOrigin(knobData *kData, QObject *widget)
+{
+    QString name = (widget != (QObject *) Q_NULLPTR) ? widget->objectName() : QString();
+    QString origin = QString("widget '%1'").arg(name.isEmpty() ? QString("genSoftPV") : name);
+    if(kData->fileName[0] != '\0') origin += QString(" in %1").arg(QString::fromLatin1(kData->fileName));
+    return origin;
 }
 
 int InternalPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
@@ -164,19 +180,30 @@ int InternalPlugin::pvAddMonitor(int index, knobData *kData, int rate, int skip)
 
     // the configuration comes from the channelConfigJSON property of the defining
     // widget (genSoftPV); field monitors never configure the channel
-    if((field == InternalChannel::FieldVal) && !channel->isConfigured()) {
+    if(field == InternalChannel::FieldVal) {
         QObject *object = (QObject *) kData->dispW;
-        if(object != (QObject *) Q_NULLPTR) {
-            QString config = object->property("channelConfigJSON").toString();
-            if(!config.isEmpty()) {
+        QString config = (object != (QObject *) Q_NULLPTR) ? object->property("channelConfigJSON").toString() : QString();
+        if(!config.isEmpty()) {
+            QString origin = definitionOrigin(kData, object);
+            char asc[MAX_STRING_LENGTH];
+            if(!channel->isConfigured()) {
                 QString error;
-                if(!channel->configure(config, &error)) {
-                    char asc[MAX_STRING_LENGTH];
-                    snprintf(asc, MAX_STRING_LENGTH, "internal plugin: invalid configuration for %s (%s), using defaults",
-                             qasc(key), qasc(error));
+                if(channel->configure(config, &error)) {
+                    channel->definedBy = origin;
+                } else {
+                    snprintf(asc, MAX_STRING_LENGTH, "internal plugin: invalid configuration for %s by %s (%s), channel stays unconnected",
+                             qasc(key), qasc(origin), qasc(error));
                     if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtWarningMsg, asc);
                     qCWarning(internalLog) << asc;
                 }
+            } else if(InternalChannel::normalizedJson(config) != channel->configJson) {
+                // first definition wins; a different later one is only reported
+                snprintf(asc, MAX_STRING_LENGTH, "internal plugin: channel %s is already defined by %s, the different definition of %s is ignored",
+                         qasc(key), qasc(channel->definedBy), qasc(origin));
+                if(messagewindowP != (MessageWindow *) Q_NULLPTR) messagewindowP->postMsgEvent(QtInfoMsg, asc);
+                qCDebug(internalLog) << asc;
+            } else {
+                qCDebug(internalLog) << "channel" << key << "same definition by" << origin << "ignored";
             }
         }
     }
@@ -238,6 +265,8 @@ int InternalPlugin::setValueForPv(const QString &pv, double rdata, int32_t idata
     if(!InternalChannel::splitField(pv, &key, &field)) return false;
     InternalChannel *channel = channels.value(key, Q_NULLPTR);
     if(channel == Q_NULLPTR) return false;
+    // an unconfigured channel is a disconnected shell, writes are rejected
+    if(!channel->isConfigured()) return false;
 
     channel->setFieldValue(field, rdata, idata,
                            (sdata != (char *) Q_NULLPTR) ? QString::fromLatin1(sdata) : QString());
@@ -271,6 +300,7 @@ int InternalPlugin::setWaveForPv(const QString &pv, float *fdata, double *ddata,
     if(field != InternalChannel::FieldVal) return false;
     InternalChannel *channel = channels.value(key, Q_NULLPTR);
     if(channel == Q_NULLPTR) return false;
+    if(!channel->isConfigured()) return false;
 
     QVector<double> values;
     values.reserve(nelm);
@@ -312,7 +342,12 @@ int InternalPlugin::pvGetTimeStamp(char *pv, char *timestamp)
 
 int InternalPlugin::pvGetDescription(char *pv, char *description)
 {
-    Q_UNUSED(pv);
+    InternalChannel *chan = channel(InternalChannel::baseName(QString::fromLatin1(pv)));
+    if(chan != Q_NULLPTR && chan->isMatrix()) {
+        snprintf(description, MAX_STRING_LENGTH, "internal test/simulation channel (matrix %dx%d, row-major)",
+                 chan->dimRows, chan->dimCols);
+        return true;
+    }
     qstrncpy(description, "internal test/simulation channel", MAX_STRING_LENGTH);
     return true;
 }
