@@ -12,6 +12,14 @@ on:
 env:
   QT_MODULES: 'qtserialbus qtpositioning qt5compat qtserialport qtmultimedia qtsensors qtwebsockets qtimageformats qtwebview'
 
+  # Never let Homebrew auto-update or upgrade anything: on the Intel runners
+  # (Homebrew Tier 3, no bottles) that means compiling from source for hours.
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALL_UPGRADE: 1
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+  HOMEBREW_NO_INSTALL_CLEANUP: 1
+  HOMEBREW_NO_ENV_HINTS: 1
+
   DEPS_INSTALL_ROOT: ${{ github.workspace }}/deps
   QWT_INSTALL_DIR: ${{ github.workspace }}/deps/qwt
   ZEROMQ_INSTALL_DIR: ${{ github.workspace }}/deps/zeromq
@@ -80,17 +88,27 @@ jobs:
           set-env: true
           cache: true
 
+      # Homebrew has moved macOS Intel (x86_64) to Tier 3 (no bottles). Any
+      # "brew update"/"brew upgrade" therefore rebuilds outdated formulae from
+      # source on the Intel runners (hours, or the 6h job timeout). We only need
+      # OpenSSL for Qt OPC UA, which is already preinstalled on the images.
       - name: Install build tools (OpenSSL for Qt OPC UA)
         run: |
           set -euo pipefail
-          brew uninstall --cask --force $(brew list --cask)
-          brew remove rustup xcodes aws-sam-cli azure-cli pipx git-lfs || true
-          brew remove python3
-          brew update
-          brew upgrade  || true
-          brew install openssl@3 || true
-          brew install python@3.14 || true
-          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          # Outdated casks (Parallels, browsers, ...) caused problems in earlier runs
+          CASKS="$(brew list --cask 2>/dev/null || true)"
+          if [ -n "${CASKS}" ]; then
+            # shellcheck disable=SC2086
+            brew uninstall --cask --force ${CASKS} || true
+          fi
+          if ! brew --prefix --installed openssl@3 >/dev/null 2>&1; then
+            echo "openssl@3 not preinstalled, installing without update/upgrade"
+            brew install openssl@3
+          fi
+          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"
+          test -f "${OPENSSL_ROOT_DIR}/include/openssl/ssl.h"
+          echo "OPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}" >> "$GITHUB_ENV"
+          "${OPENSSL_ROOT_DIR}/bin/openssl" version
 
       - name: Create dependencies install directory
         run: mkdir -p "${{ env.DEPS_INSTALL_ROOT }}"
@@ -202,6 +220,31 @@ jobs:
           cd "${{ env.EPICS_BASE_DIR }}"
           git submodule update --init --recursive --jobs "$(sysctl -n hw.ncpu)"
           make -j"$(sysctl -n hw.ncpu)" EPICS_HOST_ARCH="${EPICS_HOST_ARCH}"
+
+      # -------------------------------------------------------------------
+      # Python for PYTHONCALC (from the runner toolcache, not from Homebrew)
+      # caQtDM.pri only builds Python support on macOS when PYTHONINCLUDE is set.
+      # The version is not pinned; the libpython the app links against follows it.
+      # -------------------------------------------------------------------
+      - name: Set up Python for PYTHONCALC
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'  # latest stable Python 3; PYTHONVERSION is derived below
+
+      - name: Export Python build variables
+        run: |
+          set -euo pipefail
+          PYTHONVERSION="$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LDVERSION"))')"
+          PYTHONINCLUDE="$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["include"])')"
+          PYTHONLIB="$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')"
+          test -f "${PYTHONINCLUDE}/Python.h"
+          test -f "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib"
+          {
+            echo "PYTHONVERSION=${PYTHONVERSION}"
+            echo "PYTHONINCLUDE=${PYTHONINCLUDE}"
+            echo "PYTHONLIB=${PYTHONLIB}"
+          } >> "$GITHUB_ENV"
+          echo "Using Python ${PYTHONVERSION}: include=${PYTHONINCLUDE} lib=${PYTHONLIB}"
 
       # -------------------------------------------------------------------
       # caQtDM build environment
