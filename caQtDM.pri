@@ -904,6 +904,10 @@ caQtDM_Viewer {
                                     plugins_opcua.path = Contents/PlugIns/controlsystems
                                     plugins_opcua.files += $$(CAQTDM_COLLECT)/controlsystems/libopcua_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_opcua
+                                    # Qt OPC UA backend plugin, not handled by macdeployqt
+                                    opcua_backend.path = Contents/PlugIns/opcua
+                                    opcua_backend.files += $$[QT_INSTALL_PLUGINS]/opcua/libopen62541_backend.dylib
+                                    QMAKE_BUNDLE_DATA += opcua_backend
                                 }
 
         }

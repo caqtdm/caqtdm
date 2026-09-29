@@ -12,6 +12,11 @@ on:
 env:
   QT_MODULES: 'qtserialbus qtpositioning qt5compat qtserialport qtmultimedia qtsensors qtwebsockets qtimageformats qtwebview'
 
+  # Optional control-system plugins (qtdefs.pri only builds them when set)
+  CAQTDM_OPCUA: 1
+  CAQTDM_MODBUS: 1
+  CAQTDM_GPS: 1
+
   # Never let Homebrew auto-update or upgrade anything: on the Intel runners
   # (Homebrew Tier 3, no bottles) that means compiling from source for hours.
   HOMEBREW_NO_AUTO_UPDATE: 1
@@ -380,6 +385,11 @@ jobs:
                 install_name_tool -id "@rpath/$(basename "$f")" "$f" 2>/dev/null || true
                 PLUGIN_EXECS+=( -executable="$f" )
                 ;;
+              */PlugIns/opcua/*.dylib)
+                # Qt OPC UA backend (bundled via caQtDM.pri); macdeployqt does not
+                # know this plugin type, so pass it explicitly to deploy QtOpcUa/OpenSSL.
+                PLUGIN_EXECS+=( -executable="$f" )
+                ;;
             esac
           done <<< "$(find "$APP/Contents/MacOS" "$APP/Contents/Frameworks" "$APP/Contents/PlugIns" -type f 2>/dev/null || true)"
 
@@ -389,7 +399,21 @@ jobs:
             -libpath="${{ env.CAQTDM_DIR }}/caQtDM_Binaries" \
             -libpath="${EPICSLIB}" \
             -libpath="${QWTLIB}" \
-            -libpath="${ZMQLIB}" || true
+            -libpath="${ZMQLIB}" \
+            -libpath="${OPENSSL_ROOT_DIR}/lib" || true
+
+          # Optional plugins must be present and relocatable
+          for p in opcua modbus gps; do
+            test -f "$APP/Contents/PlugIns/controlsystems/lib${p}_plugin.dylib"
+          done
+          OPCUA_BACKEND="$APP/Contents/PlugIns/opcua/libopen62541_backend.dylib"
+          test -f "$OPCUA_BACKEND"
+          test -d "$APP/Contents/Frameworks/QtOpcUa.framework"
+          otool -L "$OPCUA_BACKEND"
+          if otool -L "$OPCUA_BACKEND" | grep -qE '/opt/homebrew/|/usr/local/opt/'; then
+            echo "open62541 backend still references Homebrew libraries" >&2
+            exit 1
+          fi
 
           # Python must be bundled and referenced relocatably (PYTHONCALC)
           PYLIB="$APP/Contents/Frameworks/libpython${PYTHONVERSION}.dylib"
