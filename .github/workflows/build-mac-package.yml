@@ -349,7 +349,12 @@ jobs:
             exit 1
           fi
           mkdir -p "$APP/Contents/PlugIns/platforms" \
-                   "$APP/Contents/PlugIns/imageformats"
+                   "$APP/Contents/PlugIns/imageformats" \
+                   "$APP/Contents/Frameworks"
+          # macdeployqt resolves "@rpath/..." dependencies only through the rpath
+          # entries of the binaries (Contents/Frameworks), not via -libpath.
+          # Put libpython there up front so the reference resolves.
+          cp "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib" "$APP/Contents/Frameworks/"
           cp "${QTHOME}"/plugins/imageformats/*.dylib "$APP/Contents/PlugIns/imageformats/" 2>/dev/null || true
           rm -f "$APP"/Contents/PlugIns/imageformats/*_debug.dylib || true
           cp "${QTHOME}/plugins/platforms/libqcocoa.dylib" "$APP/Contents/PlugIns/platforms/" 2>/dev/null || true
@@ -384,14 +389,14 @@ jobs:
             -libpath="${{ env.CAQTDM_DIR }}/caQtDM_Binaries" \
             -libpath="${EPICSLIB}" \
             -libpath="${QWTLIB}" \
-            -libpath="${ZMQLIB}" \
-            -libpath="${PYTHONLIB}" || true
+            -libpath="${ZMQLIB}" || true
 
-          # Python must have been deployed next to the other libraries (PYTHONCALC)
+          # Python must be bundled and referenced relocatably (PYTHONCALC)
           PYLIB="$APP/Contents/Frameworks/libpython${PYTHONVERSION}.dylib"
-          if [ ! -f "$PYLIB" ]; then
-            echo "libpython${PYTHONVERSION}.dylib was not deployed into $APP/Contents/Frameworks" >&2
-            otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib" || true
+          test -f "$PYLIB"
+          if otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib" | grep -q "/Library/Frameworks/Python"; then
+            echo "libcaQtDM_Lib.dylib still references the system Python framework" >&2
+            otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib"
             exit 1
           fi
           echo "Python deployed: $PYLIB"
