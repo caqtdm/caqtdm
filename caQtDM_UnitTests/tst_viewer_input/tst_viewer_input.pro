@@ -36,13 +36,15 @@ HEADERS += ../../caQtDM_Viewer/src/fileopenwindow.h \
     ../../caQtDM_Viewer/src/configDialog.h \
     ../../caQtDM_Viewer/src/loggingcategories.h \
     ../../caQtDM_QtControls/src/networkaccess.h \
-    ../../caQtDM_Lib/src/caqtdm_lib.h
+    ../../caQtDM_Lib/src/caqtdm_lib.h \
+    ../../caQtDM_Lib/src/panelthemeapplier.h
 
 SOURCES += ../../caQtDM_Viewer/src/fileopenwindow.cpp \
     ../../caQtDM_Viewer/src/messagebox.cpp \
     ../../caQtDM_Viewer/src/configDialog.cpp \
     ../../caQtDM_QtControls/src/networkaccess.cpp \
-    ../../caQtDM_Lib/src/caqtdm_lib.cpp
+    ../../caQtDM_Lib/src/caqtdm_lib.cpp \
+    ../../caQtDM_Lib/src/panelthemeapplier.cpp
 
 FORMS += ../../caQtDM_Viewer/src/main.ui
 
