@@ -534,6 +534,9 @@ int main(int argc, char *argv[])
 
             if (web_launcher_file.isNull()) {
                 printf("caQtDM -- Error: Web launcher file not found, exiting...");
+#ifndef CAQTDM_NO_CUSTOM_LOGHANDLER
+                GeneralLogHandler::shutdown();
+#endif
                 return 1;
             }
         }
@@ -714,6 +717,10 @@ int main(int argc, char *argv[])
         exitCode = EXIT_FAILURE;
         qCCritical(caQtDMLog) << e.what();
     }
+
+#ifndef CAQTDM_NO_CUSTOM_LOGHANDLER
+    GeneralLogHandler::shutdown();
+#endif
 
     return exitCode;
 }

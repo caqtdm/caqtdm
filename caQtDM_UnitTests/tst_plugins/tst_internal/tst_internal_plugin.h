@@ -49,7 +49,8 @@ private slots:
     void configFromWidgetPropertyWorks();
     void filterSuffixIsIgnored();
     void channelsAreSharedByBaseName();
-    void invalidConfigFallsBackToDefaults();
+    void invalidConfigLeavesChannelUnconnected();
+    void channelConnectsOnlyAfterConfiguration();
     void counterAdvancesWithTimerTicks();
     void writeThroughPluginWorks();
     void channelDeletedWhenUnreferenced();
@@ -60,11 +61,13 @@ private slots:
     void controlInfoWriteForcesReinitialize();
     void drvlDrvhClampThroughPlugin();
     void schemePrefixInDirectCallsIsStripped();
+    void matrixChannelThroughPluginWorks();
+    void duplicateDefinitionIsReportedAndIgnored();
 
 private:
     // registers a monitor; the configuration travels like in the real
     // application through the channelConfigJSON property of the widget
-    int createMonitor(const QString &pv, const QString &configJSON = QString());
+    int createMonitor(const QString &pv, const QString &configJSON = QString(), const QString &widgetName = QString());
     void pumpTimerOnce();
 
     InternalPlugin *m_plugin;

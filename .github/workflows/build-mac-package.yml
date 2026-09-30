@@ -12,6 +12,19 @@ on:
 env:
   QT_MODULES: 'qtserialbus qtpositioning qt5compat qtserialport qtmultimedia qtsensors qtwebsockets qtimageformats qtwebview'
 
+  # Optional control-system plugins (qtdefs.pri only builds them when set)
+  CAQTDM_OPCUA: 1
+  CAQTDM_MODBUS: 1
+  CAQTDM_GPS: 1
+
+  # Never let Homebrew auto-update or upgrade anything: on the Intel runners
+  # (Homebrew Tier 3, no bottles) that means compiling from source for hours.
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALL_UPGRADE: 1
+  HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+  HOMEBREW_NO_INSTALL_CLEANUP: 1
+  HOMEBREW_NO_ENV_HINTS: 1
+
   DEPS_INSTALL_ROOT: ${{ github.workspace }}/deps
   QWT_INSTALL_DIR: ${{ github.workspace }}/deps/qwt
   ZEROMQ_INSTALL_DIR: ${{ github.workspace }}/deps/zeromq
@@ -80,17 +93,27 @@ jobs:
           set-env: true
           cache: true
 
+      # Homebrew has moved macOS Intel (x86_64) to Tier 3 (no bottles). Any
+      # "brew update"/"brew upgrade" therefore rebuilds outdated formulae from
+      # source on the Intel runners (hours, or the 6h job timeout). We only need
+      # OpenSSL for Qt OPC UA, which is already preinstalled on the images.
       - name: Install build tools (OpenSSL for Qt OPC UA)
         run: |
           set -euo pipefail
-          brew uninstall --cask --force $(brew list --cask)
-          brew remove rustup xcodes aws-sam-cli azure-cli pipx  || true
-          brew remove python3
-          brew update
-          brew upgrade  || true
-          brew install openssl@3 || true
-          brew install python@3.14 || true
-          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          # Outdated casks (Parallels, browsers, ...) caused problems in earlier runs
+          CASKS="$(brew list --cask 2>/dev/null || true)"
+          if [ -n "${CASKS}" ]; then
+            # shellcheck disable=SC2086
+            brew uninstall --cask --force ${CASKS} || true
+          fi
+          if ! brew --prefix --installed openssl@3 >/dev/null 2>&1; then
+            echo "openssl@3 not preinstalled, installing without update/upgrade"
+            brew install openssl@3
+          fi
+          OPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"
+          test -f "${OPENSSL_ROOT_DIR}/include/openssl/ssl.h"
+          echo "OPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}" >> "$GITHUB_ENV"
+          "${OPENSSL_ROOT_DIR}/bin/openssl" version
 
       - name: Create dependencies install directory
         run: mkdir -p "${{ env.DEPS_INSTALL_ROOT }}"
@@ -204,6 +227,43 @@ jobs:
           make -j"$(sysctl -n hw.ncpu)" EPICS_HOST_ARCH="${EPICS_HOST_ARCH}"
 
       # -------------------------------------------------------------------
+      # Python for PYTHONCALC (from the runner toolcache, not from Homebrew)
+      # caQtDM.pri only builds Python support on macOS when PYTHONINCLUDE is set.
+      # The version is not pinned; the libpython the app links against follows it.
+      # -------------------------------------------------------------------
+      - name: Set up Python for PYTHONCALC
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'  # latest stable Python 3; PYTHONVERSION is derived below
+
+      - name: Export Python build variables
+        run: |
+          set -euo pipefail
+          PYTHONVERSION="$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LDVERSION"))')"
+          PYTHONINCLUDE="$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["include"])')"
+          PYTHONLIB="$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')"
+          test -f "${PYTHONINCLUDE}/Python.h"
+          test -f "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib"
+          # The toolcache Python is a framework build: libpython<ver>.dylib is only a
+          # symlink to Python.framework/Versions/<ver>/Python, whose install name
+          # (/Library/Frameworks/...) macdeployqt cannot resolve. Create a real,
+          # relocatable copy with an @rpath install name and link against that one.
+          PYTHON_DEPLOY_LIB="${{ env.DEPS_INSTALL_ROOT }}/python/lib"
+          mkdir -p "${PYTHON_DEPLOY_LIB}"
+          cp -L "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib" "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          chmod u+w "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          install_name_tool -id "@rpath/libpython${PYTHONVERSION}.dylib" "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          codesign --force --sign - "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          file "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          otool -D -L "${PYTHON_DEPLOY_LIB}/libpython${PYTHONVERSION}.dylib"
+          {
+            echo "PYTHONVERSION=${PYTHONVERSION}"
+            echo "PYTHONINCLUDE=${PYTHONINCLUDE}"
+            echo "PYTHONLIB=${PYTHON_DEPLOY_LIB}"
+          } >> "$GITHUB_ENV"
+          echo "Using Python ${PYTHONVERSION}: include=${PYTHONINCLUDE} lib=${PYTHON_DEPLOY_LIB} (copied from ${PYTHONLIB})"
+
+      # -------------------------------------------------------------------
       # caQtDM build environment
       # -------------------------------------------------------------------
       - name: Set caQtDM build environment variables
@@ -273,7 +333,7 @@ jobs:
           set -euo pipefail
 
           export PATH="${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${QTHOME}/bin:${PATH}"
-          export DYLD_LIBRARY_PATH="${EPICSLIB}:${ZMQLIB}:${QWTLIB}:${CAQTDM_COLLECT}:${CAQTDM_COLLECT}/controlsystems:${DYLD_LIBRARY_PATH:-}"
+          export DYLD_LIBRARY_PATH="${EPICSLIB}:${ZMQLIB}:${QWTLIB}:${PYTHONLIB}:${CAQTDM_COLLECT}:${CAQTDM_COLLECT}/controlsystems:${DYLD_LIBRARY_PATH:-}"
           export QT_FORCE_STDERR_LOGGING=1
           export QT_LOGGING_TO_CONSOLE=1
 
@@ -294,7 +354,12 @@ jobs:
             exit 1
           fi
           mkdir -p "$APP/Contents/PlugIns/platforms" \
-                   "$APP/Contents/PlugIns/imageformats"
+                   "$APP/Contents/PlugIns/imageformats" \
+                   "$APP/Contents/Frameworks"
+          # macdeployqt resolves "@rpath/..." dependencies only through the rpath
+          # entries of the binaries (Contents/Frameworks), not via -libpath.
+          # Put libpython there up front so the reference resolves.
+          cp "${PYTHONLIB}/libpython${PYTHONVERSION}.dylib" "$APP/Contents/Frameworks/"
           cp "${QTHOME}"/plugins/imageformats/*.dylib "$APP/Contents/PlugIns/imageformats/" 2>/dev/null || true
           rm -f "$APP"/Contents/PlugIns/imageformats/*_debug.dylib || true
           cp "${QTHOME}/plugins/platforms/libqcocoa.dylib" "$APP/Contents/PlugIns/platforms/" 2>/dev/null || true
@@ -320,6 +385,11 @@ jobs:
                 install_name_tool -id "@rpath/$(basename "$f")" "$f" 2>/dev/null || true
                 PLUGIN_EXECS+=( -executable="$f" )
                 ;;
+              */PlugIns/opcua/*.dylib)
+                # Qt OPC UA backend (bundled via caQtDM.pri); macdeployqt does not
+                # know this plugin type, so pass it explicitly to deploy QtOpcUa/OpenSSL.
+                PLUGIN_EXECS+=( -executable="$f" )
+                ;;
             esac
           done <<< "$(find "$APP/Contents/MacOS" "$APP/Contents/Frameworks" "$APP/Contents/PlugIns" -type f 2>/dev/null || true)"
 
@@ -329,7 +399,32 @@ jobs:
             -libpath="${{ env.CAQTDM_DIR }}/caQtDM_Binaries" \
             -libpath="${EPICSLIB}" \
             -libpath="${QWTLIB}" \
-            -libpath="${ZMQLIB}" || true
+            -libpath="${ZMQLIB}" \
+            -libpath="${OPENSSL_ROOT_DIR}/lib" || true
+
+          # Optional plugins must be present and relocatable
+          for p in opcua modbus gps; do
+            test -f "$APP/Contents/PlugIns/controlsystems/lib${p}_plugin.dylib"
+          done
+          OPCUA_BACKEND="$APP/Contents/PlugIns/opcua/libopen62541_backend.dylib"
+          test -f "$OPCUA_BACKEND"
+          test -d "$APP/Contents/Frameworks/QtOpcUa.framework"
+          otool -L "$OPCUA_BACKEND"
+          if otool -L "$OPCUA_BACKEND" | grep -qE '/opt/homebrew/|/usr/local/opt/'; then
+            echo "open62541 backend still references Homebrew libraries" >&2
+            exit 1
+          fi
+
+          # Python must be bundled and referenced relocatably (PYTHONCALC)
+          PYLIB="$APP/Contents/Frameworks/libpython${PYTHONVERSION}.dylib"
+          test -f "$PYLIB"
+          if otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib" | grep -q "/Library/Frameworks/Python"; then
+            echo "libcaQtDM_Lib.dylib still references the system Python framework" >&2
+            otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib"
+            exit 1
+          fi
+          echo "Python deployed: $PYLIB"
+          otool -L "$APP/Contents/Frameworks/libcaQtDM_Lib.dylib" | grep -i python || true
 
           codesign --force --sign - "$APP/Contents/Frameworks/qwt.framework" 2>/dev/null || true
           find "$APP/Contents/PlugIns" -name '*.dylib' -exec codesign --force --sign - {} \; 2>/dev/null || true

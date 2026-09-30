@@ -152,6 +152,7 @@ class epicsShareClass PVAInterface :
 {
 private:
     template <typename pureData> void fillData(pureData const &array, size_t size, knobData* kPtr);
+    void fillNtMetadata();
 
     enum NormativeType {
         ntunknown_t,
@@ -179,6 +180,9 @@ private:
     CallbackThreadPtr callbackThread;
     bool gotFirstConnect;
     NormativeType normativeType;
+    int ntKind;                 // enum ntType from the structure id, NT_NONE for non NT structures
+    int dimRows, dimCols;       // cached NTMatrix dim (0 = none received yet)
+    bool hasDimField;
     CallbackType callbackType;
     StructureConstPtr structure;
     ChannelGet::shared_pointer pvaChannelGet;
@@ -637,10 +641,31 @@ PVAInterface::PVAInterface(
       callbackThread(callbackThread),
       gotFirstConnect(false),
       normativeType(ntunknown_t),
+      ntKind(NT_NONE),
+      dimRows(0),
+      dimCols(0),
+      hasDimField(false),
       callbackType(unknown_t),
       convert(getConvert())
 {
     if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "PVAInterface::PVAInterface()";
+}
+
+// NT metadata, written on every publish (K6); an NTMatrix without a dim
+// so far is published as a column vector [valueCount, 1]
+void PVAInterface::fillNtMetadata()
+{
+    kData.edata.ntType = ntKind;
+    if(ntKind == NT_MATRIX) {
+        bool cached = (dimRows > 0 && dimCols > 0);
+        kData.edata.dimCount = 2;
+        kData.edata.dim[0] = cached ? dimRows : kData.edata.valueCount;
+        kData.edata.dim[1] = cached ? dimCols : 1;
+    } else {
+        kData.edata.dimCount = 0;
+        kData.edata.dim[0] = 0;
+        kData.edata.dim[1] = 0;
+    }
 }
 
 PVAInterface::~PVAInterface()
@@ -745,6 +770,20 @@ void PVAInterface::getDone(
         message(" value is not a valid nttype",errorMessage);
         return;
     }
+
+    // the NT kind comes from the structure id; an NTMatrix keeps its
+    // ntscalararray_t data path (value is double[])
+    ntKind = NT_NONE;
+    hasDimField = false;
+    if(NTMatrix::is_a(structure)) {
+        ntKind = NT_MATRIX;
+        hasDimField = structure->getField("dim") ? true : false;
+    } else if(NTScalarArray::is_a(structure)) {
+        ntKind = NT_SCALAR_ARRAY;
+    } else if(NTScalar::is_a(structure)) {
+        ntKind = NT_SCALAR;
+    }
+    qCDebug(::epics4Log) << "structure id" << structure->getID().c_str() << "ntType" << ntKind;
     gotInterface();
 }
 
@@ -848,6 +887,20 @@ void PVAInterface::monitorEvent(MonitorPtr const & monitor)
             case ntscalararray_t : getScalarArrayData(pvStructure); break;
             default: throw std::runtime_error("PVAInterface::event logic error");
         }
+        if(ntKind == NT_MATRIX) {
+            // value and dim may be marked separately, the last dim stays cached
+            PVIntArrayPtr pvDim = pvStructure->getSubField<PVIntArray>("dim");
+            if(pvDim && pvDim->getLength() == 2) {
+                shared_vector<const int32> dim(pvDim->view());
+                if(dim[0] > 0 && dim[1] > 0) {
+                    dimRows = dim[0];
+                    dimCols = dim[1];
+                }
+            }
+            if(dimRows * dimCols != kData.edata.valueCount && dimRows > 0)
+                qCDebug(::epics4Log) << kData.pv << "dim" << dimRows << "x" << dimCols << "does not match" << kData.edata.valueCount << "values";
+        }
+        fillNtMetadata();
         qCDebug(::epics4Log) << "update" << kData.pv << kData.index << kData.pluginFlavor << kData.dispName <<kData.edata.rvalue << kData.edata.ivalue;
         mutexKnobData->SetMutexKnobDataReceived(&kData);
 
@@ -973,6 +1026,7 @@ void PVAInterface::gotInterface()
         kData.edata.initialize = true;
         kData.edata.accessR = 1;
         kData.edata.accessW = 1;
+        fillNtMetadata();
         mutexKnobData->SetMutexKnobDataReceived(&kData);
 
         mutexKnobData->DataUnlock(&kData);
@@ -1074,6 +1128,7 @@ void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
         for(int i=0; i< len; ++i) kData.edata.units[i] = from[i];
         kData.edata.units[len] = '\0';
     }
+    fillNtMetadata();
     mutexKnobData->SetMutexKnobDataReceived(&kData);
 
     mutexKnobData->DataUnlock(&kData);
@@ -1134,6 +1189,7 @@ void PVAInterface::gotEnum(PVStructurePtr const & pvStructure)
     kData.edata.fieldtype  = DBF_ENUM;
     kData.edata.accessR = 1;
     kData.edata.accessW = 1;
+    fillNtMetadata();
 
     mutexKnobData->SetMutexKnobDataReceived(&kData);
 
@@ -1150,6 +1206,7 @@ void PVAInterface::createMonitor()
         if(normativeType==ntunknown_t) return;
         string request("value,alarm,timeStamp");
         if(normativeType==ntenum_t) request = "alarm,timeStamp,value.index";
+        if(ntKind == NT_MATRIX && hasDimField) request += ",dim";
         PVStructurePtr pvRequest = createRequest->createRequest(request);
         pvaMonitorRequester = PVAMonitorRequesterPtr(new PVAMonitorRequester(shared_from_this()));
         monitor = pvaChannel->getChannel()->createMonitor(pvaMonitorRequester,pvRequest);

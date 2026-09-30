@@ -41,6 +41,7 @@ private slots:
     void allFieldsAppearInConfig();
     void valueListsAndTextsWork();
     void configIsReadableThroughGenericProperty();
+    void matrixRowsColumnsBuildDimConfig();
 };
 
 #endif // TST_GENSOFTPV_H

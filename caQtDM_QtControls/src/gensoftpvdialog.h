@@ -59,7 +59,7 @@ private:
     QSpinBox *periodValue;
     QLineEdit *drvlLine, *drvhLine, *hoprLine, *loprLine, *lowLine, *loloLine, *highLine, *hihiLine;
     QCheckBox *overflowCheckBox, *persistentCheckBox;
-    QSpinBox *nelmValue, *nordValue;
+    QSpinBox *nelmValue, *nordValue, *matrixRowsValue, *matrixColumnsValue;
     QLineEdit *unitsLine;
     QSpinBox *precisionValue;
     QLineEdit *enumStringsLine, *regexLine;

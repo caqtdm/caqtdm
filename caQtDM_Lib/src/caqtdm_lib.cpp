@@ -8933,6 +8933,16 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
                         snprintf(asc, MAX_STRING_LENGTH, "<br>Count: %d", kPtr->edata.valueCount);
                         info.append(asc);
+                        switch(kPtr->edata.ntType) {
+                        case NT_SCALAR:       info.append("<br>NT: NTScalar"); break;
+                        case NT_SCALAR_ARRAY: info.append("<br>NT: NTScalarArray"); break;
+                        case NT_MATRIX:       info.append("<br>NT: NTMatrix"); break;
+                        default: break;
+                        }
+                        if(kPtr->edata.dimCount == 2) {
+                            snprintf(asc, MAX_STRING_LENGTH, "<br>Dim: %d x %d (matrix, row-major)", kPtr->edata.dim[0], kPtr->edata.dim[1]);
+                            info.append(asc);
+                        }
 
                         info.append("<br>Value: ");
                         const std::string edataUnits = QString::fromLatin1((const char*)&kPtr->edata.units,strlen(kPtr->edata.units)).toStdString();

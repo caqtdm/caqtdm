@@ -72,6 +72,9 @@ typedef struct _epicsData {
     long long    lastTimeMs;            /* last displayed time */
     long long    actTimeMs;               /* receive time */
     int          repRate;               /* repetition rate for this channel, default will be 5Hz */
+    int          ntType;                /* enum ntType, NT_NONE for classic channels */
+    int          dimCount;              /* 0 = scalar/vector, 2 = matrix */
+    int          dim[2];                /* rows, cols; data row-major */
 } epicsData;
 
 typedef struct _knobData {

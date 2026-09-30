@@ -53,6 +53,10 @@ typedef char pv_desc[MAXPVDESC];
 
 enum caType {caSTRING = 0, caINT = 1, caFLOAT = 2, caENUM = 3, caCHAR = 4, caLONG = 5, caDOUBLE = 6};
 
+// normative type kind of a channel (epicsData.ntType); a matrix carries its
+// shape in epicsData.dim as [rows, cols] with the data in row-major order
+enum ntType {NT_NONE = 0, NT_SCALAR = 1, NT_SCALAR_ARRAY = 2, NT_MATRIX = 3};
+
 // not really used, now just inserted as property in the widgets, not used elsewhere
 enum objectType {caCalc_Widget = 0,
                  caLabel_Widget,

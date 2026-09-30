@@ -44,6 +44,8 @@ genSoftPV::genSoftPV(QWidget *parent) : ESimpleLabel(parent)
     thisPersistent = false;
     thisNelm = 1;
     thisNord = -1;
+    thisMatrixRows = 0;
+    thisMatrixColumns = 0;
     thisUnits = "";
     thisPrecision = -1;
     thisRegex = "";
@@ -124,18 +126,27 @@ QString genSoftPV::buildConfigJSON() const
     if(!thisoverflow) object["overflow"] = false;
     if(thisPersistent) object["persistent"] = true;
 
-    if(thisNelm > 1) object["nelm"] = thisNelm;
-    if(thisNord >= 0) object["nord"] = thisNord;
+    // a matrix has a fixed element count rows*cols and no enums/regex
+    bool matrix = isMatrix() && thisDataType != Enum && thisDataType != String;
+    if(matrix) {
+        QJsonArray dim;
+        dim.append(thisMatrixRows);
+        dim.append(thisMatrixColumns);
+        object["dim"] = dim;
+    } else {
+        if(thisNelm > 1) object["nelm"] = thisNelm;
+        if(thisNord >= 0) object["nord"] = thisNord;
+    }
 
     if(!thisUnits.isEmpty()) object["units"] = thisUnits;
     if(thisPrecision >= 0) object["prec"] = thisPrecision;
 
-    if(!thisEnumStrings.isEmpty()) {
+    if(!thisEnumStrings.isEmpty() && !matrix) {
         QJsonArray array;
         foreach(const QString &item, thisEnumStrings) array.append(item);
         object["enums"] = array;
     }
-    if(!thisRegex.isEmpty()) object["regex"] = thisRegex;
+    if(!thisRegex.isEmpty() && !matrix) object["regex"] = thisRegex;
 
     return QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact));
 }
