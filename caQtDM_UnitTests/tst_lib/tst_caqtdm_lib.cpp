@@ -30,13 +30,18 @@
 #include <cainclude.h>
 #include <canumeric.h>
 #include <caspinbox.h>
+#include <castripplot.h>
+#include <catogglebutton.h>
+#include <cawavetable.h>
 #include <gensoftpv.h>
 
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QPushButton>
 #include <QTabBar>
 #include <QTabWidget>
+#include <qwt_legend_label.h>
 
 #include <cfloat>
 #include <climits>
@@ -824,4 +829,111 @@ void TestCaQtDM_Lib::panelThemeEnvironmentOverrideWins()
         qunsetenv("CAQTDM_PANEL_THEME_MODE");
     else
         qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
+{
+    const QPalette applicationPalette = QApplication::palette();
+    QPalette darkPalette = applicationPalette;
+    darkPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, QColor(20, 20, 20));
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::Light, QColor(70, 70, 70));
+    darkPalette.setColor(QPalette::Dark, QColor(25, 25, 25));
+    QApplication::setPalette(darkPalette);
+
+    QWidget panel;
+    panel.setStyleSheet("QWidget { background: wheat; }");
+    caToggleButton toggle(&panel);
+    caNumeric numeric(&panel);
+    numeric.resize(140, 60);
+    caWaveTable table(&panel);
+    table.displayText(0, 0, "NC");
+    QWidget included(&panel);
+    included.setProperty("caqtdmThemeMode", "System");
+    caWaveTable includedTable(&included);
+    PanelThemeApplier::apply(&included);
+    caStripPlot plot(&panel);
+    plot.setScaleColor(Qt::black);
+    plot.defineCurves(QStringList() << "curve", caStripPlot::Second, 60, 300, 1);
+
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::black));
+    QVERIFY(toggle.styleSheet().isEmpty());
+    QCOMPARE(numeric.palette().color(QPalette::Light), QColor(Qt::white));
+    QCOMPARE(numeric.palette().color(QPalette::Dark), QColor(160, 160, 160));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Base), QColor(Qt::white));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(table.item(0, 0)->foreground().style(), Qt::NoBrush);
+    QCOMPARE(includedTable.viewport()->palette().color(QPalette::Text), QColor(Qt::white));
+    QCOMPARE(plot.itemList(QwtPlotItem::Rtti_PlotCurve).first()->title().color(), QColor(Qt::black));
+    table.resize(200, 80);
+    panel.show();
+    QApplication::processEvents();
+    const QImage tableImage = table.viewport()->grab().toImage();
+    QCOMPARE(tableImage.pixelColor(40, 5), QColor(Qt::white));
+    QCOMPARE(tableImage.pixelColor(tableImage.width() - 5, tableImage.height() - 5),
+             QColor(Qt::white));
+    const QList<QwtLegendLabel *> legendLabels = plot.findChildren<QwtLegendLabel *>();
+    QVERIFY(!legendLabels.isEmpty());
+    QCOMPARE(legendLabels.first()->text().color(), QColor(Qt::black));
+    plot.setScaleColor(Qt::blue);
+    QApplication::processEvents();
+    QCOMPARE(legendLabels.first()->text().color(), QColor(Qt::blue));
+    plot.setScaleColor(Qt::black);
+    QApplication::processEvents();
+    QCOMPARE(legendLabels.first()->text().color(), QColor(Qt::black));
+
+    QPushButton *arrow = Q_NULLPTR;
+    for (QPushButton *button : numeric.findChildren<QPushButton *>()) {
+        if (!button->icon().isNull()) {
+            arrow = button;
+            break;
+        }
+    }
+    QVERIFY(arrow);
+    const qint64 legacyIcon = arrow->icon().cacheKey();
+
+    panel.setProperty("caqtdmThemeMode", "System");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Text), QColor(Qt::white));
+    QVERIFY(arrow->icon().cacheKey() != legacyIcon);
+
+    panel.setProperty("caqtdmThemeMode", "LegacyLight");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(table.viewport()->palette().color(QPalette::Base), QColor(Qt::white));
+    QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::black));
+
+    QApplication::setPalette(applicationPalette);
+}
+
+void TestCaQtDM_Lib::panelThemePreservesAuthoredWidgetColors()
+{
+    QWidget panel;
+    caToggleButton toggle(&panel);
+    toggle.setColorMode(caToggleButton::Static);
+    toggle.setBackground(Qt::green);
+    toggle.setForeground(Qt::red);
+    caWaveTable table(&panel);
+    table.noStyle("background-color: magenta; color: yellow;");
+    caWaveTable paletteTable(&panel);
+    QPalette authoredPalette = paletteTable.palette();
+    authoredPalette.setColor(QPalette::Base, Qt::yellow);
+    authoredPalette.setColor(QPalette::Text, Qt::magenta);
+    paletteTable.setPalette(authoredPalette);
+    caStripPlot plot(&panel);
+    plot.setScaleColor(Qt::red);
+    plot.defineCurves(QStringList() << "curve", caStripPlot::Second, 60, 300, 1);
+
+    PanelThemeApplier::apply(&panel);
+
+    QVERIFY(toggle.styleSheet().contains("255, 0, 0"));
+    QCOMPARE(toggle.getForeground(), QColor(Qt::red));
+    QCOMPARE(table.styleSheet(), QString("background-color: magenta; color: yellow;"));
+    QCOMPARE(paletteTable.viewport()->palette().color(QPalette::Base), QColor(Qt::yellow));
+    QCOMPARE(paletteTable.viewport()->palette().color(QPalette::Text), QColor(Qt::magenta));
+    QCOMPARE(plot.itemList(QwtPlotItem::Rtti_PlotCurve).first()->title().color(), QColor(Qt::red));
 }

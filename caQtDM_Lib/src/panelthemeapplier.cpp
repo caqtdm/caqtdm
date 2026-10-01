@@ -6,12 +6,14 @@
 #include <QWidget>
 
 #include "caQtDM_Lib_global.h"
+#include "cawavetable.h"
 
 Q_LOGGING_CATEGORY(panelThemeLog, "caqtdm.lib.paneltheme")
 
 namespace {
 const char ThemeModeProperty[] = "caqtdmThemeMode";
 const char ThemeModeOverrideEnvironment[] = "CAQTDM_PANEL_THEME_MODE";
+const char ThemeRootProperty[] = "caqtdmAppliedThemeRoot";
 
 QPalette createLegacyLightPalette()
 {
@@ -27,6 +29,11 @@ QPalette createLegacyLightPalette()
         palette.setColor(colorGroup, QPalette::Text, Qt::black);
         palette.setColor(colorGroup, QPalette::Button, QColor(239, 239, 239));
         palette.setColor(colorGroup, QPalette::ButtonText, Qt::black);
+        palette.setColor(colorGroup, QPalette::Light, Qt::white);
+        palette.setColor(colorGroup, QPalette::Midlight, QColor(247, 247, 247));
+        palette.setColor(colorGroup, QPalette::Mid, QColor(184, 184, 184));
+        palette.setColor(colorGroup, QPalette::Dark, QColor(160, 160, 160));
+        palette.setColor(colorGroup, QPalette::Shadow, QColor(105, 105, 105));
         palette.setColor(colorGroup, QPalette::ToolTipBase, Qt::white);
         palette.setColor(colorGroup, QPalette::ToolTipText, Qt::black);
         palette.setColor(colorGroup, QPalette::Highlight, QColor(53, 132, 228));
@@ -107,11 +114,25 @@ void PanelThemeApplier::apply(QWidget *root)
     if (!root) return;
     QWidget *const target = contentRoot(root);
     if (!target) return;
-    seed(target, root);
+    const bool legacyLight = usesLegacyLightTheme(root);
+    seed(target, legacyLight);
+    target->setProperty(ThemeRootProperty, true);
+    for (caWaveTable *table : target->findChildren<caWaveTable *>()) {
+        bool belongsToNestedPanel = false;
+        for (QWidget *parent = table->parentWidget(); parent && parent != target;
+             parent = parent->parentWidget()) {
+            if (parent->property(ThemeRootProperty).toBool()) {
+                belongsToNestedPanel = true;
+                break;
+            }
+        }
+        if (!belongsToNestedPanel)
+            table->setPanelThemePalette(legacyLight);
+    }
     if (qobject_cast<QMainWindow *>(root))
         root->setPalette(QPalette());
     target->update();
-    qCDebug(panelThemeLog) << (usesLegacyLightTheme(root)
+    qCDebug(panelThemeLog) << (legacyLight
                                  ? "applied legacy-light palette to content root"
                                  : "applied system palette to content root")
                             << target;

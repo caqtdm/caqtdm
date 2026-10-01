@@ -735,6 +735,15 @@ void ENumeric::reconstructGeometry()
 {
 }
 
+void ENumeric::changeEvent(QEvent *event)
+{
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange) {
+        QResizeEvent resize(size(), size());
+        resizeEvent(&resize);
+    }
+}
+
 void ENumeric::resizeEvent(QResizeEvent *e)
 {
     int hmargin, vmargin;

@@ -690,6 +690,15 @@ void SNumeric::reconstructGeometry()
 
 }
 
+void SNumeric::changeEvent(QEvent *event)
+{
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange) {
+        QResizeEvent resize(size(), size());
+        resizeEvent(&resize);
+    }
+}
+
 void SNumeric::resizeEvent(QResizeEvent *e)
 {
     int hmargin, vmargin;

@@ -152,11 +152,8 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
         currentParent = currentParent->parentWidget();
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    defaultForeColor = palette().foreground().color();
-#else
-    defaultForeColor = this->palette().brush(QPalette::Text).color();
-#endif
+    builtInStyleSheet = styleSheet();
+    builtInPalette = palette();
 
     blockIndex = -1;
 
@@ -201,6 +198,48 @@ void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
 
 void caWaveTable::noStyle(QString stylesheet){
     this->setStyleSheet(stylesheet);
+}
+
+void caWaveTable::setPanelThemePalette(bool legacyLight)
+{
+    QWidget *view = viewport();
+    if (!viewportThemeSaved) {
+        savedViewportPalette = view->palette();
+        savedViewportHasPalette = view->testAttribute(Qt::WA_SetPalette);
+        savedViewportStyleSheet = view->styleSheet();
+        savedViewportAutoFill = view->autoFillBackground();
+        const QPalette currentPalette = palette();
+        const QPalette::ColorRole roles[] = {
+            QPalette::Base, QPalette::AlternateBase, QPalette::Text, QPalette::Window
+        };
+        for (QPalette::ColorGroup group : {QPalette::Active, QPalette::Inactive, QPalette::Disabled}) {
+            for (QPalette::ColorRole role : roles) {
+                if (currentPalette.isBrushSet(group, role) &&
+                    (!builtInPalette.isBrushSet(group, role) ||
+                     currentPalette.brush(group, role) != builtInPalette.brush(group, role)))
+                    hasAuthoredPalette = true;
+            }
+        }
+        viewportThemeSaved = true;
+    }
+
+    if (!legacyLight || hasAuthoredPalette || styleSheet() != builtInStyleSheet ||
+        !savedViewportStyleSheet.isEmpty()) {
+        view->setStyleSheet(savedViewportStyleSheet);
+        view->setPalette(savedViewportHasPalette ? savedViewportPalette : QPalette());
+        view->setAutoFillBackground(savedViewportAutoFill);
+        return;
+    }
+
+    QPalette viewPalette = view->palette();
+    for (QPalette::ColorGroup group : {QPalette::Active, QPalette::Inactive, QPalette::Disabled}) {
+        viewPalette.setColor(group, QPalette::Base, Qt::white);
+        viewPalette.setColor(group, QPalette::AlternateBase, QColor(245, 245, 245));
+        viewPalette.setColor(group, QPalette::Text, Qt::black);
+    }
+    view->setPalette(viewPalette);
+    view->setAutoFillBackground(true);
+    view->setStyleSheet("background-color: white; alternate-background-color: rgb(245, 245, 245); color: black;");
 }
 int caWaveTable::getVerticalOffset() const
 {
@@ -809,7 +848,7 @@ void caWaveTable::displayText(int index, short status, QString const &text)
                 break;
             }
         }   else {
-            this->item(row, column)->setForeground(defaultForeColor);
+            this->item(row, column)->setForeground(QBrush());
         }
     }
 }
@@ -990,4 +1029,3 @@ void caWaveTable::copy()
 void caWaveTable::createActions() {
 
 }
-

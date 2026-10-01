@@ -109,6 +109,7 @@ signals:
     void valueChanged(double);
 
 protected:
+    void changeEvent(QEvent *) override;
     virtual void showEvent(QShowEvent *);
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
