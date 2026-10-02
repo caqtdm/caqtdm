@@ -819,7 +819,7 @@ void caAlarmTree::initViews()
     m_groupRoot = -1;
     fixColumnWidths();
     m_treeView->expandToDepth(0);
-    const QList<int> roots = m_tree->alhModel().roots();
+    const QVector<int> &roots = m_tree->alhModel().roots();      // QVector: Qt5 has no implicit QList conversion
     if(roots.size() == 1) {
         showGroupContents(roots.first());
         selectNode(roots.first());
