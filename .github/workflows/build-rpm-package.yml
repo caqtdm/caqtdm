@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - image: fedora:44
+          - image: fedora:latest
             rhel_major: 0
           - image: almalinux:10
             rhel_major: 10
