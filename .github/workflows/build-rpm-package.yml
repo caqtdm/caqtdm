@@ -67,7 +67,7 @@ jobs:
         path: |
           ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm
           ~/rpmbuild/SRPMS/epics-base-7.0.10-*.src.rpm
-        key: epics-base-rpm-7.0.10-${{ matrix.image }}-${{ steps.os-release.outputs.version }}-${{ hashFiles('caQtDM_Viewer/package/redhat/epics-base/epics-base.spec', 'caQtDM_Viewer/package/redhat/epics-base/*.patch') }}
+        key: epics-base-rpm-7.0.10-${{ matrix.image }}-${{ steps.os-release.outputs.version }}-${{ hashFiles('.github/workflows/build-rpm-package.yml', 'caQtDM_Viewer/package/redhat/epics-base/epics-base.spec', 'caQtDM_Viewer/package/redhat/epics-base/*.patch') }}
 
     - name: Install build dependencies for epics-base
       run: |
