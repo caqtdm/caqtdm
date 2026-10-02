@@ -2172,6 +2172,135 @@ has no equivalent in MEDM.
 
 --------------
 
+.. _caAlarmTree:
+
+``caAlarmTree``, alarm handler tree for alh configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+shows the group/channel tree of an EPICS alarm handler configuration
+(``.alhConfig``) with the current and the latched (unacknowledged)
+severity of every node, like the ``alh`` tool. The widget parses the
+configuration itself, the display manager subscribes to all channels
+for it, and the latch and acknowledge state is kept locally (one client
+= one alh instance). See
+:ref:`alhconfig` for the file format, the masks and the runtime
+functions.
+
+   | :ref:`geometry` is used for any object
+   | **Description:**
+
+   **configFile:**
+      QString: alh configuration file (absolute, relative to the panel
+      or found through ``CAQTDM_DISPLAY_PATH``); macros ``$(NAME)`` are
+      substituted
+   **includeDir:**
+      QString: directory for ``INCLUDE`` lines (alh *configDir*),
+      default is the directory of the configuration file
+   **macros:**
+      QString: additional macros ``A=x,B=y`` substituted in the
+      configuration before parsing (the panel macros apply as well)
+   **logTarget:**
+      QString: objectName of a :ref:`caAlarmLog` in the same panel
+      receiving the alarm events
+   **alarmMode:**
+      bool: true (default) = full alarm handler (events, writes to
+      ``$ACKPV``/``$SEVRPV``/``$HEARTBEATPV``, beep signals); false =
+      passive display, acknowledges stay local
+   **beepSeverity:**
+      int: overrides ``$BEEPSEVERITY``/``$BEEPSEVR`` (0 NO_ALARM, 1
+      MINOR, 2 MAJOR, 3 INVALID), -1 = from the configuration
+   **configPV:**
+      QString: optional char waveform holding the shared runtime
+      configuration (enable/disable/mute) as JSON, see :ref:`alhconfig`
+   **configKey:**
+      QString: key of this tree inside the configPV document, default
+      is the file name of the configuration
+   **commandMode:**
+      Shell (``$COMMAND`` runs in the background like caShellCommand),
+      Script (runs with an output window like caScriptButton) or Ask
+      (both entries in the context menu)
+   **showMaskColumn, showValueColumn, showPvColumn:**
+      bool: show the mask column (default), the value column (default,
+      group window only) and the pv column (group window only)
+
+   **displayFilter:**
+      NoFilter, ActiveAlarms (channels and groups in alarm or
+      unacknowledged) or UnackAlarms, like the alh display filter
+   **silenceForever:**
+      bool: start silenced (alh Setup menu / command line option)
+   **showMenuBar, showTreeWindow, showStatusArea:**
+      bool: show the menu bar, the tree window (left half) and the
+      message area of the alh main window
+
+   The widget reproduces the alh main window:
+
+   - Menu bar: *Action* (Acknowledge Alarm, Display Guidance, Start Related Process, Force
+     Process Variable..., Force Mask..., Beep Severity..., NoAck for One
+     Hour..., Acknowledge All, disable/enable, mute, reset), *View*
+     (Expand One Level, Expand Branch, Expand All, Collapse Branch,
+     Current Alarm History Window, Configuration File Window,
+     Group/Channel Properties Window), *Setup* (Display Filter, ALH Beep
+     Severity, Silence Forever, Mute All); the alh *File* and *Help*
+     menus are not reproduced.
+   - Two windows like alh: the **tree window** on the left shows the
+     groups with tree lines, the **group window** on the right shows the
+     channels and subgroups of the group selected in the tree window.
+     Clicking a group name in the tree window fills the group window. In
+     the group window the arrow after a group name (or a double click on
+     the name) descends into that group; in the tree window the arrow
+     expands/collapses the subgroups (double click: the whole branch).
+   - Lines as in alh: ack button with the unacknowledged severity letter
+     (blank, ``Y`` minor, ``R`` major, ``V`` invalid, ``E`` not
+     connected; click = acknowledge), current severity letter, name
+     button (channels light blue), arrow, **G** and **P** buttons where
+     guidance or a command exists, the mask ``<CDATL>`` (``H`` while a
+     noAck timer runs, ``M`` when muted, blue while D, A or T silence
+     the line) and the alh line message (groups: counts
+     ``(ERROR,INVALID,MAJOR,MINOR,NOALARM)``, channels:
+     ``<STATUS,SEVERITY>,<UNACK>``); the group window adds the value.
+   - Message area: execution status (Local Active/Passive =
+     ``alarmMode``, plus the display filter), the alh legend lines, the
+     file name, the check boxes *SilenceOneHour* and *SilenceCurrent*
+     (ends with the next new alarm), *Silence Forever* and the ALH beep
+     severity.
+   - Shortcuts of alh: Ctrl+A acknowledge, Ctrl+G guidance, Ctrl+P
+     process, Ctrl+V force process variable, Ctrl+M force mask, Ctrl+B
+     beep severity, Ctrl+N noAck timer; Space acknowledges the selected
+     line, a double click on a channel line as well.
+
+   Force Mask, Beep Severity, disable/enable and mute are published
+   through the configuration channel when ``configPV`` is set, the
+   noAck timer and the silence buttons stay local like in alh. Not
+   taken over from alh: File open/save, Modify Mask Settings (default
+   masks are never written), the global ACKS/ACKT mode and CMLOG.
+   Signals: ``alarmEvent(QVariantMap)``, ``beepRequested(int)``,
+   ``beepStopped()``.
+
+--------------
+
+.. _caAlarmLog:
+
+``caAlarmLog``, event list of caAlarmTree
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+is a scrolling table with the last events of one or more
+:ref:`caAlarmTree` widgets (severity transitions, acknowledges,
+connection changes, mask changes). It has no process variables of its
+own; a tree sends its events to the log named in its ``logTarget``
+property.
+
+   | :ref:`geometry` is used for any object
+   | **Description:**
+
+   **maxEntries:**
+      int: ring buffer size, default 1000
+   **autoScroll:**
+      bool: follow the newest entry (default true)
+   **showDisplayColumn:**
+      bool: show the configuration file of the originating tree
+
+--------------
+
 all graphical objects
 -------------------------
 
@@ -3081,6 +3210,119 @@ Limitations
   and truncates longer panels silently; the new converter has no such
   limits - for very long panels the ``#!tab`` directive can be used to
   split the content into tabs.
+
+.. _alhconfig:
+
+ALH Alarm Handler Configurations (.alhConfig)
+------------------------------------------------
+
+Overview
+~~~~~~~~
+
+caQtDM can replace the EPICS alarm handler ``alh``: a configuration
+file ``.alhConfig`` is opened directly (like a ``.ui`` file), caQtDM
+generates a panel with a :ref:`caAlarmTree` above a :ref:`caAlarmLog`.
+Both widgets can also be placed in any ``.ui`` panel with the Qt
+designer; the tree then reads the file given in its ``configFile``
+property. The file format of alh is read unchanged: ``GROUP``,
+``CHANNEL``, ``INCLUDE``, the optional ``$`` lines and the five
+character masks. Like alh, the reader never stops on an error: invalid
+lines are reported in the message window and skipped. Macros of the
+form ``$(NAME)`` are substituted before parsing (an extension, alh has
+no macros).
+
+Behaviour
+~~~~~~~~~
+
+- Every channel shows its current severity and the highest severity
+  seen since the last acknowledge (latched). Groups show the maximum
+  of their children; disabled (``D``) and cancelled (``C``) channels
+  do not count.
+- A channel that is not connected is shown grey (``NC``) and is
+  treated like an alarm (alh ``ERROR`` state), it has to be
+  acknowledged after the connection returns.
+- Masks: ``C`` cancel (not subscribed), ``D`` disable (subscribed, not
+  reported), ``A`` no acknowledge required, ``T`` transient alarms need
+  no acknowledge, ``L`` not logged.
+- ``$ALARMCOUNTFILTER count seconds`` delays transitions between normal
+  and alarm by ``seconds``; a channel toggling ``2*count`` times within
+  that window is processed at once (behaviour of alh). Changes inside an
+  alarm (e.g. MINOR to MAJOR) are never delayed. Defaults are 1 and 1.
+- ``$GUIDANCE`` text and locations, ``$ALIAS`` and ``$COMMAND`` are
+  available in the context menu; ``$COMMAND`` runs through the
+  mechanism of caShellCommand or caScriptButton (``commandMode``).
+- ``$FORCEPV`` and ``$FORCEPV_CALC`` replace the masks of the node and
+  everything below by the force mask while the force condition holds and
+  restore the configured masks on reset (like alh; disabling clears the
+  acknowledge state, enabling an alarming channel latches it again).
+  ``$ACKPV`` is written on acknowledge, ``$SEVRPV`` receives the current
+  severity of the node and ``$HEARTBEATPV`` is written periodically
+  (default every second with value 1).
+- ``$SEVRCOMMAND`` and ``$STATCOMMAND`` are read but never executed.
+- Beep: the tree decides when an audible alarm is due
+  (``$BEEPSEVERITY``, ``$BEEPSEVR``, property ``beepSeverity``) and
+  emits ``beepRequested``/``beepStopped``; the sound itself is left to
+  a separate widget.
+
+Shared runtime configuration (configPV)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The configuration file is never written. Runtime changes (disable,
+enable, mute) are published through an optional char waveform given
+in ``configPV`` and are therefore seen by all clients showing the same
+configuration. The waveform holds a JSON document whose top level is
+keyed by the configuration (``configKey``, default the file name), so
+several trees can share one pv and a tree ignores foreign content::
+
+   { "test.alhConfig": {
+       "updated": "2026-10-01T12:00:00Z", "by": "user@host",
+       "mute": false,
+       "nodes": {
+         "MAIN/GROUP/jba:Example3": { "mask": "-D---", "mute": true },
+         "MAIN/SECONDGROUP":        { "disable": true } } } }
+
+An empty pv or a missing key means "as configured in the file". A
+node entry may set the whole ``mask`` or single flags (``disable``,
+``noAck``, ``noAckTransient``, ``noLog``) and ``mute``; group entries
+apply to the whole subtree. The document is declarative: whatever is
+received replaces the current overrides. A local change is written
+back with the other keys untouched. The waveform must be large enough
+for the document (a warning is shown otherwise); 16000 elements are a
+reasonable size. An active ``$FORCEPV`` replaces this layer as long as
+its condition holds.
+
+Logging
+~~~~~~~
+
+Every event (start, transition, status, connect, disconnect, ack,
+mask, force, config) is written as one JSON line on the logging
+category ``caqtdm.alarm.events`` at info level and is therefore
+visible with the default logging rules in all configured handlers
+(``CAQTDM_LOGGING_HANDLERS``). Fields: ``ts`` (UTC), ``action``,
+``pv``, ``node``, ``group``, ``sevr_old``, ``sevr_new``, ``unack``,
+``stat``, ``value``, ``mask``, ``user``, ``host``, ``display``,
+``pid``. Channels with mask ``L`` and trees with ``alarmMode=false``
+produce no events; like alh, the initial connection of a channel is
+not logged, disabled channels are. ``QT_LOGGING_RULES="caqtdm.alarm.events.info=false"``
+switches the lines off.
+
+Debug tool alh2ui
+~~~~~~~~~~~~~~~~~
+
+The command line tool ``alh2ui`` (built with ``CAQTDM_ALH2UI=1``, not
+installed) reads a configuration with the same library and prints the
+generated ``.ui`` (``--ui``), the tree in the format of alh
+(``--tree``), all warnings and unsupported attributes (``--warn``) or
+the model as JSON (``--json``).
+
+Limitations
+~~~~~~~~~~~
+
+- ``.alhConfig`` files are opened as top level panels or through a
+  related display, not through ``caInclude``.
+- A cancel mask (``C``) set at runtime behaves like disable, the
+  channel stays subscribed.
+- ``$SEVRCOMMAND``/``$STATCOMMAND`` are not executed.
 
 Connection Problems and Access Rights
 ------------------------------------------------------

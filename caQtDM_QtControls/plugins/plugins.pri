@@ -110,3 +110,6 @@ unix:!ios {
 INCLUDEPATH += ../../caQtDM_Lib/src
 INCLUDEPATH += ../src
 INCLUDEPATH += .
+
+# caAlarmTree (monitors plugin) needs the alh parser model headers
+INCLUDEPATH += ../../caQtDM_Parsers/alhParserSrc

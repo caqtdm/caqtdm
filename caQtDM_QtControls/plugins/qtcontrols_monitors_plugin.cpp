@@ -32,6 +32,7 @@
 
 
 #include <QtControls>
+#include "caalarmtree.h"   // not in the umbrella header (needs caQtDM_Parsers/alhParserSrc)
 #include <qtcontrols_monitors_plugin.h>
 #include <qglobal.h>
 
@@ -632,6 +633,38 @@ caLineDrawInterface::caLineDrawInterface(QObject* parent) : CustomWidgetInterfac
 }
 
 
+QWidget *caAlarmTreeInterface::createWidget(QWidget* parent)
+{
+    return new caAlarmTree(parent);
+}
+
+caAlarmTreeInterface::caAlarmTreeInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
+{
+    strng name[1], type[1]  = {""};
+    longtext text[1] = {""};
+    d_domXml = XmlFunc("caAlarmTree", "caalarmtree", 0, 0, 500, 300, name, type, text, 0);
+    d_toolTip = "[Alarm handler tree for alh configurations (.alhConfig): severities, latch, acknowledge]";
+    d_name = "caAlarmTree";
+    d_include = "caAlarmTree";
+    d_icon = QPixmap(":pixmaps/alarmtree.png");
+}
+
+QWidget *caAlarmLogInterface::createWidget(QWidget* parent)
+{
+    return new caAlarmLog(parent);
+}
+
+caAlarmLogInterface::caAlarmLogInterface(QObject* parent) : CustomWidgetInterface_Monitors(parent)
+{
+    strng name[1], type[1]  = {""};
+    longtext text[1] = {""};
+    d_domXml = XmlFunc("caAlarmLog", "caalarmlog", 0, 0, 500, 150, name, type, text, 0);
+    d_toolTip = "[Alarm event log, sink for caAlarmTree (property logTarget)]";
+    d_name = "caAlarmLog";
+    d_include = "caAlarmLog";
+    d_icon = QPixmap(":pixmaps/alarmlog.png");
+}
+
 CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monitors(QObject *parent): QObject(parent)
 {
     d_plugins.append(new caLedInterface(this));
@@ -653,6 +686,8 @@ CustomWidgetCollectionInterface_Monitors::CustomWidgetCollectionInterface_Monito
     d_plugins.append(new caWaterfallPlotInterface(this));
     d_plugins.append(new caScan2DInterface(this));
     d_plugins.append(new caLineDrawInterface(this));
+    d_plugins.append(new caAlarmTreeInterface(this));
+    d_plugins.append(new caAlarmLogInterface(this));
 }
 
 QList<QDesignerCustomWidgetInterface*> CustomWidgetCollectionInterface_Monitors::customWidgets(void) const

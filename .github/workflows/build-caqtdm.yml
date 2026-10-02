@@ -10,6 +10,8 @@ on:
     paths-ignore:
       - 'caQtDM_docs/**'
       - 'caQtDM_Tests/**'
+  schedule: # Daily at 2am
+    - cron: '0 2 * * *'
 
 jobs:
   build:
@@ -56,6 +58,7 @@ jobs:
           ninja \
           openssl \
           devtools \
+          pacman-contrib \
           nvchecker
 
     - name: Checkout repository
@@ -80,7 +83,7 @@ jobs:
         echo "Current MAKEFLAGS in /etc/makepkg.conf:"
         grep "MAKEFLAGS" /etc/makepkg.conf
 
-    - name: Self-upgrade qt6-opcua and epics-base (pkgctl version upgrade)
+    - name: Match qt6-opcua to Arch Qt and upgrade epics-base
       id: dep_versions
       run: |
         set -euo pipefail
@@ -92,13 +95,21 @@ jobs:
           set -euo pipefail
           export TERM=xterm
           ARCH_DIR="$WORKSPACE_DIR/caQtDM_Viewer/package/archlinux"
-          for pkg in qt6-opcua epics-base; do
-            cd "$ARCH_DIR/$pkg"
-            echo "::group::pkgctl version upgrade ${pkg}"
-            pkgctl version upgrade
-            echo "::endgroup::"
-            makepkg --printsrcinfo | awk "\$1 == \"pkgver\" {print \"${pkg}=\" \$3}" >> "$VERSIONS_FILE"
-          done
+          cd "$ARCH_DIR/qt6-opcua"
+          qt_version=$(pacman -Q qt6-base | awk "{print \$2}")
+          qt_version=${qt_version%-*}
+          current_version=$(makepkg --printsrcinfo | awk "\$1 == \"pkgver\" {print \$3}")
+          if [[ "$current_version" != "$qt_version" ]]; then
+            sed -i "s/^pkgver=.*/pkgver=$qt_version/" PKGBUILD
+            updpkgsums
+          fi
+          echo "qt6-opcua=$qt_version" >> "$VERSIONS_FILE"
+
+          cd "$ARCH_DIR/epics-base"
+          echo "::group::pkgctl version upgrade epics-base"
+          pkgctl version upgrade
+          echo "::endgroup::"
+          makepkg --printsrcinfo | awk "\$1 == \"pkgver\" {print \"epics-base=\" \$3}" >> "$VERSIONS_FILE"
         '
 
         cat "$VERSIONS_FILE" | tee -a "$GITHUB_OUTPUT"
