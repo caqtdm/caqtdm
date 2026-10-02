@@ -25,15 +25,22 @@
 
 #include "vaPrintf.h"
 
+#if defined(_MSC_VER)
+#define VAPRINTF_THREAD_LOCAL __declspec(thread)
+#else
+#define VAPRINTF_THREAD_LOCAL __thread
+#endif
+
+// bounded, thread-local buffer: callers run in CA callback threads
 char* vaPrintf(const char *fmt, ...)
 {
-    static char errmsg[256] = {0};
+    static VAPRINTF_THREAD_LOCAL char errmsg[256] = {0};
     va_list     alist;
     int         status;
 
     va_start(alist, fmt);
-    status = vsprintf(errmsg, fmt, alist);
-    if (status == EOF) {
+    status = vsnprintf(errmsg, sizeof(errmsg), fmt, alist);
+    if (status < 0) {
         va_end(alist);
         return (char*) 0;
     }

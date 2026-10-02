@@ -253,8 +253,8 @@ void writeRectangleDimensions(DlObject *object, FrameOffset *offset, char *widge
     Qt_writeCloseProperty();
 }
 
-// decompose string
-int parseDelimited(char *s, string40 items[], int nbItems, char token)
+// decompose string, bounded in item count and item length
+int parseDelimited(char *s, char items[][MAX_TOKEN_LENGTH], int nbItems, char token)
 {
     int i, cnt;
     char * pch;
@@ -264,13 +264,22 @@ int parseDelimited(char *s, string40 items[], int nbItems, char token)
     for (i=0; i< (int) strlen(s); i++) if(s[i] < ' ') s[i] = '\0';
     cnt = 0;
     pch = strtok (s, ctoken);
-    while (pch != NULL)
+    while (pch != NULL && cnt < nbItems)
     {
-        strcpy(items[cnt], pch);
+        snprintf(items[cnt], MAX_TOKEN_LENGTH, "%s", pch);
+        cnt++;
         pch = strtok (NULL, ctoken);
-        if(cnt++ >= nbItems) break;
     }
     return cnt;
+}
+
+// append "x,y;" to a LONGSTRING points buffer, ignore points that do not fit
+static void appendPoint(char *points, int x, int y)
+{
+    char pair[32];
+    size_t len = strlen(points);
+    snprintf(pair, sizeof(pair), "%d,%d;", x, y);
+    if(len + strlen(pair) < LONGSTRING) strcat(points, pair);
 }
 
 void parseAndSkip(DisplayInfo *displayInfo)
@@ -2437,7 +2446,7 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
     char token[MAX_TOKEN_LENGTH];
     TOKEN tokenType;
     int nestingLevel = 0;
-    string40 items[10];
+    char items[10][MAX_TOKEN_LENGTH];
     int nbitems;
 
     do {
@@ -2454,7 +2463,9 @@ void parseControl(DisplayInfo *displayInfo, char *widget)
                     Qt_handleString("channel", "string", items[0]);
                     //printf("==================== token = <%s> nbitems=%d\n", token, nbitems);
                     if(nbitems > 1) {
-                        nbitems = parseDelimited(items[1], items, 10, ',');
+                        char bits[MAX_TOKEN_LENGTH];
+                        snprintf(bits, sizeof(bits), "%s", items[1]);
+                        nbitems = parseDelimited(bits, items, 10, ',');
                         //printf("==================== nbitems=%d <%s> <%s>\n", nbitems, items[0], items[1]);
                         Qt_handleString("startBit", "number", items[0]);
                         Qt_handleString("endBit", "number", items[1]);
@@ -2923,7 +2934,7 @@ void parsePolygonPoints(DisplayInfo *displayInfo, char *widget, int offsetX, int
                 getToken(displayInfo,token);
                 y = atoi(token);
                 getToken(displayInfo,token);	//   ")"
-                sprintf(points, "%s%d,%d;", points,  x-offsetX, y-offsetY);
+                appendPoint(points, x-offsetX, y-offsetY);
             }
 
             break;
@@ -3326,7 +3337,7 @@ void parsePolylinePoints(DisplayInfo *displayInfo, char *widget, int offsetX, in
                 getToken(displayInfo,token);
                 y = atoi(token);
                 getToken(displayInfo,token);	//   ")"
-                sprintf(points, "%s%d,%d;", points,  x-offsetX, y-offsetY);
+                appendPoint(points, x-offsetX, y-offsetY);
             }
             break;
         case T_EQUAL:
@@ -3488,10 +3499,10 @@ void *parseBar(DisplayInfo *displayInfo, FrameOffset * offset)
         char pipeWidth[10];
         Qt_handleString("scalePosition", "enum", "NoScale");
         if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
-            sprintf(pipeWidth, "%d", object.width);
+            sprintf(pipeWidth, "%u", object.width);
             Qt_handleString("pipeWidth", "number", pipeWidth);
         } else {
-            sprintf(pipeWidth, "%d", object.height);
+            sprintf(pipeWidth, "%u", object.height);
             Qt_handleString("pipeWidth", "number", pipeWidth);
         }
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
@@ -3589,10 +3600,10 @@ void *parseIndicator(DisplayInfo *displayInfo, FrameOffset * offset)
         Qt_handleString("scalePosition", "enum", "NoScale");
         Qt_handleString("scalePosition", "enum", "NoScale");
         if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
-            sprintf(pipeWidth, "%d", object.width-4);
+            sprintf(pipeWidth, "%u", object.width-4);
             Qt_handleString("pipeWidth", "number", pipeWidth);
         } else {
-            sprintf(pipeWidth, "%d", object.height-4);
+            sprintf(pipeWidth, "%u", object.height-4);
             Qt_handleString("pipeWidth", "number", pipeWidth);
         }
     } else if(!strcmp(direction, "Up") || !strcmp(direction, "Down")) {
