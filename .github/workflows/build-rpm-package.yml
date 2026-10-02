@@ -16,15 +16,14 @@ jobs:
     container:
       image: ${{ matrix.image }}
     env:
-      QWT_VER: 6.3.0 # Qwt version to build for RHEL 10+
-      CAQTDM_OPCUA: 0 # Disabled for now because qt6-opcua in epel is newer than qt6-base-devel on rhel 10
+      CAQTDM_OPCUA: 1
     strategy:
       fail-fast: false
       matrix:
         include:
           - image: fedora:44
             rhel_major: 0
-          - image: almalinux:10.0
+          - image: almalinux:10
             rhel_major: 10
           - image: rockylinux:9
             rhel_major: 9
@@ -54,28 +53,6 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v6
-
-    - name: Install Qwt build dependencies (RHEL >=10)
-      if: ${{ matrix.rhel_major >= 10 }}
-      run: |
-        set -euo pipefail
-        dnf install -y \
-          qt6-qtbase-devel qt6-qttools-devel qt6-qtsvg-devel \
-          cmake gcc-c++ make autoconf automake libtool pkgconfig \
-          bzip2 rpmdevtools
-
-    - name: Build Qwt RPM (RHEL >=10)
-      if: ${{ matrix.rhel_major >= 10 }}
-      run: |
-        set -euo pipefail
-        mkdir -p "$HOME/rpmbuild/RPMS"
-        chmod +x caQtDM_Viewer/package/redhat/qwt-qt6/build-qwt-rpm.sh
-        caQtDM_Viewer/package/redhat/qwt-qt6/build-qwt-rpm.sh
-
-    - name: Install qwt RPM (RHEL >=10)
-      if: ${{ matrix.rhel_major >= 10 }}
-      run: |
-        rpm -ivh "$HOME"/rpmbuild/RPMS/*/qwt-qt6-*.rpm
 
     - name: Install build dependencies for epics-base
       run: |
