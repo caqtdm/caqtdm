@@ -12,9 +12,10 @@ SUBDIRS += adlParserStaticLib
 # which conflicts with the static library of the same target name.
 !win32-msvc*:!msvc {
     SUBDIRS += prcParserStaticLib
+    SUBDIRS += alhParserStaticLib
 }
 !MOBILE:{
-    SUBDIRS += adlParserSharedLib prcParserSharedLib
+    SUBDIRS += adlParserSharedLib prcParserSharedLib alhParserSharedLib
 }
 unix:{
     SUBDIRS += edlParserStaticLib

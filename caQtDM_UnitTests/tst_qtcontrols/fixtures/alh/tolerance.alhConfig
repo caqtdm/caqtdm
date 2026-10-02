@@ -1,0 +1,17 @@
+$ALIAS before any group
+this is garbage
+GROUP NOSUCH ORPHAN
+GROUP NULL MAIN
+$UNKNOWNKEY value
+CHANNEL MAIN ok:pv1 -X---
+CHANNEL MISSING ok:pv2
+$GUIDANCE
+some text
+$ALIAS breaks the block
+CHANNEL MAIN ok:pv3
+GROUP MAIN SUB
+$FORCEPV	tabbed:pv -D---
+CHANNEL SUB averyveryveryveryveryveryveryveryveryveryveryveryveryveryveryverylongpvnameexceedingsixtyfivecharacters
+# comment line
+
+CHANNEL

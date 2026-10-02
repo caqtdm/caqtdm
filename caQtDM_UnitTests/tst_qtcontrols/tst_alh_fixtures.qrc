@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/alh">
+        <file alias="test.alhConfig">fixtures/alh/test.alhConfig</file>
+        <file alias="optional.alhConfig">fixtures/alh/optional.alhConfig</file>
+        <file alias="tolerance.alhConfig">fixtures/alh/tolerance.alhConfig</file>
+        <file alias="include_main.alhConfig">fixtures/alh/include_main.alhConfig</file>
+        <file alias="include_sub.alhConfig">fixtures/alh/include_sub.alhConfig</file>
+        <file alias="include_loop.alhConfig">fixtures/alh/include_loop.alhConfig</file>
+        <file alias="macros.alhConfig">fixtures/alh/macros.alhConfig</file>
+        <file alias="include_first.alhConfig">fixtures/alh/include_first.alhConfig</file>
+    </qresource>
+</RCC>

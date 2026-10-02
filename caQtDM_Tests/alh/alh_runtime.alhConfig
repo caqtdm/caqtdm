@@ -1,0 +1,16 @@
+$BEEPSEVERITY MAJOR
+$HEARTBEATPV ALH:HB 2 1
+GROUP NULL SMOKE
+$SEVRPV ALH:SEVR
+$COMMAND echo related display
+$GUIDANCE
+Smoke test guidance.
+$END
+CHANNEL SMOKE jba:Example1 -----
+$ACKPV ALH:ACK 1
+CHANNEL SMOKE jba:Example2 ---T-
+GROUP SMOKE SUB
+$FORCEPV testjbaai -D--- 1 0
+CHANNEL SUB jba:Example3 -----
+CHANNEL SUB jba:Example4 -D---
+CHANNEL SMOKE jba:Missing -----

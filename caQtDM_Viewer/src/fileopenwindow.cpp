@@ -1413,11 +1413,15 @@ void FileOpenWindow::Callback_OpenButton()
 
     if(path.size() == 0 && lastFilePath.size()==0) path.append(".");
     else path = lastFilePath;
+    QString filter = tr("ui/prc Files (*.ui *.prc)");
 #ifdef ADL_EDL_FILES
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, tr("ui/prc Files (*.ui *.prc);;MEDM Files (*.adl);;EDM Files (*.edl);;ALL Files (*.*)"));
-#else
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, tr("ui/prc Files (*.ui *.prc);;ALL Files (*.*)"));
+    filter += tr(";;MEDM Files (*.adl);;EDM Files (*.edl)");
 #endif
+#ifdef ALH_FILES
+    filter += tr(";;ALH Files (*.alhConfig)");
+#endif
+    filter += tr(";;ALL Files (*.*)");
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Display file"), path, filter);
     //std::cout << "Got filename: " << fileName.toStdString() << std::endl;
 
     if(!fileName.isNull()) {
@@ -1497,13 +1501,15 @@ void FileOpenWindow::Callback_OpenNewFile(const QString& inputFile, const QStrin
 {
     qCDebug(fileOpenWindowLog) << "callback open new file" << inputFile << "with macro string" << macroString;
 
+    QStringList valid_extensions;
+    valid_extensions << ".ui" << ".prc";
 #ifdef ADL_EDL_FILES
-    const int extensions=4;
-    const QString valid_extensions[extensions] = {".ui", ".prc", ".adl", ".edl"};
-#else
-    const int extensions=2;
-    const QString valid_extensions[extensions] = {".ui", ".prc"};
+    valid_extensions << ".adl" << ".edl";
 #endif
+#ifdef ALH_FILES
+    valid_extensions << ".alhConfig";
+#endif
+    const int extensions = valid_extensions.size();
     QString FileName;
     int ext_found=-1;
     FileName=inputFile;

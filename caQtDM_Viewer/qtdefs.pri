@@ -125,6 +125,19 @@ unix:!macx:{
     DEFINES += ADL_EDL_FILES
 }
 
+# enable loading of alh alarm handler configurations (.alhConfig) via caAlarmTree
+!MOBILE: {
+    CONFIG += ALH_FILES
+    DEFINES += ALH_FILES
+}
+
+# debug/test only command line tool alh2ui (not installed, not packaged)
+_CAQTDM_ALH2UI = $$(CAQTDM_ALH2UI)
+!isEmpty(_CAQTDM_ALH2UI) {
+    message("alh2ui command line tool will be built")
+    CONFIG += caqtdm_alh2ui
+}
+
 
 # undefine CONFIG epics7 for epics4 plugin support with epics version 7 (only preliminary version as example)
 # one can specify channel access with ca:// and pv access with pva:// (both use the epics4 plugin)

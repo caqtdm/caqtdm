@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">alh_runtime.alhConfig</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="caAlarmTree" name="alarmTree">
+       <property name="configFile" stdset="0">
+        <string notr="true">alh_runtime.alhConfig</string>
+       </property>
+       <property name="logTarget" stdset="0">
+        <string notr="true">alarmLog</string>
+       </property>
+       <property name="configPV" stdset="0">
+     <string notr="true">ALH:CONFIG</string>
+    </property>
+    <property name="alarmMode" stdset="0">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="caAlarmLog" name="alarmLog"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>caAlarmTree</class>
+   <extends>QTreeView</extends>
+   <header>caAlarmTree</header>
+  </customwidget>
+  <customwidget>
+   <class>caAlarmLog</class>
+   <extends>QTableView</extends>
+   <header>caAlarmLog</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

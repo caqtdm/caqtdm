@@ -1,0 +1,6 @@
+GROUP NULL TOP
+CHANNEL TOP top:ch
+INCLUDE TOP include_sub.alhConfig
+GROUP TOP AFTER
+INCLUDE TOP missing_file.alhConfig
+INCLUDE NULL include_loop.alhConfig
