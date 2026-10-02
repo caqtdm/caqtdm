@@ -48,6 +48,7 @@ public:
     enum Column { ColTime = 0, ColAction, ColPv, ColNode, ColGroup, ColFrom, ColTo, ColUnack, ColStatus, ColValue, ColUser, ColDisplay, ColCount };
 
     explicit caAlarmLog(QWidget *parent = Q_NULLPTR);
+    ~caAlarmLog();
 
     void noStyle(QString style) { Q_UNUSED(style); }
     int getMaxEntries() const;

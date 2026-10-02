@@ -133,6 +133,10 @@ private:
     int m_max;
 };
 
+caAlarmLog::~caAlarmLog()
+{
+}
+
 caAlarmLog::caAlarmLog(QWidget *parent) : QTableView(parent), m_autoScroll(true), m_showDisplay(false)
 {
     m_model = new AlarmLogModel(this);

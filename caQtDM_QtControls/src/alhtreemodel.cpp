@@ -27,14 +27,6 @@
 #include "alarmdefs.h"
 #include <QFont>
 
-AlhNodeState::AlhNodeState()
-    : curSevr(NOTCONNECTED), unackSevr(NO_ALARM), status(0), connected(false), everConnected(false),
-      forced(false), noAckUntilMs(0), beepSevrOverride(-1), mute(false), lastReceivedSevr(NOTCONNECTED), filterPending(false), filterDueMs(0),
-      pendingSevr(NOTCONNECTED), pendingStatus(0), filterIndex(0), contribCur(-1), contribUnack(-1)
-{
-    for(int i = 0; i < AlhSevCount; i++) curCount[i] = unackCount[i] = 0;
-}
-
 //---------------------------------------------------------------------------- static helpers
 
 int AlhTreeModel::severityIndex(int sevr)
@@ -109,6 +101,10 @@ AlhMask AlhTreeModel::maskAndNot(const AlhMask &a, const AlhMask &b)
 //---------------------------------------------------------------------------- setup
 
 AlhTreeModel::AlhTreeModel(QObject *parent) : QAbstractItemModel(parent), m_treeMuted(false)
+{
+}
+
+AlhTreeModel::~AlhTreeModel()
 {
 }
 
