@@ -3254,8 +3254,13 @@ Behaviour
   no acknowledge, ``L`` not logged.
 - ``$ALARMCOUNTFILTER count seconds`` delays transitions between normal
   and alarm by ``seconds``; a channel toggling ``2*count`` times within
-  that window is processed at once (behaviour of alh). Changes inside an
-  alarm (e.g. MINOR to MAJOR) are never delayed. Defaults are 1 and 1.
+  that window is processed at once (behaviour of alh). ``count 0`` only
+  delays (no toggle counter), ``count -1`` delays entering an alarm only
+  and reports the end of an alarm at once, ``seconds 0`` disables the
+  filter. Changes inside an alarm (e.g. MINOR to MAJOR) are never
+  delayed. A missing ``count`` or ``seconds`` on the line is taken as 1,
+  like in alh (``$ALARMCOUNTFILTER`` alone means 1 second delay, toggle
+  counter 1).
 - ``$GUIDANCE`` text and locations, ``$ALIAS`` and ``$COMMAND`` are
   available in the context menu; ``$COMMAND`` runs through the
   mechanism of caShellCommand or caScriptButton (``commandMode``).

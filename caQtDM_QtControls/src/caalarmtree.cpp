@@ -242,8 +242,9 @@ public:
             QRect button = cell;
             button.setWidth(qMin(cell.width(), QFontMetrics(opt.font).horizontalAdvance(text) + 12));
             drawBox(painter, button, fill, selected ? Sunken : Raised);
-            QColor fg = selected ? QApplication::palette().highlightedText().color() : pal.buttonText().color();
-            if(index.data(AlhTreeModel::InactiveRole).toBool() && !selected) fg = pal.color(QPalette::Disabled, QPalette::ButtonText);
+            // channel buttons have a fixed light blue, so their text colour is fixed too (dark mode)
+            QColor fg = selected ? QApplication::palette().highlightedText().color() : (group ? pal.buttonText().color() : QColor(Qt::black));
+            if(index.data(AlhTreeModel::InactiveRole).toBool() && !selected) fg = group ? pal.color(QPalette::Disabled, QPalette::ButtonText) : AL_DEFAULT;
             painter->setPen(fg);
             painter->drawText(button.adjusted(5, 0, -5, 0), Qt::AlignVCenter | Qt::AlignLeft, text);
         } else if(col == AlhTreeModel::ColArrow) {
@@ -650,10 +651,12 @@ void caAlarmTree::updateStatus()
     int disabledForce = 0;
     for(QHash<int, bool>::const_iterator it = m_forced.constBegin(); it != m_forced.constEnd(); ++it) if(it.value()) disabledForce++;
     m_forceCountLabel->setText(disabledForce > 0 ? tr("Disabled ForcePV Count:  %1").arg(disabledForce) : QString());
-    // alh: message area turns blue while "silence one hour" runs; both states keep a style sheet so the look is constant
-    m_statusArea->setStyleSheet(m_silenceOneHour
+    // alh: message area turns blue while "silence one hour" runs; both states keep a style sheet so the look is constant.
+    // the normal state sets no colour at all, so the area follows palette changes (dark/light) by itself
+    const QString sheet = m_silenceOneHour
         ? QStringLiteral("QWidget#alhMessageArea { background-color: blue; } QWidget#alhMessageArea QLabel, QWidget#alhMessageArea QCheckBox { color: white; }")
-        : QStringLiteral("QWidget#alhMessageArea { background-color: palette(window); }"));
+        : QStringLiteral("QWidget#alhMessageArea { border: none; }");
+    if(m_statusArea->styleSheet() != sheet) m_statusArea->setStyleSheet(sheet);
     syncSetupActions();
 }
 

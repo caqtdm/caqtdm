@@ -428,9 +428,9 @@ QList<QVariantMap> AlhTreeModel::applyUpdate(int id, bool connected, int sevr, s
     AlhNodeState &s = m_state[id];
     const int newSevr = connected ? sevr : (int) NOTCONNECTED;
 
-    // alNewAlarmFilter: not for the initial state, connection changes or filters with count/seconds 0
-    const bool filtered = n.hasCountFilter && n.countFilter.count > 0 && n.countFilter.seconds > 0 &&
-                          connected && s.connected && s.everConnected && !s.filterHistory.isEmpty();
+    // alNewAlarmFilter (alh upstream): not for the initial state, connection changes or seconds 0;
+    // count > 0 adds the flap counter, count 0 delays both directions, count -1 delays entering an alarm only
+    const bool filtered = n.hasCountFilter && n.countFilter.seconds > 0 && connected && s.connected && s.everConnected;
     if(!filtered) {
         s.filterPending = false;
         s.lastReceivedSevr = newSevr;
@@ -450,6 +450,12 @@ QList<QVariantMap> AlhTreeModel::applyUpdate(int id, bool connected, int sevr, s
         s.filterPending = false;
         if(curAlarm) process(id, connected, newSevr, stat, value, &events);   // changes inside an alarm go through
         else { s.value = value; notifyRow(id); }
+    } else if(curAlarm && n.countFilter.count == -1) {
+        s.filterPending = false;                                             // count -1: leaving an alarm is not filtered
+        s.filterHistory.fill(0);
+        s.filterIndex = 0;
+        process(id, connected, newSevr, stat, value, &events);
+        return events;
     } else if(!s.filterPending) {
         s.filterPending = true;                                              // delayed by seconds
         s.filterDueMs = nowMs + window;
@@ -457,8 +463,8 @@ QList<QVariantMap> AlhTreeModel::applyUpdate(int id, bool connected, int sevr, s
         notifyRow(id);
     }
 
-    // toggling 2*count times within the window: process at once
-    if((prevReceived != NO_ALARM) != newAlarm) {
+    // count > 0: toggling 2*count times within the window is processed at once
+    if(!s.filterHistory.isEmpty() && (prevReceived != NO_ALARM) != newAlarm) {
         const int i = s.filterIndex;
         if(s.filterHistory.at(i) != 0 && nowMs - s.filterHistory.at(i) <= window) {
             s.filterHistory.fill(0);

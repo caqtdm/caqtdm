@@ -47,6 +47,7 @@ private slots:
     void disableMask();
     void disconnectIsAnAlarm();
     void countFilter();
+    void countFilterSecondsOnly();
     void forceBits();
     void baseMaskOverride();
     void beepDecision();

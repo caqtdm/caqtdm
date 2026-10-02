@@ -44,8 +44,12 @@ panel formats:
   (no remote configured). Both were compared for the semantics implemented
   in `alhtreemodel.cpp` (group counters count every channel in all ancestor
   groups, disabled channels count as NO_ALARM, `$FORCEPV` replaces the masks
-  of the subtree, count filter delays instead of dropping). When they
-  disagree with ALH.MD or older plan notes, the sources win.
+  of the subtree, count filter delays instead of dropping). Where the two
+  versions differ, upstream wins: `$ALARMCOUNTFILTER` with count 0/-1 is
+  the documented seconds-only mode upstream (0 = both directions delayed,
+  -1 = only entering an alarm), while ALH 1.2.28 switched the filter off
+  for count 0. When they disagree with ALH.MD or older plan notes, the
+  sources win.
 
 Relevant for work here:
 

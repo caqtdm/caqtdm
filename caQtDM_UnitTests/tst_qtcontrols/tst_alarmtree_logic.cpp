@@ -232,6 +232,57 @@ void TestAlarmTreeLogic::countFilter()
     QVERIFY(!m_model.hasPendingFilters());
 }
 
+// alh upstream alNewAlarmFilter: count 0 = seconds only in both directions, count -1 = entering an alarm only
+void TestAlarmTreeLogic::countFilterSecondsOnly()
+{
+    static const char *config =
+            "GROUP NULL R\n"
+            "CHANNEL R c:zero -----\n"
+            "$ALARMCOUNTFILTER 0 5\n"
+            "CHANNEL R c:minus -----\n"
+            "$ALARMCOUNTFILTER -1 5\n"
+            "CHANNEL R c:nosec -----\n"
+            "$ALARMCOUNTFILTER 3 0\n";
+    AlhModel alh;
+    AlhConfigParser parser;
+    QVERIFY(parser.parseText(QString::fromLatin1(config), "filter.alhConfig", &alh));
+    AlhTreeModel model;
+    model.setAlhModel(alh);
+    const int zero = alh.findByPath("R/c:zero"), minus = alh.findByPath("R/c:minus"), nosec = alh.findByPath("R/c:nosec");
+    foreach(int c, QList<int>() << zero << minus << nosec) model.applyUpdate(c, true, NO_ALARM, 0, QStringLiteral("0"), 0);
+
+    // count 0: no flap counter, entering and leaving are delayed by seconds
+    QVERIFY(model.applyUpdate(zero, true, MAJOR_ALARM, 0, QStringLiteral("9"), 1000).isEmpty());
+    QCOMPARE(model.state(zero).curSevr, (int) NO_ALARM);
+    QCOMPARE(countAction(model.processDue(6000), "transition"), 1);
+    QCOMPARE(model.state(zero).curSevr, (int) MAJOR_ALARM);
+    QVERIFY(model.applyUpdate(zero, true, NO_ALARM, 0, QStringLiteral("0"), 7000).isEmpty());
+    QCOMPARE(model.state(zero).curSevr, (int) MAJOR_ALARM);
+    QCOMPARE(countAction(model.processDue(12000), "transition"), 1);
+    QCOMPARE(model.state(zero).curSevr, (int) NO_ALARM);
+    qint64 t = 20000;                                                              // fast toggling never short-cuts
+    for(int i = 0; i < 8; i++, t += 100) QVERIFY(model.applyUpdate(zero, true, (i % 2 == 0) ? MAJOR_ALARM : NO_ALARM, 0, QStringLiteral("1"), t).isEmpty());
+    QCOMPARE(model.state(zero).curSevr, (int) NO_ALARM);
+
+    // count -1: entering is delayed, leaving goes through at once
+    QVERIFY(model.applyUpdate(minus, true, MAJOR_ALARM, 0, QStringLiteral("9"), 1000).isEmpty());
+    QVERIFY(model.hasPendingFilters());
+    QCOMPARE(countAction(model.processDue(6000), "transition"), 1);
+    QCOMPARE(model.state(minus).curSevr, (int) MAJOR_ALARM);
+    QCOMPARE(countAction(model.applyUpdate(minus, true, NO_ALARM, 0, QStringLiteral("0"), 7000), "transition"), 1);
+    QCOMPARE(model.state(minus).curSevr, (int) NO_ALARM);
+    QVERIFY(!model.hasPendingFilters());
+    // a pending entry is dropped when the alarm ends before the delay
+    QVERIFY(model.applyUpdate(minus, true, MAJOR_ALARM, 0, QStringLiteral("9"), 8000).isEmpty());
+    QVERIFY(model.applyUpdate(minus, true, NO_ALARM, 0, QStringLiteral("0"), 9000).isEmpty());
+    QVERIFY(model.processDue(20000).isEmpty());
+    QCOMPARE(model.state(minus).curSevr, (int) NO_ALARM);
+
+    // seconds 0: no filtering at all
+    QCOMPARE(countAction(model.applyUpdate(nosec, true, MAJOR_ALARM, 0, QStringLiteral("9"), 1000), "transition"), 1);
+    QCOMPARE(model.state(nosec).curSevr, (int) MAJOR_ALARM);
+}
+
 void TestAlarmTreeLogic::forceBits()
 {
     connectAll(id("ROOT"));
