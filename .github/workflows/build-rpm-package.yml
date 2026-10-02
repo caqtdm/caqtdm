@@ -36,9 +36,10 @@ jobs:
       run: |
         dnf install -y nodejs
 
-    - name: Install git and which
+    - name: Install git, which, and zstd
       run: |
-        dnf install -y git which
+        # Cache restore and save must use the same compression method.
+        dnf install -y git which zstd
 
     - name: Prepare EPEL repository
       if: ${{ matrix.rhel_major > 0 }}
