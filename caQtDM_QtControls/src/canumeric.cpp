@@ -24,6 +24,7 @@
  */
 
 #include "canumeric.h"
+#include "numericpaneltheme.h"
 #include <QResizeEvent>
 #include <QPainter>
 #include <QPen>
@@ -46,6 +47,7 @@ caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
      renewStyleSheet = true;
      setBackground(QColor(230,230,230));
      setElevation(on_top);
+     panelTheme = new NumericPanelTheme(this, this);
 }
 
 QString caNumeric::getPV() const
@@ -62,6 +64,17 @@ void caNumeric::setAccessW(bool access)
 {
      thisAccessW = access;
      writeAccessW(thisAccessW);
+}
+
+void caNumeric::setColorMode(colMode mode)
+{
+    if (mode != Default) panelTheme->setDefaultMode(false);
+    thisColorMode = mode;
+    setBackground(thisBackColor);
+    renewStyleSheet = true;
+    setForeground(thisForeColor);
+    if (mode == Default) panelTheme->setDefaultMode(true);
+    oldColorMode = mode;
 }
 
 void caNumeric::setBackground(QColor c)

@@ -30,6 +30,8 @@
 #include <qtcontrols_global.h>
 #include <enumeric.h>
 
+class NumericPanelTheme;
+
 class QTCON_EXPORT caNumeric : public ENumeric
 {
 Q_OBJECT
@@ -72,12 +74,7 @@ public:
 
     colMode getColorMode() const { return thisColorMode; }
 
-    void setColorMode(colMode colormode) {thisColorMode = colormode;
-                                          setBackground(thisBackColor);
-                                          renewStyleSheet = true;
-                                          setForeground(thisForeColor);
-                                          oldColorMode = thisColorMode;
-                                           }
+    void setColorMode(colMode colormode);
 
     enum SourceMode {Channel = 0, User};
     SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -141,5 +138,6 @@ private:
     QColor thisBackColor, oldBackColor;
     bool renewStyleSheet;
     bool oldConnected = true;
+    NumericPanelTheme *panelTheme = nullptr;
 };
 #endif

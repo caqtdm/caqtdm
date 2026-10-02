@@ -225,6 +225,7 @@ HEADERS	+= \
     src/imagepushbutton.h \
     src/epushbutton.h \
     src/enumeric.h \
+    src/numericpaneltheme.h \
     src/number_delegate.h \
     src/leftclick_with_modifiers_eater.h \
     src/eapplybutton.h \

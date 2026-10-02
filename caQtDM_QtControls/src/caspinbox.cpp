@@ -24,6 +24,7 @@
  */
 
 #include "caspinbox.h"
+#include "numericpaneltheme.h"
 #include <QResizeEvent>
 #include <QPainter>
 #include <QPen>
@@ -48,6 +49,7 @@ caSpinbox::caSpinbox(QWidget *parent) : SNumeric(parent)
      setBackground(QColor(230,230,230));
 
      setElevation(on_top);
+     panelTheme = new NumericPanelTheme(this, this);
 }
 
 QString caSpinbox::getPV() const
@@ -64,6 +66,17 @@ void caSpinbox::setAccessW(bool access)
 {
      thisAccessW = access;
      writeAccessW(thisAccessW);
+}
+
+void caSpinbox::setColorMode(colMode mode)
+{
+    if (mode != Default) panelTheme->setDefaultMode(false);
+    thisColorMode = mode;
+    setBackground(thisBackColor);
+    renewStyleSheet = true;
+    setForeground(thisForeColor);
+    if (mode == Default) panelTheme->setDefaultMode(true);
+    oldColorMode = mode;
 }
 
 void caSpinbox::setBackground(QColor c)

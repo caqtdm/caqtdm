@@ -36,6 +36,7 @@
 #include <gensoftpv.h>
 
 #include <QLineEdit>
+#include <QLabel>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QPushButton>
@@ -887,6 +888,25 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
     table.resize(200, 80);
     panel.show();
     QApplication::processEvents();
+    QLabel *numericDigit = defaultNumeric.findChild<QLabel *>("layoutmember0");
+    QLabel *applyDigit = applyNumeric.findChild<QLabel *>("layoutmember0");
+    QLabel *spinDigit = spinbox.findChild<QLabel *>("layoutmember0");
+    QVERIFY(numericDigit);
+    QVERIFY(applyDigit);
+    QVERIFY(spinDigit);
+    QCOMPARE(numericDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(applyDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QPalette restyledDigit = spinDigit->palette();
+    restyledDigit.setColor(QPalette::WindowText, Qt::white);
+    spinDigit->setPalette(restyledDigit);
+    QApplication::processEvents();
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    spinbox.setIntDigits(5);
+    QApplication::processEvents();
+    spinDigit = spinbox.findChild<QLabel *>("layoutmember0");
+    QVERIFY(spinDigit);
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
     const QImage tableImage = table.viewport()->grab().toImage();
     QCOMPARE(tableImage.pixelColor(40, 5), QColor(Qt::white));
     QCOMPARE(tableImage.pixelColor(tableImage.width() - 5, tableImage.height() - 5),
@@ -913,7 +933,11 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
 
     panel.setProperty("caqtdmThemeMode", "System");
     PanelThemeApplier::apply(&panel);
+    QApplication::processEvents();
     QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(numericDigit->palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(applyDigit->palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::white));
     QCOMPARE(applyNumeric.palette().color(QPalette::Text), QColor(Qt::white));
     QCOMPARE(spinbox.palette().color(QPalette::Text), QColor(Qt::white));
     QCOMPARE(table.viewport()->palette().color(QPalette::Text), QColor(Qt::white));
@@ -921,8 +945,17 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
 
     panel.setProperty("caqtdmThemeMode", "LegacyLight");
     PanelThemeApplier::apply(&panel);
+    QApplication::processEvents();
+    QCOMPARE(numericDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(applyDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
     QCOMPARE(table.viewport()->palette().color(QPalette::Base), QColor(Qt::white));
     QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::black));
+
+    spinbox.setForeground(Qt::red);
+    spinbox.setColorMode(caSpinbox::Static);
+    QApplication::processEvents();
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::red));
 
     QApplication::setPalette(applicationPalette);
 }
