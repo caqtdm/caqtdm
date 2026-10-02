@@ -3,6 +3,10 @@ include(../unitTests.pri)
 
 QT += network gui widgets designer uitools printsupport
 
+win32 {
+    DEFINES += QWT_DLL
+}
+
 web {
     QT += websockets
 }
