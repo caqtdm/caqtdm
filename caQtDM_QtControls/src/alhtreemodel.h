@@ -36,10 +36,11 @@
 #include <QVariantMap>
 #include <QVector>
 #include <qtcontrols_global.h>
+#include "alarmdefs.h"
 #include "alhmodel.h"
 
-// runtime state of one node (channel or group)
-struct QTCON_EXPORT AlhNodeState {
+// runtime state of one node (channel or group); plain struct, not exported (MSVC: implicit members stay local)
+struct AlhNodeState {
     int curSevr;              // alarmdefs.h Alarms, NOTCONNECTED = 99
     int unackSevr;
     short status;
@@ -68,7 +69,14 @@ struct QTCON_EXPORT AlhNodeState {
     int curCount[AlhSevCount];   // groups: channels of the whole subtree per severity index (alh curSev[])
     int unackCount[AlhSevCount];
 
-    AlhNodeState();
+    AlhNodeState()
+        : curSevr(NOTCONNECTED), unackSevr(NO_ALARM), status(0), connected(false), everConnected(false),
+          forced(false), noAckUntilMs(0), beepSevrOverride(-1), mute(false), lastReceivedSevr(NOTCONNECTED),
+          filterPending(false), filterDueMs(0), pendingSevr(NOTCONNECTED), pendingStatus(0), filterIndex(0),
+          contribCur(-1), contribUnack(-1)
+    {
+        for(int i = 0; i < AlhSevCount; i++) curCount[i] = unackCount[i] = 0;
+    }
 };
 
 class QTCON_EXPORT AlhTreeModel : public QAbstractItemModel
@@ -80,6 +88,7 @@ public:
     enum Roles { NodeIdRole = Qt::UserRole + 1, IsGroupRole, HasSubGroupsRole, InactiveRole, MaskHighlightRole };
 
     explicit AlhTreeModel(QObject *parent = Q_NULLPTR);
+    ~AlhTreeModel();                         // out of line: exported class with virtuals (MSVC LNK2005)
 
     void setAlhModel(const AlhModel &model);
     const AlhModel &alhModel() const { return m_alh; }
