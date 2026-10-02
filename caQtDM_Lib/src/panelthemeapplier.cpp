@@ -14,6 +14,7 @@ namespace {
 const char ThemeModeProperty[] = "caqtdmThemeMode";
 const char ThemeModeOverrideEnvironment[] = "CAQTDM_PANEL_THEME_MODE";
 const char ThemeRootProperty[] = "caqtdmAppliedThemeRoot";
+const char LegacyLightProperty[] = "caqtdmAppliedLegacyLight";
 
 QPalette createLegacyLightPalette()
 {
@@ -116,6 +117,7 @@ void PanelThemeApplier::apply(QWidget *root)
     if (!target) return;
     const bool legacyLight = usesLegacyLightTheme(root);
     seed(target, legacyLight);
+    target->setProperty(LegacyLightProperty, legacyLight);
     target->setProperty(ThemeRootProperty, true);
     for (caWaveTable *table : target->findChildren<caWaveTable *>()) {
         bool belongsToNestedPanel = false;

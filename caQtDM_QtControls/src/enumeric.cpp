@@ -760,11 +760,8 @@ void ENumeric::resizeEvent(QResizeEvent *e)
     temp =  qobject_cast<QPushButton *>(list.front());
     if (temp) {
         QPixmap pix1(temp->size() * 0.9);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        pix1.fill(palette().color(QPalette::Background));
-#else
-        pix1.fill(palette().color(QPalette::Window));
-#endif
+        const QColor arrowBackground = property("caqtdmNumericArrowBackground").value<QColor>();
+        pix1.fill(arrowBackground.isValid() ? arrowBackground : palette().color(QPalette::Button));
         QPainter *p = new QPainter(&pix1);
         p->setRenderHint(QPainter::Antialiasing);
         hmargin = (int) (pix1.width() * MARGIN);

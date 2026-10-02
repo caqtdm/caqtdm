@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QPalette>
 #include <QPointer>
+#include <QResizeEvent>
+#include <QVariant>
 #include <QWidget>
 
 class NumericPanelTheme : public QObject
@@ -38,7 +40,8 @@ private:
             scheduleRefresh();
         } else if (watched == themeRoot &&
                    (event->type() == QEvent::PaletteChange ||
-                    event->type() == QEvent::StyleChange)) {
+                    event->type() == QEvent::StyleChange ||
+                    event->type() == QEvent::DynamicPropertyChange)) {
             scheduleRefresh();
         } else if (defaultMode && watched != host && watched != numeric &&
                    (event->type() == QEvent::PaletteChange ||
@@ -81,6 +84,11 @@ private:
         }
 
         if (!defaultMode || !themeRoot) {
+            if (numeric->property("caqtdmNumericArrowBackground").isValid()) {
+                numeric->setProperty("caqtdmNumericArrowBackground", QVariant());
+                QResizeEvent resize(numeric->size(), numeric->size());
+                QCoreApplication::sendEvent(numeric, &resize);
+            }
             if (applied) {
                 numeric->setPalette(QPalette());
                 for (QLabel *label : numeric->findChildren<QLabel *>())
@@ -91,6 +99,14 @@ private:
         }
 
         const QPalette panelPalette = themeRoot->palette();
+        const QColor arrowBackground = themeRoot->property("caqtdmAppliedLegacyLight").toBool()
+                                           ? QColor(224, 224, 224)
+                                           : panelPalette.color(QPalette::Button);
+        if (numeric->property("caqtdmNumericArrowBackground").value<QColor>() != arrowBackground) {
+            numeric->setProperty("caqtdmNumericArrowBackground", arrowBackground);
+            QResizeEvent resize(numeric->size(), numeric->size());
+            QCoreApplication::sendEvent(numeric, &resize);
+        }
         if (numeric->palette() != panelPalette)
             numeric->setPalette(panelPalette);
         for (QLabel *label : numeric->findChildren<QLabel *>()) {
