@@ -54,6 +54,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v6
 
+    - name: Get OS release
+      id: os-release
+      run: |
+        . /etc/os-release
+        echo "version=$VERSION_ID" >> "$GITHUB_OUTPUT"
+
+    - name: Cache epics-base RPMs
+      id: cache-epics-base
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm
+          ~/rpmbuild/SRPMS/epics-base-7.0.10-*.src.rpm
+        key: epics-base-rpm-7.0.10-${{ matrix.image }}-${{ steps.os-release.outputs.version }}-${{ hashFiles('caQtDM_Viewer/package/redhat/epics-base/epics-base.spec', 'caQtDM_Viewer/package/redhat/epics-base/*.patch') }}
+
     - name: Install build dependencies for epics-base
       run: |
         dnf install -y \
@@ -61,6 +76,7 @@ jobs:
           wget rpmdevtools git
 
     - name: Build epics-base RPM
+      if: steps.cache-epics-base.outputs.cache-hit != 'true'
       run: |
         cd caQtDM_Viewer/package/redhat/epics-base
 
