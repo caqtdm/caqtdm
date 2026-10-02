@@ -848,6 +848,12 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
     caToggleButton toggle(&panel);
     caNumeric numeric(&panel);
     numeric.resize(140, 60);
+    caNumeric defaultNumeric(&panel);
+    defaultNumeric.setColorMode(caNumeric::Default);
+    caApplyNumeric applyNumeric(&panel);
+    applyNumeric.setColorMode(caApplyNumeric::Default);
+    caSpinbox spinbox(&panel);
+    spinbox.setColorMode(caSpinbox::Default);
     caWaveTable table(&panel);
     table.displayText(0, 0, "NC");
     QWidget included(&panel);
@@ -860,6 +866,15 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
 
     PanelThemeApplier::apply(&panel);
 
+    defaultNumeric.setConnectedColors(false);
+    applyNumeric.setConnectedColors(false);
+    spinbox.setConnectedColors(false);
+    QVERIFY(defaultNumeric.styleSheet().isEmpty());
+    QVERIFY(applyNumeric.styleSheet().isEmpty());
+    QVERIFY(spinbox.styleSheet().isEmpty());
+    QCOMPARE(defaultNumeric.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(applyNumeric.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(spinbox.palette().color(QPalette::Text), QColor(Qt::black));
     QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::black));
     QVERIFY(toggle.styleSheet().isEmpty());
     QCOMPARE(numeric.palette().color(QPalette::Light), QColor(Qt::white));
@@ -899,6 +914,8 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
     panel.setProperty("caqtdmThemeMode", "System");
     PanelThemeApplier::apply(&panel);
     QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(applyNumeric.palette().color(QPalette::Text), QColor(Qt::white));
+    QCOMPARE(spinbox.palette().color(QPalette::Text), QColor(Qt::white));
     QCOMPARE(table.viewport()->palette().color(QPalette::Text), QColor(Qt::white));
     QVERIFY(arrow->icon().cacheKey() != legacyIcon);
 

@@ -78,17 +78,16 @@ void caNumeric::setForeground(QColor c)
 
 void caNumeric::setColors(QColor bg, QColor fg, bool init)
 {
+    Q_UNUSED(init);
     if(thisColorMode == Default) {
         if(!styleSheet().isEmpty()) {
             setStyleSheet("");
             renewStyleSheet = true;
         }
-        if(!init) {
-            // force resize for repainting
-            QResizeEvent re(size(), size());
-            resizeEvent(&re);
-            return;
-        }
+        // Default colors come from the panel palette, even while disconnected.
+        QResizeEvent re(size(), size());
+        resizeEvent(&re);
+        return;
     }
 
     if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
@@ -151,4 +150,3 @@ void caNumeric::paintEvent(QPaintEvent *event) {
         p.drawRect(0,0,rect().width()-1, rect().height()-1);
     }
 }
-

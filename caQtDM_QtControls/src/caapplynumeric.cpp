@@ -101,17 +101,16 @@ void caApplyNumeric::setForeground(QColor c)
 
 void caApplyNumeric::setColors(QColor bg, QColor fg, bool init)
 {
+    Q_UNUSED(init);
     if(thisColorMode == Default) {
         if(!styleSheet().isEmpty()) {
             setStyleSheet("");
             renewStyleSheet = true;
         }
-        if(!init) {
-            // force resize for repainting
-            QResizeEvent re(size(), size());
-            resizeEvent(&re);
-            return;
-        }
+        // Default colors come from the panel palette, even while disconnected.
+        QResizeEvent re(size(), size());
+        resizeEvent(&re);
+        return;
     }else if(thisColorMode == Static){
         setStyleSheet("");
         renewStyleSheet = true;
