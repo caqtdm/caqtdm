@@ -85,6 +85,7 @@
 
 #include "caqtdm_lib.h"
 #include "panelthemeapplier.h"
+#include "caalarmtree.h"      // not part of the QtControls umbrella header
 #include "uiconverter.h"
 #include "fileFunctions.h"
 
@@ -758,6 +759,22 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
                 this->deleteLater();
                 return;
             }
+#ifdef ALH_FILES
+        // alh alarm handler configuration: converter generates a panel with caAlarmTree + caAlarmLog
+        } else if(filename.endsWith(".alhConfig", Qt::CaseInsensitive)) {
+            UiConverterInterface *alhFile = UiConverterFactory::create(filename);
+            if(alhFile != (UiConverterInterface *) Q_NULLPTR) {
+                foreach(const QString &line, alhFile->errorString().split("\n", SKIP_EMPTY_PARTS))
+                    postMessage(QtWarningMsg, (char*) qasc(line));
+                if(alhFile->ok()) myWidget = alhFile->load(this);
+                delete alhFile;
+            }
+            if (!myWidget) {
+                QMessageBox::warning(this, tr("caQtDM"), tr("Error loading %1 (see messages)").arg(filename));
+                this->deleteLater();
+                return;
+            }
+#endif
 #ifdef ADL_EDL_FILES
         } else if(isMedmFile || isEdmFile) {
             UiConverterInterface *otherFile = UiConverterFactory::create(filename);
@@ -3642,6 +3659,38 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         tableWidget->setToolTip("select row or columns, then with Ctrl+C you can copy to the clipboard\ninside X11 you can then do shft+ins\nwhen doubleclicking on a value, you may execute a shell script for that device");
 
         connect(tableWidget, SIGNAL(TableDoubleClickedSignal(QString)), this, SLOT(Callback_TableDoubleClicked(QString)));
+
+        // alarm handler tree: the widget parses its alh configuration and lists the pvs, the lib subscribes and writes
+        //==================================================================================================================
+    } else if(caAlarmTree* alarmTree = qobject_cast<caAlarmTree *>(w1)) {
+
+        w1->setProperty("ObjectType", caAlarmTree_Widget);
+        connect(alarmTree, SIGNAL(writeRequested(QString,QString,bool)), this, SLOT(Callback_AlarmTreeWrite(QString,QString,bool)));
+        connect(alarmTree, SIGNAL(calcRequested(QString,QVector<double>,double*,bool*)),
+                this, SLOT(Callback_AlarmTreeCalc(QString,QVector<double>,double*,bool*)), Qt::DirectConnection);
+        // log window before loading, the "start" event is emitted while loading
+        QString logTarget = alarmTree->getLogTarget();
+        if(!logTarget.isEmpty()) {
+            caAlarmLog *alarmLog = myWidget->findChild<caAlarmLog *>(logTarget);
+            if(alarmLog != (caAlarmLog *) Q_NULLPTR) connect(alarmTree, SIGNAL(alarmEvent(QVariantMap)), alarmLog, SLOT(appendEvent(QVariantMap)));
+            else postMessage(QtWarningMsg, (char*) qasc(QString("caAlarmTree %1: logTarget %2 not found").arg(w1->objectName(), logTarget)));
+        }
+        alarmTree->loadConfiguration(map);
+
+        // addMonitor nests the previous tooltip into the new one on every call, keep it empty inside the loop
+        foreach(const caAlarmTree::PvRequest &request, alarmTree->requestedPvs()) {
+            specData[0] = request.specId;
+            w1->setToolTip(QString());
+            int num = addMonitor(myWidget, &kData, request.pv, w1, specData, map, &pv);
+            alarmTree->setResolvedPv(request.specId, pv);
+            integerList.append(num);
+            nbMonitors++;
+        }
+        specData[0] = 0;
+        integerList.insert(0, nbMonitors);
+        alarmTree->setProperty("MonitorList", integerList);
+        if(!vncServer) alarmTree->setToolTip(ToolTipPrefix + alarmTree->resolvedConfigFile() + QString(" (%1 pvs)").arg(nbMonitors) + ToolTipPostfix);
+        alarmTree->setProperty("Taken", true);
 
         //==================================================================================================================
     } else if(caWaveTable* wavetableWidget = qobject_cast<caWaveTable *>(w1)) {
@@ -6661,6 +6710,10 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
             tableWidget->displayText(row, 2, NOTCONNECTED, "NC");
         }
 
+        // alarm handler tree: routed by specData[0] inside the widget=========================================
+    } else if(caAlarmTree *alarmTree = qobject_cast<caAlarmTree *>(w)) {
+        alarmTree->dataUpdate(String, data);
+
         // table for waveform values==========================================================================
     } else if(caWaveTable *wavetableWidget = qobject_cast<caWaveTable *>(w)) {
 
@@ -7319,6 +7372,37 @@ void CaQtDM_Lib::Callback_TextEntryChanged(const QString& text)
 
     fType = (FormatType) w->getFormatType();
     TreatRequestedValue(w->getPV(), text, fType, w1);
+}
+
+/**
+ * caAlarmTree asks for a write ($SEVRPV, $ACKPV, $HEARTBEATPV, $FORCEPV, config pv); all of them are monitored by the tree
+ */
+void CaQtDM_Lib::Callback_AlarmTreeWrite(const QString &pv, const QString &text, bool asString)
+{
+    QWidget *w = qobject_cast<QWidget *>(sender());
+    const QString pvName = pv.trimmed();
+    if(w == (QWidget *) Q_NULLPTR || pvName.isEmpty()) return;
+    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pvName);
+    if(kPtr == (knobData *) Q_NULLPTR) {
+        postMessage(QtWarningMsg, (char*) qasc(QString("caAlarmTree %1: write to unmonitored pv %2 ignored").arg(w->objectName(), pvName)));
+        return;
+    }
+    if(!kPtr->edata.connected) return;
+    if(!kPtr->edata.accessW) {
+        postMessage(QtWarningMsg, (char*) qasc(QString("caAlarmTree %1: no write access to %2").arg(w->objectName(), pvName)));
+        return;
+    }
+    TreatRequestedValue(pvName, text, asString ? string : decimal, w);
+}
+
+/**
+ * caAlarmTree $FORCEPV_CALC: EPICS calc evaluated here, directly connected so the result is available at once
+ */
+void CaQtDM_Lib::Callback_AlarmTreeCalc(const QString &expr, const QVector<double> &inputs, double *result, bool *ok)
+{
+    QString error;
+    *ok = evaluateCalc(expr, inputs.constData(), inputs.size(), result, &error);
+    if(!*ok) postMessage(QtWarningMsg, (char*) qasc(QString("caAlarmTree calc <%1>: %2").arg(expr, error)));
 }
 
 void CaQtDM_Lib::Callback_WaveEntryChanged(const QString& text, int index)
@@ -8469,7 +8553,22 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     int nbMonitors = 0;
     if(MonitorList.size() > 0) nbMonitors = MonitorList.at(0).toInt();
 
-    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {   // any caWidget with caWidgetInterface
+    if(caAlarmTree *alarmTree = qobject_cast<caAlarmTree *>(w)) {
+        // the property lists every channel, the menu is about the line under the cursor
+        MonitorList.clear();
+        nbMonitors = 0;
+        QString pvc = alarmTree->pvUnderCursor();
+        if(!pvc.isEmpty()) {
+            knobData *kPtr =  mutexKnobDataP->getMutexKnobDataPV(w, pvc);
+            if(kPtr != (knobData*) Q_NULLPTR) {
+                MonitorList.append(kPtr->index);
+                nbMonitors = 1;
+            }
+        }
+        MonitorList.insert(0, nbMonitors);
+        strcpy(colMode, "Alarm");
+
+    } else if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {   // any caWidget with caWidgetInterface
         QString pv[20];
         wif->getWidgetInfo(pv, nbMonitors, limitsDefault, precMode, limitsMode, Precision, colMode, limitsMax, limitsMin);
         // problem here not yet solved, while some major changes would be needed
@@ -8638,7 +8737,14 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     }
 
     // add some more actions
-    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) { // any caWidget with caWidgetInterface
+    if(caAlarmTree *alarmTree = qobject_cast<caAlarmTree *>(w)) {
+        alarmTree->addContextActions(myMenu);
+        if(nbMonitors > 0) {
+            myMenu.addSeparator();
+            myMenu.addAction(GETINFO);
+        }
+
+    } else if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) { // any caWidget with caWidgetInterface
         wif->createContextMenu(myMenu);
 
         // for the camera cameraWidget
@@ -9814,6 +9920,25 @@ double CaQtDM_Lib::getDoubleValueFromString(char *textValue, FormatType fType, c
 /**
   * this routine will treat the string, command, value to write to the pv
   */
+// EPICS calc for widgets without an EPICS dependency (caAlarmTree $FORCEPV_CALC via Callback_AlarmTreeCalc)
+bool CaQtDM_Lib::evaluateCalc(const QString &expr, const double *inputs, int nInputs, double *result, QString *errorText)
+{
+    double valueArray[MAX_CALC_INPUTS];
+    char post[calcstring_length], calcString[calcstring_length];
+    short errnum = 0;
+    for(int i = 0; i < MAX_CALC_INPUTS; i++) valueArray[i] = (i < nInputs) ? inputs[i] : 0.0;
+    qstrncpy(calcString, qasc(expr), calcstring_length);
+    if(postfix(calcString, post, &errnum)) {
+        if(errorText != Q_NULLPTR) *errorText = QString("invalid calc '%1' (error %2)").arg(expr).arg(errnum);
+        return false;
+    }
+    if(calcPerform(valueArray, result, post)) {
+        if(errorText != Q_NULLPTR) *errorText = QString("calc '%1' could not be performed").arg(expr);
+        return false;
+    }
+    return true;
+}
+
 void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType, QWidget *w)
 {
     char errmess[SMALL_STRING_LENGTH];
@@ -11209,7 +11334,13 @@ void CaQtDM_Lib::mousePressEvent(QMouseEvent *event)
     mimeData->setData("application/x-hotspot", QByteArray::number(hotSpot.x()) + " " + QByteArray::number(hotSpot.y()));
 
 
-    if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {  // any caWidget with caWidgetInterface
+    // the alarm tree views are nested, look for the tree above the pressed child
+    caAlarmTree *alarmTree = (caAlarmTree *) Q_NULLPTR;
+    for(QWidget *p = w; p != (QWidget *) Q_NULLPTR && alarmTree == (caAlarmTree *) Q_NULLPTR && p != myWidget; p = p->parentWidget())
+        alarmTree = qobject_cast<caAlarmTree *>(p);
+    if(alarmTree != (caAlarmTree *) Q_NULLPTR) {
+        mimeData->setText(alarmTree->dragText());
+    } else if(caWidgetInterface* wif = dynamic_cast<caWidgetInterface *>(w)) {  // any caWidget with caWidgetInterface
         mimeData->setText(wif->getDragText());
     } else if(caCalc *calcWidget = qobject_cast<caCalc *>(w)) {
         mimeData->setText(calcWidget->getVariable());

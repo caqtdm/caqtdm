@@ -1,0 +1,75 @@
+record(ai, "jba:Example1") {
+    field(DESC, "alh smoke test 1")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example2") {
+    field(DESC, "alh smoke test 2")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example3") {
+    field(DESC, "alh smoke test 3")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example4") {
+    field(DESC, "alh smoke test 4")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example5") {
+    field(DESC, "alh smoke test 5")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example6") {
+    field(DESC, "alh smoke test 6")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example7") {
+    field(DESC, "alh smoke test 7")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example8") {
+    field(DESC, "alh smoke test 8")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example9") {
+    field(DESC, "alh smoke test 9")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "jba:Example10") {
+    field(DESC, "alh smoke test 10")
+    field(HIHI, "90") field(HHSV, "MAJOR")
+    field(HIGH, "70") field(HSV, "MINOR")
+    field(LOLO, "-90") field(LLSV, "MAJOR")
+    field(VAL, "0") field(UDF, "0") field(PINI, "YES")
+}
+record(ai, "testjbaai") { field(VAL, "0") field(UDF, "0") field(PINI, "YES") }
+record(bo, "ALH:ACK") { field(ZNAM, "idle") field(ONAM, "ack") }
+record(ai, "ALH:SEVR") { field(VAL, "0") field(UDF, "0") field(PINI, "YES") }
+record(ai, "ALH:HB") { field(VAL, "0") field(UDF, "0") field(PINI, "YES") }
+record(waveform, "ALH:CONFIG") { field(FTVL, "CHAR") field(NELM, "16000") }

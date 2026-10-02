@@ -44,5 +44,7 @@
         <file>pixmaps/input.png</file>
         <file>pixmaps/wmrescale.png</file>
         <file>pixmaps/genSoftPV.png</file>
+        <file>pixmaps/alarmtree.png</file>
+        <file>pixmaps/alarmlog.png</file>
     </qresource>
 </RCC>

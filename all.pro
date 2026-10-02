@@ -84,6 +84,11 @@ caQtDM_Plugins.depends = caQtDM_Lib
    parserEDM.depends = caQtDM_Parsers
    parserPRC.file = caQtDM_Viewer/parserPRC/parserPRC.pro
    parserPRC.depends = caQtDM_Parsers
+   caqtdm_alh2ui {
+      SUBDIRS += parserALH
+      parserALH.file = caQtDM_Viewer/parserALH/parserALH.pro
+      parserALH.depends = caQtDM_Parsers
+   }
    ADL_EDL_FILES {
       caQtDM_Lib.depends += caQtDM_Parsers
    }

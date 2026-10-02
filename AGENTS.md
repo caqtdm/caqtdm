@@ -26,7 +26,7 @@ and do NOT contain feature-branch states.
 | `caQtDM_Tests/` | Test/demo UI panels (.ui) for manual testing |
 | `caQtDM_Web/`, `caQtDM_docs/`, `ci/` | Browser variant (see caQtDM_Web section), Sphinx docs (see Documentation section), CI helper files |
 
-## MEDM / EDM (legacy predecessors and format reference)
+## MEDM / EDM / ALH (legacy predecessors and format reference)
 
 caQtDM can replaces the older EPICS display managers and still reads their
 panel formats:
@@ -35,6 +35,17 @@ panel formats:
   https://github.com/epics-extensions/medm.git
 - **EDM** (Extensible Display Manager, `.edl` panels) — upstream:
   https://github.com/gnartohl/edm.git
+- **ALH** (Alarm Handler, `.alhConfig` files, replaced by `caAlarmTree`) —
+  upstream: https://github.com/epics-extensions/alh.git (behaviour reference
+  `alLib.c`, `alConfig.c`, `alFilter.c`, `awView.c`, `line.c`, `axRunW.c`);
+  additionally the older PSI build ALH 1.2.28 with local patches
+  (A. Luedeke: blue mask label while D/A/T silence a line) kept as a plain
+  source copy at `/Users/brands/Documents/Entwicklung/epics/alarmhandler`
+  (no remote configured). Both were compared for the semantics implemented
+  in `alhtreemodel.cpp` (group counters count every channel in all ancestor
+  groups, disabled channels count as NO_ALARM, `$FORCEPV` replaces the masks
+  of the subtree, count filter delays instead of dropping). When they
+  disagree with ALH.MD or older plan notes, the sources win.
 
 Relevant for work here:
 
@@ -42,7 +53,9 @@ Relevant for work here:
   sources (`adlParserSrc/parser.c` from MEDM; `edlParserSrc/expString.cc`,
   `tag_pkg.cc`, `parserClass.cc` from EDM). For questions like "what does
   this adl/edl attribute mean?", the behavior of MEDM/EDM in the upstream
-  repos is the reference.
+  repos is the reference. The alh parser (`alhParserSrc/`) is a clean
+  re-implementation of `alConfig.c` (tolerant line dispatcher, same `$`
+  keyword order and defaults), not derived code.
 - Each parser is built as static + shared lib (`caQtDM_Parsers.pro`); the
   **edl side only on Unix**, Windows builds only the adl parser. There are
   also standalone converters: `adl2ui` (`caQtDM_Viewer/parser/`) and
@@ -66,6 +79,26 @@ Two coexisting linking patterns, per parser:
   UiConverterFactory works everywhere qtcontrols is loaded (viewer,
   caInclude, Designer). macOS links the dylib with full path, Windows the
   import lib (prcParser.dll ships in the MSI).
+- **alh (new pattern, like prc):** `libalhParser.a`/`.dylib`/`alhParser.lib`
+  (`caQtDM_Parsers/alhParserSrc`, model + parser + ui generator for alh
+  `.alhConfig` files) is linked into libqtcontrols the same way as prc;
+  `alhParser.dll` ships in both WiX installers, brew patches the install
+  name. Consumers: `AlhConverterAdapter` in `uiconverter.cpp` (suffix
+  `alhconfig`, gated by `ALH_FILES` in qtdefs.pri, not on MOBILE) and the
+  widget `caAlarmTree` (`caalarmtree.*`, `alhtreemodel.*`). The widget follows
+  the classic pattern: it parses its configuration in `loadConfiguration()`
+  and lists the pvs (`requestedPvs()`, specData[0] = node id or aux index);
+  `caqtdm_lib.cpp` has explicit cases in HandleWidget (addMonitor loop,
+  MonitorList, log target), Callback_UpdateWidget (`dataUpdate()`),
+  DisplayContextMenu and mousePressEvent; writes come back through the
+  `writeRequested` signal (`Callback_AlarmTreeWrite`, checks accessW) and
+  `$FORCEPV_CALC` through the directly connected `calcRequested` signal
+  (`Callback_AlarmTreeCalc`, EPICS postfix/calcPerform). `caalarmtree.h`
+  only forward-declares the model, so the lib needs no parser include path;
+  it is still kept out of the umbrella header `src/QtControls` and included
+  explicitly by the lib and the monitors plugin.
+  Debug CLI `alh2ui` (`caQtDM_Viewer/parserALH`) builds only with
+  `CAQTDM_ALH2UI=1` and is never installed or packaged.
 - **adl/edl (legacy pattern):** their symbols (via `parseotherfile.cpp`
   in QtControls) stay **unresolved** in libqtcontrols.so; the viewer
   links `-ladlParser/-ledlParser` on top (`caQtDM.pri` viewer scope).
@@ -115,7 +148,9 @@ and `.prc` — any other extension in its file property is replaced by
   getDragText) meant to move per-widget special cases out of
   `caqtdm_lib.cpp` — the dispatcher probes it via `dynamic_cast` and
   falls back to the classic type checks. So far only `caLineDraw`
-  implements it; it is NOT a repo-wide widget interface.
+  implements it; it is NOT a repo-wide widget interface (caAlarmTree used
+  it briefly in 2026-10 and was moved back to the classic pattern: the lib
+  decides what to subscribe to and executes all writes).
 - **`wmSignalPropagator`** (utilities group): Designer bridge from panel
   widgets to window operations of the surrounding main window (close,
   reload, show*, print, resize; `caqtdm_lib.cpp` collects instances and
@@ -280,6 +315,10 @@ Two separate levels — do not mix them up:
    - `caQtDM_Plugins/caQtDM_Plugins_global.h` — plugin categories
    - `caQtDM_Viewer/src/loggingcategories.h` — viewer categories
    - `caQtDM_Parsers/prcParserSrc/prcparserdefs.h` — prc parser
+   - `caQtDM_Parsers/alhParserSrc/alhparserdefs.h` — alh parser
+     (`caqtdm.parsers.alh`); alarm events of caAlarmTree go to
+     `caqtdm.alarm.events` at **info** level (one JSON line per event,
+     defined in `caalarmtree.cpp`) — visible with the default rules
    Naming scheme: `caqtdm.lib.*`, `caqtdm.widgets.*`, `caqtdm.viewer.*`,
    `caqtdm.web.*`, `caqtdm.plugins.*`, `caqtdm.parsers.*`,
    `caqtdm.logging.*` (the log handlers themselves), `caqtdm.extern.c`.

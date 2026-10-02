@@ -277,4 +277,24 @@ public:
     virtual QWidget* createWidget(QWidget* parent);
 };
 
+class caAlarmTreeInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caAlarmTreeInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
+class caAlarmLogInterface : public CustomWidgetInterface_Monitors
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerCustomWidgetInterface)
+
+public:
+    caAlarmLogInterface(QObject* parent);
+    virtual QWidget* createWidget(QWidget* parent);
+};
+
 #endif

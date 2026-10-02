@@ -185,6 +185,7 @@ public:
     // ZHW requested for external integration - allow an external application/object to get the top level ui widget of caQtDM_Lib window
     QWidget* getMyWidget(){ return myWidget; }
     // interface finish (perhaps we need more)
+    bool evaluateCalc(const QString &expr, const double *inputs, int nInputs, double *result, QString *errorText);  // Callback_AlarmTreeCalc
 
 #ifdef MOBILE
     void grabSwipeGesture(Qt::GestureType fingerSwipeGestureTypeID);
@@ -595,6 +596,8 @@ public slots:
     void ShowContextMenu(const QPoint&);
     void DisplayContextMenu(QWidget* w);
     void Callback_TextEntryChanged(const QString &);
+    void Callback_AlarmTreeWrite(const QString &pv, const QString &text, bool asString);
+    void Callback_AlarmTreeCalc(const QString &expr, const QVector<double> &inputs, double *result, bool *ok);
     void Callback_WaveEntryChanged(const QString &, int index);
     void processTerminated();
     void closeWindow();
