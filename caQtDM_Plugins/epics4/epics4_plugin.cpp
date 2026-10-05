@@ -1795,7 +1795,7 @@ bool PVAInterface::getTimeStamp(char *buf)
 {
     if(!gotTimeStamp) return false;
     // never processed record, same text as the epics3 plugin
-    if(timeStamp.getSecondsPastEpoch() <= posixEpochAtEpicsEpoch) {
+    if(timeStamp.getSecondsPastEpoch() <= (int64) POSIX_TIME_AT_EPICS_EPOCH) {
         qstrncpy(buf, "TimeStamp: <undefined>", TIMESTAMP_STRING_LENGTH);
         return true;
     }
