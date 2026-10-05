@@ -194,6 +194,7 @@ private:
     knobData kData;
     shared_vector<const string> choices;
     TimeStamp timeStamp;
+    bool gotTimeStamp;
     string description;
     Mutex mutex;
     PVAGetFieldRequesterPtr pvaGetFieldRequester;
@@ -649,7 +650,8 @@ PVAInterface::PVAInterface(
       dimCols(0),
       hasDimField(false),
       callbackType(unknown_t),
-      convert(getConvert())
+      convert(getConvert()),
+      gotTimeStamp(false)
 {
     if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "PVAInterface::PVAInterface()";
 }
@@ -870,19 +872,19 @@ void PVAInterface::monitorEvent(MonitorPtr const & monitor)
         mutexKnobData->DataLock(&kData);
         // nothing may escape into the pvAccess thread
         try {
-            if(structure->getField("alarm")) {
-                PVFieldPtr pvField = pvStructure->getSubField<PVStructure>("alarm");
-                Alarm alarm;
-                PVAlarm pvAlarm;
-                if(pvField && pvAlarm.attach(pvField)) {
-                    pvAlarm.get(alarm);
-                    kData.edata.severity = alarm.getSeverity();
-                }
+            // from the monitor data, the ca introspection lacks timeStamp
+            PVFieldPtr pvAlarmField = pvStructure->getSubField<PVStructure>("alarm");
+            Alarm alarm;
+            PVAlarm pvAlarm;
+            if(pvAlarmField && pvAlarm.attach(pvAlarmField)) {
+                pvAlarm.get(alarm);
+                kData.edata.severity = alarm.getSeverity();
             }
-            if(structure->getField("timeStamp")) {
-                PVFieldPtr pvField = pvStructure->getSubField<PVStructure>("timeStamp");
-                PVTimeStamp pvTimeStamp;
-                if(pvField && pvTimeStamp.attach(pvField)) pvTimeStamp.get(timeStamp);
+            PVFieldPtr pvTimeField = pvStructure->getSubField<PVStructure>("timeStamp");
+            PVTimeStamp pvTimeStamp;
+            if(pvTimeField && pvTimeStamp.attach(pvTimeField)) {
+                pvTimeStamp.get(timeStamp);
+                gotTimeStamp = true;
             }
 
             switch (normativeType) {
@@ -1053,6 +1055,15 @@ void PVAInterface::getDisplayControl()
     pvaChannelGet = pvaChannel->getChannel()->createChannelGet(pvaChannelGetRequester,pvRequest);
 }
 
+// precision from a format like "F11.5" or "%.5f", 0 without a fraction
+static short precisionFromFormat(const string & format)
+{
+    size_t pos = format.rfind('.');
+    if(pos == string::npos) return 0;
+    int prec = atoi(format.c_str() + pos + 1);
+    return (prec < 0 || prec > 17) ? 0 : (short) prec;
+}
+
 void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
 {
     double controlLow = 0;
@@ -1082,7 +1093,13 @@ void PVAInterface::gotDisplayControl(PVStructurePtr const & pvStructure)
         if(pvDouble)  displayHigh = pvDouble->get();
         // precision
         PVIntPtr pvInt  = pvDisplay->getSubField<PVInt>("precision");
-        if(pvInt) precision =  pvInt->get();
+        if(pvInt) {
+            precision =  pvInt->get();
+        } else {
+            // the ca provider has a format string instead
+            PVStringPtr pvFormat = pvDisplay->getSubField<PVString>("format");
+            if(pvFormat) precision = precisionFromFormat(pvFormat->get());
+        }
         // units
         PVStringPtr pvString = pvDisplay->getSubField<PVString>("units");
         if(pvString) units = pvString->get();
@@ -1396,6 +1413,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_STRING;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVStringArrayPtr ArrayData = std::tr1::static_pointer_cast<PVStringArray> (pva);
@@ -1431,6 +1449,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_CHAR;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVByteArray> (pva);
@@ -1444,6 +1463,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_CHAR;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVUByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUByteArray> (pva);
@@ -1457,6 +1477,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_INT;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVShortArray> (pva);
@@ -1470,6 +1491,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_INT;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVUShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUShortArray> (pva);
@@ -1483,6 +1505,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_LONG;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVIntArray> (pva);
@@ -1496,6 +1519,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_LONG;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVUIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUIntArray> (pva);
@@ -1514,6 +1538,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_FLOAT;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVFloatArrayPtr ArrayData = std::tr1::static_pointer_cast<PVFloatArray> (pva);
@@ -1528,6 +1553,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
         if(length<1) {
             kData.edata.fieldtype = DBF_DOUBLE;
             kData.edata.valueCount = 0;
+            kData.edata.monitorCount++;
             return;
         }
         PVDoubleArrayPtr ArrayData = std::tr1::static_pointer_cast<PVDoubleArray> (pva);
@@ -1767,14 +1793,22 @@ bool PVAInterface::setArrayValue(
 
 bool PVAInterface::getTimeStamp(char *buf)
 {
-    if(!structure->getField("timeStamp")) return false;
+    if(!gotTimeStamp) return false;
+    // never processed record, same text as the epics3 plugin
+    if(timeStamp.getSecondsPastEpoch() <= posixEpochAtEpicsEpoch) {
+        qstrncpy(buf, "TimeStamp: <undefined>", TIMESTAMP_STRING_LENGTH);
+        return true;
+    }
     time_t tt;
     timeStamp.toTime_t(tt);
     struct tm ctm;
     memcpy(&ctm,localtime(&tt),sizeof(struct tm));
-    strftime(buf,32,"%b %d, %Y %H:%M:%S%n",&ctm);
-    int len = strlen(buf);
-    snprintf(buf + len,TIMESTAMP_STRING_LENGTH - len,".%09d tag %d\n",timeStamp.getNanoseconds(),timeStamp.getUserTag());
+    char tsString[32];
+    strftime(tsString,32,"%b %d, %Y %H:%M:%S",&ctm);
+    // same line format as the epics3 plugin
+    int len = snprintf(buf,TIMESTAMP_STRING_LENGTH,"TimeStamp: %s.%09d",tsString,timeStamp.getNanoseconds());
+    if(timeStamp.getUserTag() != 0 && len > 0 && len < TIMESTAMP_STRING_LENGTH)
+        snprintf(buf + len,TIMESTAMP_STRING_LENGTH - len," tag %d",timeStamp.getUserTag());
     return true;
 }
 
@@ -1793,6 +1827,16 @@ static PVAInterfacePtr interfaceOf(void *info)
     PVAInterfaceGlue *pvaInterfaceGlue = static_cast<PVAInterfaceGlue *>(info);
     if(!pvaInterfaceGlue) return PVAInterfacePtr();
     return pvaInterfaceGlue->getPVAInterface();
+}
+
+// channel name of a map key "provider://name_index"
+static string channelNameOf(const string &mapname)
+{
+    size_t start = mapname.find("://");
+    start = (start == string::npos) ? 0 : start + 3;
+    size_t end = mapname.rfind('_');
+    if(end == string::npos || end < start) end = mapname.length();
+    return mapname.substr(start, end - start);
 }
 
 bool Epics4Plugin::debug = false;
@@ -1969,11 +2013,9 @@ int Epics4Plugin::pvGetTimeStamp(char *pv, char *timestamp)
     if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "Epics4Plugin:pvGetTimeStamp";
     map<std::string, int>::iterator it = pvMap.begin();
     while (it != pvMap.end()) {
-        string mapname = it->first;
-        if (mapname.find(pv) != string::npos) {
-            //cout << "found" << endl;
+        if (channelNameOf(it->first) == pv) {
             knobData kData = mutexKnobData->GetMutexKnobData(it->second);
-            pvGetTimeStampN(&kData, timestamp);
+            pvGetTimeStamp(&kData, timestamp);
             break;
         }
         it++;
@@ -1981,11 +2023,11 @@ int Epics4Plugin::pvGetTimeStamp(char *pv, char *timestamp)
     return true;
 }
 
-bool Epics4Plugin::pvGetTimeStampN(knobData *kData, char *timestamp) {
+bool Epics4Plugin::pvGetTimeStamp(knobData *kData, char *timestamp) {
     if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "Epics4Plugin:pvGetTimeStamp";
     PVAInterfacePtr pvaInterface = interfaceOf(kData->edata.info);
     if(!pvaInterface) {
-        qCDebug(::epics4Log) << "Epics4Plugin::pvGetTimeStampN no interface for" << kData->pv;
+        qCDebug(::epics4Log) << "Epics4Plugin::pvGetTimeStamp no interface for" << kData->pv;
         return false;
     }
     pvaInterface->getTimeStamp(timestamp);
@@ -1997,11 +2039,9 @@ int Epics4Plugin::pvGetDescription(char *pv, char *description)
     if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "Epics4Plugin:pvGetDescription";
     map<std::string, int>::iterator it = pvMap.begin();
     while (it != pvMap.end()) {
-        string mapname = it->first;
-        if (mapname.find(pv) != string::npos) {
-            //cout << "found" << endl;
+        if (channelNameOf(it->first) == pv) {
             knobData kData = mutexKnobData->GetMutexKnobData(it->second);
-            pvGetDescriptionN(&kData, description);
+            pvGetDescription(&kData, description);
             break;
         }
         it++;
@@ -2009,11 +2049,11 @@ int Epics4Plugin::pvGetDescription(char *pv, char *description)
     return true;
 }
 
-bool Epics4Plugin::pvGetDescriptionN(knobData *kData, char *description) {
-    if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "Epics4Plugin:pvGetTimeStamp";
+bool Epics4Plugin::pvGetDescription(knobData *kData, char *description) {
+    if(Epics4Plugin::getDebug()) qCDebug(::epics4Log) << "Epics4Plugin:pvGetDescription";
     PVAInterfacePtr pvaInterface = interfaceOf(kData->edata.info);
     if(!pvaInterface) {
-        qCDebug(::epics4Log) << "Epics4Plugin::pvGetDescriptionN no interface for" << kData->pv;
+        qCDebug(::epics4Log) << "Epics4Plugin::pvGetDescription no interface for" << kData->pv;
         return false;
     }
     pvaInterface->getDescription(description);

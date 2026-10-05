@@ -99,8 +99,8 @@ public:
     int pvGetDescription(char *pv, char *description);
     bool pvSetValue(knobData *kData, double rdata, int32_t idata, char *sdata, char *object, char *errmess, int forceType);
     bool pvSetWave(knobData *kData, float *fdata, double *ddata, int16_t *data16, int32_t *data32, char *sdata, int nelm, char *object, char *errmess);
-    bool pvGetTimeStampN(knobData *kData, char *timestamp);
-    bool pvGetDescriptionN(knobData *kData, char *description);
+    bool pvGetTimeStamp(knobData *kData, char *timestamp);
+    bool pvGetDescription(knobData *kData, char *description);
     int pvClearEvent(void * ptr);
     int pvAddEvent(void * ptr);
     int pvReconnect(knobData *kData);
