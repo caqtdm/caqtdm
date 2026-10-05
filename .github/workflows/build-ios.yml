@@ -246,7 +246,7 @@ jobs:
             echo "Verifying QtPositioning, QtOpcUa, and secure Open62541 backend for ${target}"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
-            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.dylib"
+            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
             test -f "${qt_prefix}/include/QtOpcUa/QOpcUaX509CertificateSigningRequest"
             echo "Qt ${target} installation ready at ${qt_prefix}"
             echo "::endgroup::"
@@ -260,7 +260,7 @@ jobs:
             test -d "${qt_prefix}/lib/QtSvg.framework"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
-            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.dylib"
+            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
             test -f "${qt_prefix}/include/QtOpcUa/QOpcUaX509CertificateSigningRequest"
           done
 
@@ -302,7 +302,7 @@ jobs:
             test -d "${qt_prefix}/lib/QtCore.framework"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
-            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.dylib"
+            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
           done
           ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
@@ -392,7 +392,8 @@ jobs:
           test -d "${QT_TARGET_ROOT}/lib/QtCore.framework"
           test -d "${QT_TARGET_ROOT}/lib/QtPositioning.framework"
           test -d "${QT_TARGET_ROOT}/lib/QtOpcUa.framework"
-          test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.dylib"
+          test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a"
+          test -f "${QT_TARGET_ROOT}/mkspecs/modules/qt_plugin_open62541_backend.pri"
           ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-epics.outputs.toolchain_key }}"
@@ -508,8 +509,9 @@ jobs:
           else
             QT_TARGET_ROOT="${QT_IOS_SIMULATOR_ROOT}"
           fi
-          test -f "${APP}/PlugIns/opcua/libopen62541_backend.dylib"
-          strings "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.dylib" | grep -q 'SecurityPolicy#Basic256Sha256'
+          test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a"
+          strings "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a" | grep -F 'SecurityPolicy#Basic256Sha256' >/dev/null
+          strings "${EXECUTABLE}" | grep -F 'SecurityPolicy#Basic256Sha256' >/dev/null
           if codesign -dv "${APP}" >/dev/null 2>&1; then
             echo "Expected an unsigned CI app bundle"
             exit 1
