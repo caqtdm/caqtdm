@@ -230,9 +230,9 @@ isEmpty(_CAQTDM_OPCUA) {
         QT_OPCUA_ENCRYPTION_HEADER = QtOpcUa/QOpcUaX509CertificateSigningRequest
 		exists($$quote($$[QT_INSTALL_HEADERS]/$$QT_OPCUA_ENCRYPTION_HEADER)) {
 		    DEFINES += QT_OPCUA_X509
-			message("Building OPCUA plugin with encryption.")
+		    message("Building OPC UA certificate generation support.")
 		} else {
-		    message("No QOpcUaX509 headers available, skipping OPCUA encryption.")
+		    message("No QOpcUaX509 headers available, skipping OPC UA certificate generation support.")
 		}
 	} else {
 	    message("Qt module opcua was not found, OPCUA plugin will not be built.")

@@ -239,6 +239,18 @@ jobs:
               -DOPENSSL_ROOT_DIR="${openssl_prefix}" \
               -DOPENSSL_USE_STATIC_LIBS=ON \
               -DFEATURE_open62541_security=ON
+            summary_file="${build_dir}/config.summary"
+            echo "Checking Qt's configure summary for Open62541 security support"
+            if [ ! -f "${summary_file}" ]; then
+              echo "Qt configure did not create ${summary_file}"
+              exit 1
+            fi
+            if ! grep -Eq 'Open62541 security support[.[:space:]]+yes' "${summary_file}"; then
+              cat "${summary_file}"
+              echo "Open62541 security support was not enabled for ${target}; stopping before the Qt build"
+              exit 1
+            fi
+            grep -E 'Open62541 security support' "${summary_file}"
             echo "::endgroup::"
             echo "::group::Build and install Qt ${QT_VERSION} for ${target}"
             run_with_heartbeat "Build Qt for ${target}" cmake --build . --parallel
@@ -246,8 +258,8 @@ jobs:
             echo "Verifying QtPositioning, QtOpcUa, and secure Open62541 backend for ${target}"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
-            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
-            test -f "${qt_prefix}/include/QtOpcUa/QOpcUaX509CertificateSigningRequest"
+            opcua_backend="${qt_prefix}/plugins/opcua/libopen62541_backend.a"
+            test -f "${opcua_backend}"
             echo "Qt ${target} installation ready at ${qt_prefix}"
             echo "::endgroup::"
           done
@@ -261,7 +273,6 @@ jobs:
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
             test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
-            test -f "${qt_prefix}/include/QtOpcUa/QOpcUaX509CertificateSigningRequest"
           done
 
   build-epics:
@@ -510,7 +521,6 @@ jobs:
             QT_TARGET_ROOT="${QT_IOS_SIMULATOR_ROOT}"
           fi
           test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a"
-          strings "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a" | grep -F 'SecurityPolicy#Basic256Sha256' >/dev/null
           strings "${EXECUTABLE}" | grep -F 'SecurityPolicy#Basic256Sha256' >/dev/null
           if codesign -dv "${APP}" >/dev/null 2>&1; then
             echo "Expected an unsigned CI app bundle"
