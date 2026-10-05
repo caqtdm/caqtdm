@@ -27,6 +27,7 @@
 
 
 #include <queue>
+#include <memory>
 #include <epicsThread.h>
 #include <pv/event.h>
 #include <pv/lock.h>
@@ -35,10 +36,10 @@ namespace epics { namespace pvData {
 
 
 class epics4_CallbackThread;
-typedef std::tr1::shared_ptr<epics4_CallbackThread> CallbackThreadPtr;
+typedef std::shared_ptr<epics4_CallbackThread> CallbackThreadPtr;
 
 class epics4_CallbackRequester;
-typedef std::tr1::shared_ptr<epics4_CallbackRequester> CallbackRequesterPtr;
+typedef std::shared_ptr<epics4_CallbackRequester> CallbackRequesterPtr;
 
 class epicsShareClass epics4_CallbackRequester
 {
@@ -47,14 +48,11 @@ public:
     virtual void callback() = 0;
 };
 
-class epics4_CallbackThread;
-typedef std::tr1::shared_ptr<epics4_CallbackThread> CallbackThreadPtr;
-
 class epicsShareClass  epics4_CallbackThread :
     public epicsThreadRunable
 {
     std::queue<CallbackRequesterPtr> monitorQueue;
-    std::tr1::shared_ptr<epicsThread> thread;
+    std::shared_ptr<epicsThread> thread;
     epics::pvData::Mutex mutex;
     epics::pvData::Event runStop;
     epics::pvData::Event runReturn;
@@ -64,7 +62,7 @@ public:
     virtual void run();
     void startThread()
     {
-         thread =  std::tr1::shared_ptr<epicsThread>(new epicsThread(
+         thread =  std::shared_ptr<epicsThread>(new epicsThread(
             *this,
             "callbackThread",
             epicsThreadGetStackSize(epicsThreadStackSmall),

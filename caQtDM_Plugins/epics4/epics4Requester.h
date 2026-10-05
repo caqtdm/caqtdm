@@ -25,6 +25,7 @@
 #ifndef EPICS4REQUESTER_H
 #define EPICS4REQUESTER_H
 
+#include <memory>
 #include <pv/requester.h>
 
 #include <QObject>
@@ -34,11 +35,11 @@
 namespace epics { namespace caqtdm { namespace epics4 {
 
 class Epics4Requester;
-typedef std::tr1::shared_ptr<Epics4Requester> Epics4RequesterPtr;
+typedef std::shared_ptr<Epics4Requester> Epics4RequesterPtr;
 
 class epicsShareClass Epics4Requester :
    public epics::pvData::Requester,
-   public std::tr1::enable_shared_from_this<Epics4Requester>
+   public std::enable_shared_from_this<Epics4Requester>
 {
     MessageWindow *messageWindow;   
 public:

@@ -46,15 +46,15 @@ namespace epics { namespace caqtdm { namespace epics4 {
 
 
 class PVAInterface;
-typedef std::tr1::shared_ptr<PVAInterface> PVAInterfacePtr;
-typedef std::tr1::weak_ptr<PVAInterface> PVAInterfaceWPtr;
+typedef std::shared_ptr<PVAInterface> PVAInterfacePtr;
+typedef std::weak_ptr<PVAInterface> PVAInterfaceWPtr;
 
 class PVAChannelRequester;
-typedef std::tr1::shared_ptr<PVAChannelRequester> PVAChannelRequesterPtr;
-typedef std::tr1::weak_ptr<PVAChannelRequester> PVAChannelRequesterWPtr;
+typedef std::shared_ptr<PVAChannelRequester> PVAChannelRequesterPtr;
+typedef std::weak_ptr<PVAChannelRequester> PVAChannelRequesterWPtr;
 
 class epicsShareClass PVAChannel :
-        public std::tr1::enable_shared_from_this<PVAChannel>
+        public std::enable_shared_from_this<PVAChannel>
 {
 private:
     string fullName;
@@ -131,24 +131,24 @@ public:
 };
 
 class PVAGetFieldRequester;
-typedef std::tr1::shared_ptr<PVAGetFieldRequester> PVAGetFieldRequesterPtr;
-typedef std::tr1::weak_ptr<PVAGetFieldRequester> PVAGetFieldRequesterWPtr;
+typedef std::shared_ptr<PVAGetFieldRequester> PVAGetFieldRequesterPtr;
+typedef std::weak_ptr<PVAGetFieldRequester> PVAGetFieldRequesterWPtr;
 
 class PVAChannelGetRequester;
-typedef std::tr1::shared_ptr<PVAChannelGetRequester> PVAChannelGetRequesterPtr;
-typedef std::tr1::weak_ptr<PVAChannelGetRequester> PVAChannelGetRequesterWPtr;
+typedef std::shared_ptr<PVAChannelGetRequester> PVAChannelGetRequesterPtr;
+typedef std::weak_ptr<PVAChannelGetRequester> PVAChannelGetRequesterWPtr;
 
 class PVAChannelPutRequester;
-typedef std::tr1::shared_ptr<PVAChannelPutRequester> PVAChannelPutRequesterPtr;
-typedef std::tr1::weak_ptr<PVAChannelPutRequester> PVAChannelPutRequesterWPtr;
+typedef std::shared_ptr<PVAChannelPutRequester> PVAChannelPutRequesterPtr;
+typedef std::weak_ptr<PVAChannelPutRequester> PVAChannelPutRequesterWPtr;
 
 class PVAMonitorRequester;
-typedef std::tr1::shared_ptr<PVAMonitorRequester> PVAMonitorRequesterPtr;
-typedef std::tr1::weak_ptr<PVAMonitorRequester> PVAMonitorRequesterWPtr;
+typedef std::shared_ptr<PVAMonitorRequester> PVAMonitorRequesterPtr;
+typedef std::weak_ptr<PVAMonitorRequester> PVAMonitorRequesterWPtr;
 
 class epicsShareClass PVAInterface :
         public epics4_CallbackRequester,
-        public std::tr1::enable_shared_from_this<PVAInterface>
+        public std::enable_shared_from_this<PVAInterface>
 {
 private:
     template <typename pureData> void fillData(pureData const &array, size_t size, knobData* kPtr);
@@ -752,7 +752,7 @@ void PVAInterface::getDone(
         const Status& status,
         FieldConstPtr const & yyy)
 {
-    structure =  std::tr1::dynamic_pointer_cast<const Structure>(yyy);
+    structure =  std::dynamic_pointer_cast<const Structure>(yyy);
     if(!status.isOK()) {
         string mess(status.getMessage());
         mess += " getField failed";
@@ -1280,7 +1280,7 @@ void PVAInterface::getScalarData(PVStructurePtr const & pvStructure)
     case pvBoolean:
     {
         //cout << "boolean "<< endl ;
-        PVBooleanPtr pvBoolean = std::tr1::dynamic_pointer_cast<PVBoolean>(pvScalar);
+        PVBooleanPtr pvBoolean = std::dynamic_pointer_cast<PVBoolean>(pvScalar);
         bool value  = pvBoolean->get();
         kData.edata.ivalue = (value ? 1 : 0);
         kData.edata.rvalue = (float) kData.edata.ivalue;
@@ -1332,7 +1332,7 @@ void PVAInterface::getScalarData(PVStructurePtr const & pvStructure)
     case pvString:
     {
         //cout  << "string " << endl;
-        PVStringPtr pvString = std::tr1::dynamic_pointer_cast<PVString>(pvScalar);
+        PVStringPtr pvString = std::dynamic_pointer_cast<PVString>(pvScalar);
         string value = pvString->get();
         int len = value.length();
         const char * data = value.data();
@@ -1416,7 +1416,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVStringArrayPtr ArrayData = std::tr1::static_pointer_cast<PVStringArray> (pva);
+        PVStringArrayPtr ArrayData = std::static_pointer_cast<PVStringArray> (pva);
         shared_vector<const string> array(ArrayData->view());
         kData.edata.fieldtype = DBF_STRING;
         int numBytes = 0;
@@ -1452,7 +1452,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVByteArray> (pva);
+        PVByteArrayPtr ArrayData = std::static_pointer_cast<PVByteArray> (pva);
         shared_vector<const int8> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_CHAR;
         fillData(xxx, length, &kData);
@@ -1466,7 +1466,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVUByteArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUByteArray> (pva);
+        PVUByteArrayPtr ArrayData = std::static_pointer_cast<PVUByteArray> (pva);
         shared_vector<const uint8> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_CHAR;
         fillData(xxx, length, &kData);
@@ -1480,7 +1480,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVShortArray> (pva);
+        PVShortArrayPtr ArrayData = std::static_pointer_cast<PVShortArray> (pva);
         shared_vector<const int16> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_INT;
         fillData(xxx, length, &kData);
@@ -1494,7 +1494,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVUShortArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUShortArray> (pva);
+        PVUShortArrayPtr ArrayData = std::static_pointer_cast<PVUShortArray> (pva);
         shared_vector<const uint16> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_INT;
         fillData(xxx, length, &kData);
@@ -1508,7 +1508,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVIntArray> (pva);
+        PVIntArrayPtr ArrayData = std::static_pointer_cast<PVIntArray> (pva);
         shared_vector<const int32> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_LONG;
         fillData(xxx, length, &kData);
@@ -1522,7 +1522,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVUIntArrayPtr ArrayData = std::tr1::static_pointer_cast<PVUIntArray> (pva);
+        PVUIntArrayPtr ArrayData = std::static_pointer_cast<PVUIntArray> (pva);
         shared_vector<const uint32> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_LONG;
         fillData(xxx, length, &kData);
@@ -1541,7 +1541,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVFloatArrayPtr ArrayData = std::tr1::static_pointer_cast<PVFloatArray> (pva);
+        PVFloatArrayPtr ArrayData = std::static_pointer_cast<PVFloatArray> (pva);
         shared_vector<const float> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_FLOAT;
         fillData(xxx, length, &kData);
@@ -1556,7 +1556,7 @@ void PVAInterface::getScalarArrayData(PVStructurePtr const & pvStructure)
             kData.edata.monitorCount++;
             return;
         }
-        PVDoubleArrayPtr ArrayData = std::tr1::static_pointer_cast<PVDoubleArray> (pva);
+        PVDoubleArrayPtr ArrayData = std::static_pointer_cast<PVDoubleArray> (pva);
         shared_vector<const double> xxx(ArrayData->view());
         kData.edata.fieldtype = DBF_DOUBLE;
         fillData(xxx, length, &kData);
@@ -1631,7 +1631,7 @@ bool PVAInterface::setValue(double rdata, int32_t idata, char *sdata, int forceT
     switch (scalarType) {
     case pvBoolean:
     {
-        PVBooleanPtr pvBoolean = std::tr1::dynamic_pointer_cast<PVBoolean>(pvScalar);
+        PVBooleanPtr pvBoolean = std::dynamic_pointer_cast<PVBoolean>(pvScalar);
         bool value  = (idata==0) ? false : true;
         pvBoolean->put(value);
     }
@@ -1656,7 +1656,7 @@ bool PVAInterface::setValue(double rdata, int32_t idata, char *sdata, int forceT
         break;
     case pvString:
     {
-        PVStringPtr pvString = std::tr1::dynamic_pointer_cast<PVString>(pvScalar);
+        PVStringPtr pvString = std::dynamic_pointer_cast<PVString>(pvScalar);
         pvString->put(sdata);
     }
         break;

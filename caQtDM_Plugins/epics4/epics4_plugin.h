@@ -50,6 +50,15 @@
 #include <pv/nt.h>
 #include <pv/convert.h>
 
+#if __cplusplus < 201103L && !defined(_MSC_VER)
+#error "epics4 plugin needs C++11"
+#endif
+#include <type_traits>
+// std::* is used instead of std::tr1::*, both must be the same type
+// (not the case when pvData is built with DEBUG_SHARED_PTR)
+static_assert(std::is_same<std::tr1::shared_ptr<int>, std::shared_ptr<int> >::value,
+              "std::tr1::shared_ptr is not std::shared_ptr, see TR1_MIGRATION.md");
+
 #include <QObject>
 #include "controlsinterface.h"
 #include "epics4_callbackThread.h"
@@ -60,13 +69,13 @@ namespace epics { namespace caqtdm { namespace epics4 {
 
 class PVAChannel;
 
-typedef std::tr1::shared_ptr<PVAChannel> PVAChannelPtr;
-typedef std::tr1::weak_ptr<PVAChannel> PVAChannelWPtr;
-typedef std::tr1::shared_ptr<epics::pvAccess::ChannelProvider> PVAChannelProviderPtr;
+typedef std::shared_ptr<PVAChannel> PVAChannelPtr;
+typedef std::weak_ptr<PVAChannel> PVAChannelWPtr;
+typedef std::shared_ptr<epics::pvAccess::ChannelProvider> PVAChannelProviderPtr;
 
 }}}
 
-class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, public std::tr1::enable_shared_from_this<Epics4Plugin>
+class Q_DECL_EXPORT Epics4Plugin : public QObject, ControlsInterface, public std::enable_shared_from_this<Epics4Plugin>
 {
     Q_OBJECT
     Q_INTERFACES(ControlsInterface)
