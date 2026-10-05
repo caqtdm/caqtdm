@@ -937,6 +937,7 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_Plugins/demo/libdemo_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Plugins/epics3/libepics3_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.a
+                    LIBS += $$OUT_PWD/../caQtDM_Plugins/archive/archiveHTTP/libarchiveHTTP_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_Plugins/environment/libenvironment_plugin.a
 
                     opcua {
@@ -950,12 +951,7 @@ caQtDM_Viewer {
 					    LIBS += $$OUT_PWD/../caQtDM_Plugins/gps/libgps_plugin.a
                     }
                     epics7{
-					    LIBS += $$OUT_PWD/../caQtDM_Plugins/epics4/libepics4_plugin.a
-                        LIBS += $(EPICSLIB)/libpvAccess.a
-                        LIBS += $(EPICSLIB)/libpvAccessCA.a
-                        LIBS += $(EPICSLIB)/libpvData.a
-                        LIBS += $(EPICSLIB)/libpvaClient.a
-                        LIBS += $(EPICSLIB)/libnt.a
+                        LIBS += $$OUT_PWD/../caQtDM_Plugins/epics4/libepics4_plugin.a
                     }
 
                     ICON = $$PWD/caQtDM_Viewer/src/caQtDM.icns
@@ -1002,76 +998,21 @@ caQtDM_Viewer {
                     QMAKE_INFO_PLIST += $$PWD/caQtDM_Viewer/src/IOS/Info.plist
                     QMAKE_ASSET_CATALOGS += $$PWD/caQtDM_Viewer/src/IOS/Assets.xcassets
                     QMAKE_IOS_LAUNCH_SCREEN += $$PWD/caQtDM_Viewer/src/IOS/LaunchScreen.storyboard
-#actually, I have a problem with ios, it seems that iphonesimulator is defined too and wants than the library of simlator
-# I comment it out now
-                    CONFIG(iphonesimulator,iphoneos|iphonesimulator): {
-                         message("caQtDM_viewer configuration : iphonesimulator")
-                         # when .dylib and .a in same directory, macos takes .dylib, so separate the libraries
-                         LIBS += $$(EPICS_BASE)/lib/ios-x86/libca.a
-                         LIBS += $$(EPICS_BASE)/lib/ios-x86/libCom.a
-                         LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
-                         #LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME)_iphonesimulator.a
-                         # build simulator only for 32 bit
-                         INCLUDEPATH += $$(QWTHOME)/src
-                         QMAKE_LFLAGS += -all_load
-                         QMAKE_APPLE_SIMULATOR_ARCHS="arm64 x86_64"
+                    LIBS += $(EPICSLIB)/libca.a
+                    LIBS += $(EPICSLIB)/libCom.a
+                    epics7 {
+                        LIBS += $(EPICSLIB)/libdbCore.a
+                        LIBS += $(EPICSLIB)/libdbRecStd.a
+                        LIBS += $(EPICSLIB)/libnt.a
+                        LIBS += $(EPICSLIB)/libpvAccess.a
+                        LIBS += $(EPICSLIB)/libpvAccessCA.a
+                        LIBS += $(EPICSLIB)/libpvAccessIOC.a
+                        LIBS += $(EPICSLIB)/libpvaClient.a
+                        LIBS += $(EPICSLIB)/libpvData.a
+                        LIBS += $(EPICSLIB)/libpvDatabase.a
+                        LIBS += $(EPICSLIB)/libqsrv.a
                     }
-                    CONFIG(iphoneos,iphoneos|iphonesimulator): {
-                        message("caQtDM_viewer configuration : iphoneos")
-                         LIBS += $$(EPICS_BASE)/lib/ios-arm/libca.a
-                         LIBS += $$(EPICS_BASE)/lib/ios-arm/libCom.a
-                         LIBS += $$(QWTHOME)/lib/lib$$(QWTLIBNAME).a
-
-                         ###############################################################################
-                         # Code Signing settings needed only for iOS App Store
-                         ###############################################################################
-
-                         #bitcode.name = ENABLE_BITCODE
-                         #bitcode.value = YES
-                         #QMAKE_MAC_XCODE_SETTINGS += bitcode
-
-                         #bitcode_generator.name = BITCODE_GENERATION_MODE
-                         #bitcode_generator.value = bitcode
-                         #QMAKE_MAC_XCODE_SETTINGS += bitcode_generator
-
-                         #provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
-                         #provisioning_profile_spec.value = caQtDM Distribution
-                         #provisioning_profile_spec.value = caQtDM Provisioning Profile Development
-                         #QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
-
-                         #signing_identity.name = CODE_SIGN_IDENTITY
-                         #signing_identity.value = $$(CODE_SIGN_IDENTITY)
-                         #QMAKE_MAC_XCODE_SETTINGS += signing_identity
-
-                         #signing_identity.name = CODE_SIGN_IDENTITY
-                         #signing_identity.value = Apple Distribution: Helge Brands (Q6CFPW364S)
-                         #signing_identity.value = Apple Development: Helge Brands (8G5FY9T8QT)
-                         #QMAKE_MAC_XCODE_SETTINGS += signing_identity
-
-
-
-                         #setting.name = DEVELOPMENT_TEAM
-                         #setting.value = $$(CERTIFICATNUMBER)
-                         #QMAKE_MAC_XCODE_SETTINGS += setting
-                         #setting.name = DEVELOPMENT_TEAM
-                         #setting.value = Q6CFPW364S
-                         #QMAKE_MAC_XCODE_SETTINGS += setting
-
-                         payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
-                         payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
-                         payload_dir.depends = $$OUT_PWD/Release-iphoneos
-
-                         QMAKE_EXTRA_TARGETS +=payload_dir
-                    }
-                    epics4: {
-					                LIBS += $$OUT_PWD/../caQtDM_Plugins/epics4/libepics4_plugin.a
-                    }
-                    archiveSF:{
-					                LIBS += $$OUT_PWD/../caQtDM_Plugins/archive/archiveSF/libarchiveSF_plugin.a
-                    }
-                    archiveHTTP: {
-                            LIBS += $$OUT_PWD/../caQtDM_Plugins/archive/archiveHTTP/libarchiveHTTP_plugin.a
-                    }
+                    LIBS += $$(QWTLIB)/lib$$(QWTLIBNAME).a
 
         }
         android {

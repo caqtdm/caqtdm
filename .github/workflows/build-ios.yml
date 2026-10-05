@@ -1,0 +1,327 @@
+name: caQtDM iOS Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - 'caQtDM_docs/**'
+      - 'caQtDM_Tests/**'
+  schedule:
+    - cron: '0 2 * * *'
+
+env:
+  QT_VERSION: 6.12.0
+  QWT_VERSION: v6.3.0
+  EPICS_VERSION: R7.0.10
+  IOS_DEPLOYMENT_TARGET: '18.0'
+  QT_ROOT: ${{ github.workspace }}/.ci-cache/Qt
+  QT_HOST_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/macos
+  QT_IOS_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/ios
+  EPICS_BASE: ${{ github.workspace }}/.ci-cache/ios-deps/epics-base
+  EPICS_HOST_ARCH: darwin-aarch64
+
+jobs:
+  build-qt:
+    name: Build Qt 6.12.0 host and iOS SDKs
+    runs-on: macos-15
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      toolchain_key: ${{ steps.toolchain.outputs.key }}
+    steps:
+      - name: Identify Xcode and SDKs
+        id: toolchain
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          XCODE_VERSION="$(xcodebuild -version | awk '/^Xcode / {print $2}')"
+          IOS_SDK="$(xcrun --sdk iphoneos --show-sdk-version)"
+          SIM_SDK="$(xcrun --sdk iphonesimulator --show-sdk-version)"
+          echo "key=xcode${XCODE_VERSION}-ios${IOS_SDK}-sim${SIM_SDK}" >> "$GITHUB_OUTPUT"
+          echo "Xcode ${XCODE_VERSION}; iOS SDK ${IOS_SDK}; simulator SDK ${SIM_SDK}"
+
+      - name: Restore Qt source build cache
+        id: cache-qt
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.QT_ROOT }}
+          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-${{ steps.toolchain.outputs.key }}-arm64
+
+      - name: Install build tools
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          brew install ninja || brew list ninja >/dev/null
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-path
+          xcrun --sdk iphonesimulator --show-sdk-path
+
+      - name: Build Qt host tools and iOS frameworks
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p "${QT_ROOT}" "${RUNNER_TEMP}/qt-src"
+          QT_TARBALL="qt-everywhere-src-${QT_VERSION}.tar.xz"
+          QT_MINOR="$(echo "${QT_VERSION}" | cut -d. -f1,2)"
+          curl -fsSL --retry 3 \
+            "https://download.qt.io/official_releases/qt/${QT_MINOR}/${QT_VERSION}/single/${QT_TARBALL" \
+            -o "${RUNNER_TEMP}/${QT_TARBALL}"
+          tar -xf "${RUNNER_TEMP}/${QT_TARBALL}" -C "${RUNNER_TEMP}/qt-src"
+          QT_SRC="${RUNNER_TEMP}/qt-src/qt-everywhere-src-${QT_VERSION}"
+          QT_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats'
+
+          mkdir -p "${RUNNER_TEMP}/qt-build-host"
+          cd "${RUNNER_TEMP}/qt-build-host"
+          "${QT_SRC}/configure" \
+            -prefix "${QT_HOST_ROOT}" \
+            -submodules "${QT_SUBMODULES}" \
+            -release -opensource -confirm-license \
+            -nomake tests -nomake examples
+          cmake --build . --parallel
+          cmake --install .
+
+          mkdir -p "${RUNNER_TEMP}/qt-build-ios"
+          cd "${RUNNER_TEMP}/qt-build-ios"
+          "${QT_SRC}/configure" \
+            -prefix "${QT_IOS_ROOT}" \
+            -platform macx-ios-clang \
+            -qt-host-path "${QT_HOST_ROOT}" \
+            -submodules "${QT_SUBMODULES}" \
+            -release -opensource -confirm-license \
+            -nomake tests -nomake examples
+          cmake --build . --parallel
+          cmake --install .
+
+          test -x "${QT_HOST_ROOT}/bin/qmake"
+          test -x "${QT_IOS_ROOT}/bin/qmake"
+          test -d "${QT_IOS_ROOT}/lib/QtCore.framework"
+          test -d "${QT_IOS_ROOT}/lib/QtUiTools.framework"
+          test -d "${QT_IOS_ROOT}/lib/QtSvg.framework"
+
+  build-epics:
+    name: Build EPICS 7.0.10 for iOS SDKs
+    runs-on: macos-15
+    needs: build-qt
+    permissions:
+      contents: read
+      actions: write
+    outputs:
+      toolchain_key: ${{ steps.toolchain.outputs.key }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Identify Xcode and SDKs
+        id: toolchain
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          XCODE_VERSION="$(xcodebuild -version | awk '/^Xcode / {print $2}')"
+          IOS_SDK="$(xcrun --sdk iphoneos --show-sdk-version)"
+          SIM_SDK="$(xcrun --sdk iphonesimulator --show-sdk-version)"
+          echo "key=xcode${XCODE_VERSION}-ios${IOS_SDK}-sim${SIM_SDK}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Qt source build cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.QT_ROOT }}
+          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
+
+      - name: Verify Qt toolchain
+        run: |
+          set -euo pipefail
+          test -x "${QT_HOST_ROOT}/bin/qmake"
+          test -x "${QT_IOS_ROOT}/bin/qmake"
+          test -d "${QT_IOS_ROOT}/lib/QtCore.framework"
+          ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
+          test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
+
+      - name: Cache EPICS 7.0.10 iOS build
+        id: cache-epics
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.EPICS_BASE }}
+          key: epics-ios-${{ runner.os }}-${{ runner.arch }}-epics${{ env.EPICS_VERSION }}-${{ steps.toolchain.outputs.key }}-${{ hashFiles('ci/epics-ios/**') }}
+
+      - name: Build EPICS host tools and iOS libraries
+        if: steps.cache-epics.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --recurse-submodules --branch "${EPICS_VERSION}" \
+            https://github.com/epics-base/epics-base.git "${RUNNER_TEMP}/epics-src"
+          cd "${RUNNER_TEMP}/epics-src"
+          cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/CONFIG_SITE.local" configure/CONFIG_SITE.local
+          cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG.Common.iosCommon" configure/os/CONFIG.Common.iosCommon
+          cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG_SITE.Common.iosCommon" configure/os/CONFIG_SITE.Common.iosCommon
+          cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG_SITE.Common.ios-arm" configure/os/CONFIG_SITE.Common.ios-arm
+          cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG.Common.ios-sim-arm64" configure/os/CONFIG.Common.ios-sim-arm64
+          cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG_SITE.Common.ios-sim-arm64" configure/os/CONFIG_SITE.Common.ios-sim-arm64
+
+          make -j"$(sysctl -n hw.ncpu)" EPICS_HOST_ARCH="${EPICS_HOST_ARCH}"
+          mkdir -p "${EPICS_BASE}/include" "${EPICS_BASE}/lib/ios-arm" "${EPICS_BASE}/lib/ios-sim-arm64"
+          rsync -a include/ "${EPICS_BASE}/include/"
+          rsync -a lib/ios-arm/ "${EPICS_BASE}/lib/ios-arm/"
+          rsync -a lib/ios-sim-arm64/ "${EPICS_BASE}/lib/ios-sim-arm64/"
+
+      - name: Verify EPICS target archives
+        run: |
+          set -euo pipefail
+          for arch in ios-arm ios-sim-arm64; do
+            for lib in ca Com dbCore dbRecStd nt pvAccess pvAccessCA pvAccessIOC pvaClient pvData pvDatabase qsrv; do
+              test -f "${EPICS_BASE}/lib/${arch}/lib${lib}.a"
+              lipo -archs "${EPICS_BASE}/lib/${arch}/lib${lib}.a" | grep -qw arm64
+            done
+          done
+
+  build-ios:
+    name: Build ${{ matrix.name }}
+    runs-on: macos-15
+    needs: [build-qt, build-epics]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: iPhoneOS arm64
+            sdk: iphoneos
+            epics_arch: ios-arm
+            configuration: iphoneos
+          - name: iOS Simulator arm64
+            sdk: iphonesimulator
+            epics_arch: ios-sim-arm64
+            configuration: iphonesimulator
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Restore Qt source build cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.QT_ROOT }}
+          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
+
+      - name: Restore EPICS iOS cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.EPICS_BASE }}
+          key: epics-ios-${{ runner.os }}-${{ runner.arch }}-epics${{ env.EPICS_VERSION }}-${{ needs.build-epics.outputs.toolchain_key }}-${{ hashFiles('ci/epics-ios/**') }}
+
+      - name: Verify cached dependencies
+        run: |
+          set -euo pipefail
+          test -x "${QT_HOST_ROOT}/bin/qmake"
+          test -x "${QT_IOS_ROOT}/bin/qmake"
+          test -d "${QT_IOS_ROOT}/lib/QtCore.framework"
+          ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
+          test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
+          test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-epics.outputs.toolchain_key }}"
+          for lib in ca Com dbCore dbRecStd nt pvAccess pvAccessCA pvAccessIOC pvaClient pvData pvDatabase qsrv; do
+            test -f "${EPICS_BASE}/lib/${{ matrix.epics_arch }}/lib${lib}.a"
+          done
+
+      - name: Cache Qwt
+        id: cache-qwt
+        uses: actions/cache@v5
+        with:
+          path: ${{ github.workspace }}/.ci-cache/qwt-${{ matrix.epics_arch }}
+          key: qwt-ios-${{ runner.os }}-${{ runner.arch }}-${{ env.QWT_VERSION }}-qt${{ env.QT_VERSION }}-${{ matrix.epics_arch }}-${{ needs.build-qt.outputs.toolchain_key }}
+
+      - name: Build Qwt
+        if: steps.cache-qwt.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --single-branch --branch "${QWT_VERSION}" \
+            https://git.code.sf.net/p/qwt/git "${RUNNER_TEMP}/qwt-src"
+          sed -i '' -E "s|^[[:space:]]*QWT_INSTALL_PREFIX[[:space:]]*=.*|QWT_INSTALL_PREFIX = ${GITHUB_WORKSPACE}/.ci-cache/qwt-${{ matrix.epics_arch }}|" \
+            "${RUNNER_TEMP}/qwt-src/qwtconfig.pri"
+          sed -i '' -E 's|^QWT_CONFIG[[:space:]]*\+=[[:space:]]*Qwt(Dll|Designer|Examples|Playground|Tests|Framework|PkgConfig).*|# disabled for mobile: &|' \
+            "${RUNNER_TEMP}/qwt-src/qwtconfig.pri"
+          grep -q '^QWT_CONFIG[[:space:]]*+=[[:space:]]*QwtStatic' "${RUNNER_TEMP}/qwt-src/qwtconfig.pri" || \
+            echo 'QWT_CONFIG += QwtStatic' >> "${RUNNER_TEMP}/qwt-src/qwtconfig.pri"
+          mkdir -p "${RUNNER_TEMP}/qwt-build"
+          cd "${RUNNER_TEMP}/qwt-build"
+          SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
+            "${QT_IOS_ROOT}/bin/qmake" "${RUNNER_TEMP}/qwt-src/qwt.pro" \
+            "CONFIG+=${{ matrix.configuration }}" \
+            QMAKE_APPLE_DEVICE_ARCHS=arm64 QMAKE_APPLE_SIMULATOR_ARCHS=arm64
+          SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
+            CODE_SIGNING_ALLOWED=NO make -j"$(sysctl -n hw.ncpu)"
+          make install
+          test -f "${GITHUB_WORKSPACE}/.ci-cache/qwt-${{ matrix.epics_arch }}/lib/libqwt.a"
+
+      - name: Export caQtDM build environment
+        run: |
+          set -euo pipefail
+          QWT_ROOT="${GITHUB_WORKSPACE}/.ci-cache/qwt-${{ matrix.epics_arch }}"
+          {
+            echo "QTHOME=${QT_IOS_ROOT}"
+            echo "QWTHOME=${QWT_ROOT}"
+            echo "QWTINCLUDE=${QWT_ROOT}/include"
+            echo "QWTLIB=${QWT_ROOT}/lib"
+            echo "QWTLIBNAME=qwt"
+            echo "QWTVERSION=6.1"
+            echo "EPICS_BASE=${EPICS_BASE}"
+            echo "EPICS_HOST_ARCH=${{ matrix.epics_arch }}"
+            echo "EPICSINCLUDE=${EPICS_BASE}/include"
+            echo "EPICSLIB=${EPICS_BASE}/lib/${{ matrix.epics_arch }}"
+            echo "EPICSEXTENSIONS=/usr/lib/epics/extensions"
+            echo "CAQTDM_COLLECT=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
+            echo "QTCONTROLS_LIBS=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
+            echo "QTBASE=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
+          } >> "$GITHUB_ENV"
+
+      - name: Prepare temporary source tree
+        run: |
+          set -euo pipefail
+          mkdir -p "${RUNNER_TEMP}/caqtdm-build"
+          rsync -a --exclude='.git' --exclude='.ci-cache' \
+            "${GITHUB_WORKSPACE}/" "${RUNNER_TEMP}/caqtdm-build/"
+          mkdir -p "${CAQTDM_COLLECT}/designer" "${CAQTDM_COLLECT}/controlsystems"
+
+      - name: Build caQtDM for ${{ matrix.name }}
+        working-directory: ${{ runner.temp }}/caqtdm-build
+        run: |
+          set -euo pipefail
+          SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
+            "${QTHOME}/bin/qmake" all.pro \
+            "CONFIG+=${{ matrix.configuration }}" \
+            QMAKE_IOS_DEPLOYMENT_TARGET="${IOS_DEPLOYMENT_TARGET}" \
+            QMAKE_IOS_DEVICE_ARCHS=arm64 \
+            QMAKE_APPLE_SIMULATOR_ARCHS=arm64
+          SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
+            CODE_SIGNING_ALLOWED=NO make -j"$(sysctl -n hw.ncpu)"
+
+      - name: Verify and archive app
+        working-directory: ${{ runner.temp }}/caqtdm-build
+        run: |
+          set -euo pipefail
+          APP="$(find caQtDM_Viewer -type d -name 'caQtDM.app' -print -quit)"
+          test -n "${APP}"
+          EXECUTABLE="${APP}/caQtDM"
+          test -x "${EXECUTABLE}"
+          lipo -archs "${EXECUTABLE}" | grep -qw arm64
+          BUILD_INFO="$(xcrun vtool -show-build "${EXECUTABLE}")"
+          if [ "${{ matrix.sdk }}" = "iphoneos" ]; then
+            grep -q 'platform IOS$' <<< "${BUILD_INFO}"
+          else
+            grep -q 'platform IOSSIMULATOR$' <<< "${BUILD_INFO}"
+          fi
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "${APP}/Info.plist" | grep -qx 'ch.psi.caQtDM'
+          test -f "${APP}/caQtDM_IOS_Config.xml"
+          test -f "${APP}/fonts/lucida-sans-typewriter.ttf"
+          if codesign -dv "${APP}" >/dev/null 2>&1; then
+            echo "Expected an unsigned CI app bundle"
+            exit 1
+          fi
+          mkdir -p "${GITHUB_WORKSPACE}/artifacts"
+          ditto -c -k --sequesterRsrc --keepParent "${APP}" \
+            "${GITHUB_WORKSPACE}/artifacts/caQtDM-${{ matrix.epics_arch }}.zip"
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: caQtDM-ios-${{ matrix.epics_arch }}-${{ github.sha }}
+          path: artifacts/*.zip

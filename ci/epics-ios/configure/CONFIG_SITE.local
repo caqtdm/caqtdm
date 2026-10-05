@@ -1,0 +1,4 @@
+# Build both iOS targets alongside the macOS host tools.
+CROSS_COMPILER_TARGET_ARCHS = ios-arm ios-sim-arm64
+SHARED_LIBRARIES = NO
+STATIC_BUILD = YES
