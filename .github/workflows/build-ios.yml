@@ -146,25 +146,48 @@ jobs:
           mkdir -p "${QT_ROOT}" "${RUNNER_TEMP}/qt-src"
           QT_TARBALL="qt-everywhere-src-${QT_VERSION}.tar.xz"
           QT_MINOR="$(echo "${QT_VERSION}" | cut -d. -f1,2)"
-          curl -fsSL --retry 3 \
-            "https://download.qt.io/official_releases/qt/${QT_MINOR}/${QT_VERSION}/single/${QT_TARBALL}" \
-            -o "${RUNNER_TEMP}/${QT_TARBALL}"
+          QT_URL="https://download.qt.io/official_releases/qt/${QT_MINOR}/${QT_VERSION}/single/${QT_TARBALL}"
+          QT_ARCHIVE="${RUNNER_TEMP}/${QT_TARBALL}"
+          echo "::group::Download Qt ${QT_VERSION} source"
+          echo "Source URL: ${QT_URL}"
+          echo "Saving to: ${QT_ARCHIVE}"
+          curl --fail --location --show-error --retry 3 --progress-bar \
+            --write-out $'\nHTTP %{http_code}; downloaded %{size_download} bytes in %{time_total}s\n' \
+            "${QT_URL}" -o "${QT_ARCHIVE}"
+          test -s "${QT_ARCHIVE}"
+          echo "Archive size: $(stat -f%z "${QT_ARCHIVE}") bytes"
+          shasum -a 256 "${QT_ARCHIVE}"
+          echo "::endgroup::"
+
+          echo "::group::Extract Qt ${QT_VERSION} source"
+          echo "Extracting ${QT_ARCHIVE} into ${RUNNER_TEMP}/qt-src"
           tar -xf "${RUNNER_TEMP}/${QT_TARBALL}" -C "${RUNNER_TEMP}/qt-src"
           QT_SRC="${RUNNER_TEMP}/qt-src/qt-everywhere-src-${QT_VERSION}"
+          test -d "${QT_SRC}"
+          echo "Qt source directory ready: ${QT_SRC}"
+          echo "::endgroup::"
           QT_HOST_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
           QT_IOS_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
 
           mkdir -p "${RUNNER_TEMP}/qt-build-host"
           cd "${RUNNER_TEMP}/qt-build-host"
+          echo "::group::Configure Qt ${QT_VERSION} host tools"
+          echo "Install prefix: ${QT_HOST_ROOT}"
+          echo "Qt modules: ${QT_HOST_SUBMODULES}"
           "${QT_SRC}/configure" \
             -prefix "${QT_HOST_ROOT}" \
             -submodules "${QT_HOST_SUBMODULES}" \
             -release -opensource -confirm-license \
             -nomake tests -nomake examples
+          echo "::endgroup::"
+          echo "::group::Build and install Qt host tools"
           cmake --build . --parallel
           cmake --install .
-          test -x "${QT_HOST_ROOT}/bin/qopcuaxmldatatypes2"
+          echo "Verifying host OPC UA code generator and CMake package"
+          test -x "${QT_HOST_ROOT}/bin/qopcuaxmldatatypes2cpp"
           test -f "${QT_HOST_ROOT}/lib/cmake/Qt6OpcUaTools/Qt6OpcUaToolsConfig.cmake"
+          echo "Host Qt installation ready at ${QT_HOST_ROOT}"
+          echo "::endgroup::"
 
           for target in iphoneos iphonesimulator; do
             if [ "${target}" = iphoneos ]; then
@@ -177,6 +200,11 @@ jobs:
             build_dir="${RUNNER_TEMP}/qt-build-${target}"
             mkdir -p "${build_dir}"
             cd "${build_dir}"
+            echo "::group::Configure Qt ${QT_VERSION} for ${target}"
+            echo "SDK version: $(xcrun --sdk "${target}" --show-sdk-version)"
+            echo "Install prefix: ${qt_prefix}"
+            echo "OpenSSL prefix: ${openssl_prefix}"
+            echo "Qt modules: ${QT_IOS_SUBMODULES}"
             "${QT_SRC}/configure" \
               -prefix "${qt_prefix}" \
               -platform macx-ios-clang -sdk "${target}" \
@@ -190,8 +218,17 @@ jobs:
               -DOPENSSL_ROOT_DIR="${openssl_prefix}" \
               -DOPENSSL_USE_STATIC_LIBS=ON \
               -DFEATURE_open62541_security=ON
+            echo "::endgroup::"
+            echo "::group::Build and install Qt ${QT_VERSION} for ${target}"
             cmake --build . --parallel
             cmake --install .
+            echo "Verifying QtPositioning, QtOpcUa, and secure Open62541 backend for ${target}"
+            test -d "${qt_prefix}/lib/QtPositioning.framework"
+            test -d "${qt_prefix}/lib/QtOpcUa.framework"
+            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.dylib"
+            test -f "${qt_prefix}/include/QtOpcUa/QOpcUaX509CertificateSigningRequest"
+            echo "Qt ${target} installation ready at ${qt_prefix}"
+            echo "::endgroup::"
           done
 
           test -x "${QT_HOST_ROOT}/bin/qmake"
