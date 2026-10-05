@@ -90,7 +90,7 @@ public:
         if(role == Qt::ForegroundRole && (index.column() == caAlarmLog::ColFrom || index.column() == caAlarmLog::ColTo)) {
             // black only on the severity colours, mask events use the palette text (dark mode)
             const QString key = index.column() == caAlarmLog::ColFrom ? QStringLiteral("sevr_old") : QStringLiteral("sevr_new");
-            return ev.contains(key) ? QVariant(AL_BLACK) : QVariant();
+            return ev.contains(key) ? QVariant(ALH_SEVR_TEXT) : QVariant();
         }
         return QVariant();
     }

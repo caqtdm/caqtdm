@@ -248,8 +248,8 @@ QVariant AlhTreeModel::data(const QModelIndex &index, int role) const
         if(index.column() == ColUnackSevr) return (inactive || s.unackSevr == NO_ALARM) ? QVariant() : severityColor(s.unackSevr);
     }
     if(role == Qt::ForegroundRole) {
-        if(index.column() == ColCurSevr || index.column() == ColUnackSevr) return AL_BLACK;
-        if(inactive) return AL_DEFAULT;
+        if(index.column() == ColCurSevr || index.column() == ColUnackSevr) return ALH_SEVR_TEXT;
+        if(inactive) return ALH_INACTIVE_TEXT;
     }
     if(role == Qt::TextAlignmentRole && (index.column() == ColGuidance || index.column() == ColProcess ||
                                          index.column() == ColCurSevr || index.column() == ColUnackSevr))

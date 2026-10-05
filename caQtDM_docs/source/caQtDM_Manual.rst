@@ -2252,7 +2252,8 @@ functions.
    - Lines as in alh: ack button with the unacknowledged severity letter
      (blank, ``Y`` minor, ``R`` major, ``V`` invalid, ``E`` not
      connected; click = acknowledge), current severity letter, name
-     button (channels light blue), arrow, **G** and **P** buttons where
+     button (channels light blue, steel blue with a dark palette),
+     arrow, **G** and **P** buttons where
      guidance or a command exists, the mask ``<CDATL>`` (``H`` while a
      noAck timer runs, ``M`` when muted, blue while D, A or T silence
      the line) and the alh line message (groups: counts
