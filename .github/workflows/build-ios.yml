@@ -11,12 +11,15 @@ on:
 
 env:
   QT_VERSION: 6.12.0
+  OPENSSL_LTS_SERIES: '3.5'
   QWT_VERSION: v6.3.0
   EPICS_VERSION: R7.0.10
   IOS_DEPLOYMENT_TARGET: '18.0'
   QT_ROOT: ${{ github.workspace }}/.ci-cache/Qt
   QT_HOST_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/macos
-  QT_IOS_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/ios
+  QT_IOS_DEVICE_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/ios-device
+  QT_IOS_SIMULATOR_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/ios-simulator-arm64
+  OPENSSL_IOS_ROOT: ${{ github.workspace }}/.ci-cache/openssl-ios
   EPICS_BASE: ${{ github.workspace }}/.ci-cache/ios-deps/epics-base
   EPICS_HOST_ARCH: darwin-aarch64
 
@@ -29,6 +32,7 @@ jobs:
       actions: write
     outputs:
       toolchain_key: ${{ steps.toolchain.outputs.key }}
+      openssl_version: ${{ steps.openssl-version.outputs.version }}
     steps:
       - name: Identify Xcode and SDKs
         id: toolchain
@@ -41,12 +45,46 @@ jobs:
           echo "key=xcode${XCODE_VERSION}-ios${IOS_SDK}-sim${SIM_SDK}" >> "$GITHUB_OUTPUT"
           echo "Xcode ${XCODE_VERSION}; iOS SDK ${IOS_SDK}; simulator SDK ${SIM_SDK}"
 
+      - name: Determine latest OpenSSL LTS release
+        id: openssl-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_tag="$(gh api --paginate --slurp "repos/openssl/openssl/tags?per_page=100" | \
+            jq -er --arg series "${OPENSSL_LTS_SERIES}" \
+              '[.[][] | select((.name | sub("^openssl-"; "") | split(".")) as $parts | ($parts[0] + "." + $parts[1] == $series) and ($parts[2] | test("^[0-9]+$")))] | sort_by(.name | sub("^openssl-"; "") | split(".") | map(tonumber)) | last | [.name, .commit.sha] | @tsv')"
+          test -n "${latest_tag}"
+          IFS=$'\t' read -r OPENSSL_TAG OPENSSL_TAG_SHA <<< "${latest_tag}"
+          OPENSSL_VERSION="${OPENSSL_TAG#openssl-}"
+          echo "version=${OPENSSL_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${OPENSSL_TAG}" >> "$GITHUB_OUTPUT"
+          echo "tag_sha=${OPENSSL_TAG_SHA}" >> "$GITHUB_OUTPUT"
+          echo "OPENSSL_VERSION=${OPENSSL_VERSION}" >> "$GITHUB_ENV"
+          echo "OPENSSL_TAG=${OPENSSL_TAG}" >> "$GITHUB_ENV"
+          echo "OPENSSL_TAG_SHA=${OPENSSL_TAG_SHA}" >> "$GITHUB_ENV"
+          echo "Using OpenSSL LTS tag ${OPENSSL_TAG} at ${OPENSSL_TAG_SHA}"
+
       - name: Restore Qt source build cache
         id: cache-qt
         uses: actions/cache@v5
         with:
           path: ${{ env.QT_ROOT }}
-          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-${{ steps.toolchain.outputs.key }}-arm64
+          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-openssl${{ steps.openssl-version.outputs.version }}-${{ steps.toolchain.outputs.key }}-arm64
+
+      - name: Restore OpenSSL iPhoneOS cache
+        id: cache-openssl-device
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.OPENSSL_IOS_ROOT }}/${{ steps.openssl-version.outputs.version }}/iphoneos
+          key: openssl-ios-${{ steps.openssl-version.outputs.version }}-iphoneos-arm64-${{ steps.toolchain.outputs.key }}
+
+      - name: Restore OpenSSL Simulator cache
+        id: cache-openssl-simulator
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.OPENSSL_IOS_ROOT }}/${{ steps.openssl-version.outputs.version }}/iphonesimulator-arm64
+          key: openssl-ios-${{ steps.openssl-version.outputs.version }}-iphonesimulator-arm64-${{ steps.toolchain.outputs.key }}
 
       - name: Install build tools
         if: steps.cache-qt.outputs.cache-hit != 'true'
@@ -56,6 +94,50 @@ jobs:
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-path
           xcrun --sdk iphonesimulator --show-sdk-path
+
+      - name: Build OpenSSL for iPhoneOS arm64
+        if: steps.cache-openssl-device.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          OPENSSL_PREFIX="${OPENSSL_IOS_ROOT}/${OPENSSL_VERSION}/iphoneos"
+          curl -fsSL --retry 3 \
+            "https://github.com/openssl/openssl/archive/refs/tags/${OPENSSL_TAG}.tar.gz" \
+            -o "${RUNNER_TEMP}/${OPENSSL_TAG}.tar.gz"
+          mkdir -p "${RUNNER_TEMP}/openssl-device"
+          tar -xzf "${RUNNER_TEMP}/${OPENSSL_TAG}.tar.gz" -C "${RUNNER_TEMP}/openssl-device" --strip-components=1
+          cd "${RUNNER_TEMP}/openssl-device"
+          ./Configure ios64-xcrun no-shared no-tests \
+            --prefix="${OPENSSL_PREFIX}" --openssldir="${OPENSSL_PREFIX}/ssl"
+          make -j"$(sysctl -n hw.ncpu)"
+          make install_sw
+
+      - name: Build OpenSSL for iOS Simulator arm64
+        if: steps.cache-openssl-simulator.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          OPENSSL_PREFIX="${OPENSSL_IOS_ROOT}/${OPENSSL_VERSION}/iphonesimulator-arm64"
+          curl -fsSL --retry 3 \
+            "https://github.com/openssl/openssl/archive/refs/tags/${OPENSSL_TAG}.tar.gz" \
+            -o "${RUNNER_TEMP}/${OPENSSL_TAG}.tar.gz"
+          mkdir -p "${RUNNER_TEMP}/openssl-simulator"
+          tar -xzf "${RUNNER_TEMP}/${OPENSSL_TAG}.tar.gz" -C "${RUNNER_TEMP}/openssl-simulator" --strip-components=1
+          cd "${RUNNER_TEMP}/openssl-simulator"
+          ./Configure iossimulator-arm64-xcrun no-shared no-tests \
+            --prefix="${OPENSSL_PREFIX}" --openssldir="${OPENSSL_PREFIX}/ssl"
+          make -j"$(sysctl -n hw.ncpu)"
+          make install_sw
+
+      - name: Verify OpenSSL archives
+        run: |
+          set -euo pipefail
+          for target in iphoneos iphonesimulator-arm64; do
+            prefix="${OPENSSL_IOS_ROOT}/${OPENSSL_VERSION}/${target}"
+            test -f "${prefix}/include/openssl/ssl.h"
+            test -f "${prefix}/lib/libssl.a"
+            test -f "${prefix}/lib/libcrypto.a"
+            lipo -archs "${prefix}/lib/libssl.a" | grep -qw arm64
+            lipo -archs "${prefix}/lib/libcrypto.a" | grep -qw arm64
+          done
 
       - name: Build Qt host tools and iOS frameworks
         if: steps.cache-qt.outputs.cache-hit != 'true'
@@ -69,35 +151,58 @@ jobs:
             -o "${RUNNER_TEMP}/${QT_TARBALL}"
           tar -xf "${RUNNER_TEMP}/${QT_TARBALL}" -C "${RUNNER_TEMP}/qt-src"
           QT_SRC="${RUNNER_TEMP}/qt-src/qt-everywhere-src-${QT_VERSION}"
-          QT_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats'
+          QT_HOST_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats'
+          QT_IOS_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
 
           mkdir -p "${RUNNER_TEMP}/qt-build-host"
           cd "${RUNNER_TEMP}/qt-build-host"
           "${QT_SRC}/configure" \
             -prefix "${QT_HOST_ROOT}" \
-            -submodules "${QT_SUBMODULES}" \
+            -submodules "${QT_HOST_SUBMODULES}" \
             -release -opensource -confirm-license \
             -nomake tests -nomake examples
           cmake --build . --parallel
           cmake --install .
 
-          mkdir -p "${RUNNER_TEMP}/qt-build-ios"
-          cd "${RUNNER_TEMP}/qt-build-ios"
-          "${QT_SRC}/configure" \
-            -prefix "${QT_IOS_ROOT}" \
-            -platform macx-ios-clang \
-            -qt-host-path "${QT_HOST_ROOT}" \
-            -submodules "${QT_SUBMODULES}" \
-            -release -opensource -confirm-license \
-            -nomake tests -nomake examples
-          cmake --build . --parallel
-          cmake --install .
+          for target in iphoneos iphonesimulator; do
+            if [ "${target}" = iphoneos ]; then
+              qt_prefix="${QT_IOS_DEVICE_ROOT}"
+              openssl_prefix="${OPENSSL_IOS_ROOT}/${OPENSSL_VERSION}/iphoneos"
+            else
+              qt_prefix="${QT_IOS_SIMULATOR_ROOT}"
+              openssl_prefix="${OPENSSL_IOS_ROOT}/${OPENSSL_VERSION}/iphonesimulator-arm64"
+            fi
+            build_dir="${RUNNER_TEMP}/qt-build-${target}"
+            mkdir -p "${build_dir}"
+            cd "${build_dir}"
+            "${QT_SRC}/configure" \
+              -prefix "${qt_prefix}" \
+              -platform macx-ios-clang -sdk "${target}" \
+              -qt-host-path "${QT_HOST_ROOT}" \
+              -submodules "${QT_IOS_SUBMODULES}" \
+              -openssl-linked -feature-open62541-security \
+              -release -opensource -confirm-license \
+              -nomake tests -nomake examples \
+              -- \
+              -DCMAKE_OSX_ARCHITECTURES=arm64 \
+              -DOPENSSL_ROOT_DIR="${openssl_prefix}" \
+              -DOPENSSL_USE_STATIC_LIBS=ON \
+              -DFEATURE_open62541_security=ON
+            cmake --build . --parallel
+            cmake --install .
+          done
 
           test -x "${QT_HOST_ROOT}/bin/qmake"
-          test -x "${QT_IOS_ROOT}/bin/qmake"
-          test -d "${QT_IOS_ROOT}/lib/QtCore.framework"
-          test -d "${QT_IOS_ROOT}/lib/QtUiTools.framework"
-          test -d "${QT_IOS_ROOT}/lib/QtSvg.framework"
+          for qt_prefix in "${QT_IOS_DEVICE_ROOT}" "${QT_IOS_SIMULATOR_ROOT}"; do
+            test -x "${qt_prefix}/bin/qmake"
+            test -d "${qt_prefix}/lib/QtCore.framework"
+            test -d "${qt_prefix}/lib/QtUiTools.framework"
+            test -d "${qt_prefix}/lib/QtSvg.framework"
+            test -d "${qt_prefix}/lib/QtPositioning.framework"
+            test -d "${qt_prefix}/lib/QtOpcUa.framework"
+            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.dylib"
+            test -f "${qt_prefix}/include/QtOpcUa/QOpcUaX509CertificateSigningRequest"
+          done
 
   build-epics:
     name: Build EPICS 7.0.10 for iOS SDKs
@@ -126,14 +231,19 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ env.QT_ROOT }}
-          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
+          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-openssl${{ needs.build-qt.outputs.openssl_version }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
 
       - name: Verify Qt toolchain
         run: |
           set -euo pipefail
           test -x "${QT_HOST_ROOT}/bin/qmake"
-          test -x "${QT_IOS_ROOT}/bin/qmake"
-          test -d "${QT_IOS_ROOT}/lib/QtCore.framework"
+          for qt_prefix in "${QT_IOS_DEVICE_ROOT}" "${QT_IOS_SIMULATOR_ROOT}"; do
+            test -x "${qt_prefix}/bin/qmake"
+            test -d "${qt_prefix}/lib/QtCore.framework"
+            test -d "${qt_prefix}/lib/QtPositioning.framework"
+            test -d "${qt_prefix}/lib/QtOpcUa.framework"
+            test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.dylib"
+          done
           ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
 
@@ -201,7 +311,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ env.QT_ROOT }}
-          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
+          key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-openssl${{ needs.build-qt.outputs.openssl_version }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
 
       - name: Restore EPICS iOS cache
         uses: actions/cache@v5
@@ -213,8 +323,16 @@ jobs:
         run: |
           set -euo pipefail
           test -x "${QT_HOST_ROOT}/bin/qmake"
-          test -x "${QT_IOS_ROOT}/bin/qmake"
-          test -d "${QT_IOS_ROOT}/lib/QtCore.framework"
+          if [ "${{ matrix.sdk }}" = "iphoneos" ]; then
+            QT_TARGET_ROOT="${QT_IOS_DEVICE_ROOT}"
+          else
+            QT_TARGET_ROOT="${QT_IOS_SIMULATOR_ROOT}"
+          fi
+          test -x "${QT_TARGET_ROOT}/bin/qmake"
+          test -d "${QT_TARGET_ROOT}/lib/QtCore.framework"
+          test -d "${QT_TARGET_ROOT}/lib/QtPositioning.framework"
+          test -d "${QT_TARGET_ROOT}/lib/QtOpcUa.framework"
+          test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.dylib"
           ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-epics.outputs.toolchain_key }}"
@@ -233,6 +351,11 @@ jobs:
         if: steps.cache-qwt.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
+          if [ "${{ matrix.sdk }}" = "iphoneos" ]; then
+            QT_TARGET_ROOT="${QT_IOS_DEVICE_ROOT}"
+          else
+            QT_TARGET_ROOT="${QT_IOS_SIMULATOR_ROOT}"
+          fi
           git clone --depth 1 --single-branch --branch "${QWT_VERSION}" \
             https://git.code.sf.net/p/qwt/git "${RUNNER_TEMP}/qwt-src"
           sed -i '' -E "s|^[[:space:]]*QWT_INSTALL_PREFIX[[:space:]]*=.*|QWT_INSTALL_PREFIX = ${GITHUB_WORKSPACE}/.ci-cache/qwt-${{ matrix.epics_arch }}|" \
@@ -244,7 +367,7 @@ jobs:
           mkdir -p "${RUNNER_TEMP}/qwt-build"
           cd "${RUNNER_TEMP}/qwt-build"
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
-            "${QT_IOS_ROOT}/bin/qmake" "${RUNNER_TEMP}/qwt-src/qwt.pro" \
+            "${QT_TARGET_ROOT}/bin/qmake" "${RUNNER_TEMP}/qwt-src/qwt.pro" \
             "CONFIG+=${{ matrix.configuration }}" \
             QMAKE_APPLE_DEVICE_ARCHS=arm64 QMAKE_APPLE_SIMULATOR_ARCHS=arm64
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
@@ -255,9 +378,14 @@ jobs:
       - name: Export caQtDM build environment
         run: |
           set -euo pipefail
+          if [ "${{ matrix.sdk }}" = "iphoneos" ]; then
+            QT_TARGET_ROOT="${QT_IOS_DEVICE_ROOT}"
+          else
+            QT_TARGET_ROOT="${QT_IOS_SIMULATOR_ROOT}"
+          fi
           QWT_ROOT="${GITHUB_WORKSPACE}/.ci-cache/qwt-${{ matrix.epics_arch }}"
           {
-            echo "QTHOME=${QT_IOS_ROOT}"
+            echo "QTHOME=${QT_TARGET_ROOT}"
             echo "QWTHOME=${QWT_ROOT}"
             echo "QWTINCLUDE=${QWT_ROOT}/include"
             echo "QWTLIB=${QWT_ROOT}/lib"
@@ -271,6 +399,8 @@ jobs:
             echo "CAQTDM_COLLECT=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
             echo "QTCONTROLS_LIBS=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
             echo "QTBASE=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
+            echo "CAQTDM_GPS=1"
+            echo "CAQTDM_OPCUA=1"
           } >> "$GITHUB_ENV"
 
       - name: Prepare temporary source tree
@@ -312,6 +442,14 @@ jobs:
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "${APP}/Info.plist" | grep -qx 'ch.psi.caQtDM'
           test -f "${APP}/caQtDM_IOS_Config.xml"
           test -f "${APP}/fonts/lucida-sans-typewriter.ttf"
+          /usr/libexec/PlistBuddy -c 'Print :NSLocationWhenInUseUsageDescription' "${APP}/Info.plist" | grep -q .
+          if [ "${{ matrix.sdk }}" = "iphoneos" ]; then
+            QT_TARGET_ROOT="${QT_IOS_DEVICE_ROOT}"
+          else
+            QT_TARGET_ROOT="${QT_IOS_SIMULATOR_ROOT}"
+          fi
+          test -f "${APP}/PlugIns/opcua/libopen62541_backend.dylib"
+          strings "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.dylib" | grep -q 'SecurityPolicy#Basic256Sha256'
           if codesign -dv "${APP}" >/dev/null 2>&1; then
             echo "Expected an unsigned CI app bundle"
             exit 1

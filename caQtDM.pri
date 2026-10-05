@@ -942,6 +942,9 @@ caQtDM_Viewer {
 
                     opcua {
                         LIBS += $$OUT_PWD/../caQtDM_Plugins/opcua/libopcua_plugin.a
+                        opcua_backend.path = PlugIns/opcua
+                        opcua_backend.files += $$[QT_INSTALL_PLUGINS]/opcua/libopen62541_backend.dylib
+                        QMAKE_BUNDLE_DATA += opcua_backend
                     }
 
                     modbus {
