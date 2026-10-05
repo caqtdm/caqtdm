@@ -65,7 +65,7 @@ jobs:
           QT_TARBALL="qt-everywhere-src-${QT_VERSION}.tar.xz"
           QT_MINOR="$(echo "${QT_VERSION}" | cut -d. -f1,2)"
           curl -fsSL --retry 3 \
-            "https://download.qt.io/official_releases/qt/${QT_MINOR}/${QT_VERSION}/single/${QT_TARBALL" \
+            "https://download.qt.io/official_releases/qt/${QT_MINOR}/${QT_VERSION}/single/${QT_TARBALL}" \
             -o "${RUNNER_TEMP}/${QT_TARBALL}"
           tar -xf "${RUNNER_TEMP}/${QT_TARBALL}" -C "${RUNNER_TEMP}/qt-src"
           QT_SRC="${RUNNER_TEMP}/qt-src/qt-everywhere-src-${QT_VERSION}"
