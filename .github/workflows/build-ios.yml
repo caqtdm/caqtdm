@@ -143,6 +143,27 @@ jobs:
         if: steps.cache-qt.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
+          run_with_heartbeat() {
+            local label="$1"
+            shift
+            "$@" &
+            local command_pid=$!
+            (
+              while kill -0 "${command_pid}" 2>/dev/null; do
+                sleep 60
+                if kill -0 "${command_pid}" 2>/dev/null; then
+                  echo "$(date -u '+%Y-%m-%dT%H:%M:%SZ') Still running: ${label} (pid ${command_pid})"
+                fi
+              done
+            ) &
+            local heartbeat_pid=$!
+            local result=0
+            wait "${command_pid}" || result=$?
+            kill "${heartbeat_pid}" 2>/dev/null || true
+            wait "${heartbeat_pid}" 2>/dev/null || true
+            return "${result}"
+          }
+
           mkdir -p "${QT_ROOT}" "${RUNNER_TEMP}/qt-src"
           QT_TARBALL="qt-everywhere-src-${QT_VERSION}.tar.xz"
           QT_MINOR="$(echo "${QT_VERSION}" | cut -d. -f1,2)"
@@ -181,8 +202,8 @@ jobs:
             -nomake tests -nomake examples
           echo "::endgroup::"
           echo "::group::Build and install Qt host tools"
-          cmake --build . --parallel
-          cmake --install .
+          run_with_heartbeat "Build Qt host tools" cmake --build . --parallel
+          run_with_heartbeat "Install Qt host tools" cmake --install .
           echo "Verifying host OPC UA code generator and CMake package"
           test -x "${QT_HOST_ROOT}/bin/qopcuaxmldatatypes2cpp"
           test -f "${QT_HOST_ROOT}/lib/cmake/Qt6OpcUaTools/Qt6OpcUaToolsConfig.cmake"
@@ -220,8 +241,8 @@ jobs:
               -DFEATURE_open62541_security=ON
             echo "::endgroup::"
             echo "::group::Build and install Qt ${QT_VERSION} for ${target}"
-            cmake --build . --parallel
-            cmake --install .
+            run_with_heartbeat "Build Qt for ${target}" cmake --build . --parallel
+            run_with_heartbeat "Install Qt for ${target}" cmake --install .
             echo "Verifying QtPositioning, QtOpcUa, and secure Open62541 backend for ${target}"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
