@@ -550,16 +550,19 @@ jobs:
               exit 1
             }
           )
+          mapfile -t viewer_targets < <(
+            awk '/^sub-caQtDM_Viewer-make_first:/ {
+              for (i = 2; i <= NF; ++i)
+                if ($i != "FORCE") print $i
+            }' Makefile
+          )
+          if [ "${#viewer_targets[@]}" -eq 0 ]; then
+            echo 'No caQtDM Viewer prerequisites found in the generated Makefile' >&2
+            exit 1
+          fi
+          printf 'Building caQtDM Viewer prerequisites: %s\n' "${viewer_targets[*]}"
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
-            make -j"$(sysctl -n hw.ncpu)" \
-            caQtDM_QtControls \
-            caQtDM_Lib \
-            qtcontrols_controllers \
-            qtcontrols_graphics \
-            qtcontrols_monitors \
-            qtcontrols_utilities \
-            caQtDM_Plugins \
-            caQtDM_Parsers
+            make -j"$(sysctl -n hw.ncpu)" "${viewer_targets[@]}"
           (
             cd caQtDM_Viewer
             SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
