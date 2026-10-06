@@ -51,6 +51,7 @@ GenSoftPVDialog::GenSoftPVDialog(QWidget *widget, QWidget *parent) : QDialog(par
     channelForm->addRow(tr("variable:"), variableLine);
 
     dataTypeCombo = new QComboBox(this);
+    // order must match genSoftPV::DataType, the mapping goes by index
     dataTypeCombo->addItems(QStringList() << "double" << "float" << "int" << "long"
                                           << "enum" << "string" << "char");
     channelForm->addRow(tr("data type:"), dataTypeCombo);
@@ -136,6 +137,18 @@ GenSoftPVDialog::GenSoftPVDialog(QWidget *widget, QWidget *parent) : QDialog(par
     nordValue->setToolTip(tr("NORD: used elements, auto = full array or length of the value list"));
     optionsForm->addRow(tr("nord:"), nordValue);
 
+    matrixRowsValue = new QSpinBox(this);
+    matrixRowsValue->setRange(0, 1000);
+    matrixRowsValue->setSpecialValueText(tr("none"));
+    matrixRowsValue->setToolTip(tr("matrix rows; rows and columns > 0 make the channel a row-major matrix of the data type"));
+    optionsForm->addRow(tr("matrix rows:"), matrixRowsValue);
+
+    matrixColumnsValue = new QSpinBox(this);
+    matrixColumnsValue->setRange(0, 1000);
+    matrixColumnsValue->setSpecialValueText(tr("none"));
+    matrixColumnsValue->setToolTip(tr("matrix columns; the value list is taken row by row"));
+    optionsForm->addRow(tr("matrix columns:"), matrixColumnsValue);
+
     unitsLine = new QLineEdit(this);
     optionsForm->addRow(tr("units:"), unitsLine);
 
@@ -180,6 +193,8 @@ GenSoftPVDialog::GenSoftPVDialog(QWidget *widget, QWidget *parent) : QDialog(par
         persistentCheckBox->setChecked(softpv->getPersistent());
         nelmValue->setValue(softpv->getNelm());
         nordValue->setValue(softpv->getNord());
+        matrixRowsValue->setValue(softpv->getMatrixRows());
+        matrixColumnsValue->setValue(softpv->getMatrixColumns());
         unitsLine->setText(softpv->getUnits());
         precisionValue->setValue(softpv->getPrecision());
         enumStringsLine->setText(softpv->getEnumStrings().join(";"));
@@ -210,6 +225,8 @@ void GenSoftPVDialog::saveState()
         cursor->setProperty("persistent", persistentCheckBox->isChecked());
         cursor->setProperty("nelm", nelmValue->value());
         cursor->setProperty("nord", nordValue->value());
+        cursor->setProperty("matrixRows", matrixRowsValue->value());
+        cursor->setProperty("matrixColumns", matrixColumnsValue->value());
         cursor->setProperty("units", unitsLine->text().trimmed());
         cursor->setProperty("precision", precisionValue->value());
         QString enums = enumStringsLine->text().trimmed();

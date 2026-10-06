@@ -57,6 +57,8 @@ InternalChannel::InternalChannel()
     , persistent(false)
     , nelm(1)
     , nord(1)
+    , dimRows(0)
+    , dimCols(0)
     , units("")
     , precision(2)
     , enums()
@@ -81,6 +83,13 @@ QString InternalChannel::jsonPart(const QString &pv)
     int pos = pv.indexOf(".{");
     if(pos == -1) return QString();
     return pv.mid(pos + 1).trimmed();
+}
+
+QString InternalChannel::normalizedJson(const QString &json)
+{
+    QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+    if(document.isNull()) return json.trimmed();
+    return QString::fromUtf8(document.toJson(QJsonDocument::Compact));
 }
 
 static bool parseFieldName(const QString &name, InternalChannel::Field *field)
@@ -341,7 +350,56 @@ bool InternalChannel::configure(const QString &json, QString *errorString)
     if(object.contains("units"))  units = object["units"].toString();
     if(object.contains("prec"))   precision = (short) object["prec"].toDouble();
 
-    if(object.contains("enums")) {
+    // matrix (NTMatrix like): "dim": [rows, cols], row-major, fixed element count
+    dimRows = dimCols = 0;
+    if(object.contains("dim")) {
+        QJsonArray dim = object["dim"].toArray();
+        int rows = (dim.size() == 2) ? (int) dim.at(0).toDouble() : 0;
+        int cols = (dim.size() == 2) ? (int) dim.at(1).toDouble() : 0;
+        if(rows < 1 || cols < 1 || (qint64) rows * (qint64) cols > (qint64) INT_MAX) {
+            if(errorString != Q_NULLPTR) *errorString = "dim must be [rows, cols] with both >= 1";
+            return false;
+        }
+        if(fieldtype == caENUM || fieldtype == caSTRING) {
+            if(errorString != Q_NULLPTR) *errorString = "dim requires a numeric type";
+            return false;
+        }
+        int count = rows * cols;
+        if(object.contains("nelm") && (int) object["nelm"].toDouble() != count) {
+            if(errorString != Q_NULLPTR) *errorString = QString("nelm conflicts with dim of %1 elements").arg(count);
+            return false;
+        }
+        if(object.contains("nord") && (int) object["nord"].toDouble() != count) {
+            if(errorString != Q_NULLPTR) *errorString = QString("nord conflicts with dim of %1 elements").arg(count);
+            return false;
+        }
+        if(m_waveOverride.size() > count) {
+            if(errorString != Q_NULLPTR) *errorString = QString("val has %1 elements, dim takes %2")
+                                                            .arg(m_waveOverride.size()).arg(count);
+            return false;
+        }
+        if(object.contains("enums") || object.contains("regex"))
+            qCDebug(internalChannelLog) << "enums/regex ignored for a matrix channel";
+        dimRows = rows;
+        dimCols = cols;
+        nelm = nord = count;
+
+        // shorter val arrays are zero padded, a scalar val sets element 0,
+        // without val a square matrix starts as the identity
+        QVector<double> elements(count, 0.0);
+        if(!m_waveOverride.isEmpty()) {
+            for(int i = 0; i < m_waveOverride.size(); i++) elements[i] = m_waveOverride.at(i);
+        } else if(object.contains("val")) {
+            elements[0] = val;
+        } else if(rows == cols) {
+            for(int i = 0; i < rows; i++) elements[i * cols + i] = 1.0;
+        }
+        m_waveOverride = elements;
+        textArray.clear();
+        val = elements.at(0);
+    }
+
+    if(object.contains("enums") && !isMatrix()) {
         enums.clear();
         foreach(const QJsonValue &item, object["enums"].toArray()) {
             enums.append(item.toString());
@@ -350,7 +408,7 @@ bool InternalChannel::configure(const QString &json, QString *errorString)
     if(fieldtype == caENUM && enums.isEmpty()) enums << "OFF" << "ON";
     if(fieldtype != caDOUBLE && fieldtype != caFLOAT && !object.contains("prec")) precision = 0;
 
-    if(object.contains("regex")) {
+    if(object.contains("regex") && !isMatrix()) {
         QString pattern = object["regex"].toString();
         if(mode == Counter) {
             // counter: enumerable subset drives the generator
@@ -372,10 +430,16 @@ bool InternalChannel::configure(const QString &json, QString *errorString)
     }
 
     setCurrentValue(clampToDriveLimits(val));
+    // the scalar value mirrors element 0 of a matrix
+    if(isMatrix()) m_waveOverride[0] = clampToDriveLimits(val);
     updateAlarmState();
     m_elapsedMs = 0;
     needsPublish = true;
     m_configured = true;
+    configJson = normalizedJson(json);
+    // the first configuration is the channel's real connect: force
+    // initialize=true on the next publish so widgets pick up the limits
+    controlInfoChanged = true;
 
     qCDebug(internalChannelLog) << "configured type" << fieldtype << "mode" << mode
                                 << "drvl" << drvl.defined << drvl.value
@@ -467,6 +531,7 @@ void InternalChannel::tick()
     for(int i = 0; i < m_waveOverride.size(); i++) {
         m_waveOverride[i] = steppedValue(m_waveOverride.at(i), step, rangeLow, rangeHigh, overflow);
     }
+    if(isMatrix()) setCurrentValue(m_waveOverride.at(0));
 
     updateAlarmState();
     needsPublish = true;
@@ -535,6 +600,16 @@ static bool statusFromWrite(qint32 idata, const QString &sdata, short *code)
 
 static void writeStringsToDataB(knobData *kData, const QStringList &items);
 
+// NT metadata, written on every publish; rows == 0 marks a plain scalar/vector
+static void writeDim(knobData *kData, int rows, int cols)
+{
+    bool matrix = (rows > 0 && cols > 0);
+    kData->edata.ntType = matrix ? NT_MATRIX : NT_NONE;
+    kData->edata.dimCount = matrix ? 2 : 0;
+    kData->edata.dim[0] = matrix ? rows : 0;
+    kData->edata.dim[1] = matrix ? cols : 0;
+}
+
 void InternalChannel::updateAlarmState()
 {
     alarmState(currentValue(), &severity, &status);
@@ -568,7 +643,10 @@ void InternalChannel::setFieldValue(Field field, double rdata, qint32 idata, con
     case FieldLopr: lopr.set(rdata); controlInfoChanged = true; break;
     case FieldPrec: precision = (short) ((rdata != 0.0) ? rdata : idata); controlInfoChanged = true; break;
     case FieldEgu:  units = sdata; controlInfoChanged = true; break;
-    case FieldNord: nord = qBound(0, (idata != 0) ? (int) idata : (int) rdata, nelm); break;
+    case FieldNord:
+        if(isMatrix()) return;   // fixed element count
+        nord = qBound(0, (idata != 0) ? (int) idata : (int) rdata, nelm);
+        break;
     case FieldNelm: // read only
         return;
     }
@@ -604,6 +682,15 @@ void InternalChannel::fillKnobDataField(knobData *kData, Field field) const
 {
     if(field == FieldVal) {
         fillKnobData(kData);
+        return;
+    }
+
+    writeDim(kData, 0, 0);
+
+    // field monitors of an unconfigured channel are disconnected as well
+    if(!m_configured) {
+        kData->edata.connected = false;
+        kData->edata.valueCount = 0;
         return;
     }
 
@@ -681,6 +768,18 @@ void InternalChannel::fillKnobDataField(knobData *kData, Field field) const
 
 void InternalChannel::setValue(double rdata, qint32 idata, const QString &sdata)
 {
+    if(isMatrix()) {
+        // a scalar write targets element 0, the other elements stay
+        bool integer = (fieldtype == caINT || fieldtype == caLONG || fieldtype == caCHAR);
+        double element = clampToDriveLimits(integer ? (double) idata : rdata);
+        m_waveOverride[0] = element;
+        setCurrentValue(element);
+        m_elapsedMs = 0;
+        updateAlarmState();
+        needsPublish = true;
+        return;
+    }
+
     switch(fieldtype) {
     case caSTRING:
         // a generator channel is positioned by index (idata); with a regex the
@@ -719,6 +818,15 @@ void InternalChannel::setValue(double rdata, qint32 idata, const QString &sdata)
 
 void InternalChannel::setWave(const QVector<double> &values)
 {
+    if(isMatrix()) {
+        // partial writes keep the remaining elements, the count never changes
+        int count = qMin(values.size(), m_waveOverride.size());
+        for(int i = 0; i < count; i++) m_waveOverride[i] = values.at(i);
+        if(count > 0) setCurrentValue(m_waveOverride.at(0));
+        updateAlarmState();
+        needsPublish = true;
+        return;
+    }
     m_waveOverride = values;
     // like an EPICS waveform record a write updates NORD, capped at NELM
     nord = qMin(values.size(), nelm);
@@ -777,6 +885,15 @@ static void writeStringsToDataB(knobData *kData, const QStringList &items)
 
 void InternalChannel::fillKnobData(knobData *kData) const
 {
+    // a channel no genSoftPV has configured yet behaves like a disconnected
+    // pv; it comes to life with the panel that defines it
+    if(!m_configured) {
+        writeDim(kData, 0, 0);
+        kData->edata.connected = false;
+        kData->edata.valueCount = 0;
+        return;
+    }
+    writeDim(kData, dimRows, dimCols);
     kData->edata.fieldtype = fieldtype;
     kData->edata.connected = (severity != NOTCONNECTED);
     kData->edata.accessR = true;

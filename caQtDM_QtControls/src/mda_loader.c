@@ -91,7 +91,11 @@
     /* If reading, obtain room for the string */
     if (mode)
       {
+        if( length < 0)
+          return 0;
         *p = (char *) malloc( (length + 1) * sizeof(char) );
+        if( *p == NULL)
+          return 0;
         (*p)[length] = '\0'; /* Null termination */
       }
 
@@ -118,33 +122,74 @@
 #endif
 
 
+/* NULL-safe element destructors, also used to clean up failed reads */
+static void positioner_free( struct mda_positioner *p)
+{
+  if( !p) return;
+  free( p->name);
+  free( p->description);
+  free( p->step_mode);
+  free( p->unit);
+  free( p->readback_name);
+  free( p->readback_description);
+  free( p->readback_unit);
+  free( p);
+}
+
+static void detector_free( struct mda_detector *d)
+{
+  if( !d) return;
+  free( d->name);
+  free( d->description);
+  free( d->unit);
+  free( d);
+}
+
+static void trigger_free( struct mda_trigger *t)
+{
+  if( !t) return;
+  free( t->name);
+  free( t);
+}
+
+static void pv_free( struct mda_pv *pv)
+{
+  if( !pv) return;
+  free( pv->name);
+  free( pv->description);
+  free( pv->unit);
+  free( pv->values);
+  free( pv);
+}
+
+
 static struct mda_header *header_read( XDR *xdrs)
 {
   struct mda_header *header;
 
   header = (struct mda_header *) 
-    malloc( sizeof(struct mda_header));
+    calloc( 1, sizeof(struct mda_header));
 
   if( !xdr_float(xdrs, &(header->version) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_int32_t(xdrs, &(header->scan_number) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_int16_t(xdrs, &(header->data_rank) ))
-    return NULL;
+    goto fail;
 
   header->dimensions = (int32_t *) 
     malloc( header->data_rank * sizeof(int32_t));
   if( !xdr_vector( xdrs, (char *) header->dimensions, header->data_rank, 
 		   sizeof( int32_t), (xdrproc_t) xdr_int32_t))
-    return NULL;
+    goto fail;
 
   if( !xdr_int16_t(xdrs, &(header->regular) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_int32_t(xdrs, &(header->extra_pvs_offset) )) 
-    return NULL;
+    goto fail;
 
   {  // need to do error checking on dimensions!
     int i;
@@ -153,13 +198,15 @@ static struct mda_header *header_read( XDR *xdrs)
       // -1 is it was int16_t, not int32_t
       if(  header->dimensions[i] == 0xFFFFFFFF) 
         {
-          free( header->dimensions);
-          free( header);
-          return NULL;
+          goto fail;
         }
   }
 
   return header;
+
+ fail:
+  mda_header_unload( header);
+  return NULL;
 }
 
 
@@ -169,27 +216,31 @@ static struct mda_positioner *positioner_read(XDR *xdrs)
 
 
   positioner = (struct mda_positioner *) 
-    malloc( sizeof(struct mda_positioner));
+    calloc( 1, sizeof(struct mda_positioner));
 
   if( !xdr_int16_t(xdrs, &(positioner->number) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_counted_string( xdrs, &(positioner->name) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(positioner->description) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(positioner->step_mode) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(positioner->unit) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(positioner->readback_name) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(positioner->readback_description) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(positioner->readback_unit) ) )
-    return NULL;
+    goto fail;
 
   return positioner;
+
+ fail:
+  positioner_free( positioner);
+  return NULL;
 }
 
 
@@ -200,19 +251,23 @@ static struct mda_detector *detector_read(XDR *xdrs)
 
 
   detector = (struct mda_detector *) 
-    malloc( sizeof(struct mda_detector));
+    calloc( 1, sizeof(struct mda_detector));
 
   if( !xdr_int16_t(xdrs, &(detector->number) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_counted_string( xdrs, &(detector->name) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(detector->description) ) )
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(detector->unit) ) )
-    return NULL;
+    goto fail;
 
   return detector;
+
+ fail:
+  detector_free( detector);
+  return NULL;
 }
 
 
@@ -224,16 +279,20 @@ static struct mda_trigger *trigger_read(XDR *xdrs)
 
 
   trigger = (struct mda_trigger *) 
-    malloc( sizeof(struct mda_trigger));
+    calloc( 1, sizeof(struct mda_trigger));
 
   if( !xdr_int16_t(xdrs, &(trigger->number) ))
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(trigger->name ) ))
-    return NULL;
+    goto fail;
   if( !xdr_float(xdrs, &(trigger->command) ))
-    return NULL;
+    goto fail;
 
   return trigger;
+
+ fail:
+  trigger_free( trigger);
+  return NULL;
 }
 
 
@@ -246,19 +305,19 @@ static struct mda_scan *scan_read(XDR *xdrs, int recursive)
  
   int i;
 
-  scan = (struct mda_scan *) malloc( sizeof(struct mda_scan));
+  scan = (struct mda_scan *) calloc( 1, sizeof(struct mda_scan));
 
 
   if( !xdr_int16_t(xdrs, &(scan->scan_rank) ))
-    return NULL;
+    goto fail;
   if( !xdr_int32_t(xdrs, &(scan->requested_points) ))
-    return NULL;
+    goto fail;
   if( !xdr_int32_t(xdrs, &(scan->last_point) ))
-    return NULL;
+    goto fail;
 
   // this happens in corrupt files sometimes.
   if( scan->scan_rank < 1)
-    return NULL;
+    goto fail;
 
   if( scan->scan_rank > 1)
     {
@@ -266,56 +325,56 @@ static struct mda_scan *scan_read(XDR *xdrs, int recursive)
         malloc( scan->requested_points * sizeof(int32_t));
       if( !xdr_vector( xdrs, (char *) scan->offsets, scan->requested_points, 
 		       sizeof( int32_t), (xdrproc_t) xdr_int32_t))
-	return NULL;
+	goto fail;
 
       // there can be no zero offsets for the first "last_point" values
       for( i = 0; i < scan->last_point; i++)
         if( scan->offsets[i] == 0)
-          return NULL;
+          goto fail;
     }
   else
     scan->offsets = NULL;
 
   if( !xdr_counted_string( xdrs, &(scan->name) ))
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(scan->time) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_int16_t(xdrs, &(scan->number_positioners) ))
-    return NULL;
+    goto fail;
   if( !xdr_int16_t(xdrs, &(scan->number_detectors) ))
-    return NULL;
+    goto fail;
   if( !xdr_int16_t(xdrs, &(scan->number_triggers) ))
-    return NULL;
+    goto fail;
 
 
 
   scan->positioners = (struct mda_positioner **) 
-    malloc( scan->number_positioners * sizeof(struct mda_positioner *));
+    calloc( scan->number_positioners, sizeof(struct mda_positioner *));
   for( i = 0; i < scan->number_positioners; i++)
     {
       if( (scan->positioners[i] = positioner_read( xdrs)) == NULL )
-	return NULL;
+	goto fail;
     }
 
   scan->detectors = (struct mda_detector **) 
-    malloc( scan->number_detectors * sizeof(struct mda_detector *));
+    calloc( scan->number_detectors, sizeof(struct mda_detector *));
   for( i = 0; i < scan->number_detectors; i++)
     {
       if( (scan->detectors[i] = detector_read( xdrs)) == NULL )
-	return NULL;
+	goto fail;
     }
 
   scan->triggers = (struct mda_trigger **) 
-    malloc( scan->number_triggers * sizeof(struct mda_trigger *));
+    calloc( scan->number_triggers, sizeof(struct mda_trigger *));
   for( i = 0; i < scan->number_triggers; i++)
     {
       if( (scan->triggers[i] = trigger_read( xdrs)) == NULL )
-	return NULL;
+	goto fail;
     }
 
   scan->positioners_data = (double **) 
-    malloc( scan->number_positioners * sizeof(double *));
+    calloc( scan->number_positioners, sizeof(double *));
   for( i = 0 ; i < scan->number_positioners; i++)
     {
       scan->positioners_data[i] = (double *) 
@@ -323,11 +382,11 @@ static struct mda_scan *scan_read(XDR *xdrs, int recursive)
       if( !xdr_vector( xdrs, (char *) scan->positioners_data[i], 
 		       scan->requested_points, 
 		       sizeof( double), (xdrproc_t) xdr_double))
-	return NULL;
+	goto fail;
     }
 
   scan->detectors_data = (float **) 
-    malloc( scan->number_detectors * sizeof(float *));
+    calloc( scan->number_detectors, sizeof(float *));
   for( i = 0 ; i < scan->number_detectors; i++)
     {
       scan->detectors_data[i] = (float *) 
@@ -335,13 +394,13 @@ static struct mda_scan *scan_read(XDR *xdrs, int recursive)
       if( !xdr_vector( xdrs, (char *) scan->detectors_data[i], 
 		       scan->requested_points, 
 		       sizeof( float), (xdrproc_t) xdr_float))
-	return NULL;
+	goto fail;
     }
 
   if( (scan->scan_rank > 1) && recursive)
     {
       scan->sub_scans = (struct mda_scan **)
-	malloc( scan->requested_points * sizeof( struct mda_scan *) );
+	calloc( scan->requested_points, sizeof( struct mda_scan *) );
       for( i = 0; i < scan->requested_points; i++)
 	scan->sub_scans[i] = NULL;
       for( i = 0 ; (i < scan->requested_points) && 
@@ -351,7 +410,7 @@ static struct mda_scan *scan_read(XDR *xdrs, int recursive)
           if( xdr_getpos( xdrs) != scan->offsets[i])
             {
               if( !xdr_setpos( xdrs,scan->offsets[i] ) )
-                return NULL;
+                goto fail;
             }
           scan->sub_scans[i] = scan_read(xdrs, recursive);
         }
@@ -361,6 +420,10 @@ static struct mda_scan *scan_read(XDR *xdrs, int recursive)
 
 
   return scan;
+
+ fail:
+  mda_scan_unload( scan);
+  return NULL;
 }
 
 
@@ -372,22 +435,22 @@ static struct mda_pv *pv_read(XDR *xdrs)
 
 /*   unsigned int   byte_count; */
 
-  pv = (struct mda_pv *) malloc( sizeof(struct mda_pv));
+  pv = (struct mda_pv *) calloc( 1, sizeof(struct mda_pv));
 
 
   if( !xdr_counted_string( xdrs, &(pv->name) ))
-    return NULL;
+    goto fail;
   if( !xdr_counted_string( xdrs, &(pv->description) ))
-    return NULL;
+    goto fail;
   if( !xdr_int16_t(xdrs, &(pv->type) ))
-    return NULL;
+    goto fail;
 
   if( pv->type != EXTRA_PV_STRING)
     {
       if( !xdr_int16_t(xdrs, &(pv->count) ))
-	return NULL;
+	goto fail;
       if( !xdr_counted_string( xdrs, &(pv->unit) ))
-	return NULL;
+	goto fail;
     }
   else
     {
@@ -399,48 +462,52 @@ static struct mda_pv *pv_read(XDR *xdrs)
     {
     case EXTRA_PV_STRING:
       if( !xdr_counted_string( xdrs, &(pv->values) ))
-	return NULL;
+	goto fail;
       break;
     case EXTRA_PV_INT8:
       pv->values = (char *) malloc( pv->count * sizeof(int8_t));
 #ifndef DARWIN
       if( !xdr_vector( xdrs, pv->values, pv->count, 
 		       sizeof( int8_t), (xdrproc_t) xdr_int8_t))
-	return NULL;
+	goto fail;
 #else
         // MacOS Darwin is missing xdr_int8_t, have to fake it with xdr_char
       if( !xdr_vector( xdrs, pv->values, pv->count, 
 		       sizeof( int8_t), (xdrproc_t) xdr_char))
-	return NULL;
+	goto fail;
 #endif
       break;
     case EXTRA_PV_INT16:
       pv->values = (char *) malloc( pv->count * sizeof(int16_t));
       if( !xdr_vector( xdrs, pv->values, pv->count, 
 		       sizeof( int16_t), (xdrproc_t) xdr_int16_t))
-	return NULL;
+	goto fail;
       break;
     case EXTRA_PV_INT32:
       pv->values = (char *) malloc( pv->count * sizeof(int32_t));
       if( !xdr_vector( xdrs, pv->values, pv->count, 
 		       sizeof( int32_t), (xdrproc_t) xdr_int32_t))
-	return NULL;
+	goto fail;
       break;
     case EXTRA_PV_FLOAT:
       pv->values = (char *) malloc( pv->count * sizeof(float));
       if( !xdr_vector( xdrs, pv->values, pv->count, 
 		       sizeof( float), (xdrproc_t) xdr_float))
-	return NULL;
+	goto fail;
       break;
     case EXTRA_PV_DOUBLE:
       pv->values = (char *) malloc( pv->count * sizeof(double));
       if( !xdr_vector( xdrs, pv->values, pv->count, 
 		       sizeof( double), (xdrproc_t) xdr_double))
-	return NULL;
+	goto fail;
       break;
     }
 
   return pv;
+
+ fail:
+  pv_free( pv);
+  return NULL;
 }
 
 
@@ -452,22 +519,26 @@ static struct mda_extra *extra_read(XDR *xdrs)
 
   int i;
 
-  extra = (struct mda_extra *) malloc( sizeof(struct mda_extra));
+  extra = (struct mda_extra *) calloc( 1, sizeof(struct mda_extra));
 
 
   if( !xdr_int16_t(xdrs, &(extra->number_pvs) ))
-    return NULL;
+    goto fail;
 
   extra->pvs = (struct mda_pv **) 
-    malloc( extra->number_pvs * sizeof( struct mda_pv *) );
+    calloc( extra->number_pvs, sizeof( struct mda_pv *) );
 
    for( i = 0 ; i < extra->number_pvs; i++)
      { 
        if( (extra->pvs[i] = pv_read(xdrs)) == NULL )
-	 return NULL;
+	 goto fail;
      } 
 
   return extra;
+
+ fail:
+  mda_extra_unload( extra);
+  return NULL;
 }
 
 
@@ -494,18 +565,18 @@ struct mda_file *mda_load( FILE *fptr)
   xdrstdio_create(xdrstream, fptr, XDR_DECODE);
 #endif
 
-  mda = (struct mda_file *) malloc( sizeof(struct mda_file));
+  mda = (struct mda_file *) calloc( 1, sizeof(struct mda_file));
 
   if( (mda->header = header_read( xdrstream)) == NULL)
-    return NULL;
+    goto fail;
   if( (mda->scan = scan_read( xdrstream, 1)) == NULL)
-    return NULL;
+    goto fail;
   if( mda->header->extra_pvs_offset)
     {
       if( !xdr_setpos( xdrstream, mda->header->extra_pvs_offset ))
-        return NULL;
+        goto fail;
       if( (mda->extra = extra_read( xdrstream)) == NULL)
-	return NULL;
+	goto fail;
     }
   else
     mda->extra = NULL;
@@ -515,6 +586,10 @@ struct mda_file *mda_load( FILE *fptr)
 #endif
 
   return mda;
+
+ fail:
+  mda_unload( mda);
+  return NULL;
 }
 
 
@@ -576,10 +651,10 @@ struct mda_scan *mda_subscan_load( FILE *fptr, int depth, int *indices,
 #endif
 
   if( (header = header_read( xdrstream)) == NULL)
-    return NULL;
+    goto fail;
 
   if( (depth < 0) || (depth >= header->data_rank ) )
-    return NULL;
+    goto fail;
 
   if( depth)
     {
@@ -593,43 +668,49 @@ struct mda_scan *mda_subscan_load( FILE *fptr, int depth, int *indices,
       for( i = 0; i < depth; i++)
 	{
 	  if( indices[i] >= header->dimensions[i])
-	    return NULL;
+	    goto fail;
 	}
 
       for( i = 0; i < depth; i++)
 	{
 	  if( !xdr_int16_t(xdrstream, &scan_rank ))
-	    return NULL;
+	    goto fail;
 	  if( scan_rank < 1)  // file error
-	    return NULL;
+	    goto fail;
 	  if( scan_rank == 1)  // this case should not happen
-	    return NULL;
+	    goto fail;
 
 	  if( !xdr_int32_t(xdrstream, &requested_points ))
-	    return NULL;
+	    goto fail;
 
 	  if( !xdr_int32_t(xdrstream, &last_point ))
-	    return NULL;
+	    goto fail;
 	  if( indices[i] >= last_point)
-	    return NULL;
+	    goto fail;
 
 
 	  offsets = (int32_t *) malloc( requested_points * sizeof(int32_t));
 	  if( !xdr_vector( xdrstream, (char *) offsets, requested_points, 
 			   sizeof( int32_t), (xdrproc_t) xdr_int32_t))
-	    return NULL;
+	    {
+	      free( offsets);
+	      goto fail;
+	    }
 
 	  if( offsets[indices[i]])
 	    fseek( fptr, offsets[indices[i]], SEEK_SET);
 	  else
-	    return NULL;
+	    {
+	      free( offsets);
+	      goto fail;
+	    }
 
 	  free( offsets);
 	}
     }
 
   if( (scan = scan_read( xdrstream, recursive)) == NULL)
-    return NULL;
+    goto fail;
 
 #ifndef XDR_HACK
   xdr_destroy( xdrstream);
@@ -638,6 +719,10 @@ struct mda_scan *mda_subscan_load( FILE *fptr, int depth, int *indices,
   mda_header_unload(header);
 
   return scan;
+
+ fail:
+  mda_header_unload( header);
+  return NULL;
 }
 
 
@@ -664,14 +749,14 @@ struct mda_extra *mda_extra_load( FILE *fptr)
 #endif
 
   if( (header = header_read( xdrstream)) == NULL)
-    return NULL;
+    goto fail;
 
 
   if( header->extra_pvs_offset)
     {
       fseek( fptr, header->extra_pvs_offset, SEEK_SET);
       if( (extra = extra_read( xdrstream)) == NULL)
-	return NULL;
+	goto fail;
     }
   else
     extra = NULL;
@@ -684,6 +769,10 @@ struct mda_extra *mda_extra_load( FILE *fptr)
   mda_header_unload(header);
 
   return extra;
+
+ fail:
+  mda_header_unload( header);
+  return NULL;
 }
 
 
@@ -693,63 +782,53 @@ struct mda_extra *mda_extra_load( FILE *fptr)
 
 void mda_header_unload(struct mda_header *header)
 {
+  if( !header) return;
   free( header->dimensions);
   free( header);
 }
 
 
-/* this function is recursive */
+/* this function is recursive; tolerates partially filled scans */
 void mda_scan_unload( struct mda_scan *scan)
 {
   int i;
 
-  if( (scan->scan_rank > 1) && (scan->sub_scans != NULL))
+  if( !scan) return;
+
+  if( scan->sub_scans != NULL)
     {
-      for( i = 0; (i < scan->requested_points) && (scan->sub_scans[i] != NULL);
-           i++)
+      for( i = 0; i < scan->requested_points; i++)
 	mda_scan_unload( scan->sub_scans[i]);
+      free( scan->sub_scans);
     }
-  free( scan->sub_scans);
   
   free( scan->offsets);
   free( scan->name);
   free( scan->time);
 
-  for( i = 0; i < scan->number_positioners; i++)
-    {
-      free(scan->positioners[i]->name);
-      free(scan->positioners[i]->description);
-      free(scan->positioners[i]->step_mode);
-      free(scan->positioners[i]->unit);
-      free(scan->positioners[i]->readback_name);
-      free(scan->positioners[i]->readback_description);
-      free(scan->positioners[i]->readback_unit);
-      free(scan->positioners[i]);
-    }
+  if( scan->positioners != NULL)
+    for( i = 0; i < scan->number_positioners; i++)
+      positioner_free( scan->positioners[i]);
   free( scan->positioners);
 
-  for( i = 0; i < scan->number_triggers; i++)
-    {
-      free(scan->triggers[i]->name);
-      free(scan->triggers[i]);
-    }      
+  if( scan->triggers != NULL)
+    for( i = 0; i < scan->number_triggers; i++)
+      trigger_free( scan->triggers[i]);
   free( scan->triggers);
 
-  for( i = 0; i < scan->number_detectors; i++)
-    {
-      free(scan->detectors[i]->name);
-      free(scan->detectors[i]->description);
-      free(scan->detectors[i]->unit);
-      free(scan->detectors[i]);
-    }
+  if( scan->detectors != NULL)
+    for( i = 0; i < scan->number_detectors; i++)
+      detector_free( scan->detectors[i]);
   free( scan->detectors);
 
-  for( i = 0 ; i < scan->number_positioners; i++)
-    free( scan->positioners_data[i] );
+  if( scan->positioners_data != NULL)
+    for( i = 0 ; i < scan->number_positioners; i++)
+      free( scan->positioners_data[i] );
   free( scan->positioners_data );
 
-  for( i = 0 ; i < scan->number_detectors; i++)
-    free( scan->detectors_data[i] );
+  if( scan->detectors_data != NULL)
+    for( i = 0 ; i < scan->number_detectors; i++)
+      free( scan->detectors_data[i] );
   free( scan->detectors_data );
 
   free( scan);
@@ -762,15 +841,9 @@ void mda_extra_unload(struct mda_extra *extra)
 
   if( extra)
     {
-      for( i = 0; i < extra->number_pvs; i++)
-	{
-	  free( extra->pvs[i]->name);
-	  free( extra->pvs[i]->description);
-	  if( extra->pvs[i]->unit)
-	    free( extra->pvs[i]->unit);
-	  free( extra->pvs[i]->values);
-	  free( extra->pvs[i]);
-	}
+      if( extra->pvs != NULL)
+	for( i = 0; i < extra->number_pvs; i++)
+	  pv_free( extra->pvs[i]);
       free( extra->pvs);
       free( extra);
     }
@@ -780,6 +853,7 @@ void mda_extra_unload(struct mda_extra *extra)
 /*  deallocates all the memory used for the mda file loading  */
 void mda_unload( struct mda_file *mda)
 {
+  if( !mda) return;
   mda_header_unload(mda->header);
   mda_scan_unload(mda->scan);
   mda_extra_unload(mda->extra);
@@ -803,7 +877,7 @@ struct mda_fileinfo *mda_info_load( FILE *fptr)
   XDR *xdrstream;
 
   int32_t  last_point;
-  int32_t *offsets;
+  int32_t *offsets = NULL;
   char *time;
 
   int i, j;
@@ -821,64 +895,62 @@ struct mda_fileinfo *mda_info_load( FILE *fptr)
 #endif
 
   fileinfo = (struct mda_fileinfo *) 
-    malloc( sizeof(struct mda_fileinfo));
+    calloc( 1, sizeof(struct mda_fileinfo));
   
   if( !xdr_float(xdrstream, &(fileinfo->version) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_int32_t(xdrstream, &(fileinfo->scan_number) ))
-    return NULL;
+    goto fail;
 
   if( !xdr_int16_t(xdrstream, &(fileinfo->data_rank) ))
-    return NULL;
+    goto fail;
 
   fileinfo->dimensions = 
     (int32_t *) malloc( fileinfo->data_rank * sizeof(int32_t));
   if( !xdr_vector( xdrstream, (char *) fileinfo->dimensions, 
                    fileinfo->data_rank, 
                    sizeof( int32_t), (xdrproc_t) xdr_int32_t))
-    return NULL;
+    goto fail;
 
   for( i = 0; i < fileinfo->data_rank; i++)
     // -1 is it was int16_t, not int32_t
     if(  fileinfo->dimensions[i] == 0xFFFFFFFF) 
       {
-        free(fileinfo->dimensions);
-        free(fileinfo);
-        return NULL;
+        goto fail;
       }
 
   if( !xdr_int16_t(xdrstream, &(fileinfo->regular) ))
-    return NULL;
+    goto fail;
 
   // don't need this
   if( !xdr_int32_t(xdrstream, &t )) 
-    return NULL;
+    goto fail;
 
 
   // This double pointer business is a bit of overkill, but to be consistent, 
   // I'll do it here as well
   fileinfo->scaninfos = (struct mda_scaninfo **) 
-    malloc( fileinfo->data_rank * sizeof(struct mda_scaninfo *));
+    calloc( fileinfo->data_rank, sizeof(struct mda_scaninfo *));
 
 
   for( i = 0; i < fileinfo->data_rank; i++)
     {
       fileinfo->scaninfos[i] = (struct mda_scaninfo *) 
-        malloc( sizeof(struct mda_scaninfo ));
+        calloc( 1, sizeof(struct mda_scaninfo ));
 
       if( !xdr_int16_t(xdrstream, &(fileinfo->scaninfos[i]->scan_rank) ))
-        return NULL;
+        goto fail;
 
       // file error
       if( fileinfo->scaninfos[i]->scan_rank < 1)
-        return NULL;
+        goto fail;
 
       if( !xdr_int32_t(xdrstream, 
                        &(fileinfo->scaninfos[i]->requested_points)))
-	return NULL;
+	goto fail;
       if( !xdr_int32_t(xdrstream, &last_point ))
-	return NULL;
+	goto fail;
 
       if( fileinfo->scaninfos[i]->scan_rank > 1)
 	{
@@ -888,16 +960,16 @@ struct mda_fileinfo *mda_info_load( FILE *fptr)
 	  if( !xdr_vector( xdrstream, (char *) offsets, 
 			   fileinfo->scaninfos[i]->requested_points, 
 			   sizeof( int32_t), (xdrproc_t) xdr_int32_t))
-	    return NULL;
+	    goto fail;
 	}
       else
 	offsets = NULL;
 
       if( !xdr_counted_string( xdrstream, &(fileinfo->scaninfos[i]->name) ))
-	return NULL;
+	goto fail;
 
       if( !xdr_counted_string( xdrstream, &time ))
-	return NULL;
+	goto fail;
       
       // only want this stuff for outer loop
       if( !i)
@@ -910,48 +982,49 @@ struct mda_fileinfo *mda_info_load( FILE *fptr)
 
       if( !xdr_int16_t(xdrstream, 
                        &(fileinfo->scaninfos[i]->number_positioners)))
-	return NULL;
+	goto fail;
       if( !xdr_int16_t(xdrstream, 
                        &(fileinfo->scaninfos[i]->number_detectors)))
-	return NULL;
+	goto fail;
       if( !xdr_int16_t(xdrstream, &(fileinfo->scaninfos[i]->number_triggers)))
-	return NULL;
+	goto fail;
 
      
       fileinfo->scaninfos[i]->positioners = (struct mda_positioner **) 
-	malloc( fileinfo->scaninfos[i]->number_positioners * 
+	calloc( fileinfo->scaninfos[i]->number_positioners, 
 		sizeof(struct mda_positioner *));
       for( j = 0; j < fileinfo->scaninfos[i]->number_positioners; j++)
 	{
 	  if( (fileinfo->scaninfos[i]->positioners[j] = 
 	       positioner_read(xdrstream)) == NULL )
-	    return NULL;
+	    goto fail;
 	}
 
       fileinfo->scaninfos[i]->detectors = (struct mda_detector **) 
-	malloc( fileinfo->scaninfos[i]->number_detectors * 
+	calloc( fileinfo->scaninfos[i]->number_detectors, 
 		sizeof(struct mda_detector *));
       for( j = 0; j < fileinfo->scaninfos[i]->number_detectors; j++)
 	{
 	  if( (fileinfo->scaninfos[i]->detectors[j] = 
 	       detector_read( xdrstream)) == NULL )
-	    return NULL;
+	    goto fail;
 	}
 
       fileinfo->scaninfos[i]->triggers = (struct mda_trigger **) 
-	malloc( fileinfo->scaninfos[i]->number_triggers * 
+	calloc( fileinfo->scaninfos[i]->number_triggers, 
 		sizeof(struct mda_trigger *));
       for( j = 0; j < fileinfo->scaninfos[i]->number_triggers; j++)
 	{
 	  if( (fileinfo->scaninfos[i]->triggers[j] = 
 	       trigger_read( xdrstream)) == NULL )
-	    return NULL;
+	    goto fail;
 	}
 
       if( offsets != NULL)
 	{
 	  fseek( fptr, offsets[0], SEEK_SET);
 	  free( offsets);
+	  offsets = NULL;
 	}
     }
 
@@ -960,6 +1033,11 @@ struct mda_fileinfo *mda_info_load( FILE *fptr)
 #endif
 
   return fileinfo;
+
+ fail:
+  free( offsets);
+  mda_info_unload( fileinfo);
+  return NULL;
 }
 
 
@@ -969,41 +1047,31 @@ void mda_info_unload( struct mda_fileinfo *fileinfo)
 
   struct mda_scaninfo *scaninfo;
 
+  if( !fileinfo) return;
+
   free( fileinfo->time);
 
-  for( j = 0; j < fileinfo->data_rank; j++)
+  if( fileinfo->scaninfos != NULL)
+    for( j = 0; j < fileinfo->data_rank; j++)
   {
     scaninfo = fileinfo->scaninfos[j];
+    if( !scaninfo) continue;
 
     free( scaninfo->name);
 
-    for( i = 0; i < scaninfo->number_positioners; i++)
-      {
-	free(scaninfo->positioners[i]->name);
-	free(scaninfo->positioners[i]->description);
-	free(scaninfo->positioners[i]->step_mode);
-	free(scaninfo->positioners[i]->unit);
-	free(scaninfo->positioners[i]->readback_name);
-	free(scaninfo->positioners[i]->readback_description);
-	free(scaninfo->positioners[i]->readback_unit);
-	free(scaninfo->positioners[i]);
-      }
+    if( scaninfo->positioners != NULL)
+      for( i = 0; i < scaninfo->number_positioners; i++)
+	positioner_free( scaninfo->positioners[i]);
     free( scaninfo->positioners);
     
-    for( i = 0; i < scaninfo->number_triggers; i++)
-      {
-        free(scaninfo->triggers[i]->name);
-        free(scaninfo->triggers[i]);
-      }
+    if( scaninfo->triggers != NULL)
+      for( i = 0; i < scaninfo->number_triggers; i++)
+	trigger_free( scaninfo->triggers[i]);
     free( scaninfo->triggers);
     
-    for( i = 0; i < scaninfo->number_detectors; i++)
-      {
-	free(scaninfo->detectors[i]->name);
-	free(scaninfo->detectors[i]->description);
-	free(scaninfo->detectors[i]->unit);
-        free(scaninfo->detectors[i]);
-      }
+    if( scaninfo->detectors != NULL)
+      for( i = 0; i < scaninfo->number_detectors; i++)
+	detector_free( scaninfo->detectors[i]);
     free( scaninfo->detectors);
 
     free( scaninfo);

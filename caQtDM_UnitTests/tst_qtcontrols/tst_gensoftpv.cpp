@@ -149,6 +149,56 @@ void TestGenSoftPV::valueListsAndTextsWork()
     QCOMPARE(object.value("regex").toString(), QString("STATE-[0-9]{2}"));
 }
 
+void TestGenSoftPV::matrixRowsColumnsBuildDimConfig()
+{
+    // rows and columns > 0 make the channel a matrix of its data type: dim
+    // travels, nelm/nord/enums/regex never do
+    genSoftPV pose;
+    pose.setMatrixRows(4);
+    pose.setMatrixColumns(4);
+    pose.setValue("1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16");
+    pose.setNelm(8);
+    pose.setNord(2);
+    pose.setEnumStrings(QStringList() << "OFF" << "ON");
+    pose.setRegex("STATE-[0-9]{2}");
+    QJsonObject object = parseConfig(pose.buildConfigJSON());
+    QCOMPARE(object.value("type").toString(), QString("double"));
+    QJsonArray dim = object.value("dim").toArray();
+    QCOMPARE(dim.size(), 2);
+    QCOMPARE(dim.at(0).toInt(), 4);
+    QCOMPARE(dim.at(1).toInt(), 4);
+    QCOMPARE(object.value("val").toArray().size(), 16);
+    QCOMPARE(object.value("val").toArray().at(15).toDouble(), 16.0);
+    QCOMPARE(object.contains("nelm"), false);
+    QCOMPARE(object.contains("nord"), false);
+    QCOMPARE(object.contains("enums"), false);
+    QCOMPARE(object.contains("regex"), false);
+
+    // the element type stays free
+    genSoftPV grid;
+    grid.setDataType(genSoftPV::Int);
+    grid.setMatrixRows(2);
+    grid.setMatrixColumns(3);
+    object = parseConfig(grid.buildConfigJSON());
+    QCOMPARE(object.value("type").toString(), QString("int"));
+    QCOMPARE(object.value("dim").toArray().at(1).toInt(), 3);
+
+    // without both dimensions the channel stays a plain waveform
+    genSoftPV wave;
+    wave.setMatrixRows(4);
+    wave.setNelm(8);
+    object = parseConfig(wave.buildConfigJSON());
+    QCOMPARE(object.contains("dim"), false);
+    QCOMPARE(object.value("nelm").toInt(), 8);
+
+    // enum and string channels ignore the shape
+    genSoftPV state;
+    state.setDataType(genSoftPV::Enum);
+    state.setMatrixRows(2);
+    state.setMatrixColumns(2);
+    QCOMPARE(parseConfig(state.buildConfigJSON()).contains("dim"), false);
+}
+
 void TestGenSoftPV::configIsReadableThroughGenericProperty()
 {
     // the internal plugin reads the configuration without knowing the class,

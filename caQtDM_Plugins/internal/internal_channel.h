@@ -82,6 +82,8 @@ public:
     static bool splitField(const QString &pv, QString *base, Field *field);
     static QString baseName(const QString &pv);
     static QString jsonPart(const QString &pv);
+    // canonical (compact, sorted keys) form of a configuration for comparisons
+    static QString normalizedJson(const QString &json);
 
     // parses the JSON configuration; on error the previous state stays untouched
     bool configure(const QString &json, QString *errorString = Q_NULLPTR);
@@ -108,6 +110,10 @@ public:
 
     void alarmState(double checkValue, short *severity, short *status) const;
 
+    // a matrix channel (JSON "dim": [rows, cols]) has a fixed element count
+    // and an always materialized, row-major element store (m_waveOverride)
+    bool isMatrix() const { return dimRows > 0; }
+
     // string matching the regex pattern for the given enumeration index (string channels)
     QString generatedString(qint64 index) const;
     // number of different strings the regex pattern can produce (0 = no pattern)
@@ -131,12 +137,16 @@ public:
     bool persistent;            // keeps the channel alive without any monitor
     int nelm;                   // NELM: maximum array size
     int nord;                   // NORD: number of elements actually used (<= nelm)
+    int dimRows;                // matrix shape, 0 = plain scalar/waveform
+    int dimCols;
     QString units;
     short precision;
     QStringList enums;
     QString text;
     QStringList textArray;      // string waveform content given as "val" array
     QString regexPattern;
+    QString configJson;         // accepted configuration (normalized), later definitions are compared to it
+    QString definedBy;          // origin of the accepted configuration (widget, file), set by the plugin
 
     // state; severity/status are re-evaluated from the limits on every value change,
     // a SEVR/STAT write sets them directly until then (NOTCONNECTED = 99)

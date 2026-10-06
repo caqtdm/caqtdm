@@ -35,6 +35,7 @@
 #include <QTimer>
 
 #include "sfRetrieval.h"
+#include "sslverifyhelper.h"
 #include "caQtDM_Plugins_global.h"
 #include <QDebug>
 #include <QThread>
@@ -92,21 +93,7 @@ bool sfRetrieval::requestUrl(const QUrl url, const QByteArray &json, int seconds
 
     QNetworkRequest *request = new QNetworkRequest(url);
 
-    //for https we need some configuration (with no verify socket)
-#ifndef CAQTDM_SSL_IGNORE
-#ifndef QT_NO_SSL
-    if(url.toString().toUpper().contains("HTTPS")) {
-        QSslConfiguration config = request->sslConfiguration();
-#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-        config.setProtocol(QSsl::TlsV1);
-#endif
-        config.setPeerVerifyMode(QSslSocket::VerifyNone);
-        request->setSslConfiguration(config);
-    }
-
-
-#endif
-#endif
+    caQtDM_applySslPolicy(*request);
 
     request->setRawHeader("Content-Type", "application/json");
     request->setRawHeader("Timeout", "86400");

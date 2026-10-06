@@ -16,15 +16,14 @@ jobs:
     container:
       image: ${{ matrix.image }}
     env:
-      QWT_VER: 6.3.0 # Qwt version to build for RHEL 10+
-      CAQTDM_OPCUA: 0 # Disabled for now because qt6-opcua in epel is newer than qt6-base-devel on rhel 10
+      CAQTDM_OPCUA: 1
     strategy:
       fail-fast: false
       matrix:
         include:
-          - image: fedora:44
+          - image: fedora:latest
             rhel_major: 0
-          - image: almalinux:10.0
+          - image: almalinux:10
             rhel_major: 10
           - image: rockylinux:9
             rhel_major: 9
@@ -37,9 +36,10 @@ jobs:
       run: |
         dnf install -y nodejs
 
-    - name: Install git and which
+    - name: Install git, which, and zstd
       run: |
-        dnf install -y git which
+        # Cache restore and save must use the same compression method.
+        dnf install -y git which zstd
 
     - name: Prepare EPEL repository
       if: ${{ matrix.rhel_major > 0 }}
@@ -53,29 +53,20 @@ jobs:
         dnf config-manager --set-enabled epel || true
 
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
-    - name: Install Qwt build dependencies (RHEL >=10)
-      if: ${{ matrix.rhel_major >= 10 }}
+    - name: Get OS release
+      id: os-release
       run: |
-        set -euo pipefail
-        dnf install -y \
-          qt6-qtbase-devel qt6-qttools-devel qt6-qtsvg-devel \
-          cmake gcc-c++ make autoconf automake libtool pkgconfig \
-          bzip2 rpmdevtools
+        . /etc/os-release
+        echo "version=$VERSION_ID" >> "$GITHUB_OUTPUT"
 
-    - name: Build Qwt RPM (RHEL >=10)
-      if: ${{ matrix.rhel_major >= 10 }}
-      run: |
-        set -euo pipefail
-        mkdir -p "$HOME/rpmbuild/RPMS"
-        chmod +x caQtDM_Viewer/package/redhat/qwt-qt6/build-qwt-rpm.sh
-        caQtDM_Viewer/package/redhat/qwt-qt6/build-qwt-rpm.sh
-
-    - name: Install qwt RPM (RHEL >=10)
-      if: ${{ matrix.rhel_major >= 10 }}
-      run: |
-        rpm -ivh "$HOME"/rpmbuild/RPMS/*/qwt-qt6-*.rpm
+    - name: Cache epics-base RPMs
+      id: cache-epics-base
+      uses: actions/cache@v6
+      with:
+        path: /tmp/epics-base-rpm-cache
+        key: epics-base-rpm-7.0.10-${{ matrix.image }}-${{ steps.os-release.outputs.version }}-${{ hashFiles('.github/workflows/build-rpm-package.yml', 'caQtDM_Viewer/package/redhat/epics-base/epics-base.spec', 'caQtDM_Viewer/package/redhat/epics-base/*.patch') }}
 
     - name: Install build dependencies for epics-base
       run: |
@@ -84,6 +75,7 @@ jobs:
           wget rpmdevtools git
 
     - name: Build epics-base RPM
+      if: steps.cache-epics-base.outputs.cache-hit != 'true'
       run: |
         cd caQtDM_Viewer/package/redhat/epics-base
 
@@ -109,6 +101,20 @@ jobs:
         
         # Build the RPM package
         rpmbuild -ba epics-base.spec
+
+    - name: Stage epics-base RPMs for cache
+      if: steps.cache-epics-base.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p /tmp/epics-base-rpm-cache/RPMS /tmp/epics-base-rpm-cache/SRPMS
+        cp ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm /tmp/epics-base-rpm-cache/RPMS/
+        cp ~/rpmbuild/SRPMS/epics-base-7.0.10-*.src.rpm /tmp/epics-base-rpm-cache/SRPMS/
+
+    - name: Restore epics-base RPMs to rpmbuild
+      if: steps.cache-epics-base.outputs.cache-hit == 'true'
+      run: |
+        mkdir -p ~/rpmbuild/RPMS/"$(uname -m)" ~/rpmbuild/SRPMS
+        cp /tmp/epics-base-rpm-cache/RPMS/*.rpm ~/rpmbuild/RPMS/"$(uname -m)"/
+        cp /tmp/epics-base-rpm-cache/SRPMS/*.src.rpm ~/rpmbuild/SRPMS/
 
     - name: Install epics-base RPM
       run: |

@@ -1,0 +1,40 @@
+$BEEPSEVERITY MINOR
+$BEEPSEVERITY MAJOR
+$HEARTBEATPV hb:pv 30 2
+$HEARTBEATPV hb:other
+GROUP NULL ROOT
+$ALIAS Root alias
+$ALIAS second alias
+$COMMAND first command arg1
+$COMMAND second command
+$BEEPSEVR INVALID
+$BEEPSEVR MINOR
+$SEVRPV root:sevr
+$SEVRPV root:sevr2
+$GUIDANCE http://example.org/root
+$GUIDANCE http://example.org/second
+$SEVRCOMMAND UP_MAJOR echo up major
+$SEVRCOMMAND DOWN_ANY echo down any
+$SEVRCOMMAND UP_ALARM echo alarm
+$STATCOMMAND HIHI echo hihi
+$ALARMCOUNTFILTER 3 10
+CHANNEL ROOT test:ch1 -DA--
+$ALARMCOUNTFILTER 3 10
+$ALARMCOUNTFILTER 5 20
+$ACKPV ack:pv 1
+$ACKPV ack:pv2 2
+$STATCOMMAND HIHI echo hihi
+$STATCOMMAND FOO echo foo
+$GUIDANCE
+line one
+  line two indented
+$End
+CHANNEL ROOT test:ch2 CDATL
+$FORCEPV CALC -D--- 1 NE
+$FORCEPV_CALC A>B
+$FORCEPV_CALC_A in:a
+$FORCEPV_CALC_B 5
+$FORCEPV_CALC_A dup:a
+$FORCEPV other -C--- 2 3
+GROUP ROOT SUB
+$FORCEPV force:pv -D---

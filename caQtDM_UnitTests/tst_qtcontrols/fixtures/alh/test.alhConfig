@@ -1,0 +1,36 @@
+$BEEPSEVERITY  MAJOR
+GROUP    NULL                         JBA_TEST_MAIN_GROUP                       
+$COMMAND  xload
+$GUIDANCE
+This is the text guidance for JBA_TEST_MAIN_GROUP alarms.    
+This is the text guidance for JBA_TEST_MAIN_GROUP alarms.    
+$END
+CHANNEL  JBA_TEST_MAIN_GROUP  jba:Example1 -----
+CHANNEL  JBA_TEST_MAIN_GROUP  jba:Example2 -----
+GROUP JBA_TEST_MAIN_GROUP    GROUP
+$FORCEPV testjbaai -D--- 1 0
+$GUIDANCE
+This is the text guidance for group GROUP.
+This is the text guidance for group GROUP.
+$END
+$COMMAND xascii
+CHANNEL  GROUP  jba:Example3 -----
+CHANNEL  GROUP  jba:Example4 -----
+GROUP   GROUP   SUBGROUP                          
+$GUIDANCE
+This is the text guidance for SUBGROUP.
+This is the text guidance for SUBGROUP.
+$END
+CHANNEL  SUBGROUP  jba:Example5 -----
+CHANNEL  SUBGROUP  jba:Example6 -----
+GROUP   GROUP   SECONDSUBGROUP                          
+$GUIDANCE
+This is the text guidance for SECONDSUBGROUP.
+This is the text guidance for SECONDSUBGROUP.
+$END
+CHANNEL  SECONDSUBGROUP  jba:Example7 -----
+CHANNEL  SECONDSUBGROUP  jba:Example8 -----
+GROUP JBA_TEST_MAIN_GROUP    SECONDGROUP
+$ALIAS   This is a test alias for the second group
+CHANNEL  SECONDGROUP  jba:Example9 -----
+CHANNEL  SECONDGROUP  jba:Example10 -----

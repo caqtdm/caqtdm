@@ -610,6 +610,7 @@ caQtDM_QtControls {
                 # static on purpose: keeps libqtcontrols.so self-contained
                 # (no DT_NEEDED on libprcParser.so, works with CAQTDM_NORPATH)
                 LIBS += $$(CAQTDM_COLLECT)/libprcParser.a
+                LIBS += $$(CAQTDM_COLLECT)/libalhParser.a
                 caqtdm_rpath {
                     LIBS += -Wl,-rpath,$(QWTLIB)
                 }
@@ -628,6 +629,7 @@ caQtDM_QtControls {
                            LIBS += $(CAQTDM_COLLECT)/libedlParser.dylib
                         }
                 LIBS += $(CAQTDM_COLLECT)/libprcParser.dylib
+                LIBS += $(CAQTDM_COLLECT)/libalhParser.dylib
   	}
 
 	ios | android {
@@ -651,11 +653,13 @@ caQtDM_QtControls {
       			INCLUDEPATH = $(QWTHOME)/src
                         LIBS += $$(QWTLIB)/lib$$(QWTLIBNAME).a
                         LIBS += $$(CAQTDM_COLLECT)/libprcParser.a
+                        LIBS += $$(CAQTDM_COLLECT)/libalhParser.a
      		}
      		win32-msvc* || msvc{
         		DEFINES += QTCON_MAKEDLL _CRT_SECURE_NO_WARNINGS
                         CONFIG += Define_Build_qwt Define_Build_objDirs Define_Symbols Define_Build_OutputDir
                         LIBS += $$(CAQTDM_COLLECT)/prcParser.lib
+                        LIBS += $$(CAQTDM_COLLECT)/alhParser.lib
      		}
 	}
 }
@@ -828,6 +832,7 @@ caQtDM_Viewer {
                            caqtdmlibs.files += $$(CAQTDM_COLLECT)/libedlParser.dylib
                 }
                 caqtdmlibs.files += $$(CAQTDM_COLLECT)/libprcParser.dylib
+                caqtdmlibs.files += $$(CAQTDM_COLLECT)/libalhParser.dylib
                 QMAKE_BUNDLE_DATA += plugins caqtdmlibs
                 calib.path = Contents/Frameworks
 #                calib.files = $$(EPICS_BASE)/lib/darwin-x86/libca.3.14.12.dylib
@@ -904,6 +909,10 @@ caQtDM_Viewer {
                                     plugins_opcua.path = Contents/PlugIns/controlsystems
                                     plugins_opcua.files += $$(CAQTDM_COLLECT)/controlsystems/libopcua_plugin.dylib
                                     QMAKE_BUNDLE_DATA += plugins_opcua
+                                    # Qt OPC UA backend plugin, not handled by macdeployqt
+                                    opcua_backend.path = Contents/PlugIns/opcua
+                                    opcua_backend.files += $$[QT_INSTALL_PLUGINS]/opcua/libopen62541_backend.dylib
+                                    QMAKE_BUNDLE_DATA += opcua_backend
                                 }
 
         }
@@ -919,6 +928,7 @@ caQtDM_Viewer {
                     LIBS += $$OUT_PWD/../caQtDM_Lib/libcaQtDM_Lib.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/libqtcontrols.a
                     LIBS += $$OUT_PWD/../caQtDM_Parsers/prcParserStaticLib/libprcParser.a
+                    LIBS += $$OUT_PWD/../caQtDM_Parsers/alhParserStaticLib/libalhParser.a
 
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_controllers_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_monitors_plugin.a
@@ -1086,6 +1096,7 @@ caQtDM_Viewer {
                         LIBS += $$(QWTLIB)/lib$$(QWTLIBNAME)_$${QT_ARCH}.a
                         LIBS += $(CAQTDM_COLLECT)/libqtcontrols_$${QT_ARCH}.a
                         LIBS += $(CAQTDM_COLLECT)/libprcParser_$${QT_ARCH}.a
+                        LIBS += $(CAQTDM_COLLECT)/libalhParser_$${QT_ARCH}.a
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_controllers_plugin_$${QT_ARCH}.a
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_monitors_plugin_$${QT_ARCH}.a
                         LIBS += $(CAQTDM_COLLECT)/designer/libqtcontrols_graphics_plugin_$${QT_ARCH}.a
@@ -1331,7 +1342,7 @@ Define_Build_Python {
                     message("using MAC python settings")
                     DEFINES += PYTHON
                     LIBS += -L$(PYTHONLIB)  -lpython$(PYTHONVERSION)
-                    INCLUDEPATH += += $(PYTHONINCLUDE)
+                    INCLUDEPATH += $(PYTHONINCLUDE)
                 }
             }
         }

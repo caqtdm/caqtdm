@@ -29,6 +29,12 @@
 #ifdef ADL_EDL_FILES
 #include "parseotherfile.h"  // .adl / .edl converters
 #endif
+#ifdef ALH_FILES
+#include "alhconfigparser.h"  // alh alarm handler configurations (caQtDM_Parsers/alhParserSrc)
+#include "alhuigenerator.h"
+#include <QBuffer>
+#include <QtUiTools/QUiLoader>
+#endif
 #include <QFileInfo>
 
 Q_LOGGING_CATEGORY(uiConverterLog, "caqtdm.widgets.uiconverter")
@@ -76,6 +82,51 @@ private:
 };
 #endif
 
+#ifdef ALH_FILES
+// .alhConfig: the generated .ui holds a caAlarmTree that parses the config itself;
+// parsing here only validates the file and collects the warnings
+class AlhConverterAdapter : public UiConverterInterface
+{
+public:
+    AlhConverterAdapter(const QString &filename) : okFlag(false)
+    {
+        AlhModel model;
+        AlhConfigParser parser;
+        okFlag = parser.parseFile(filename, &model);
+        if(!okFlag) {
+            error = QString("cannot read %1").arg(filename);
+        } else {
+            QStringList lines;
+            foreach(const AlhWarning &w, model.warnings()) {
+                if(lines.size() >= 20) {
+                    lines.append(QString("... %1 warnings in total").arg(model.warnings().size()));
+                    break;
+                }
+                lines.append(w.toString());
+            }
+            error = lines.join("\n");
+        }
+        AlhUiGenerator::Params p;
+        p.configFile = QFileInfo(filename).absoluteFilePath();
+        ui = AlhUiGenerator::generate(p);
+    }
+    QWidget *load(QWidget *parent)
+    {
+        QBuffer buffer;
+        buffer.setData(ui);
+        buffer.open(QIODevice::ReadOnly);
+        QUiLoader loader;
+        return loader.load(&buffer, parent);
+    }
+    bool ok() const { return okFlag; }
+    QString errorString() const { return error; }
+private:
+    QByteArray ui;
+    bool okFlag;
+    QString error;
+};
+#endif
+
 QString UiConverterFactory::selectionFor(const QString &extension)
 {
     const QString ext = extension.toLower();
@@ -94,6 +145,9 @@ bool UiConverterFactory::handles(const QString &fileName)
     if(suffix == "prc") return true;
 #ifdef ADL_EDL_FILES
     if(suffix == "adl" || suffix == "edl") return true;
+#endif
+#ifdef ALH_FILES
+    if(suffix == "alhconfig") return true;
 #endif
     return false;
 }
@@ -115,6 +169,9 @@ UiConverterInterface *UiConverterFactory::create(const QString &fileName, bool w
     }
 #ifdef ADL_EDL_FILES
     if(suffix == "adl" || suffix == "edl") return new OtherFileAdapter(fileName);
+#endif
+#ifdef ALH_FILES
+    if(suffix == "alhconfig") return new AlhConverterAdapter(fileName);
 #endif
 
     qCWarning(uiConverterLog) << "no converter registered for" << fileName;

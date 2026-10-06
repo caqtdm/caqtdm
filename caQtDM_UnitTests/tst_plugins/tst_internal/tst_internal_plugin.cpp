@@ -70,10 +70,11 @@ void TestInternalPlugin::cleanup()
 // registers a monitor for the given pv like caqtdm_lib does; the configuration
 // is carried by the channelConfigJSON property of the defining widget (as the
 // genSoftPV widget does) and read by the plugin through kData->dispW
-int TestInternalPlugin::createMonitor(const QString &pv, const QString &configJSON)
+int TestInternalPlugin::createMonitor(const QString &pv, const QString &configJSON, const QString &widgetName)
 {
     QWidget *widget = new QWidget();
     if(!configJSON.isEmpty()) widget->setProperty("channelConfigJSON", configJSON);
+    if(!widgetName.isEmpty()) widget->setObjectName(widgetName);
     m_widgets.append(widget);
 
     int index = m_mutexKnobData->GetMutexKnobDataIndex();
@@ -186,21 +187,55 @@ void TestInternalPlugin::channelsAreSharedByBaseName()
     QCOMPARE(m_plugin->channel("SHARED")->currentValue(), 11.0);
 }
 
-void TestInternalPlugin::invalidConfigFallsBackToDefaults()
+void TestInternalPlugin::invalidConfigLeavesChannelUnconnected()
 {
     int index = createMonitor("BROKEN", R"({"type":"nonsense"})");
 
     pumpTimerOnce();
 
-    // the channel still connects, with default double/constant 0
+    // an unconfigurable channel behaves like a disconnected pv
     knobData *kData = m_mutexKnobData->GetMutexKnobDataPtr(index);
-    QCOMPARE(kData->edata.connected, (int) true);
-    QCOMPARE(kData->edata.fieldtype, (short) caDOUBLE);
-    QCOMPARE(kData->edata.rvalue, 0.0);
+    QCOMPARE(kData->edata.connected, (int) false);
 
     InternalChannel *channel = m_plugin->channel("BROKEN");
     QVERIFY(channel != Q_NULLPTR);
     QCOMPARE(channel->isConfigured(), false);
+}
+
+void TestInternalPlugin::channelConnectsOnlyAfterConfiguration()
+{
+    // a panel referencing a channel before its defining genSoftPV was loaded
+    // (the generator panel scenario): everything stays disconnected
+    int viewIndex = createMonitor("LATE");
+    int sevrIndex = createMonitor("LATE.SEVR");
+    pumpTimerOnce();
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(viewIndex)->edata.connected, (int) false);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(sevrIndex)->edata.connected, (int) false);
+
+    // writes to the unconfigured shell are rejected
+    char pv[MAXPVLEN];
+    char errmess[SMALL_STRING_LENGTH];
+    errmess[0] = '\0';
+    qstrncpy(pv, "LATE", MAXPVLEN);
+    QCOMPARE(m_plugin->pvSetValue(pv, 1.0, 0, (char *) "", (char *) "tst", errmess, 0), (int) false);
+    double waveData[2] = {1.0, 2.0};
+    QCOMPARE(m_plugin->pvSetWave(pv, (float *) Q_NULLPTR, waveData, (int16_t *) Q_NULLPTR,
+                                 (int32_t *) Q_NULLPTR, (char *) Q_NULLPTR, 2, (char *) "tst", errmess),
+             (int) false);
+
+    // the defining panel opens later: all monitors connect, and the first
+    // publish carries initialize=true so widgets pick up the limits
+    createMonitor("LATE", R"({"type":"double","val":7,"drvl":0,"drvh":10})");
+    pumpTimerOnce();
+    knobData *kView = m_mutexKnobData->GetMutexKnobDataPtr(viewIndex);
+    QCOMPARE(kView->edata.connected, (int) true);
+    QCOMPARE(kView->edata.rvalue, 7.0);
+    QCOMPARE(kView->edata.initialize, (int) true);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(sevrIndex)->edata.connected, (int) true);
+
+    // and writes work now
+    QCOMPARE(m_plugin->pvSetValue(pv, 3.0, 0, (char *) "", (char *) "tst", errmess, 0), (int) true);
+    QCOMPARE(kView->edata.rvalue, 3.0);
 }
 
 void TestInternalPlugin::counterAdvancesWithTimerTicks()
@@ -389,6 +424,10 @@ void TestInternalPlugin::controlInfoWriteForcesReinitialize()
     // "channel limits" widget logic silently ignore the new values.
     int index = createMonitor("REINIT", R"({"type":"double","val":50,"drvl":0,"drvh":100})");
     pumpTimerOnce();
+    // the configuration itself is the channel's connect and forces
+    // initialize=true; caqtdm_lib consumes the flag when it updates the
+    // widget - simulated here
+    m_mutexKnobData->GetMutexKnobDataPtr(index)->edata.initialize = false;
 
     char pv[MAXPVLEN];
     char errmess[SMALL_STRING_LENGTH];
@@ -460,6 +499,94 @@ void TestInternalPlugin::schemePrefixInDirectCallsIsStripped()
     qstrncpy(pv, "internal://PREFIXED.HOPR", MAXPVLEN);
     QCOMPARE(m_plugin->pvSetValue(pv, 90.0, 0, (char *) "", (char *) "tst", errmess, 0), (int) true);
     QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(index)->edata.upper_disp_limit, 90.0);
+}
+
+void TestInternalPlugin::matrixChannelThroughPluginWorks()
+{
+    // a 4x4 double matrix through the real plugin path: the dim metadata
+    // travels with every publish and wave writes keep the shape
+    int matIndex = createMonitor("POSE", R"({"type":"double","dim":[4,4]})");
+    int nordIndex = createMonitor("POSE.NORD");
+    pumpTimerOnce();
+
+    knobData *kMat = m_mutexKnobData->GetMutexKnobDataPtr(matIndex);
+    QCOMPARE(kMat->edata.fieldtype, (short) caDOUBLE);
+    QCOMPARE(kMat->edata.ntType, (int) NT_MATRIX);
+    QCOMPARE(kMat->edata.dimCount, 2);
+    QCOMPARE(kMat->edata.dim[0], 4);
+    QCOMPARE(kMat->edata.dim[1], 4);
+    QCOMPARE(kMat->edata.valueCount, 16);
+    double *values = (double *) kMat->edata.dataB;
+    QVERIFY(values != (double *) Q_NULLPTR);
+    QCOMPARE(values[0], 1.0); // identity default
+    QCOMPARE(values[9], 0.0);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(nordIndex)->edata.ivalue, (long) 16);
+
+    char pv[MAXPVLEN];
+    char errmess[SMALL_STRING_LENGTH];
+    errmess[0] = '\0';
+
+    // a whole matrix write through the double wave path, row-major
+    double matrix[16];
+    for(int i = 0; i < 16; i++) matrix[i] = (double) i;
+    qstrncpy(pv, "POSE", MAXPVLEN);
+    QCOMPARE(m_plugin->pvSetWave(pv, (float *) Q_NULLPTR, matrix, (int16_t *) Q_NULLPTR,
+                                 (int32_t *) Q_NULLPTR, (char *) Q_NULLPTR, 16, (char *) "tst", errmess),
+             (int) true);
+    values = (double *) kMat->edata.dataB;
+    QCOMPARE(values[1 * 4 + 2], 6.0);
+    QCOMPARE(kMat->edata.dimCount, 2);
+
+    // a partial write keeps the remaining elements and the count
+    double part[4] = {100.0, 101.0, 102.0, 103.0};
+    QCOMPARE(m_plugin->pvSetWave(pv, (float *) Q_NULLPTR, part, (int16_t *) Q_NULLPTR,
+                                 (int32_t *) Q_NULLPTR, (char *) Q_NULLPTR, 4, (char *) "tst", errmess),
+             (int) true);
+    values = (double *) kMat->edata.dataB;
+    QCOMPARE(values[3], 103.0);
+    QCOMPARE(values[4], 4.0);
+    QCOMPARE(kMat->edata.valueCount, 16);
+    QCOMPARE(kMat->edata.dim[1], 4);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(nordIndex)->edata.ivalue, (long) 16);
+
+    // a scalar write lands on element 0
+    QCOMPARE(m_plugin->pvSetValue(pv, 0.5, 0, (char *) "", (char *) "tst", errmess, 0), (int) true);
+    values = (double *) kMat->edata.dataB;
+    QCOMPARE(values[0], 0.5);
+    QCOMPARE(values[1], 101.0);
+    QCOMPARE(kMat->edata.rvalue, 0.5);
+
+    // a plain waveform next to it carries no dim
+    int waveIndex = createMonitor("WAVE", R"({"type":"double","nelm":4})");
+    pumpTimerOnce();
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(waveIndex)->edata.ntType, (int) NT_NONE);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(waveIndex)->edata.dimCount, 0);
+}
+
+void TestInternalPlugin::duplicateDefinitionIsReportedAndIgnored()
+{
+    // the first genSoftPV definition wins; a different later one is ignored
+    // (and reported to the message window, which the test does not have)
+    int first = createMonitor("DUP", R"({"type":"long","val":11})", "gensoftpv_a");
+    int second = createMonitor("DUP", R"({"type":"double","val":5,"mode":"counter"})", "gensoftpv_b");
+    pumpTimerOnce();
+
+    InternalChannel *channel = m_plugin->channel("DUP");
+    QVERIFY(channel != Q_NULLPTR);
+    QCOMPARE(channel->fieldtype, (short) caLONG);
+    QCOMPARE(channel->mode, InternalChannel::Constant);
+    QCOMPARE(channel->currentValue(), 11.0);
+    QVERIFY(channel->definedBy.contains("gensoftpv_a"));
+    QCOMPARE(channel->configJson, InternalChannel::normalizedJson(R"({"type":"long","val":11})"));
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(first)->edata.ivalue, 11L);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(second)->edata.ivalue, 11L);
+    QCOMPARE(m_mutexKnobData->GetMutexKnobDataPtr(second)->edata.fieldtype, (short) caLONG);
+
+    // the same definition written differently changes nothing
+    createMonitor("DUP", R"({ "val": 11,  "type": "long" })", "gensoftpv_c");
+    pumpTimerOnce();
+    QCOMPARE(channel->currentValue(), 11.0);
+    QVERIFY(channel->definedBy.contains("gensoftpv_a"));
 }
 
 void TestInternalPlugin::persistentChannelKeepsRunning()

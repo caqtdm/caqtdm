@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
                    "  \t\t bsstrategy(complete-all|complete-latest)\n"
                    "  [-url url] will look for files on the specified url and download them to a local directory\n"
                    "  [-emptycache] will empty the local cache used for downloading"
-                   "  [file] UI file to open\n"
+                   "  [file] UI file to open (.ui, .prc, .adl, .edl, .alhConfig)\n"
                    "  [&]\n"
                    "\n"
                    "  -x -displayFont -display are ignored !\n\n"
@@ -529,6 +529,9 @@ int main(int argc, char *argv[])
 
             if (web_launcher_file.isNull()) {
                 printf("caQtDM -- Error: Web launcher file not found, exiting...");
+#ifndef CAQTDM_NO_CUSTOM_LOGHANDLER
+                GeneralLogHandler::shutdown();
+#endif
                 return 1;
             }
         }
@@ -709,6 +712,10 @@ int main(int argc, char *argv[])
         exitCode = EXIT_FAILURE;
         qCCritical(caQtDMLog) << e.what();
     }
+
+#ifndef CAQTDM_NO_CUSTOM_LOGHANDLER
+    GeneralLogHandler::shutdown();
+#endif
 
     return exitCode;
 }

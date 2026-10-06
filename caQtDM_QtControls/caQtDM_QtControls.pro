@@ -48,6 +48,7 @@ INCLUDEPATH += ../caQtDM_Lib/src
 INCLUDEPATH += ../caQtDM_Parsers/adlParserSrc
 INCLUDEPATH += ../caQtDM_Parsers/edlParserSrc
 INCLUDEPATH += ../caQtDM_Parsers/prcParserSrc
+INCLUDEPATH += ../caQtDM_Parsers/alhParserSrc
 
 freebsd {
    INCLUDEPATH += /usr/local/include
@@ -151,6 +152,9 @@ SOURCES	+= \
     src/camultilinestring.cpp \
     src/camimedisplay.cpp \
     src/calinedraw.cpp \
+    src/alhtreemodel.cpp \
+    src/caalarmtree.cpp \
+    src/caalarmlog.cpp \
     src/wmsignalpropagator.cpp \
     src/replacemacro.cpp \
     src/textedit.cpp \
@@ -184,8 +188,11 @@ XDR_HACK {
     HEADERS +=  src/cadoubletabwidgetextensionfactory.h  src/capolylinetaskmenu.h
 }
 
-HEADERS += src/networkaccess.h src/fileFunctions.h \
+HEADERS += src/networkaccess.h src/sslverifyhelper.h src/fileFunctions.h \
     src/calinedraw.h \
+    src/alhtreemodel.h \
+    src/caalarmtree.h \
+    src/caalarmlog.h \
     src/plotHelperClasses.h \
     src/wmsignalpropagator.h \
     src/replacemacro.h \
