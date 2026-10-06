@@ -516,6 +516,9 @@ jobs:
             QMAKE_IOS_DEPLOYMENT_TARGET="${IOS_DEPLOYMENT_TARGET}" \
             QMAKE_IOS_DEVICE_ARCHS=arm64 \
             QMAKE_APPLE_SIMULATOR_ARCHS=arm64
+          XCODE_PROJECT="${RUNNER_TEMP}/caqtdm-build/caQtDM_Viewer/caQtDM.xcodeproj/project.pbxproj"
+          grep -q 'CODE_SIGNING_ALLOWED = NO' "${XCODE_PROJECT}"
+          grep -q 'CODE_SIGNING_REQUIRED = NO' "${XCODE_PROJECT}"
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
             CODE_SIGNING_ALLOWED=NO make -j"$(sysctl -n hw.ncpu)"
 
