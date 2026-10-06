@@ -64,6 +64,7 @@ private slots:
     void panelThemeEnvironmentOverrideWins();
     void panelThemeAppliesWidgetDetails();
     void panelThemePreservesAuthoredWidgetColors();
+    void panelStyleSheetIsScopedAndOverridesRootStyle();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

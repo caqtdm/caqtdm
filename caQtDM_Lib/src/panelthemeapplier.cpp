@@ -1,6 +1,7 @@
 #include "panelthemeapplier.h"
 
 #include <QApplication>
+#include <QFile>
 #include <QMainWindow>
 #include <QPalette>
 #include <QWidget>
@@ -16,6 +17,48 @@ const char ThemeModeProperty[] = "caqtdmThemeMode";
 const char ThemeModeOverrideEnvironment[] = "CAQTDM_PANEL_THEME_MODE";
 const char ThemeRootProperty[] = "caqtdmAppliedThemeRoot";
 const char LegacyLightProperty[] = "caqtdmAppliedLegacyLight";
+const char AuthoredStyleSheetProperty[] = "caqtdmAuthoredStyleSheet";
+
+struct PanelStyleSheet {
+    QString contents;
+    QString sourceFile;
+    bool reloadable = false;
+};
+
+PanelStyleSheet &panelStyleSheet()
+{
+    static PanelStyleSheet styleSheet;
+    return styleSheet;
+}
+
+QString resolvedPanelStyleSheet()
+{
+    PanelStyleSheet &styleSheet = panelStyleSheet();
+    const QString reloadMode = QString::fromLocal8Bit(qgetenv("CAQTDM_STYLESHEET_RELOAD"));
+    if (styleSheet.reloadable && reloadMode.contains("file", Qt::CaseInsensitive) &&
+        !styleSheet.sourceFile.isEmpty()) {
+        QFile file(styleSheet.sourceFile);
+        if (file.open(QFile::ReadOnly)) {
+            styleSheet.contents = QLatin1String(file.readAll());
+            qCInfo(panelThemeLog) << "caQtDM -- reloaded panel stylesheet" << styleSheet.sourceFile;
+        }
+    }
+    if (reloadMode.contains("print", Qt::CaseInsensitive) && !styleSheet.contents.isEmpty())
+        qCInfo(panelThemeLog) << "caQtDM -- panel stylesheet data:" << styleSheet.contents;
+    return styleSheet.contents;
+}
+
+void applyPanelStyleSheet(QWidget *root)
+{
+    if (!root) return;
+    if (!root->property(AuthoredStyleSheetProperty).isValid())
+        root->setProperty(AuthoredStyleSheetProperty, root->styleSheet());
+
+    const QString authored = root->property(AuthoredStyleSheetProperty).toString();
+    const QString external = resolvedPanelStyleSheet();
+    root->setStyleSheet(authored.isEmpty() ? external :
+                        external.isEmpty() ? authored : authored + '\n' + external);
+}
 
 QPalette createLegacyLightPalette()
 {
@@ -95,6 +138,15 @@ void logPalette(const char *label, const QWidget *widget)
 }
 }
 
+void PanelThemeApplier::setPanelStyleSheet(const QString &styleSheet, const QString &sourceFile,
+                                           bool reloadable)
+{
+    PanelStyleSheet &configured = panelStyleSheet();
+    configured.contents = styleSheet;
+    configured.sourceFile = sourceFile;
+    configured.reloadable = reloadable;
+}
+
 bool PanelThemeApplier::usesLegacyLightTheme(const QWidget *root)
 {
     if (!root) return false;
@@ -114,6 +166,7 @@ bool PanelThemeApplier::resolveLegacyLightTheme(bool panelLegacyLight)
 void PanelThemeApplier::apply(QWidget *root)
 {
     if (!root) return;
+    applyPanelStyleSheet(root);
     QWidget *const target = contentRoot(root);
     if (!target) return;
     const bool legacyLight = usesLegacyLightTheme(root);

@@ -25,6 +25,7 @@
 
 #include "tst_caqtdm_lib.h"
 #include "panelthemeapplier.h"
+#include "MessageWindow.h"
 
 #include <caapplynumeric.h>
 #include <cainclude.h>
@@ -251,6 +252,7 @@ void TestCaQtDM_Lib::cleanup()
 {
     // code to be executed after each test function
 
+    PanelThemeApplier::setPanelStyleSheet(QString());
     delete m_caQtDM_Lib;
     delete m_internalPlugin;
     delete m_mutexKnobData;
@@ -1026,4 +1028,49 @@ void TestCaQtDM_Lib::panelThemePreservesAuthoredWidgetColors()
     QCOMPARE(paletteTable.viewport()->palette().color(QPalette::Base), QColor(Qt::yellow));
     QCOMPARE(paletteTable.viewport()->palette().color(QPalette::Text), QColor(Qt::magenta));
     QCOMPARE(plot.itemList(QwtPlotItem::Rtti_PlotCurve).first()->title().color(), QColor(Qt::red));
+}
+
+void TestCaQtDM_Lib::panelStyleSheetIsScopedAndOverridesRootStyle()
+{
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    QVERIFY(application);
+    const QString applicationStyleSheet = application->styleSheet();
+    PanelThemeApplier::setPanelStyleSheet("QLineEdit { color: blue; }");
+
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    panel.setStyleSheet("QLineEdit { color: red; }");
+    QLineEdit field(content);
+    QWidget included(content);
+    included.setStyleSheet("QLineEdit { color: green; }");
+    QLineEdit includedField(&included);
+    caToggleButton alarmButton(content);
+    alarmButton.setColorMode(caToggleButton::Static);
+    alarmButton.setForeground(Qt::red);
+    MessageWindow messageWindow;
+
+    PanelThemeApplier::apply(&included);
+    PanelThemeApplier::apply(&panel);
+
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    QVERIFY(included.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    QCOMPARE(application->styleSheet(), applicationStyleSheet);
+    QCOMPARE(messageWindow.styleSheet(), QString());
+    QVERIFY(alarmButton.styleSheet().contains("255, 0, 0"));
+
+    const QPalette originalPalette = application->palette();
+    QPalette systemPalette = originalPalette;
+    systemPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    systemPalette.setColor(QPalette::Text, Qt::white);
+    application->setPalette(systemPalette);
+    QWidget systemPanel;
+    systemPanel.setProperty("caqtdmThemeMode", "System");
+    PanelThemeApplier::apply(&systemPanel);
+    QCOMPARE(systemPanel.palette().color(QPalette::Window), QColor(30, 30, 30));
+    QVERIFY(systemPanel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    application->setPalette(originalPalette);
+
+    Q_UNUSED(field);
+    Q_UNUSED(includedField);
 }

@@ -1015,41 +1015,6 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
         splash->deleteLater();
     }
-    // reapply a globally loaded user stylesheet, cainlude seems to disable it
-    qCInfo(fileIOLog) << "caQtDM -- user_defined_stylesheet:" << qApp->property("user_defined_stylesheet").toString();
-    if (qApp->property("user_defined_stylesheet").isValid() && (!qApp->property("user_defined_stylesheet").toString().isEmpty())){
-        QString printdata=qApp->styleSheet();
-        QString stylereload = (QString)  qgetenv("CAQTDM_STYLESHEET_RELOAD");
-        if (stylereload.contains("file",Qt::CaseInsensitive)){
-            qCInfo(fileIOLog) << "caQtDM -- search for:" << qApp->property("user_defined_stylesheet").toString();
-            searchFile *searchDefaultStyleSheet = new searchFile(qApp->property("user_defined_stylesheet").toString());
-            QString fileNameFound = searchDefaultStyleSheet->findFile();
-            qCInfo(fileIOLog) << "caQtDM -- custom stylesheet found:" << fileNameFound;
-            if(!fileNameFound.isEmpty()) {
-                QFile file(fileNameFound);
-                if (file.open(QFile::ReadOnly)) {
-                    QString StyleSheet = QLatin1String(file.readAll());
-                    printdata=StyleSheet;
-                    qCInfo(fileIOLog) << "caQtDM -- custom stylesheet file:" << fileNameFound << "reloaded stylesheet";
-                    if (stylereload.contains("later",Qt::CaseInsensitive)){
-                        QTimer::singleShot(3000, this, [this,StyleSheet] () {
-                                this->setStyleSheet(StyleSheet);
-                            });
-                    }else setStyleSheet(StyleSheet);
-                    file.close();
-                }
-            }
-            delete searchDefaultStyleSheet;
-        }
-        if (stylereload.contains("apply",Qt::CaseInsensitive)){
-            setStyleSheet(qApp->styleSheet());
-        }
-
-        if (stylereload.contains("print",Qt::CaseInsensitive)){
-            qCInfo(fileIOLog) << "caQtDM -- custom stylesheet file data:" << printdata;
-        }
-    }
-
     applyPanelTheme(myWidget);
 
     // add a reload action
