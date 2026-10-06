@@ -9025,14 +9025,20 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
                                         // Use the key created by archiverCommon to distinguish data for the same pv but different widgets and curves.
                                         qstrncpy(specificKey, reinterpret_cast<char*>(kPtr->edata.info), sizeof(specificKey));
                                         plugininterface->pvGetDescription(specificKey, description);
-                                } else {
+                                } else if(!plugininterface->pvGetDescription(kPtr, description)) {
                                     plugininterface->pvGetDescription(kPtr->pv, description);
                                 }
                             }
                             info.append(description);
                             info.append("<br>"); // for Timestamp
-                            if(plugininterface != (ControlsInterface *) Q_NULLPTR) plugininterface->pvGetTimeStamp(kPtr->pv, timestamp);
-                            info.append(timestamp);
+                            if(plugininterface != (ControlsInterface *) Q_NULLPTR) {
+                                if(!plugininterface->pvGetTimeStamp(kPtr, timestamp)) plugininterface->pvGetTimeStamp(kPtr->pv, timestamp);
+                            }
+#if QT_VERSION > 0x050000
+                            info.append(QString(timestamp).toHtmlEscaped());
+#else
+                            info.append(Qt::escape(timestamp));
+#endif
                         }
                         info.append("<br>Type: ");
                         info.append(caTypeStr[kPtr->edata.fieldtype]);

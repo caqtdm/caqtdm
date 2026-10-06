@@ -63,8 +63,8 @@ tagClass::tagClass ( void ) : unknownTags(NULL) {
     if ( level == -1 ) {
         level = 0;
         for ( i=0; i<MAXLEVEL; i++ ) {
-            fileLineNumber[level] = 1;
-            strcpy( fileName[level], "" );
+            fileLineNumber[i] = 1;
+            strcpy( fileName[i], "" );
         }
     }
 
@@ -104,7 +104,7 @@ int tagClass::line ( void ) {
 void tagClass::setLine (
         int _line ) {
 
-    if ( ( level > -1 ) && ( level < (MAXLEVEL-2) ) ) {
+    if ( ( level > -1 ) && ( level < MAXLEVEL ) ) {
         fileLineNumber[level] = _line;
     }
     else {
@@ -122,7 +122,7 @@ const char *tagClass::filename ( void ) {
 void tagClass::setFileName (
         const char *curFileName ) {
 
-    if ( ( level > -1 ) && ( level < (MAXLEVEL-2) ) ) {
+    if ( ( level > -1 ) && ( level < MAXLEVEL ) ) {
 
         strcpy( fileName[level], "" );
         if ( curFileName ) {

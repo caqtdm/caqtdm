@@ -31,6 +31,7 @@
 #include <QSslConfiguration>
 #include <QTimer>
 #include <QWaitCondition>
+#include "sslverifyhelper.h"
 
 #include <QDebug>
 #include <QThread>
@@ -98,17 +99,7 @@ bool HttpRetrieval::requestUrl(
 
     QNetworkRequest request(m_downloadUrl);
 
-//for https we need some configuration (with no verify socket)
-#ifndef CAQTDM_SSL_IGNORE
-#ifndef QT_NO_SSL
-    if (m_downloadUrl.toString().toUpper().contains("HTTPS")) {
-        QSslConfiguration config = request.sslConfiguration();
-        config.setPeerVerifyMode(QSslSocket::VerifyNone);
-        request.setSslConfiguration(config);
-    }
-
-#endif
-#endif
+    caQtDM_applySslPolicy(request);
 
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Timeout", "86400");

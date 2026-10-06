@@ -2252,7 +2252,8 @@ functions.
    - Lines as in alh: ack button with the unacknowledged severity letter
      (blank, ``Y`` minor, ``R`` major, ``V`` invalid, ``E`` not
      connected; click = acknowledge), current severity letter, name
-     button (channels light blue), arrow, **G** and **P** buttons where
+     button (channels light blue, steel blue with a dark palette),
+     arrow, **G** and **P** buttons where
      guidance or a command exists, the mask ``<CDATL>`` (``H`` while a
      noAck timer runs, ``M`` when muted, blue while D, A or T silence
      the line) and the alh line message (groups: counts
@@ -3380,7 +3381,7 @@ The plugin fetches data for a certain interval, trying to fetch all of it at onc
 It always refetches in a certain interval, and if any previously fetched data is still in the current timeframe, it is kept, as to reduce duplication.
 
 Building:
-	This plugin is always built. It has no additional dependencies. SSL is activated if Qt supports it and the ``CAQTDM_SSL_IGNORE`` environment variable is not defined.
+	This plugin is always built. It has no additional dependencies. HTTPS is used if Qt supports SSL. By default the server certificate is not verified; set the environment variable ``CAQTDM_SSL_VERIFY=1`` at runtime to enable certificate verification (this applies to all HTTPS requests of caQtDM: archive plugins, bsread dispatcher and panel download).
 Channel Handling:
 	The plugin is meant to serve data that is a mapping between time and values. Thus, the returned data can be retrieved using virtual channels.
 	So instead of simply using ``archiveHTTP://CHANNEL`` you can do e.g. ``archiveHTTP://CHANNEL.X`` to get a one-dimensional array of the x-values. 

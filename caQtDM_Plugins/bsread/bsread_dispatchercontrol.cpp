@@ -32,6 +32,7 @@
 #include <QSslConfiguration>
 #include "caQtDM_Plugins_global.h"
 #include "qtcontrols_global.h"
+#include "sslverifyhelper.h"
 
 bsread_dispatchercontrol::bsread_dispatchercontrol()
 {
@@ -153,26 +154,8 @@ void bsread_dispatchercontrol::process()
         QUrl url(StreamDispatcher);
         requestChannel = QNetworkRequest(url);
         requestDelete  = QNetworkRequest(url);
-#ifndef CAQTDM_SSL_IGNORE
-#ifndef QT_NO_SSL
-        if(url.toString().toUpper().contains("HTTPS")) {
-            QSslConfiguration configChannel = requestChannel.sslConfiguration();
-            configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
-            #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-                configChannel.setProtocol(QSsl::TlsV1);
-            #endif
-            requestChannel.setSslConfiguration(configChannel);
-
-            QSslConfiguration configDelete = requestDelete.sslConfiguration();
-            configDelete.setPeerVerifyMode(QSslSocket::VerifyNone);
-            #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-                configDelete.setProtocol(QSsl::TlsV1);
-            #endif
-            requestDelete.setSslConfiguration(configDelete);
-        }
-
-#endif
-#endif
+        caQtDM_applySslPolicy(requestChannel);
+        caQtDM_applySslPolicy(requestDelete);
 
         if (!ChannelsAddPipeline.isEmpty()){
             ChannelVerification(&manager);
@@ -815,18 +798,7 @@ void bsread_dispatchercontrol::ChannelVerification(QNetworkAccessManager* manage
 
     QUrl url(ChannelQueryVerification);
     requestVerification = QNetworkRequest(url);
-#ifndef CAQTDM_SSL_IGNORE
-#ifndef QT_NO_SSL
-    if(url.toString().toUpper().contains("HTTPS")) {
-        QSslConfiguration configChannel = requestVerification.sslConfiguration();
-        configChannel.setPeerVerifyMode(QSslSocket::VerifyNone);
-        #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-            configChannel.setProtocol(QSsl::TlsV1);
-        #endif
-        requestVerification.setSslConfiguration(configChannel);
-    }
-#endif
-#endif
+    caQtDM_applySslPolicy(requestVerification);
 
     QString data="{\"channels\":[ ";
     while(!ChannelsAddPipeline.isEmpty()){

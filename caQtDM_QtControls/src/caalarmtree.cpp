@@ -195,6 +195,12 @@ protected:
 
 //---------------------------------------------------------------------------- line widgets of alh: ack, sevr, name, arrow, G, P, mask, message
 
+// selects the _LIGHT/_DARK colours of alarmdefs.h
+static bool alhDarkMode(const QPalette &pal)
+{
+    return pal.color(QPalette::Window).lightness() < 128;
+}
+
 class AlhLineDelegate : public QStyledItemDelegate
 {
 public:
@@ -216,6 +222,7 @@ public:
         const QString text = opt.text;
         const bool hover = (opt.state & QStyle::State_MouseOver) && isButtonColumn(col) && !text.isEmpty();
         const QPalette &pal = opt.palette;
+        const bool dark = alhDarkMode(pal);
         const QRect cell = opt.rect.adjusted(1, 1, -2, -1);
 
         painter->save();
@@ -229,22 +236,26 @@ public:
             QRect box = cell;
             box.setWidth(qMin(cell.width(), QFontMetrics(opt.font).horizontalAdvance(QStringLiteral("W")) + 10));
             drawBox(painter, box, fill, col == AlhTreeModel::ColUnackSevr && !text.isEmpty() ? Raised : Flat);
-            painter->setPen(Qt::black);
+            painter->setPen(ALH_SEVR_TEXT);
             painter->drawText(box, Qt::AlignCenter, text);
         } else if(col == AlhTreeModel::ColName) {
             // name push button: channels light blue like alh, the alh selection inverts the button
             const bool group = index.data(AlhTreeModel::IsGroupRole).toBool();
             const bool selected = opt.state & QStyle::State_Selected;
-            QColor fill = group ? pal.button().color() : QColor(173, 216, 230);
+            QColor fill = group ? pal.button().color() : (dark ? ALH_CHANNEL_BUTTON_DARK : ALH_CHANNEL_BUTTON_LIGHT);
             if(selected) fill = QApplication::palette().highlight().color();
             else if(hover) fill = fill.lighter(108);
             // button as wide as its text like the alh push button, the column keeps the widest name
             QRect button = cell;
             button.setWidth(qMin(cell.width(), QFontMetrics(opt.font).horizontalAdvance(text) + 12));
             drawBox(painter, button, fill, selected ? Sunken : Raised);
-            // channel buttons have a fixed light blue, so their text colour is fixed too (dark mode)
-            QColor fg = selected ? QApplication::palette().highlightedText().color() : (group ? pal.buttonText().color() : QColor(Qt::black));
-            if(index.data(AlhTreeModel::InactiveRole).toBool() && !selected) fg = group ? pal.color(QPalette::Disabled, QPalette::ButtonText) : AL_DEFAULT;
+            // channel buttons have a fixed fill per mode, so their text colour is fixed too
+            QColor fg = selected ? QApplication::palette().highlightedText().color()
+                                 : (group ? pal.buttonText().color() : (dark ? ALH_CHANNEL_TEXT_DARK : ALH_CHANNEL_TEXT_LIGHT));
+            if(index.data(AlhTreeModel::InactiveRole).toBool() && !selected) {
+                fg = group ? pal.color(QPalette::Disabled, QPalette::ButtonText)
+                           : (dark ? ALH_CHANNEL_INACTIVE_TEXT_DARK : ALH_CHANNEL_INACTIVE_TEXT_LIGHT);
+            }
             painter->setPen(fg);
             painter->drawText(button.adjusted(5, 0, -5, 0), Qt::AlignVCenter | Qt::AlignLeft, text);
         } else if(col == AlhTreeModel::ColArrow) {
@@ -272,8 +283,8 @@ public:
             // alh (A. Luedeke): blue mask label while D, A/H or T silences the line
             const bool highlight = index.data(AlhTreeModel::MaskHighlightRole).toBool();
             if(highlight) {
-                painter->fillRect(cell, QColor(0, 0, 255));
-                painter->setPen(Qt::white);
+                painter->fillRect(cell, dark ? ALH_MASK_HIGHLIGHT_DARK : ALH_MASK_HIGHLIGHT_LIGHT);
+                painter->setPen(ALH_HIGHLIGHT_TEXT);
             } else {
                 painter->setPen(pal.text().color());
             }
@@ -653,8 +664,10 @@ void caAlarmTree::updateStatus()
     m_forceCountLabel->setText(disabledForce > 0 ? tr("Disabled ForcePV Count:  %1").arg(disabledForce) : QString());
     // alh: message area turns blue while "silence one hour" runs; both states keep a style sheet so the look is constant.
     // the normal state sets no colour at all, so the area follows palette changes (dark/light) by itself
+    const QColor silence = alhDarkMode(palette()) ? ALH_SILENCE_AREA_DARK : ALH_SILENCE_AREA_LIGHT;
     const QString sheet = m_silenceOneHour
-        ? QStringLiteral("QWidget#alhMessageArea { background-color: blue; } QWidget#alhMessageArea QLabel, QWidget#alhMessageArea QCheckBox { color: white; }")
+        ? QStringLiteral("QWidget#alhMessageArea { background-color: %1; } QWidget#alhMessageArea QLabel, QWidget#alhMessageArea QCheckBox { color: %2; }")
+              .arg(silence.name(), ALH_HIGHLIGHT_TEXT.name())
         : QStringLiteral("QWidget#alhMessageArea { border: none; }");
     if(m_statusArea->styleSheet() != sheet) m_statusArea->setStyleSheet(sheet);
     syncSetupActions();

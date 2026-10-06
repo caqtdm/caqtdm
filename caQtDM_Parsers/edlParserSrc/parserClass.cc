@@ -973,7 +973,10 @@ int parserClass::loadFile (myParserEDM *myParser) {
                 char points[LONGSTRING];
                 points[0] = '\0';
                 for ( i=0; i<numPoints; i++ ) {
-                    sprintf(points, "%s%d,%d;", points,  (short) (xArray[i]-x), (short) (yArray[i]-y));
+                    char pair[32];
+                    snprintf(pair, sizeof(pair), "%d,%d;", (short) (xArray[i]-x), (short) (yArray[i]-y));
+                    if (strlen(points) + strlen(pair) >= sizeof(points)) break;   // buffer full
+                    strcat(points, pair);
                 }
 
                 // ----------------- write the properties to the ui file
