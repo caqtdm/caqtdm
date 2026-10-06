@@ -3032,14 +3032,6 @@ gateway or panel repository.
 Description Files
 -----------------
 
-Panel theme override
-~~~~~~~~~~~~~~~~~~~~
-
-``CAQTDM_PANEL_THEME_MODE`` overrides ``caqtdmThemeMode`` for every loaded
-panel and include. Set it to ``System`` to force the application palette, or
-to ``LegacyLight`` to force the light compatibility palette. When it is unset
-or has any other value, each panel uses its own ``caqtdmThemeMode`` property.
-
 With the Qt designer, you produce xml files with the extension ``.ui``.
 These files are used as input for the synoptic viewer caQtDM. These
 xml ascii file can be edited by hand, but care has to be taken because
@@ -3053,6 +3045,31 @@ CAQTDM_DISPLAY_PATH. The directories are specified with the separator
 
 Besides ``.ui`` files the viewer can also display in-house developed
 ``.prc`` files, described in the next chapter (:ref:`prc_files`).
+
+Panel theme
+~~~~~~~~~~~
+
+caQtDM uses its light compatibility palette by default. To use the system
+application palette for a panel, select the top-level widget of its ``.ui``
+file in Qt Designer. In the Property Editor, add a dynamic **String** property
+named ``caqtdmThemeMode`` and set its value to ``System``. Set it to
+``LegacyLight`` to select the light palette explicitly. Each included panel
+can set its own property on its own top-level widget.
+
+The equivalent property in a ``.ui`` file is::
+
+   <property name="caqtdmThemeMode">
+    <string>System</string>
+   </property>
+
+Place it directly inside the top-level ``<widget>`` element. The property
+name must match exactly; the values ``System`` and ``LegacyLight`` are
+case-insensitive.
+
+To override all panels and includes at startup, set the environment variable
+``CAQTDM_PANEL_THEME_MODE`` to ``System`` or ``LegacyLight``. When it is unset
+or has another value, each panel uses its own ``caqtdmThemeMode`` property,
+defaulting to the light palette when the property is absent.
 
 .. _prc_files:
 
