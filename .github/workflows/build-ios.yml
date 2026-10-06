@@ -515,7 +515,8 @@ jobs:
             "CONFIG+=${{ matrix.configuration }}" \
             QMAKE_IOS_DEPLOYMENT_TARGET="${IOS_DEPLOYMENT_TARGET}" \
             QMAKE_IOS_DEVICE_ARCHS=arm64 \
-            QMAKE_APPLE_SIMULATOR_ARCHS=arm64
+            QMAKE_APPLE_SIMULATOR_ARCHS=arm64 \
+            -after 'SUBDIRS-=caQtDM_Viewer'
           (
             cd caQtDM_Viewer
             SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
@@ -550,19 +551,8 @@ jobs:
               exit 1
             }
           )
-          mapfile -t viewer_targets < <(
-            awk '/^sub-caQtDM_Viewer-make_first:/ {
-              for (i = 2; i <= NF; ++i)
-                if ($i != "FORCE") print $i
-            }' Makefile
-          )
-          if [ "${#viewer_targets[@]}" -eq 0 ]; then
-            echo 'No caQtDM Viewer prerequisites found in the generated Makefile' >&2
-            exit 1
-          fi
-          printf 'Building caQtDM Viewer prerequisites: %s\n' "${viewer_targets[*]}"
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
-            make -j"$(sysctl -n hw.ncpu)" "${viewer_targets[@]}"
+            make -j"$(sysctl -n hw.ncpu)"
           (
             cd caQtDM_Viewer
             SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
