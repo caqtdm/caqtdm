@@ -454,7 +454,7 @@ jobs:
             https://git.code.sf.net/p/qwt/git "${RUNNER_TEMP}/qwt-src"
           sed -i '' -E "s|^[[:space:]]*QWT_INSTALL_PREFIX[[:space:]]*=.*|QWT_INSTALL_PREFIX = ${GITHUB_WORKSPACE}/.ci-cache/qwt-${{ matrix.epics_arch }}|" \
             "${RUNNER_TEMP}/qwt-src/qwtconfig.pri"
-          sed -i '' -E 's|^QWT_CONFIG[[:space:]]*\+=[[:space:]]*Qwt(Dll|Designer|Examples|Playground|Tests|Framework|PkgConfig).*|# disabled for mobile: &|' \
+          sed -i '' -E 's@^QWT_CONFIG[[:space:]]*\+=[[:space:]]*Qwt(Dll|Designer|Examples|Playground|Tests|Framework|PkgConfig).*@# disabled for mobile: &@' \
             "${RUNNER_TEMP}/qwt-src/qwtconfig.pri"
           grep -q '^QWT_CONFIG[[:space:]]*+=[[:space:]]*QwtStatic' "${RUNNER_TEMP}/qwt-src/qwtconfig.pri" || \
             echo 'QWT_CONFIG += QwtStatic' >> "${RUNNER_TEMP}/qwt-src/qwtconfig.pri"
