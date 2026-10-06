@@ -10,7 +10,7 @@ contains(QT_VER_MAJ, 5) {
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 contains(QT_VER_MAJ, 6) {
-  QT       += widgets
+  QT       += widgets core5compat
   DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x000000
 }
 

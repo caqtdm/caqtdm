@@ -187,8 +187,8 @@ jobs:
           test -d "${QT_SRC}"
           echo "Qt source directory ready: ${QT_SRC}"
           echo "::endgroup::"
-          QT_HOST_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
-          QT_IOS_SUBMODULES='qtbase,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
+          QT_HOST_SUBMODULES='qtbase,qt5compat,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
+          QT_IOS_SUBMODULES='qtbase,qt5compat,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
 
           mkdir -p "${RUNNER_TEMP}/qt-build-host"
           cd "${RUNNER_TEMP}/qt-build-host"
@@ -268,6 +268,7 @@ jobs:
           for qt_prefix in "${QT_IOS_DEVICE_ROOT}" "${QT_IOS_SIMULATOR_ROOT}"; do
             test -x "${qt_prefix}/bin/qmake"
             test -d "${qt_prefix}/lib/QtCore.framework"
+            test -d "${qt_prefix}/lib/QtCore5Compat.framework"
             test -d "${qt_prefix}/lib/QtUiTools.framework"
             test -d "${qt_prefix}/lib/QtSvg.framework"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
