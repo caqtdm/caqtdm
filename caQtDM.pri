@@ -980,11 +980,6 @@ caQtDM_Viewer {
                     bundle_identifier.name = PRODUCT_BUNDLE_IDENTIFIER
                     bundle_identifier.value = ch.psi.caQtDM
                     QMAKE_MAC_XCODE_SETTINGS += bundle_identifier
-                    code_signing_allowed.name = CODE_SIGNING_ALLOWED
-                    code_signing_allowed.value = NO
-                    code_signing_required.name = CODE_SIGNING_REQUIRED
-                    code_signing_required.value = NO
-                    QMAKE_MAC_XCODE_SETTINGS += code_signing_allowed code_signing_required
                     #target.name=IPHONEOS_DEPLOYMENT_TARGET
                     #target.value = 18.0
 

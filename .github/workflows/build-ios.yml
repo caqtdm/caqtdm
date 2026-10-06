@@ -525,21 +525,56 @@ jobs:
               QMAKE_IOS_DEVICE_ARCHS=arm64 \
               QMAKE_APPLE_SIMULATOR_ARCHS=arm64
           )
-          XCODE_PROJECT="${RUNNER_TEMP}/caqtdm-build/caQtDM_Viewer/caQtDM.xcodeproj/project.pbxproj"
-          if [ ! -f "${XCODE_PROJECT}" ]; then
-            echo "qmake did not generate the viewer Xcode project: ${XCODE_PROJECT}" >&2
-            exit 1
+          if [ "${{ matrix.sdk }}" = iphoneos ]; then
+            XCODE_DESTINATION='generic/platform=iOS'
+          else
+            XCODE_DESTINATION='generic/platform=iOS Simulator'
           fi
-          grep -Fq 'CODE_SIGNING_ALLOWED = NO' "${XCODE_PROJECT}" || {
-            echo "CODE_SIGNING_ALLOWED=NO is missing from the generated Xcode project" >&2
-            exit 1
-          }
-          grep -Fq 'CODE_SIGNING_REQUIRED = NO' "${XCODE_PROJECT}" || {
-            echo "CODE_SIGNING_REQUIRED=NO is missing from the generated Xcode project" >&2
-            exit 1
-          }
+          (
+            cd caQtDM_Viewer
+            XCODE_SETTINGS="$(xcodebuild -project caQtDM.xcodeproj \
+              -scheme caQtDM \
+              -configuration Release \
+              -sdk '${{ matrix.sdk }}' \
+              -destination "${XCODE_DESTINATION}" \
+              -showBuildSettings \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY=)"
+            grep -F 'CODE_SIGNING_ALLOWED = NO' <<< "${XCODE_SETTINGS}" || {
+              echo "xcodebuild did not accept CODE_SIGNING_ALLOWED=NO" >&2
+              exit 1
+            }
+            grep -F 'CODE_SIGNING_REQUIRED = NO' <<< "${XCODE_SETTINGS}" || {
+              echo "xcodebuild did not accept CODE_SIGNING_REQUIRED=NO" >&2
+              exit 1
+            }
+          )
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
-            CODE_SIGNING_ALLOWED=NO make -j"$(sysctl -n hw.ncpu)"
+            make -j"$(sysctl -n hw.ncpu)" \
+            caQtDM_QtControls \
+            caQtDM_Lib \
+            qtcontrols_controllers \
+            qtcontrols_graphics \
+            qtcontrols_monitors \
+            qtcontrols_utilities \
+            caQtDM_Plugins \
+            caQtDM_Parsers
+          (
+            cd caQtDM_Viewer
+            SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
+              xcodebuild build \
+              -project caQtDM.xcodeproj \
+              -scheme caQtDM \
+              -configuration Release \
+              -sdk '${{ matrix.sdk }}' \
+              -destination "${XCODE_DESTINATION}" \
+              -destination-timeout 1 \
+              ENABLE_ONLY_ACTIVE_RESOURCES=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY=
+          )
 
       - name: Verify and archive app
         working-directory: ${{ runner.temp }}/caqtdm-build
