@@ -516,9 +516,28 @@ jobs:
             QMAKE_IOS_DEPLOYMENT_TARGET="${IOS_DEPLOYMENT_TARGET}" \
             QMAKE_IOS_DEVICE_ARCHS=arm64 \
             QMAKE_APPLE_SIMULATOR_ARCHS=arm64
+          (
+            cd caQtDM_Viewer
+            SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
+              "${QTHOME}/bin/qmake" caQtDM_Viewer.pro \
+              "CONFIG+=${{ matrix.configuration }}" \
+              QMAKE_IOS_DEPLOYMENT_TARGET="${IOS_DEPLOYMENT_TARGET}" \
+              QMAKE_IOS_DEVICE_ARCHS=arm64 \
+              QMAKE_APPLE_SIMULATOR_ARCHS=arm64
+          )
           XCODE_PROJECT="${RUNNER_TEMP}/caqtdm-build/caQtDM_Viewer/caQtDM.xcodeproj/project.pbxproj"
-          grep -q 'CODE_SIGNING_ALLOWED = NO' "${XCODE_PROJECT}"
-          grep -q 'CODE_SIGNING_REQUIRED = NO' "${XCODE_PROJECT}"
+          if [ ! -f "${XCODE_PROJECT}" ]; then
+            echo "qmake did not generate the viewer Xcode project: ${XCODE_PROJECT}" >&2
+            exit 1
+          fi
+          grep -Fq 'CODE_SIGNING_ALLOWED = NO' "${XCODE_PROJECT}" || {
+            echo "CODE_SIGNING_ALLOWED=NO is missing from the generated Xcode project" >&2
+            exit 1
+          }
+          grep -Fq 'CODE_SIGNING_REQUIRED = NO' "${XCODE_PROJECT}" || {
+            echo "CODE_SIGNING_REQUIRED=NO is missing from the generated Xcode project" >&2
+            exit 1
+          }
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
             CODE_SIGNING_ALLOWED=NO make -j"$(sysctl -n hw.ncpu)"
 
