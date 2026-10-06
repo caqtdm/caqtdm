@@ -390,10 +390,14 @@ jobs:
             sdk: iphoneos
             epics_arch: ios-arm
             configuration: iphoneos
+            openssl_install_target: iphoneos
+            openssl_cache_target: iphoneos-arm64
           - name: iOS Simulator arm64
             sdk: iphonesimulator
             epics_arch: ios-sim-arm64
             configuration: iphonesimulator
+            openssl_install_target: iphonesimulator-arm64
+            openssl_cache_target: iphonesimulator-arm64
     permissions:
       contents: read
       actions: write
@@ -406,6 +410,12 @@ jobs:
         with:
           path: ${{ env.QT_ROOT }}
           key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-openssl${{ needs.build-qt.outputs.openssl_version }}-${{ needs.build-qt.outputs.toolchain_key }}-arm64
+
+      - name: Restore OpenSSL iOS cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.OPENSSL_IOS_ROOT }}/${{ needs.build-qt.outputs.openssl_version }}/${{ matrix.openssl_install_target }}
+          key: openssl-ios-${{ needs.build-qt.outputs.openssl_version }}-${{ matrix.openssl_cache_target }}-${{ needs.build-qt.outputs.toolchain_key }}
 
       - name: Restore EPICS iOS cache
         uses: actions/cache@v5
@@ -428,6 +438,10 @@ jobs:
           test -d "${QT_TARGET_ROOT}/lib/QtOpcUa.framework"
           test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a"
           test -f "${QT_TARGET_ROOT}/mkspecs/modules/qt_plugin_open62541_backend.pri"
+          OPENSSL_PREFIX="${OPENSSL_IOS_ROOT}/${{ needs.build-qt.outputs.openssl_version }}/${{ matrix.openssl_install_target }}"
+          test -f "${OPENSSL_PREFIX}/include/openssl/ssl.h"
+          test -s "${OPENSSL_PREFIX}/lib/libssl.a"
+          test -s "${OPENSSL_PREFIX}/lib/libcrypto.a"
           ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-qt.outputs.toolchain_key }}"
           test "${ACTUAL_TOOLCHAIN}" = "${{ needs.build-epics.outputs.toolchain_key }}"
