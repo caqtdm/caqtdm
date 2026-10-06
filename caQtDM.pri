@@ -927,8 +927,8 @@ caQtDM_Viewer {
                     CONFIG += release
                     LIBS += $$OUT_PWD/../caQtDM_Lib/libcaQtDM_Lib.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/libqtcontrols.a
-                    LIBS += $$OUT_PWD/../caQtDM_Parsers/prcParserStaticLib/libprcParser.a
-                    LIBS += $$OUT_PWD/../caQtDM_Parsers/alhParserStaticLib/libalhParser.a
+                    LIBS += $$(CAQTDM_COLLECT)/libprcParser.a
+                    LIBS += $$(CAQTDM_COLLECT)/libalhParser.a
 
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_controllers_plugin.a
                     LIBS += $$OUT_PWD/../caQtDM_QtControls/plugins/libqtcontrols_monitors_plugin.a

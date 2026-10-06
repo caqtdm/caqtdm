@@ -553,6 +553,8 @@ jobs:
           )
           SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
             make -j"$(sysctl -n hw.ncpu)"
+          test -s "${CAQTDM_COLLECT}/libprcParser.a"
+          test -s "${CAQTDM_COLLECT}/libalhParser.a"
           (
             cd caQtDM_Viewer
             SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
