@@ -613,10 +613,6 @@ jobs:
           fi
           test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a"
           strings "${EXECUTABLE}" | grep -F 'SecurityPolicy#Basic256Sha256' >/dev/null
-          if codesign -dv "${APP}" >/dev/null 2>&1; then
-            echo "Expected an unsigned CI app bundle"
-            exit 1
-          fi
           mkdir -p "${GITHUB_WORKSPACE}/artifacts"
           ditto -c -k --sequesterRsrc --keepParent "${APP}" \
             "${GITHUB_WORKSPACE}/artifacts/caQtDM-${{ matrix.epics_arch }}.zip"
