@@ -31,6 +31,7 @@
 #include "tst_canumeric.h"
 #include "tst_caspinbox.h"
 #include "tst_caapplynumeric.h"
+#include "tst_caimage.h"
 #include "tst_pvdialog.h"
 #include "tst_alhparser.h"
 #include "tst_alarmtree_logic.h"
@@ -69,6 +70,11 @@ int main(int argc, char **argv)
 
     {
         TestCaApplyNumeric tc;
+        status |= QTest::qExec(&tc, argc, argv);
+    }
+
+    {
+        TestCaImage tc;
         status |= QTest::qExec(&tc, argc, argv);
     }
 
