@@ -339,6 +339,7 @@ jobs:
           cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG_SITE.Common.ios-arm" configure/os/CONFIG_SITE.Common.ios-arm
           cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG.Common.ios-sim-arm64" configure/os/CONFIG.Common.ios-sim-arm64
           cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG_SITE.Common.ios-sim-arm64" configure/os/CONFIG_SITE.Common.ios-sim-arm64
+          bash "${GITHUB_WORKSPACE}/ci/epics-ios/prepare-source.sh" "${RUNNER_TEMP}/epics-src"
 
           python3 - <<'PY'
           from pathlib import Path
@@ -376,6 +377,7 @@ jobs:
               test -f "${EPICS_BASE}/lib/${arch}/lib${lib}.a"
               lipo -archs "${EPICS_BASE}/lib/${arch}/lib${lib}.a" | grep -qw arm64
             done
+            nm -g "${EPICS_BASE}/lib/${arch}/libCom.a" | grep -Eq ' T _osdTimeGetCurrent$'
           done
 
   build-ios:
