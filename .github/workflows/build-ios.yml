@@ -377,7 +377,7 @@ jobs:
               test -f "${EPICS_BASE}/lib/${arch}/lib${lib}.a"
               lipo -archs "${EPICS_BASE}/lib/${arch}/lib${lib}.a" | grep -qw arm64
             done
-            nm -g "${EPICS_BASE}/lib/${arch}/libCom.a" | grep -Eq ' T _osdTimeGetCurrent$'
+            nm -g "${EPICS_BASE}/lib/${arch}/libCom.a" | grep -E ' T _osdTimeGetCurrent$'
           done
 
   build-ios:
