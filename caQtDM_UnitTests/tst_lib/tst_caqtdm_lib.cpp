@@ -777,8 +777,16 @@ void TestCaQtDM_Lib::panelThemeDefaultsToLegacyLight()
 
 void TestCaQtDM_Lib::panelThemeSystemModeDoesNotChangePalette()
 {
+    const QPalette applicationPalette = QApplication::palette();
+    QPalette darkPalette = applicationPalette;
+    darkPalette.setColor(QPalette::Button, QColor(45, 45, 45));
+    QApplication::setPalette(darkPalette);
+
     QWidget panel;
     panel.setProperty("caqtdmThemeMode", "System");
+    caNumeric numeric(&panel);
+    numeric.resize(140, 60);
+    numeric.setColorMode(caNumeric::Default);
 
     PanelThemeApplier::apply(&panel);
 
@@ -787,6 +795,21 @@ void TestCaQtDM_Lib::panelThemeSystemModeDoesNotChangePalette()
              QApplication::palette().color(QPalette::Window));
     QCOMPARE(panel.palette().color(QPalette::Text),
              QApplication::palette().color(QPalette::Text));
+    panel.show();
+    QApplication::processEvents();
+    QPushButton *arrowButton = Q_NULLPTR;
+    for (QPushButton *button : numeric.findChildren<QPushButton *>()) {
+        if (!button->icon().isNull()) {
+            arrowButton = button;
+            break;
+        }
+    }
+    QVERIFY(arrowButton);
+    const QImage icon = arrowButton->icon().pixmap(arrowButton->iconSize()).toImage();
+    QVERIFY(!icon.isNull());
+    QCOMPARE(icon.pixelColor(0, 0), QColor(45, 45, 45));
+
+    QApplication::setPalette(applicationPalette);
 }
 
 void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
@@ -850,10 +873,13 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
     caNumeric numeric(&panel);
     numeric.resize(140, 60);
     caNumeric defaultNumeric(&panel);
+    defaultNumeric.resize(140, 60);
     defaultNumeric.setColorMode(caNumeric::Default);
     caApplyNumeric applyNumeric(&panel);
+    applyNumeric.resize(140, 80);
     applyNumeric.setColorMode(caApplyNumeric::Default);
     caSpinbox spinbox(&panel);
+    spinbox.resize(140, 60);
     spinbox.setColorMode(caSpinbox::Default);
     caWaveTable table(&panel);
     table.displayText(0, 0, "NC");
@@ -902,6 +928,20 @@ void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
     spinDigit->setPalette(restyledDigit);
     QApplication::processEvents();
     QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QWidget *defaultNumbers[] = {&defaultNumeric, &applyNumeric, &spinbox};
+    for (QWidget *defaultNumber : defaultNumbers) {
+        QPushButton *arrowButton = Q_NULLPTR;
+        for (QPushButton *button : defaultNumber->findChildren<QPushButton *>()) {
+            if (!button->icon().isNull()) {
+                arrowButton = button;
+                break;
+            }
+        }
+        QVERIFY2(arrowButton, defaultNumber->metaObject()->className());
+        const QImage icon = arrowButton->icon().pixmap(arrowButton->iconSize()).toImage();
+        QVERIFY(!icon.isNull());
+        QCOMPARE(icon.pixelColor(0, 0), QColor(224, 224, 224));
+    }
     spinbox.setIntDigits(5);
     QApplication::processEvents();
     spinDigit = spinbox.findChild<QLabel *>("layoutmember0");

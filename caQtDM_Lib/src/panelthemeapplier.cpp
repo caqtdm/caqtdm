@@ -7,6 +7,7 @@
 
 #include "caQtDM_Lib_global.h"
 #include "cawavetable.h"
+#include "alarmdefs.h"
 
 Q_LOGGING_CATEGORY(panelThemeLog, "caqtdm.lib.paneltheme")
 
@@ -23,23 +24,23 @@ QPalette createLegacyLightPalette()
         QPalette::Active, QPalette::Inactive, QPalette::Disabled
     };
     for (QPalette::ColorGroup colorGroup : groups) {
-        palette.setColor(colorGroup, QPalette::Window, Qt::white);
-        palette.setColor(colorGroup, QPalette::WindowText, Qt::black);
-        palette.setColor(colorGroup, QPalette::Base, Qt::white);
-        palette.setColor(colorGroup, QPalette::AlternateBase, QColor(245, 245, 245));
-        palette.setColor(colorGroup, QPalette::Text, Qt::black);
-        palette.setColor(colorGroup, QPalette::Button, QColor(239, 239, 239));
-        palette.setColor(colorGroup, QPalette::ButtonText, Qt::black);
-        palette.setColor(colorGroup, QPalette::Light, Qt::white);
-        palette.setColor(colorGroup, QPalette::Midlight, QColor(247, 247, 247));
-        palette.setColor(colorGroup, QPalette::Mid, QColor(184, 184, 184));
-        palette.setColor(colorGroup, QPalette::Dark, QColor(160, 160, 160));
-        palette.setColor(colorGroup, QPalette::Shadow, QColor(105, 105, 105));
-        palette.setColor(colorGroup, QPalette::ToolTipBase, Qt::white);
-        palette.setColor(colorGroup, QPalette::ToolTipText, Qt::black);
-        palette.setColor(colorGroup, QPalette::Highlight, QColor(53, 132, 228));
-        palette.setColor(colorGroup, QPalette::HighlightedText, Qt::white);
-        palette.setColor(colorGroup, QPalette::Link, QColor(0, 70, 180));
+        palette.setColor(colorGroup, QPalette::Window, PANEL_THEME_LEGACY_WHITE);
+        palette.setColor(colorGroup, QPalette::WindowText, PANEL_THEME_LEGACY_BLACK);
+        palette.setColor(colorGroup, QPalette::Base, PANEL_THEME_LEGACY_WHITE);
+        palette.setColor(colorGroup, QPalette::AlternateBase, PANEL_THEME_LEGACY_ALTERNATE_BASE);
+        palette.setColor(colorGroup, QPalette::Text, PANEL_THEME_LEGACY_BLACK);
+        palette.setColor(colorGroup, QPalette::Button, PANEL_THEME_LEGACY_BUTTON);
+        palette.setColor(colorGroup, QPalette::ButtonText, PANEL_THEME_LEGACY_BLACK);
+        palette.setColor(colorGroup, QPalette::Light, PANEL_THEME_LEGACY_WHITE);
+        palette.setColor(colorGroup, QPalette::Midlight, PANEL_THEME_LEGACY_MIDLIGHT);
+        palette.setColor(colorGroup, QPalette::Mid, PANEL_THEME_LEGACY_MID);
+        palette.setColor(colorGroup, QPalette::Dark, PANEL_THEME_LEGACY_DARK);
+        palette.setColor(colorGroup, QPalette::Shadow, PANEL_THEME_LEGACY_SHADOW);
+        palette.setColor(colorGroup, QPalette::ToolTipBase, PANEL_THEME_LEGACY_WHITE);
+        palette.setColor(colorGroup, QPalette::ToolTipText, PANEL_THEME_LEGACY_BLACK);
+        palette.setColor(colorGroup, QPalette::Highlight, PANEL_THEME_LEGACY_HIGHLIGHT);
+        palette.setColor(colorGroup, QPalette::HighlightedText, PANEL_THEME_LEGACY_WHITE);
+        palette.setColor(colorGroup, QPalette::Link, PANEL_THEME_LEGACY_LINK);
     }
     return palette;
 }
