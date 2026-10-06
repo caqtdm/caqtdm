@@ -620,5 +620,5 @@ jobs:
       - name: Upload app artifact
         uses: actions/upload-artifact@v7
         with:
-          name: caQtDM-ios-${{ matrix.epics_arch }}-${{ github.sha }}
+          name: caQtDM-${{ matrix.epics_arch }}-${{ github.sha }}
           path: artifacts/*.zip
