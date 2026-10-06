@@ -188,7 +188,7 @@ jobs:
           echo "Qt source directory ready: ${QT_SRC}"
           echo "::endgroup::"
           QT_HOST_SUBMODULES='qtbase,qt5compat,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
-          QT_IOS_SUBMODULES='qtbase,qt5compat,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua'
+          QT_IOS_SUBMODULES='qtbase,qt5compat,qtsvg,qttools,qtimageformats,qtpositioning,qtopcua,qtserialbus'
 
           mkdir -p "${RUNNER_TEMP}/qt-build-host"
           cd "${RUNNER_TEMP}/qt-build-host"
@@ -255,9 +255,10 @@ jobs:
             echo "::group::Build and install Qt ${QT_VERSION} for ${target}"
             run_with_heartbeat "Build Qt for ${target}" cmake --build . --parallel
             run_with_heartbeat "Install Qt for ${target}" cmake --install .
-            echo "Verifying QtPositioning, QtOpcUa, and secure Open62541 backend for ${target}"
+            echo "Verifying QtPositioning, QtOpcUa, QtSerialBus, and secure Open62541 backend for ${target}"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
+            test -d "${qt_prefix}/lib/QtSerialBus.framework"
             opcua_backend="${qt_prefix}/plugins/opcua/libopen62541_backend.a"
             test -f "${opcua_backend}"
             echo "Qt ${target} installation ready at ${qt_prefix}"
@@ -273,6 +274,7 @@ jobs:
             test -d "${qt_prefix}/lib/QtSvg.framework"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
+            test -d "${qt_prefix}/lib/QtSerialBus.framework"
             test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
           done
 
@@ -314,6 +316,7 @@ jobs:
             test -d "${qt_prefix}/lib/QtCore.framework"
             test -d "${qt_prefix}/lib/QtPositioning.framework"
             test -d "${qt_prefix}/lib/QtOpcUa.framework"
+            test -d "${qt_prefix}/lib/QtSerialBus.framework"
             test -f "${qt_prefix}/plugins/opcua/libopen62541_backend.a"
           done
           ACTUAL_TOOLCHAIN="xcode$(xcodebuild -version | awk '/^Xcode / {print $2}')-ios$(xcrun --sdk iphoneos --show-sdk-version)-sim$(xcrun --sdk iphonesimulator --show-sdk-version)"
@@ -438,6 +441,7 @@ jobs:
           test -d "${QT_TARGET_ROOT}/lib/QtCore.framework"
           test -d "${QT_TARGET_ROOT}/lib/QtPositioning.framework"
           test -d "${QT_TARGET_ROOT}/lib/QtOpcUa.framework"
+          test -d "${QT_TARGET_ROOT}/lib/QtSerialBus.framework"
           test -f "${QT_TARGET_ROOT}/plugins/opcua/libopen62541_backend.a"
           test -f "${QT_TARGET_ROOT}/mkspecs/modules/qt_plugin_open62541_backend.pri"
           OPENSSL_PREFIX="${OPENSSL_IOS_ROOT}/${{ needs.build-qt.outputs.openssl_version }}/${{ matrix.openssl_install_target }}"
@@ -512,6 +516,7 @@ jobs:
             echo "QTBASE=${RUNNER_TEMP}/caqtdm-build/caQtDM_Binaries"
             echo "CAQTDM_GPS=1"
             echo "CAQTDM_OPCUA=1"
+            echo "CAQTDM_MODBUS=1"
           } >> "$GITHUB_ENV"
 
       - name: Prepare temporary source tree
@@ -571,6 +576,7 @@ jobs:
             make -j"$(sysctl -n hw.ncpu)"
           test -s "${CAQTDM_COLLECT}/libprcParser.a"
           test -s "${CAQTDM_COLLECT}/libalhParser.a"
+          test -s "caQtDM_Plugins/modbus/libmodbus_plugin.a"
           (
             cd caQtDM_Viewer
             SDKROOT="$(xcrun --sdk ${{ matrix.sdk }} --show-sdk-path)" \
@@ -606,6 +612,7 @@ jobs:
           test -f "${APP}/caQtDM_IOS_Config.xml"
           test -f "${APP}/fonts/lucida-sans-typewriter.ttf"
           /usr/libexec/PlistBuddy -c 'Print :NSLocationWhenInUseUsageDescription' "${APP}/Info.plist" | grep -q .
+          /usr/libexec/PlistBuddy -c 'Print :NSLocalNetworkUsageDescription' "${APP}/Info.plist" | grep -q .
           if [ "${{ matrix.sdk }}" = "iphoneos" ]; then
             QT_TARGET_ROOT="${QT_IOS_DEVICE_ROOT}"
           else
