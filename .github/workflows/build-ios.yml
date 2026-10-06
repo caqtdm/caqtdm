@@ -339,6 +339,28 @@ jobs:
           cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG.Common.ios-sim-arm64" configure/os/CONFIG.Common.ios-sim-arm64
           cp "${GITHUB_WORKSPACE}/ci/epics-ios/configure/os/CONFIG_SITE.Common.ios-sim-arm64" configure/os/CONFIG_SITE.Common.ios-sim-arm64
 
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path("modules/pva2pva")
+          matches = []
+          for makefile in root.rglob("Makefile"):
+              lines = makefile.read_text().splitlines(keepends=True)
+              for index, line in enumerate(lines):
+                  definition = line.split("#", 1)[0].strip()
+                  if "softIocPVA" in definition and re.match(r"^(?:TEST)?PROD(?:_IOC)?\s*\+?=", definition):
+                      matches.append((makefile, lines, index, line))
+
+          if len(matches) != 1:
+              raise SystemExit(f"Expected one softIocPVA product declaration, found {len(matches)}")
+
+          makefile, lines, index, line = matches[0]
+          lines[index] = "# Omitted for iOS: softIocPVA is an executable, not a library.\n"
+          makefile.write_text("".join(lines))
+          print(f"Disabled iOS softIocPVA product in {makefile}")
+          PY
+
           make -j"$(sysctl -n hw.ncpu)" EPICS_HOST_ARCH="${EPICS_HOST_ARCH}"
           mkdir -p "${EPICS_BASE}/include" "${EPICS_BASE}/lib/ios-arm" "${EPICS_BASE}/lib/ios-sim-arm64"
           rsync -a include/ "${EPICS_BASE}/include/"
