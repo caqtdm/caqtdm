@@ -942,7 +942,6 @@ caQtDM_Viewer {
 
                     opcua {
                         LIBS += $$OUT_PWD/../caQtDM_Plugins/opcua/libopcua_plugin.a
-                        QTPLUGIN += open62541_backend
                     }
 
                     modbus {

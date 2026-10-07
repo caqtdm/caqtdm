@@ -88,7 +88,8 @@ ios {
   QMAKE_CXXFLAGS_WARN_ON = -w
   QMAKE_IOS_DEVICE_ARCHS = arm64
   QMAKE_APPLE_SIMULATOR_ARCHS = arm64
-  QMAKE_IOS_DEPLOYMENT_TARGET = 18.0
+  QMAKE_IOS_DEPLOYMENT_TARGET = $$(IOS_DEPLOYMENT_TARGET)
+  isEmpty(QMAKE_IOS_DEPLOYMENT_TARGET): QMAKE_IOS_DEPLOYMENT_TARGET = 18.0
 }
 android {
   DEFINES += MOBILE_ANDROID
@@ -1072,4 +1073,3 @@ DEFINES += QT_MESSAGELOGCONTEXT
 # special arguments &A and &T were implemented in shell commands
 # cabitnames, cachoice, cashellcommand : possibility to choose the font and size, buttons will be also separated by 2 pixels
 # in case of static visibility, channels will be ignored.
-
