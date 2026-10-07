@@ -86,6 +86,10 @@ ios {
   DEFINES += MOBILE_IOS
   QTPLUGIN += qjpeg qgif
   QMAKE_CXXFLAGS_WARN_ON = -w
+  QMAKE_IOS_DEVICE_ARCHS = arm64
+  QMAKE_APPLE_SIMULATOR_ARCHS = arm64
+  QMAKE_IOS_DEPLOYMENT_TARGET = $$(IOS_DEPLOYMENT_TARGET)
+  isEmpty(QMAKE_IOS_DEPLOYMENT_TARGET): QMAKE_IOS_DEPLOYMENT_TARGET = 18.0
 }
 android {
   DEFINES += MOBILE_ANDROID
@@ -227,9 +231,9 @@ isEmpty(_CAQTDM_OPCUA) {
         QT_OPCUA_ENCRYPTION_HEADER = QtOpcUa/QOpcUaX509CertificateSigningRequest
 		exists($$quote($$[QT_INSTALL_HEADERS]/$$QT_OPCUA_ENCRYPTION_HEADER)) {
 		    DEFINES += QT_OPCUA_X509
-			message("Building OPCUA plugin with encryption.")
+		    message("Building OPC UA certificate generation support.")
 		} else {
-		    message("No QOpcUaX509 headers available, skipping OPCUA encryption.")
+		    message("No QOpcUaX509 headers available, skipping OPC UA certificate generation support.")
 		}
 	} else {
 	    message("Qt module opcua was not found, OPCUA plugin will not be built.")
@@ -1069,5 +1073,3 @@ DEFINES += QT_MESSAGELOGCONTEXT
 # special arguments &A and &T were implemented in shell commands
 # cabitnames, cachoice, cashellcommand : possibility to choose the font and size, buttons will be also separated by 2 pixels
 # in case of static visibility, channels will be ignored.
-
-
