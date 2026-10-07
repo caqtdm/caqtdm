@@ -690,6 +690,15 @@ void SNumeric::reconstructGeometry()
 
 }
 
+void SNumeric::changeEvent(QEvent *event)
+{
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange) {
+        QResizeEvent resize(size(), size());
+        resizeEvent(&resize);
+    }
+}
+
 void SNumeric::resizeEvent(QResizeEvent *e)
 {
     int hmargin, vmargin;
@@ -706,11 +715,8 @@ void SNumeric::resizeEvent(QResizeEvent *e)
     temp =  qobject_cast<QPushButton *>(list.front());
     if (temp) {
         QPixmap pix(temp->size() * 0.9);
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        pix.fill(palette().color(QPalette::Background));
-#else
-        pix.fill(palette().color(QPalette::Window));
-#endif
+        const QColor arrowBackground = property("caqtdmNumericArrowBackground").value<QColor>();
+        pix.fill(arrowBackground.isValid() ? arrowBackground : palette().color(QPalette::Button));
         QPainter p(&pix);
         p.setRenderHint(QPainter::Antialiasing);
         hmargin = (int) (pix.width() * MARGIN);

@@ -2450,6 +2450,7 @@ is the equivalent of the Composite in MEDM
    ``filename``
       UI file name that is loaded and displayed inside the area of the caInclude Widget. 
       Type: name/identifier (string)
+
    ``stacking``
       
 
@@ -2957,7 +2958,8 @@ option                                    meaning
 ``-x``                                    has no effect (MEDM's execute-only mode)
 ``-attach``                               attach to a running caQtDM process
 ``-noMsg``                                iconize the main window
-``-stylefile filename``                   will replace the default stylesheet with the specified file (works only when not attaching)
+``-stylefile filename``                   replace the default panel stylesheet
+``-stylesheet filename``                  alias for ``-stylefile``
 ``-noResize``                             prevent resizing, works only when not attaching
 ``-macro "xxx=aaa,yyy=bbb, ..."``         apply :ref:`macro substitution <macro-substitution>` to replace occurrences of ``$(xxx)`` with value ``aaa``.
 ``-macrodefs filename``                   will load macro definitions from file
@@ -2977,6 +2979,10 @@ option                                    meaning
 ``-url url``                              will look for files on the specified url and download them to a local directory
 ``-emptycache``                           will empty the local cache used for downloading
 ========================================= ===================================
+
+``-stylefile`` and ``-stylesheet`` use identical caQtDM handling and are only
+available when not attaching. The selected stylesheet applies to panels and
+included panels, not the message window.
 
 Parameters in square brackets [] are optional.
 
@@ -3048,6 +3054,39 @@ CAQTDM_DISPLAY_PATH. The directories are specified with the separator
 
 Besides ``.ui`` files the viewer can also display in-house developed
 ``.prc`` files, described in the next chapter (:ref:`prc_files`).
+
+Panel theme
+~~~~~~~~~~~
+
+caQtDM uses its light compatibility palette by default. To use the system
+application palette for a panel, select the top-level widget of its ``.ui``
+file in Qt Designer. In the Property Editor, add a dynamic **String** property
+named ``caqtdmThemeMode`` and set its value to ``System``. Set it to
+``LegacyLight`` to select the light palette explicitly. Each included panel
+can set its own property on its own top-level widget.
+
+The equivalent property in a ``.ui`` file is::
+
+   <property name="caqtdmThemeMode">
+    <string>System</string>
+   </property>
+
+Place it directly inside the top-level ``<widget>`` element. The property
+name must match exactly; the values ``System`` and ``LegacyLight`` are
+case-insensitive.
+
+To override all panels and includes at startup, set the environment variable
+``CAQTDM_PANEL_THEME_MODE`` to ``System`` or ``LegacyLight``. When it is unset
+or has another value, each panel uses its own ``caqtdmThemeMode`` property,
+defaulting to the light palette when the property is absent.
+
+The default ``caQtDM_stylesheet.qss`` or a stylesheet selected with
+``-stylefile``/``-stylesheet`` is applied only to display panels and included
+panels. It is layered after a panel root's authored stylesheet, so its rules
+take precedence there, while alarm colors continue to be controlled by the
+alarm widgets. The stylesheet is used with the legacy-light palette by default;
+for a panel that explicitly selects ``System``, it is instead layered over the
+system palette. The message window always keeps the application/system theme.
 
 .. _prc_files:
 

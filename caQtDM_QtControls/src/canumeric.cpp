@@ -24,6 +24,7 @@
  */
 
 #include "canumeric.h"
+#include "numericpaneltheme.h"
 #include <QResizeEvent>
 #include <QPainter>
 #include <QPen>
@@ -46,6 +47,7 @@ caNumeric::caNumeric(QWidget *parent) : ENumeric(parent)
      renewStyleSheet = true;
      setBackground(QColor(230,230,230));
      setElevation(on_top);
+     panelTheme = new NumericPanelTheme(this, this);
 }
 
 QString caNumeric::getPV() const
@@ -64,6 +66,17 @@ void caNumeric::setAccessW(bool access)
      writeAccessW(thisAccessW);
 }
 
+void caNumeric::setColorMode(colMode mode)
+{
+    if (mode != Default) panelTheme->setDefaultMode(false);
+    thisColorMode = mode;
+    setBackground(thisBackColor);
+    renewStyleSheet = true;
+    setForeground(thisForeColor);
+    if (mode == Default) panelTheme->setDefaultMode(true);
+    oldColorMode = mode;
+}
+
 void caNumeric::setBackground(QColor c)
 {
     thisBackColor = c;
@@ -78,17 +91,16 @@ void caNumeric::setForeground(QColor c)
 
 void caNumeric::setColors(QColor bg, QColor fg, bool init)
 {
+    Q_UNUSED(init);
     if(thisColorMode == Default) {
         if(!styleSheet().isEmpty()) {
             setStyleSheet("");
             renewStyleSheet = true;
         }
-        if(!init) {
-            // force resize for repainting
-            QResizeEvent re(size(), size());
-            resizeEvent(&re);
-            return;
-        }
+        // Default colors come from the panel palette, even while disconnected.
+        QResizeEvent re(size(), size());
+        resizeEvent(&re);
+        return;
     }
 
     if((bg != oldBackColor) || (fg != oldForeColor)  || renewStyleSheet || styleSheet().isEmpty()) {
@@ -151,4 +163,3 @@ void caNumeric::paintEvent(QPaintEvent *event) {
         p.drawRect(0,0,rect().width()-1, rect().height()-1);
     }
 }
-

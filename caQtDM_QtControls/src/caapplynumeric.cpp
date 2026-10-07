@@ -24,6 +24,7 @@
  */
 
 #include "caapplynumeric.h"
+#include "numericpaneltheme.h"
 #include <QApplication>
 #include <QResizeEvent>
 #include "alarmdefs.h"
@@ -51,6 +52,7 @@ caApplyNumeric::caApplyNumeric(QWidget *parent) : EApplyNumeric(parent)
     installEventFilter(this);
 
     setElevation(on_top);
+    panelTheme = new NumericPanelTheme(this, findChild<ENumeric *>());
 }
 
 QString caApplyNumeric::getPV() const
@@ -67,6 +69,17 @@ void caApplyNumeric::setAccessW(bool access)
 {
      thisAccessW = access;
      writeAccessW(access);
+}
+
+void caApplyNumeric::setColorMode(colMode mode)
+{
+    if (mode != Default) panelTheme->setDefaultMode(false);
+    thisColorMode = mode;
+    setBackground(thisBackColor);
+    renewStyleSheet = true;
+    setForeground(thisForeColor);
+    if (mode == Default) panelTheme->setDefaultMode(true);
+    oldColorMode = mode;
 }
 
 
@@ -101,17 +114,16 @@ void caApplyNumeric::setForeground(QColor c)
 
 void caApplyNumeric::setColors(QColor bg, QColor fg, bool init)
 {
+    Q_UNUSED(init);
     if(thisColorMode == Default) {
         if(!styleSheet().isEmpty()) {
             setStyleSheet("");
             renewStyleSheet = true;
         }
-        if(!init) {
-            // force resize for repainting
-            QResizeEvent re(size(), size());
-            resizeEvent(&re);
-            return;
-        }
+        // Default colors come from the panel palette, even while disconnected.
+        QResizeEvent re(size(), size());
+        resizeEvent(&re);
+        return;
     }else if(thisColorMode == Static){
         setStyleSheet("");
         renewStyleSheet = true;

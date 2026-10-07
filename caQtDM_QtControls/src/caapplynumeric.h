@@ -29,6 +29,8 @@
 #include <qtcontrols_global.h>
 #include <eapplynumeric.h>
 
+class NumericPanelTheme;
+
 class QTCON_EXPORT caApplyNumeric : public EApplyNumeric
 {
 
@@ -72,12 +74,7 @@ void setAccessW(bool access);
 
 colMode getColorMode() const { return thisColorMode; }
 
-void setColorMode(colMode colormode) {thisColorMode = colormode;
-                                      setBackground(thisBackColor);
-                                      renewStyleSheet = true;
-                                      setForeground(thisForeColor);
-                                      oldColorMode = thisColorMode;
-                                       }
+void setColorMode(colMode colormode);
 
 enum SourceMode {Channel = 0, User};
 SourceMode getPrecisionMode() const { return thisPrecMode; }
@@ -139,7 +136,7 @@ colMode thisColorMode;
 colMode oldColorMode;
 bool renewStyleSheet;
 bool oldConnected = true;
+NumericPanelTheme *panelTheme = nullptr;
 
 };
 #endif
-

@@ -29,6 +29,7 @@
 #include <QTableWidget>
 #include <QAction>
 #include <QFont>
+#include <QPalette>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QTimer>
@@ -102,6 +103,7 @@ public:
     void displayText(int index, short status, QString const &text);
 
     void setValueFont(QFont font);
+    void setPanelThemePalette(bool legacyLight);
 
     void setData(double *vector, short status, int size);
     void setData(float *vector, short status, int size);
@@ -231,7 +233,14 @@ private:
     int rowcount;
     bool dataPresent;
 
-    QColor defaultForeColor;
+    QString builtInStyleSheet;
+    QPalette builtInPalette;
+    QString savedViewportStyleSheet;
+    QPalette savedViewportPalette;
+    bool savedViewportAutoFill = false;
+    bool savedViewportHasPalette = false;
+    bool viewportThemeSaved = false;
+    bool hasAuthoredPalette = false;
 
     int channelPrecision;
     int actualPrecision;

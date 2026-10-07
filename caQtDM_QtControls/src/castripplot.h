@@ -515,6 +515,8 @@ private:
     void defineXaxis(units unit, double period);
     void RescaleCurves(int width, units unit, double period);
     void RescaleAxis();
+    void setCurveLegendTitle(int index);
+    void refreshLegendTextColor(QColor color);
     void TimersStart();
     void selectYAxis(quint8 newYAxisIndex);
     void remapCurve(double newMin, double newMax, quint8 curvIndex, bool isNewLog);

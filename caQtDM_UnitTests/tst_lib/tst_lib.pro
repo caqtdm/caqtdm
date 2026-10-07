@@ -3,6 +3,10 @@ include(../unitTests.pri)
 
 QT += network gui widgets designer uitools printsupport
 
+win32 {
+    DEFINES += QWT_DLL
+}
+
 web {
     QT += websockets
 }
@@ -16,10 +20,12 @@ HEADERS += tst_caqtdm_lib.h \
 # --- Tested classes below ---
 
 HEADERS += ../../caQtDM_Lib/src/caqtdm_lib.h \
+    ../../caQtDM_Lib/src/panelthemeapplier.h \
     ../../caQtDM_Plugins/internal/internal_channel.h \
     ../../caQtDM_Plugins/internal/internal_plugin.h
 
 SOURCES += ../../caQtDM_Lib/src/caqtdm_lib.cpp \
+    ../../caQtDM_Lib/src/panelthemeapplier.cpp \
     ../../caQtDM_Plugins/internal/internal_channel.cpp \
     ../../caQtDM_Plugins/internal/internal_plugin.cpp
 

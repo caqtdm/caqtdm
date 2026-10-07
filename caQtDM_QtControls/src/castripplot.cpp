@@ -341,7 +341,7 @@ void caStripPlot::selectYAxis(quint8 newYAxisIndex){
     savedTitles = originalTitles;
     savedTitles.replace(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
     for(quint8 i=0; i < NumberOfCurves; i++) {
-        curve[i]->setTitle(legendText(i));
+        setCurveLegendTitle(i);
     }
 
     QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
@@ -686,7 +686,7 @@ void caStripPlot::UpdateScaling()
         scaleY->setPalette (palette);
 
         savedTitles.replace(YAxisIndex, ("<u>" + savedTitles.at(YAxisIndex) + "<u>"));
-        curve[YAxisIndex]->setTitle(legendText(YAxisIndex));
+        setCurveLegendTitle(YAxisIndex);
     } else {
         QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
         QPalette palette = scaleY->palette();
@@ -695,7 +695,7 @@ void caStripPlot::UpdateScaling()
 
         savedTitles = originalTitles;
         for(quint8 i=0; i < NumberOfCurves; i++) {
-            curve[i]->setTitle(legendText(i));
+            setCurveLegendTitle(i);
         }
     }
     if (thisYaxisScaling == fixedScale){
@@ -739,6 +739,33 @@ QString caStripPlot::legendText(int i)
     return title;
 }
 
+void caStripPlot::setCurveLegendTitle(int index)
+{
+    QwtText title(legendText(index));
+    title.setColor(thisScaleColor);
+    curve[index]->setTitle(title);
+}
+
+void caStripPlot::refreshLegendTextColor(QColor color)
+{
+    if (!legend()) return;
+#if QWT_VERSION < 0x060100
+    const QList<QWidget *> labels = static_cast<QwtLegend *>(legend())->legendItems();
+    for (QWidget *label : labels) {
+        QPalette labelPalette = label->palette();
+        labelPalette.setColor(QPalette::WindowText, color);
+        labelPalette.setColor(QPalette::Text, color);
+        label->setPalette(labelPalette);
+    }
+#else
+    for (QwtLegendLabel *label : legend()->findChildren<QwtLegendLabel *>()) {
+        QwtText text = label->text();
+        text.setColor(color);
+        label->setText(text);
+    }
+#endif
+}
+
 void caStripPlot::defineCurves(QStringList titles, units unit, double period, int width, int nbCurves)
 {
     int min, max;
@@ -776,6 +803,7 @@ void caStripPlot::defineCurves(QStringList titles, units unit, double period, in
             QString title = legendText(i);
 
             curve[i] = new QwtPlotCurve(title);
+            setCurveLegendTitle(i);
             errorcurve[i] = new QwtPlotIntervalCurveNaN(title+"?error?");
             fillcurve[i] = new QwtPlotCurveNaN(title+"?fill?");
             setStyle(s, i);
@@ -1167,7 +1195,7 @@ void caStripPlot::RescaleAxis()
     for(i=0; i < NumberOfCurves; i++) {
         setData(realMin[i], realVal[i], i);
         // redraw legend if any
-        curve[i]->setTitle(legendText(i));
+        setCurveLegendTitle(i);
     }
 }
 
@@ -1269,6 +1297,7 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
         }
     }
     updateLegend();
+    if (SW == COLOR) refreshLegendTextColor(c);
 #endif
 
 }
@@ -1475,6 +1504,14 @@ void caStripPlot::setScaleColor(QColor c)
     scaleX->setPalette( palette);
     scaleY->setPalette (palette);
     titleLabel()->setPalette(palette);
+    for (int i = 0; i < NumberOfCurves; ++i) {
+        if (curve[i] && !curve[i]->title().isEmpty()) {
+            QwtText title = curve[i]->title();
+            title.setColor(c);
+            curve[i]->setTitle(title);
+        }
+    }
+    refreshLegendTextColor(c);
 }
 
 void caStripPlot::setColor(QColor c, int number)

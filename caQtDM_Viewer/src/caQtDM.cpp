@@ -38,14 +38,17 @@
 #include <QFileDialog>
 #include <QLocale>
 #include <QHostAddress>
+#include <QSet>
 #include "signalhandler.h"
 #include <iostream>
 #include <stdlib.h>
 #include "pipereader.h"
 #include "loggingcategories.h"
+#include "panelthemeapplier.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QApplication>
+#include <QCoreApplication>
 
 #ifndef CAQTDM_NO_CUSTOM_LOGHANDLER
 #include <logging/generalloghandler.h>
@@ -203,7 +206,7 @@ int main(int argc, char *argv[])
     loc.setDefault(loc);
 
     QString theme = "";
-    int styleIndex = -1;
+    QSet<int> argumentsToRemove;
     QString fileNameStylesheet = "";
     QString fileName = "";
     QString macroString = "";
@@ -267,13 +270,21 @@ int main(int argc, char *argv[])
             printf("caQtDM -- will load macro string from file <%s>\n", argv[in]);
             macroFile = QString(argv[in]);
         } else if ( strcmp (argv[in], "-style" ) == 0 ) {
-            styleIndex = in;
+            argumentsToRemove.insert(in);
             in++;
+            argumentsToRemove.insert(in);
             printf("caQtDM -- using qt theme <%s>\n", argv[in]);
             theme = QString(argv[in]);
-        } else if ( strcmp (argv[in], "-stylefile" ) == 0 ) {
+        } else if ( strcmp (argv[in], "-stylefile" ) == 0 ||
+                    strcmp (argv[in], "-stylesheet" ) == 0 ) {
+            if (in + 1 >= numargs) {
+                fprintf(stderr, "caQtDM -- option %s requires a stylesheet filename\n", argv[in]);
+                return 1;
+            }
+            argumentsToRemove.insert(in);
             in++;
-            printf("caQtDM -- will replace the default stylesheet with stylesheet <%s>\n", argv[in]);
+            argumentsToRemove.insert(in);
+            printf("caQtDM -- will replace the default panel stylesheet with stylesheet <%s>\n", argv[in]);
             fileNameStylesheet = QString(argv[in]);
         } else if ( strcmp (argv[in], "-x" ) == 0 ) {
 
@@ -287,7 +298,7 @@ int main(int argc, char *argv[])
                    "  [-x] has no effect (MEDM’s execute-only mode)\n"
                    "  [-attach] attach to a running caQtDM instance\n"
                    "  [-noMsg] iconize the main window\n"
-                   "  [-stylefile filename] will replace the default stylesheet with the specified file (works only when not attaching)\n"
+                   "  [-stylefile filename | -stylesheet filename] replace the default panel stylesheet with the specified file (works only when not attaching)\n"
                    "  [-macro \"xxx=aaa,yyy=bbb, ...\"] apply macro substitution to replace occurrences of $(xxx) with value aaa\n"
                    "  [-macrodefs filename] will load macro definitions from file\n"
                    "  [-dg [<width>x<height>][+<xoffset>-<yoffset>] specifies the geometry (location and size) of the synoptic display\n"
@@ -479,17 +490,14 @@ int main(int argc, char *argv[])
 
 #endif // WEB
 
-    // prevents QApplication from handling style on it's own
-    if (!theme.isEmpty() && styleIndex > -1) {
-        if (styleIndex < argc - 1) {
-            for (int j = styleIndex; j < argc - 2; ++j) {
-                argv[j] = argv[j + 2];
-            }
-            argc -= 2;
-        } else if (styleIndex == argc - 1) {
-            delete argv[styleIndex];
-            --argc;
+    // Prevent QApplication from handling -style and -stylesheet globally.
+    if (!argumentsToRemove.isEmpty()) {
+        int writeIndex = 1;
+        for (int readIndex = 1; readIndex < argc; ++readIndex) {
+            if (!argumentsToRemove.contains(readIndex))
+                argv[writeIndex++] = argv[readIndex];
         }
+        argc = writeIndex;
     }
 
 #if defined(_MSC_VER)
@@ -499,6 +507,10 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
+    // Let panel palettes propagate through authored QSS.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
+#endif
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
     QApplication::setApplicationName("caQtDM");
@@ -578,8 +590,8 @@ int main(int argc, char *argv[])
         QFile file(fileNameFound);
         if (file.open(QFile::ReadOnly)) {
             QString StyleSheet = QLatin1String(file.readAll());
-            qCInfo(caQtDMLog) << "caQtDM -- file <caQtDM_stylesheet.qss> loaded as the default application stylesheet";
-            app.setStyleSheet(StyleSheet);
+            qCInfo(caQtDMLog) << "caQtDM -- file <caQtDM_stylesheet.qss> loaded as the default panel stylesheet";
+            PanelThemeApplier::setPanelStyleSheet(StyleSheet);
             file.close();
         }
     }
@@ -620,9 +632,8 @@ int main(int argc, char *argv[])
             QFile file(fileNameFound);
             if (file.open(QFile::ReadOnly)) {
                 QString StyleSheet = QLatin1String(file.readAll());
-                qCInfo(caQtDMLog) << QString("caQtDM -- custom stylesheet file <%1> replaced the default stylesheet").arg(fileNameStylesheet);
-                app.setStyleSheet(StyleSheet);
-                qApp->setProperty("user_defined_stylesheet", fileNameStylesheet);
+                qCInfo(caQtDMLog) << QString("caQtDM -- custom stylesheet file <%1> replaced the default panel stylesheet").arg(fileNameStylesheet);
+                PanelThemeApplier::setPanelStyleSheet(StyleSheet, fileNameFound, true);
                 file.close();
             }
         }

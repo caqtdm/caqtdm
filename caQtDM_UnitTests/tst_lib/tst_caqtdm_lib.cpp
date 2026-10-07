@@ -24,12 +24,26 @@
  */
 
 #include "tst_caqtdm_lib.h"
+#include "panelthemeapplier.h"
+#include "MessageWindow.h"
 
 #include <caapplynumeric.h>
 #include <cainclude.h>
 #include <canumeric.h>
 #include <caspinbox.h>
+#include <castripplot.h>
+#include <catogglebutton.h>
+#include <cawavetable.h>
 #include <gensoftpv.h>
+
+#include <QLineEdit>
+#include <QLabel>
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QPushButton>
+#include <QTabBar>
+#include <QTabWidget>
+#include <qwt_legend_label.h>
 
 #include <cfloat>
 #include <climits>
@@ -238,6 +252,7 @@ void TestCaQtDM_Lib::cleanup()
 {
     // code to be executed after each test function
 
+    PanelThemeApplier::setPanelStyleSheet(QString());
     delete m_caQtDM_Lib;
     delete m_internalPlugin;
     delete m_mutexKnobData;
@@ -713,4 +728,349 @@ void TestCaQtDM_Lib::computeNumericMaxMinPrecUpdatesWhenChannelChanges()
                                              "T_Numeric_Live");
     checkWidgetPicksUpFieldWrite<caSpinbox>(m_caQtDM_Lib, m_internalPlugin, m_parentAS,
                                              "T_Spinbox_Live");
+}
+
+void TestCaQtDM_Lib::panelThemeDefaultsToLegacyLight()
+{
+    const QPalette applicationPalette = QApplication::palette();
+    QPalette darkPalette = applicationPalette;
+    darkPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, QColor(20, 20, 20));
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    QApplication::setPalette(darkPalette);
+
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    QLineEdit inherited(content);
+    QLineEdit authored(content);
+    QTabWidget tabs(content);
+    tabs.addTab(new QWidget(&tabs), "first");
+    panel.menuBar()->addMenu("File");
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    panel.setStyleSheet("QTabBar::tab { background: #eeeeee; }");
+#endif
+    const QString authoredStyle = "QLineEdit { color: rgb(255, 0, 0); }";
+    authored.setStyleSheet(authoredStyle);
+    QPalette authoredPalette = authored.palette();
+    authoredPalette.setColor(QPalette::Text, Qt::red);
+    authored.setPalette(authoredPalette);
+
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QVERIFY(!panel.testAttribute(Qt::WA_SetPalette));
+    QVERIFY(content->testAttribute(Qt::WA_SetPalette));
+    QVERIFY(!inherited.testAttribute(Qt::WA_SetPalette));
+    QCOMPARE(inherited.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(authored.palette().color(QPalette::Text), QColor(Qt::red));
+    QCOMPARE(authored.styleSheet(), authoredStyle);
+    QCOMPARE(tabs.tabBar()->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(panel.menuBar()->palette().color(QPalette::Window),
+             QApplication::palette().color(QPalette::Window));
+    QCOMPARE(panel.menuBar()->palette().color(QPalette::WindowText),
+             QApplication::palette().color(QPalette::WindowText));
+    QCOMPARE(panel.menuBar()->palette().color(QPalette::Text),
+             QApplication::palette().color(QPalette::Text));
+
+    QApplication::setPalette(applicationPalette);
+}
+
+void TestCaQtDM_Lib::panelThemeSystemModeDoesNotChangePalette()
+{
+    const QPalette applicationPalette = QApplication::palette();
+    QPalette darkPalette = applicationPalette;
+    darkPalette.setColor(QPalette::Button, QColor(45, 45, 45));
+    QApplication::setPalette(darkPalette);
+
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "System");
+    caNumeric numeric(&panel);
+    numeric.resize(140, 60);
+    numeric.setColorMode(caNumeric::Default);
+
+    PanelThemeApplier::apply(&panel);
+
+    QVERIFY(panel.testAttribute(Qt::WA_SetPalette));
+    QCOMPARE(panel.palette().color(QPalette::Window),
+             QApplication::palette().color(QPalette::Window));
+    QCOMPARE(panel.palette().color(QPalette::Text),
+             QApplication::palette().color(QPalette::Text));
+    panel.show();
+    QApplication::processEvents();
+    QPushButton *arrowButton = Q_NULLPTR;
+    for (QPushButton *button : numeric.findChildren<QPushButton *>()) {
+        if (!button->icon().isNull()) {
+            arrowButton = button;
+            break;
+        }
+    }
+    QVERIFY(arrowButton);
+    const QImage icon = arrowButton->icon().pixmap(arrowButton->iconSize()).toImage();
+    QVERIFY(!icon.isNull());
+    QCOMPARE(icon.pixelColor(0, 0), QColor(45, 45, 45));
+
+    QApplication::setPalette(applicationPalette);
+}
+
+void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
+{
+    QWidget panel;
+    QWidget included(&panel);
+    included.setProperty("caqtdmThemeMode", "System");
+
+    PanelThemeApplier::apply(&included);
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(included.palette().color(QPalette::Window),
+             QApplication::palette().color(QPalette::Window));
+    QCOMPARE(included.palette().color(QPalette::WindowText),
+             QApplication::palette().color(QPalette::WindowText));
+    QCOMPARE(included.palette().color(QPalette::Base),
+             QApplication::palette().color(QPalette::Base));
+    QCOMPARE(included.palette().color(QPalette::Text),
+             QApplication::palette().color(QPalette::Text));
+    QVERIFY(panel.testAttribute(Qt::WA_SetPalette));
+    QVERIFY(included.testAttribute(Qt::WA_SetPalette));
+}
+
+void TestCaQtDM_Lib::panelThemeEnvironmentOverrideWins()
+{
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "System");
+
+    qputenv("CAQTDM_PANEL_THEME_MODE", "LegacyLight");
+    QVERIFY(PanelThemeApplier::usesLegacyLightTheme(&panel));
+
+    qputenv("CAQTDM_PANEL_THEME_MODE", "System");
+    QVERIFY(!PanelThemeApplier::usesLegacyLightTheme(&panel));
+
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    QVERIFY(!PanelThemeApplier::usesLegacyLightTheme(&panel));
+
+    if (originalOverride.isEmpty())
+        qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else
+        qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+void TestCaQtDM_Lib::panelThemeAppliesWidgetDetails()
+{
+    const QPalette applicationPalette = QApplication::palette();
+    QPalette darkPalette = applicationPalette;
+    darkPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, QColor(20, 20, 20));
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::Light, QColor(70, 70, 70));
+    darkPalette.setColor(QPalette::Dark, QColor(25, 25, 25));
+    QApplication::setPalette(darkPalette);
+
+    QWidget panel;
+    panel.setStyleSheet("QWidget { background: wheat; }");
+    caToggleButton toggle(&panel);
+    caNumeric numeric(&panel);
+    numeric.resize(140, 60);
+    caNumeric defaultNumeric(&panel);
+    defaultNumeric.resize(140, 60);
+    defaultNumeric.setColorMode(caNumeric::Default);
+    caApplyNumeric applyNumeric(&panel);
+    applyNumeric.resize(140, 80);
+    applyNumeric.setColorMode(caApplyNumeric::Default);
+    caSpinbox spinbox(&panel);
+    spinbox.resize(140, 60);
+    spinbox.setColorMode(caSpinbox::Default);
+    caWaveTable table(&panel);
+    table.displayText(0, 0, "NC");
+    QWidget included(&panel);
+    included.setProperty("caqtdmThemeMode", "System");
+    caWaveTable includedTable(&included);
+    PanelThemeApplier::apply(&included);
+    caStripPlot plot(&panel);
+    plot.setScaleColor(Qt::black);
+    plot.defineCurves(QStringList() << "curve", caStripPlot::Second, 60, 300, 1);
+
+    PanelThemeApplier::apply(&panel);
+
+    defaultNumeric.setConnectedColors(false);
+    applyNumeric.setConnectedColors(false);
+    spinbox.setConnectedColors(false);
+    QVERIFY(defaultNumeric.styleSheet().isEmpty());
+    QVERIFY(applyNumeric.styleSheet().isEmpty());
+    QVERIFY(spinbox.styleSheet().isEmpty());
+    QCOMPARE(defaultNumeric.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(applyNumeric.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(spinbox.palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::black));
+    QVERIFY(toggle.styleSheet().isEmpty());
+    QCOMPARE(numeric.palette().color(QPalette::Light), QColor(Qt::white));
+    QCOMPARE(numeric.palette().color(QPalette::Dark), QColor(160, 160, 160));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Base), QColor(Qt::white));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(table.item(0, 0)->foreground().style(), Qt::NoBrush);
+    QCOMPARE(includedTable.viewport()->palette().color(QPalette::Text), QColor(Qt::white));
+    QCOMPARE(plot.itemList(QwtPlotItem::Rtti_PlotCurve).first()->title().color(), QColor(Qt::black));
+    table.resize(200, 80);
+    panel.show();
+    QApplication::processEvents();
+    QLabel *numericDigit = defaultNumeric.findChild<QLabel *>("layoutmember0");
+    QLabel *applyDigit = applyNumeric.findChild<QLabel *>("layoutmember0");
+    QLabel *spinDigit = spinbox.findChild<QLabel *>("layoutmember0");
+    QVERIFY(numericDigit);
+    QVERIFY(applyDigit);
+    QVERIFY(spinDigit);
+    QCOMPARE(numericDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(applyDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QPalette restyledDigit = spinDigit->palette();
+    restyledDigit.setColor(QPalette::WindowText, Qt::white);
+    spinDigit->setPalette(restyledDigit);
+    QApplication::processEvents();
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QWidget *defaultNumbers[] = {&defaultNumeric, &applyNumeric, &spinbox};
+    for (QWidget *defaultNumber : defaultNumbers) {
+        QPushButton *arrowButton = Q_NULLPTR;
+        for (QPushButton *button : defaultNumber->findChildren<QPushButton *>()) {
+            if (!button->icon().isNull()) {
+                arrowButton = button;
+                break;
+            }
+        }
+        QVERIFY2(arrowButton, defaultNumber->metaObject()->className());
+        const QImage icon = arrowButton->icon().pixmap(arrowButton->iconSize()).toImage();
+        QVERIFY(!icon.isNull());
+        QCOMPARE(icon.pixelColor(0, 0), QColor(224, 224, 224));
+    }
+    spinbox.setIntDigits(5);
+    QApplication::processEvents();
+    spinDigit = spinbox.findChild<QLabel *>("layoutmember0");
+    QVERIFY(spinDigit);
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    const QImage tableImage = table.viewport()->grab().toImage();
+    QCOMPARE(tableImage.pixelColor(40, 5), QColor(Qt::white));
+    QCOMPARE(tableImage.pixelColor(tableImage.width() - 5, tableImage.height() - 5),
+             QColor(Qt::white));
+    const QList<QwtLegendLabel *> legendLabels = plot.findChildren<QwtLegendLabel *>();
+    QVERIFY(!legendLabels.isEmpty());
+    QCOMPARE(legendLabels.first()->text().color(), QColor(Qt::black));
+    plot.setScaleColor(Qt::blue);
+    QApplication::processEvents();
+    QCOMPARE(legendLabels.first()->text().color(), QColor(Qt::blue));
+    plot.setScaleColor(Qt::black);
+    QApplication::processEvents();
+    QCOMPARE(legendLabels.first()->text().color(), QColor(Qt::black));
+
+    QPushButton *arrow = Q_NULLPTR;
+    for (QPushButton *button : numeric.findChildren<QPushButton *>()) {
+        if (!button->icon().isNull()) {
+            arrow = button;
+            break;
+        }
+    }
+    QVERIFY(arrow);
+    const qint64 legacyIcon = arrow->icon().cacheKey();
+
+    panel.setProperty("caqtdmThemeMode", "System");
+    PanelThemeApplier::apply(&panel);
+    QApplication::processEvents();
+    QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(numericDigit->palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(applyDigit->palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::white));
+    QCOMPARE(applyNumeric.palette().color(QPalette::Text), QColor(Qt::white));
+    QCOMPARE(spinbox.palette().color(QPalette::Text), QColor(Qt::white));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Text), QColor(Qt::white));
+    QVERIFY(arrow->icon().cacheKey() != legacyIcon);
+
+    panel.setProperty("caqtdmThemeMode", "LegacyLight");
+    PanelThemeApplier::apply(&panel);
+    QApplication::processEvents();
+    QCOMPARE(numericDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(applyDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(table.viewport()->palette().color(QPalette::Base), QColor(Qt::white));
+    QCOMPARE(toggle.palette().color(QPalette::WindowText), QColor(Qt::black));
+
+    spinbox.setForeground(Qt::red);
+    spinbox.setColorMode(caSpinbox::Static);
+    QApplication::processEvents();
+    QCOMPARE(spinDigit->palette().color(QPalette::WindowText), QColor(Qt::red));
+
+    QApplication::setPalette(applicationPalette);
+}
+
+void TestCaQtDM_Lib::panelThemePreservesAuthoredWidgetColors()
+{
+    QWidget panel;
+    caToggleButton toggle(&panel);
+    toggle.setColorMode(caToggleButton::Static);
+    toggle.setBackground(Qt::green);
+    toggle.setForeground(Qt::red);
+    caWaveTable table(&panel);
+    table.noStyle("background-color: magenta; color: yellow;");
+    caWaveTable paletteTable(&panel);
+    QPalette authoredPalette = paletteTable.palette();
+    authoredPalette.setColor(QPalette::Base, Qt::yellow);
+    authoredPalette.setColor(QPalette::Text, Qt::magenta);
+    paletteTable.setPalette(authoredPalette);
+    caStripPlot plot(&panel);
+    plot.setScaleColor(Qt::red);
+    plot.defineCurves(QStringList() << "curve", caStripPlot::Second, 60, 300, 1);
+
+    PanelThemeApplier::apply(&panel);
+
+    QVERIFY(toggle.styleSheet().contains("255, 0, 0"));
+    QCOMPARE(toggle.getForeground(), QColor(Qt::red));
+    QCOMPARE(table.styleSheet(), QString("background-color: magenta; color: yellow;"));
+    QCOMPARE(paletteTable.viewport()->palette().color(QPalette::Base), QColor(Qt::yellow));
+    QCOMPARE(paletteTable.viewport()->palette().color(QPalette::Text), QColor(Qt::magenta));
+    QCOMPARE(plot.itemList(QwtPlotItem::Rtti_PlotCurve).first()->title().color(), QColor(Qt::red));
+}
+
+void TestCaQtDM_Lib::panelStyleSheetIsScopedAndOverridesRootStyle()
+{
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    QVERIFY(application);
+    const QString applicationStyleSheet = application->styleSheet();
+    PanelThemeApplier::setPanelStyleSheet("QLineEdit { color: blue; }");
+
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    panel.setStyleSheet("QLineEdit { color: red; }");
+    QLineEdit field(content);
+    QWidget included(content);
+    included.setStyleSheet("QLineEdit { color: green; }");
+    QLineEdit includedField(&included);
+    caToggleButton alarmButton(content);
+    alarmButton.setColorMode(caToggleButton::Static);
+    alarmButton.setForeground(Qt::red);
+    MessageWindow messageWindow;
+
+    PanelThemeApplier::apply(&included);
+    PanelThemeApplier::apply(&panel);
+
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    QVERIFY(included.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    QCOMPARE(application->styleSheet(), applicationStyleSheet);
+    QCOMPARE(messageWindow.styleSheet(), QString());
+    QVERIFY(alarmButton.styleSheet().contains("255, 0, 0"));
+
+    const QPalette originalPalette = application->palette();
+    QPalette systemPalette = originalPalette;
+    systemPalette.setColor(QPalette::Window, QColor(30, 30, 30));
+    systemPalette.setColor(QPalette::Text, Qt::white);
+    application->setPalette(systemPalette);
+    QWidget systemPanel;
+    systemPanel.setProperty("caqtdmThemeMode", "System");
+    PanelThemeApplier::apply(&systemPanel);
+    QCOMPARE(systemPanel.palette().color(QPalette::Window), QColor(30, 30, 30));
+    QVERIFY(systemPanel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    application->setPalette(originalPalette);
+
+    Q_UNUSED(field);
+    Q_UNUSED(includedField);
 }

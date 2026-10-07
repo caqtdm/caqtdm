@@ -58,6 +58,13 @@ private slots:
     void computeNumericMaxMinPrecIgnoresChannelInUserMode();
     void computeNumericMaxMinPrecHonoursMaxChannelPrecision();
     void computeNumericMaxMinPrecUpdatesWhenChannelChanges();
+    void panelThemeDefaultsToLegacyLight();
+    void panelThemeSystemModeDoesNotChangePalette();
+    void panelThemeIncludesRemainIndependent();
+    void panelThemeEnvironmentOverrideWins();
+    void panelThemeAppliesWidgetDetails();
+    void panelThemePreservesAuthoredWidgetColors();
+    void panelStyleSheetIsScopedAndOverridesRootStyle();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

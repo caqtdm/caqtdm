@@ -1421,6 +1421,9 @@ protected:
             m_num->setColorMode((typename WidgetT::colMode) modes[m]);
             m_num->setConnectedColors(true);
             m_num->setConnectedColors(false); /* the first disconnect may restyle */
+            if (modes[m] == 1)
+                QVERIFY2(m_num->styleSheet().isEmpty(),
+                         "Default mode must inherit the panel palette while disconnected");
 
             NumStyleChangeCounter counter;
             m_num->installEventFilter(&counter);
@@ -1433,6 +1436,8 @@ protected:
 
             /* the reconnect restores the configured colors */
             m_num->setConnectedColors(true);
+            if (modes[m] == 1)
+                QVERIFY(m_num->styleSheet().isEmpty());
             QVERIFY(!m_num->styleSheet().contains("rgba(255, 255, 255"));
         }
     }

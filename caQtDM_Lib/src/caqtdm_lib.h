@@ -42,6 +42,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QMap>
+#include <QPointer>
 #include <QtGui>
 #ifndef MOBILE
 #include <QtUiTools>
@@ -536,6 +537,9 @@ public:
 
     HMIApplicationEventFilter *globalEventFilter;
 
+    QList<QPointer<QWidget>> panelThemeRoots;
+    void applyPanelTheme(QWidget *root);
+
     void hmiHandleKeyPressed(QObject *target, QKeyEvent *event);
 
     void hmiHandleMouse(QObject *target, QMouseEvent *event);
@@ -661,5 +665,3 @@ public slots:
 };
 
 #endif // CaQtDM_Lib_H
-
-

@@ -49,12 +49,15 @@
 
 #include <QObject>
 
+#include <QCoreApplication>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QToolBar>
 #include <QUuid>
 #include <QHostInfo>
 #include <QMutableListIterator>
+#include <QPalette>
+#include <QXmlStreamReader>
 
 // interfacing widgets, handling their own data acquisition ... (thanks zai)
 #include "caWidgetInterface.h"
@@ -81,6 +84,7 @@
 #endif
 
 #include "caqtdm_lib.h"
+#include "panelthemeapplier.h"
 #include "caalarmtree.h"      // not part of the QtControls umbrella header
 #include "uiconverter.h"
 #include "fileFunctions.h"
@@ -134,6 +138,74 @@
 #define PASTEDATACSV     "Paste Data as CSV"
 
 #define POPUPDEFENITION "popup.ui"
+
+namespace {
+bool uiUsesLegacyLightTheme(const QByteArray &ui)
+{
+    QXmlStreamReader reader(ui);
+    bool rootWidgetFound = false;
+    int depth = 0;
+
+    while (!reader.atEnd()) {
+        reader.readNext();
+        if (reader.isStartElement()) {
+            if (!rootWidgetFound) {
+                if (reader.name() == "widget") {
+                    rootWidgetFound = true;
+                    depth = 1;
+                }
+                continue;
+            }
+            ++depth;
+            if (depth == 2 && reader.name() == "property" &&
+                reader.attributes().value("name") == "caqtdmThemeMode") {
+                while (reader.readNextStartElement()) {
+                    if (reader.name() == "string")
+                        return reader.readElementText(QXmlStreamReader::IncludeChildElements)
+                            .compare("System", Qt::CaseInsensitive) != 0;
+                    reader.skipCurrentElement();
+                }
+                return true;
+            }
+        } else if (reader.isEndElement() && rootWidgetFound) {
+            if (depth == 1 && reader.name() == "widget") break;
+            --depth;
+        }
+    }
+    return true;
+}
+
+class PanelUiLoader : public QUiLoader
+{
+public:
+    void beginPanel(bool legacyLight)
+    {
+        m_root = Q_NULLPTR;
+        m_legacyLight = legacyLight;
+    }
+
+    QWidget *createWidget(const QString &className, QWidget *parent,
+                          const QString &name) override
+    {
+        if (!m_root) {
+            QWidget *widget = QUiLoader::createWidget(className, parent, name);
+            if (widget) {
+                m_root = widget;
+                // QUiLoader applies the root's QSS only after this method
+                // returns. Seed now so stylesheet-backed descendants start
+                // with the selected panel palette.
+                PanelThemeApplier::seed(m_root, m_legacyLight);
+            }
+            return widget;
+        }
+        return QUiLoader::createWidget(className, parent, name);
+    }
+
+private:
+    QWidget *m_root = Q_NULLPTR;
+    bool m_legacyLight = true;
+};
+}
 
 #ifdef WEB
 #define WEB_CARELATED_DISPLAY_ERROR_MSG "Unable to open this caRelatedDisplay, please check your caQtDM Web configuration."
@@ -564,7 +636,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
                        ControlsInterface *> interfaces, MessageWindow *msgWindow, bool pepprint, QWidget *parentAS,
                        QMap<QString,QString> options) : QMainWindow(parent)
 {
-    QUiLoader loader;
+    PanelUiLoader loader;
     fromAS = false;
     AllowsUpdate = true;
     mutexKnobDataP = mKnobData;
@@ -635,7 +707,10 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
                 }else{
                     QBuffer *buffer = new QBuffer();
                     buffer->open(QIODevice::ReadWrite);
-                    buffer->write(file->readAll());
+                    const QByteArray ui = file->readAll();
+                    loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(
+                        uiUsesLegacyLightTheme(ui)));
+                    buffer->write(ui);
 
                     buffer->seek(0);
 
@@ -668,6 +743,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
             QBuffer *buffer = new QBuffer();
             buffer->open(QIODevice::ReadWrite);
+            loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(true));
             buffer->write(*array);
             delete array;
 
@@ -939,40 +1015,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
         splash->deleteLater();
     }
-    // reapply a globally loaded user stylesheet, cainlude seems to disable it
-    qCInfo(fileIOLog) << "caQtDM -- user_defined_stylesheet:" << qApp->property("user_defined_stylesheet").toString();
-    if (qApp->property("user_defined_stylesheet").isValid() && (!qApp->property("user_defined_stylesheet").toString().isEmpty())){
-        QString printdata=qApp->styleSheet();
-        QString stylereload = (QString)  qgetenv("CAQTDM_STYLESHEET_RELOAD");
-        if (stylereload.contains("file",Qt::CaseInsensitive)){
-            qCInfo(fileIOLog) << "caQtDM -- search for:" << qApp->property("user_defined_stylesheet").toString();
-            searchFile *searchDefaultStyleSheet = new searchFile(qApp->property("user_defined_stylesheet").toString());
-            QString fileNameFound = searchDefaultStyleSheet->findFile();
-            qCInfo(fileIOLog) << "caQtDM -- custom stylesheet found:" << fileNameFound;
-            if(!fileNameFound.isEmpty()) {
-                QFile file(fileNameFound);
-                if (file.open(QFile::ReadOnly)) {
-                    QString StyleSheet = QLatin1String(file.readAll());
-                    printdata=StyleSheet;
-                    qCInfo(fileIOLog) << "caQtDM -- custom stylesheet file:" << fileNameFound << "reloaded stylesheet";
-                    if (stylereload.contains("later",Qt::CaseInsensitive)){
-                        QTimer::singleShot(3000, this, [this,StyleSheet] () {
-                                this->setStyleSheet(StyleSheet);
-                            });
-                    }else setStyleSheet(StyleSheet);
-                    file.close();
-                }
-            }
-            delete searchDefaultStyleSheet;
-        }
-        if (stylereload.contains("apply",Qt::CaseInsensitive)){
-            setStyleSheet(qApp->styleSheet());
-        }
-
-        if (stylereload.contains("print",Qt::CaseInsensitive)){
-            qCInfo(fileIOLog) << "caQtDM -- custom stylesheet file data:" << printdata;
-        }
-    }
+    applyPanelTheme(myWidget);
 
     // add a reload action
     QAction *ReloadWindowAction = new QAction(this);
@@ -2669,7 +2712,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
         w1->setProperty("ObjectType", caInclude_Widget);
 
         QWidget *thisW = (QWidget *) Q_NULLPTR;
-        QUiLoader loader;
+        PanelUiLoader loader;
         bool prcFile = false;
 
         QHBoxLayout *m_boxLayout = includeWidget->getIncludeboxLayout();//new QHBoxLayout;
@@ -2886,8 +2929,10 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                             if (level<CAQTDM_MAX_INCLUDE_LEVEL-1){
                                 QBuffer *buffer = new QBuffer();
                                 buffer->open(QIODevice::ReadWrite);
-                                //QByteArray data=file->readAll();
-                                buffer->write(file->readAll());
+                                const QByteArray ui = file->readAll();
+                                loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(
+                                    uiUsesLegacyLightTheme(ui)));
+                                buffer->write(ui);
 
                                 //QCryptographicHash md5Gen(QCryptographicHash::Md5);
                                 //md5Gen.addData(data);
@@ -3030,6 +3075,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
                     // recurse (DFS) to lower widgets
                     scanWidgets(thisW->findChildren<QWidget *>(), macroS);
+                    applyPanelTheme(thisW);
 
                     cainclude_path = cainclude_path_stacked;
                     level--;
@@ -11449,6 +11495,22 @@ QStringList CaQtDM_Lib::treat_read_MacroCommand(QStringList args){
     return args;
 }
 
+void CaQtDM_Lib::applyPanelTheme(QWidget *root)
+{
+    if (!root) return;
+
+    bool registered = false;
+    for (const QPointer<QWidget> &knownRoot : panelThemeRoots) {
+        if (knownRoot.data() == root) {
+            registered = true;
+            break;
+        }
+    }
+    if (!registered) panelThemeRoots.append(root);
+
+    PanelThemeApplier::apply(root);
+}
+
 void CaQtDM_Lib::themeChanged() {
     QApplication* guiApp = qobject_cast<QApplication*>(qApp);
     QPalette palette = guiApp->palette();
@@ -11456,6 +11518,16 @@ void CaQtDM_Lib::themeChanged() {
     QString oldColorDebugHex = m_debugTextColorHex;
     m_normalTextColorHex = palette.color(QPalette::Active, QPalette::Text).name();
     m_debugTextColorHex = palette.color(QPalette::Active, QPalette::Link).name();
+
+    QMutableListIterator<QPointer<QWidget>> root(panelThemeRoots);
+    while (root.hasNext()) {
+        const QPointer<QWidget> panelRoot = root.next();
+        if (panelRoot.isNull()) {
+            root.remove();
+            continue;
+        }
+        PanelThemeApplier::apply(panelRoot.data());
+    }
 
  }
 
@@ -11522,6 +11594,9 @@ extern "C"  {
         QMap<QString, QString> OptionList;
 
         QString macroS;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+        QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
+#endif
         QApplication app(argc, argv);
         QApplication::setOrganizationName("Paul Scherrer Institut");
         QApplication::setApplicationName("caQtDM");
