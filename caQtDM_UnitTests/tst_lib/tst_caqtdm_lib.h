@@ -65,6 +65,12 @@ private slots:
     void panelThemeAppliesWidgetDetails();
     void panelThemePreservesAuthoredWidgetColors();
     void panelStyleSheetIsScopedAndOverridesRootStyle();
+    void panelThemeModeParsing();
+    void panelThemeDarkModeUsesOwnPalette();
+    void panelThemeSystemSchemeFollowsPaletteLightness();
+    void panelThemeDarkStyleSheetKeepsDarkMode();
+    void panelThemeReappliesOnApplicationPaletteChange();
+    void panelThemeLegacyPaintsItselfOnDarkSystem();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

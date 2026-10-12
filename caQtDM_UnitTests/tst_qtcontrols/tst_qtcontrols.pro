@@ -11,7 +11,8 @@ SOURCES += tst_qtcontrols.cpp \
     tst_caapplynumeric.cpp \
     tst_caimage.cpp \
     tst_alhparser.cpp \
-    tst_alarmtree_logic.cpp
+    tst_alarmtree_logic.cpp \
+    tst_themecolors.cpp
 
 HEADERS += tst_pvdialog.h \
     tst_gensoftpv.h \
@@ -22,7 +23,8 @@ HEADERS += tst_pvdialog.h \
     tst_numeric_suite.h \
     fakeformwindow.h \
     tst_alhparser.h \
-    tst_alarmtree_logic.h
+    tst_alarmtree_logic.h \
+    tst_themecolors.h
 
 # --- Tested classes below ---
 

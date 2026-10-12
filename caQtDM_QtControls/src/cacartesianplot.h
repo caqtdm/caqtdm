@@ -26,6 +26,7 @@
 #ifndef CACARTESIANPLOT_H
 #define CACARTESIANPLOT_H
 #include "plotHelperClasses.h"
+#include "themecolors.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_grid.h>
@@ -48,13 +49,9 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_panner.h>
 
-#if QWT_VERSION >= 0x060100
-  #include <qwt_legend_label.h>
-  #include <qwt_date_scale_engine.h>
-  #include <qwt_date_scale_draw.h>
-#else
-  #include <qwt_legend_item.h>
-#endif
+#include <qwt_legend_label.h>
+#include <qwt_date_scale_engine.h>
+#include <qwt_date_scale_draw.h>
 
 #include <stdint.h>
 #include <limits>
@@ -64,11 +61,9 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
 {
     Q_OBJECT
 
-#if QWT_VERSION >= 0x060100
     // suppress these properties for the designer
     Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
-#endif
 
     Q_ENUMS(curvSymbol)
     Q_ENUMS(curvStyle)
@@ -449,8 +444,11 @@ signals:
 protected:
 
     void resizeEvent ( QResizeEvent * event);
+    void changeEvent(QEvent *event);
 
 private:
+    QColor themedScaleColor() const;
+    ThemeColors::Scheme appliedScheme;
     template <typename pureData>
     void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);
     void AverageData(double *array, double *avg, int size, int ratio);

@@ -42,26 +42,6 @@
 #include <qnumeric.h>
 #include <qwt_text.h>
 
-#if QWT_VERSION < 0x060100
-
-class myDialScaleDraw: public QwtDialScaleDraw
-{
-public:
-    myDialScaleDraw(caMeter *w) : QwtDialScaleDraw(w)
-    {
-        thisParent = w;
-    }
-    virtual QwtText label(double v) const
-    {
-        return QwtText(thisParent->setScaleLabel(v));
-    }
-
-private:
-
-    caMeter *thisParent;
-
-};
-#else
 class myDialScaleDraw: public QwtRoundScaleDraw
 {
 public:
@@ -77,7 +57,6 @@ public:
 private:
     caMeter *thisParent;
 };
-#endif
 
 caMeter::~caMeter() {
 }
@@ -89,13 +68,8 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     thisScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
     setScaleDefaultColor(true);
 
-#if QWT_VERSION < 0x060100
-    QwtDialScaleDraw *ScaleDraw = new myDialScaleDraw(this);
-    setScaleDraw((QwtDialScaleDraw*) ScaleDraw);
-#else
     myDialScaleDraw *ScaleDraw = new myDialScaleDraw(this);
     setScaleDraw(ScaleDraw);
-#endif
 
     setWrapping(false);
     setReadOnly(true);
@@ -108,15 +82,8 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
 	thisMinValue = 0;
 	thisMaxValue = 300;
 
-#if QWT_VERSION < 0x060100
-    setScaleComponents(QwtAbstractScaleDraw::Ticks | QwtAbstractScaleDraw::Labels);
-    setScaleTicks(0, 4, 8);
-    setRange(thisMinValue, thisMaxValue);
-    setScale(-1, 2, (thisMaxValue-thisMinValue)/10.0);  //maxMajIntv: Maximum major interval, maxMinIntv: Maximum minor interval
-#else
     setScale( thisMinValue, thisMaxValue);
     setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
-#endif
 
 #if QWT_VERSION < 0x060200
     ScaleDraw->setPenWidth(1);
@@ -144,24 +111,14 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
 
 void caMeter::setMinValue(double v) {
     thisMinValue = v;
-#if QWT_VERSION < 0x060100
-    setRange(thisMinValue, thisMaxValue);
-    setScale(-1, 2, (thisMinValue - thisMaxValue)/10.0);
-#else
     setScale( thisMinValue, thisMaxValue);
     setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
-#endif
 }
 
 void caMeter::setMaxValue(double v) {
     thisMaxValue = v;
-#if QWT_VERSION < 0x060100
-    setRange(thisMinValue, thisMaxValue);
-    setScale(-1, 2, (thisMinValue - thisMaxValue)/10.0);
-#else
     setScale( thisMinValue, thisMaxValue);
      setScaleStepSize((thisMinValue - thisMaxValue)/10.0);
-#endif
     update();
 }
 
@@ -344,14 +301,9 @@ void caMeter::resizeEvent(QResizeEvent *e)
 
 void caMeter::invalidate()
 {
-#if QWT_VERSION >= 0x060100
     invalidateCache();
     setScale(getMinValue()-1, getMaxValue()+1);
     setScale(getMinValue(), getMaxValue());
-#else
-    setRange(thisMinValue, thisMaxValue);
-    setScale(-1, 2, (thisMinValue - thisMaxValue)/10.0);
-#endif
     update();
 }
 

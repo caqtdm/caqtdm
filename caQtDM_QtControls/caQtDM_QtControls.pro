@@ -76,9 +76,7 @@ cahmi{
     PRE_TARGETDEPS += moc/moc_cahmiconfigtransferitem.cpp
 }
 
-!contains(QWT_VER_MIN, 0){
-  PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
-}
+PRE_TARGETDEPS += moc/moc_qwt_thermo_marker_61.cpp
 
 SOURCES	+= \
     src/caframe.cpp \
@@ -208,15 +206,11 @@ HEADERS += \
 }
 
 
-SOURCES += src/networkaccess.cpp src/fileFunctions.cpp
+SOURCES += src/networkaccess.cpp src/fileFunctions.cpp src/themecolors.cpp
 
-contains(QWT_VER_MIN, 0) {
-   HEADERS	+= src/qwt_thermo_marker.h
-   SOURCES	+= src/qwt_thermo_marker.cpp
-}else {
-   HEADERS	+= src/qwt_thermo_marker_61.h
-   SOURCES	+= src/qwt_thermo_marker_61.cpp
-}
+# qwt >= 6.1 is required (qwt_thermo_marker.{h,cpp} for qwt 6.0 are no longer built)
+HEADERS	+= src/qwt_thermo_marker_61.h
+SOURCES	+= src/qwt_thermo_marker_61.cpp
 
 HEADERS	+= \
     src/caframe.h \
@@ -233,6 +227,8 @@ HEADERS	+= \
     src/epushbutton.h \
     src/enumeric.h \
     src/numericpaneltheme.h \
+    src/themecolors.h \
+    src/qtcontrols_export.h \
     src/number_delegate.h \
     src/leftclick_with_modifiers_eater.h \
     src/eapplybutton.h \

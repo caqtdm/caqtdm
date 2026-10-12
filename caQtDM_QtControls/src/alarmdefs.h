@@ -26,20 +26,22 @@
 #ifndef ALARMS_H
 #define ALARMS_H
 
+#include "themecolors.h"
+
 enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=99};
 
-// colours by name
-#define AL_GREEN QColor(0x00, 0xcd, 0x00)
-#define AL_YELLOW QColor(0xff, 0xff, 0x00)
-#define AL_RED QColor(0xff, 0x00, 0x00)
-#define AL_WHITE QColor(0xff, 0xff, 0xff)
-#define AL_BLACK QColor(0, 0, 0)
-#define AL_GREY QColor(0x88, 0x88, 0x88)
-#define AL_LIGHTGREY QColor(0xd3, 0xd3, 0xd3)
-#define AL_BLUE QColor(0x00, 0x00, 0xff)
-#define AL_LIGHTBLUE QColor(0xad, 0xd8, 0xe6)
-#define AL_STEELBLUE QColor(0x46, 0x82, 0xb4)
-#define AL_ROYALBLUE QColor(0x41, 0x69, 0xe1)
+// colours by name; values live in themecolors.h (level 1), these are aliases
+#define AL_GREEN ThemeColors::color(ThemeColors::AlarmNoAlarm)
+#define AL_YELLOW ThemeColors::color(ThemeColors::AlarmMinor)
+#define AL_RED ThemeColors::color(ThemeColors::AlarmMajor)
+#define AL_WHITE ThemeColors::color(ThemeColors::White)
+#define AL_BLACK ThemeColors::color(ThemeColors::Black)
+#define AL_GREY ThemeColors::color(ThemeColors::AlarmDefault)
+#define AL_LIGHTGREY ThemeColors::color(ThemeColors::LightGrey)
+#define AL_BLUE ThemeColors::color(ThemeColors::Blue)
+#define AL_LIGHTBLUE ThemeColors::color(ThemeColors::LightBlue)
+#define AL_STEELBLUE ThemeColors::color(ThemeColors::SteelBlue)
+#define AL_ROYALBLUE ThemeColors::color(ThemeColors::RoyalBlue)
 #define AL_DEFAULT AL_GREY
 
 // alarm handler colours by purpose, _LIGHT/_DARK = palette mode
@@ -57,16 +59,6 @@ enum Alarms {NO_ALARM=0, MINOR_ALARM, MAJOR_ALARM, INVALID_ALARM, NOTCONNECTED=9
 #define ALH_SEVR_TEXT AL_BLACK               // on the severity colours
 #define ALH_INACTIVE_TEXT AL_GREY
 
-// Panel theme legacy-light palette colours
-#define PANEL_THEME_LEGACY_WHITE QColor(0xff, 0xff, 0xff)
-#define PANEL_THEME_LEGACY_BLACK QColor(0, 0, 0)
-#define PANEL_THEME_LEGACY_ALTERNATE_BASE QColor(245, 245, 245)
-#define PANEL_THEME_LEGACY_BUTTON QColor(239, 239, 239)
-#define PANEL_THEME_LEGACY_MIDLIGHT QColor(247, 247, 247)
-#define PANEL_THEME_LEGACY_MID QColor(184, 184, 184)
-#define PANEL_THEME_LEGACY_DARK QColor(160, 160, 160)
-#define PANEL_THEME_LEGACY_SHADOW QColor(105, 105, 105)
-#define PANEL_THEME_LEGACY_HIGHLIGHT QColor(53, 132, 228)
-#define PANEL_THEME_LEGACY_LINK QColor(0, 70, 180)
+// Panel theme legacy-light palette: see ThemeColors::palette(ThemeColors::Light)
 
 #endif

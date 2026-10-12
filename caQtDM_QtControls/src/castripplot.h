@@ -45,11 +45,7 @@
 #include <qwt_scale_draw.h>
 #include <qwt_legend.h>
 #include <qwt_scale_engine.h>
-#if QWT_VERSION >= 0x060100
-  #include <qwt_legend_label.h>
-#else
-  #include <qwt_legend_item.h>
-#endif
+#include <qwt_legend_label.h>
 #include <qwt_plot_canvas.h>
 #include <qwt_plot_marker.h>
 #include <QMouseEvent>
@@ -76,11 +72,9 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
 {
     Q_OBJECT
 
-#if QWT_VERSION >= 0x060100
     // suppress these properties for the designer
     Q_PROPERTY( QBrush canvasBackground READ canvasBackground WRITE setCanvasBackground DESIGNABLE false)
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
-#endif
 
     Q_ENUMS(curvStyle)
     Q_ENUMS(axisScaling)

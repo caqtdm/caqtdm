@@ -44,9 +44,7 @@
 
 #include <qwt_color_map.h>
 #include <qwt_scale_widget.h>
-#if QWT_VERSION >= 0x060100
 #include <qwt_scale_div.h>
-#endif
 
 #include "mdaReader.h"
 

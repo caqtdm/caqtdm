@@ -326,6 +326,7 @@ protected:
 public:
 #endif
     virtual void timerEvent(QTimerEvent *e);
+    void changeEvent(QEvent *event);
     void resizeEvent ( QResizeEvent * event );
     void mousePressEvent(QMouseEvent *event);
 
@@ -538,6 +539,7 @@ public:
     HMIApplicationEventFilter *globalEventFilter;
 
     QList<QPointer<QWidget>> panelThemeRoots;
+    bool themeChangePending = false;
     void applyPanelTheme(QWidget *root);
 
     void hmiHandleKeyPressed(QObject *target, QKeyEvent *event);
@@ -656,7 +658,8 @@ public slots:
     }
 
     void updateResize();
-    void themeChanged();
+    void themeChanged();               // schedules applyThemeChange()
+    void applyThemeChange();
 
 #ifndef MOBILE
     void send_delayed_popup_signal();

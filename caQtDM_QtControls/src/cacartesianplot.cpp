@@ -31,6 +31,25 @@
 
 #include "cacartesianplot.h"
 #include "plotHelperClasses.h"
+#include "themecolors.h"
+
+// colour set of caCartesianPlot (level 2), values come from themecolors.h
+namespace caCartesianPlotColor {
+    constexpr const ThemeColor &Canvas       = ThemeColors::PlotCanvas;
+    constexpr const ThemeColor &Frame        = ThemeColors::PlotFrame;
+    constexpr const ThemeColor &Scale        = ThemeColors::PlotScale;
+    constexpr const ThemeColor &Grid         = ThemeColors::PlotGrid;
+    constexpr const ThemeColor &CanvasFrame  = ThemeColors::PlotCanvasFrame;
+    constexpr const ThemeColor &GlCanvas     = ThemeColors::PlotGlCanvas;
+    constexpr const ThemeColor &ZoomBand     = ThemeColors::PlotZoomBand;
+    constexpr const ThemeColor &NotConnected = ThemeColors::PlotNotConnected;
+    constexpr const ThemeColor &Curve1       = ThemeColors::Curve1;
+    constexpr const ThemeColor &Curve2       = ThemeColors::Curve2;
+    constexpr const ThemeColor &Curve3       = ThemeColors::Curve3;
+    constexpr const ThemeColor &Curve4       = ThemeColors::Curve4;
+    constexpr const ThemeColor &Curve5       = ThemeColors::Curve5;
+    constexpr const ThemeColor &Curve6       = ThemeColors::Curve6;
+}
 #include <QClipboard>
 #include <QtCore>
 #include <QGuiApplication>
@@ -65,11 +84,12 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setTitleX("");
     setTitleY("");
 
-    setBackground(Qt::black);
-    setForeground(Qt::white);
-    setScaleColor(Qt::black);
+    appliedScheme = ThemeColors::Light;
+    setBackground(ThemeColors::color(caCartesianPlotColor::Canvas));
+    setForeground(ThemeColors::color(caCartesianPlotColor::Frame));
+    setScaleColor(ThemeColors::color(caCartesianPlotColor::Scale));
     setGrid(true);
-    setGridColor(Qt::gray);
+    setGridColor(ThemeColors::color(caCartesianPlotColor::Grid));
     whiteColors = false;
 
     setAutoFillBackground(true);
@@ -79,14 +99,10 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
     // canvas
 
-#if QWT_VERSION < 0x060100
-    zoomer = new PlotZoomer(canvas());
-    QwtPlotPanner *panner = new QwtPlotPanner(canvas());
-#else
 #ifdef QWT_USE_OPENGL
     qCDebug(caCartesianPlotLog) << "caCartesianPlot uses opengl (zoomer works but no rubberband)?";
     GLCanvas *canvas = new GLCanvas();
-    canvas->setPalette( QColor( "khaki" ) );
+    canvas->setPalette(ThemeColors::color(caCartesianPlotColor::GlCanvas));
     setCanvas(canvas);
     zoomer = new PlotZoomer( (QwtPlotCanvas *) canvas);
 #else
@@ -94,7 +110,6 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     zoomer = new PlotZoomer( (QwtPlotCanvas *) canvas);
 #endif
     QwtPlotPanner *panner = new QwtPlotPanner(canvas);
-#endif
 
     panner->setAxisEnabled(QwtPlot::yRight, false);
     panner->setAxisEnabled(QwtPlot::yLeft, true);
@@ -107,7 +122,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
 
 
 
-        const QColor c(Qt::red);
+   const QColor c = ThemeColors::color(caCartesianPlotColor::ZoomBand);
    zoomer->setRubberBandPen(c);
    zoomer->setTrackerMode(QwtPicker::AlwaysOff);
    plotPicker = new DynamicPlotPicker(this->xBottom , this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOff, this->canvas());
@@ -130,9 +145,7 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
         curve[i].attach(this);
         curve[i].setOrientation(Qt::Vertical);
         curve[i].setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
-#if QWT_VERSION >= 0x060100
         curve[i].setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
-#endif
     }
 
     setStyle_1(Lines);
@@ -147,12 +160,12 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setSymbol_4(NoSymbol);
     setSymbol_5(NoSymbol);
     setSymbol_6(NoSymbol);
-    setColor_1(Qt::white);
-    setColor_2(Qt::red);
-    setColor_3(Qt::yellow);
-    setColor_4(Qt::blue);
-    setColor_5(Qt::green);
-    setColor_6(Qt::magenta);
+    setColor_1(ThemeColors::color(caCartesianPlotColor::Curve1));
+    setColor_2(ThemeColors::color(caCartesianPlotColor::Curve2));
+    setColor_3(ThemeColors::color(caCartesianPlotColor::Curve3));
+    setColor_4(ThemeColors::color(caCartesianPlotColor::Curve4));
+    setColor_5(ThemeColors::color(caCartesianPlotColor::Curve5));
+    setColor_6(ThemeColors::color(caCartesianPlotColor::Curve6));
 
     setLegendEnabled(false);
     setXaxisEnabled(true);
@@ -167,19 +180,12 @@ caCartesianPlot::caCartesianPlot(QWidget *parent) : QwtPlot(parent)
     setAxisFont(QwtPlot::yLeft, QFont("Arial", 8));
 
     // this allows to have a transparent widget
-#if QWT_VERSION < 0x060100
-    canvas()->setPaintAttribute(QwtPlotCanvas::BackingStore, false);
-    canvas()->setPaintAttribute(QwtPlotCanvas::Opaque, false);
-    canvas()->setAttribute( Qt::WA_OpaquePaintEvent, false );
-    canvas()->setAutoFillBackground( false );   // use in ui file this parameter for transparency
-#else
     #ifndef QWT_USE_OPENGL
     canvas->setPaintAttribute(QwtPlotCanvas::BackingStore, false);
     canvas->setPaintAttribute(QwtPlotCanvas::Opaque, false);
     canvas->setAttribute( Qt::WA_OpaquePaintEvent, false );
     canvas->setAutoFillBackground( false );   // use in ui file this parameter for transparency
     #endif
-#endif
     ignorefirst_MinY=true;
     ignorefirst_MaxY=true;
     ignorefirst_MinX=true;
@@ -214,7 +220,7 @@ void caCartesianPlot::updateLegendsPV() {
 
         // Qwt rebuilds legend labels when a curve title changes.  Apply the
         // configured colour only after the final labels exist.
-        setLegendAttribute(thisScaleColor, QFont("arial",7), COLOR);
+        setLegendAttribute(themedScaleColor(), QFont("arial",7), COLOR);
     }
 }
 
@@ -687,7 +693,7 @@ void caCartesianPlot::setTitleY(QString const &titel)
 void caCartesianPlot::setGrid(bool m){
     thisGrid = m;
     if(m) {
-        penGrid = QPen(Qt::gray);
+        penGrid = QPen(ThemeColors::color(caCartesianPlotColor::Grid));
         penGrid.setStyle(Qt::DashLine);
         plotGrid->setPen(penGrid);
         plotGrid->setVisible(penGrid.style() != Qt::NoPen);
@@ -774,19 +780,38 @@ void caCartesianPlot::setBackgroundColor(QColor c)
 {
     QPalette canvasPalette(c);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    canvasPalette.setColor(QPalette::Foreground, QColor(133, 190, 232));
+    canvasPalette.setColor(QPalette::Foreground, ThemeColors::color(caCartesianPlotColor::CanvasFrame));
 #else
-    canvasPalette.setColor(QPalette::WindowText, QColor(133, 190, 232));
+    canvasPalette.setColor(QPalette::WindowText, ThemeColors::color(caCartesianPlotColor::CanvasFrame));
 
 #endif
     canvas()->setPalette(canvasPalette);
     replot();
 }
 
+// frame, scale and grid defaults follow the panel theme; author colours stay
 void caCartesianPlot::setForegroundColor(QColor c)
 {
-    setPalette(QPalette(c));
+    setPalette(QPalette(ThemeColors::themed(c, caCartesianPlotColor::Frame, ThemeColors::schemeOf(this))));
     replot();
+}
+
+QColor caCartesianPlot::themedScaleColor() const
+{
+    return ThemeColors::themed(thisScaleColor, caCartesianPlotColor::Scale, ThemeColors::schemeOf(this));
+}
+
+void caCartesianPlot::changeEvent(QEvent *event)
+{
+    QwtPlot::changeEvent(event);
+    if(event->type() != QEvent::PaletteChange && event->type() != QEvent::StyleChange) return;
+    const ThemeColors::Scheme scheme = ThemeColors::schemeOf(this);
+    if(scheme == appliedScheme) return;
+    appliedScheme = scheme;
+    setForegroundColor(thisForeColor);
+    setScalesColor(thisScaleColor);
+    setGridsColor(thisGridColor);
+    if(thisLegendshow) setLegendAttribute(themedScaleColor(), QFont("arial",7), COLOR);
 }
 
 void caCartesianPlot::setBackground(QColor c) { thisBackColor  = c; setBackgroundColor(c);}
@@ -794,8 +819,9 @@ void caCartesianPlot::setForeground(QColor c) { thisForeColor  = c; setForegroun
 void caCartesianPlot::setScaleColor(QColor c) { thisScaleColor = c; setScalesColor(c);}
 void caCartesianPlot::setGridColor(QColor c)  { thisGridColor  = c; setGridsColor(c);}
 
-void caCartesianPlot::setScalesColor(QColor c)
+void caCartesianPlot::setScalesColor(QColor color)
 {
+    const QColor c = ThemeColors::themed(color, caCartesianPlotColor::Scale, ThemeColors::schemeOf(this));
     QwtScaleWidget *scaleX =axisWidget(QwtPlot::xBottom);
     QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
     QPalette palette = scaleX->palette();
@@ -989,13 +1015,8 @@ int caCartesianPlot::getYLimits(double &minY, double &maxY)
 
 void caCartesianPlot::setScaleXlimits(double value, int maxormin)
 {
- #if QWT_VERSION < 0x060100
-   double minX = axisScaleDiv(xBottom)->lowerBound();
-   double maxX = axisScaleDiv(xBottom)->upperBound();
-#else
    double minX = axisScaleDiv(xBottom).lowerBound();
    double maxX = axisScaleDiv(xBottom).upperBound();
-#endif
    if(maxormin == 0) {
      setAxisScale(xBottom, value, maxX);
    } else {
@@ -1006,13 +1027,8 @@ void caCartesianPlot::setScaleXlimits(double value, int maxormin)
 
 void caCartesianPlot::setScaleYlimits(double value, int maxormin)
 {
- #if QWT_VERSION < 0x060100
-   double minX = axisScaleDiv(yLeft)->lowerBound();
-   double maxX = axisScaleDiv(yLeft)->upperBound();
-#else
     double minX = axisScaleDiv(yLeft).lowerBound();
     double maxX = axisScaleDiv(yLeft).upperBound();
-#endif
    if(maxormin == 0) {
      setAxisScale(yLeft, value, maxX);
    } else {
@@ -1069,7 +1085,6 @@ void caCartesianPlot::setXaxisType(axisType s)
         plotPicker->setIsXAxisAlreadyCorrect(false);
         plotPicker->setIsXAxisTimeSinceEpoch(true);
 // in qwt6.0 no date/time scale possible
-#if QWT_VERSION >= 0x060100
         // gives an axe for milliseconds since epoch
         PlotDateScaleEngine *scaleEngine = new PlotDateScaleEngine(thisXticks, Qt::LocalTime); // in number of milliseconds from epoch
         setAxisScaleEngine(QwtPlot::xBottom, scaleEngine);
@@ -1087,18 +1102,8 @@ void caCartesianPlot::setXaxisType(axisType s)
         double INTERVAL = 3600 * 1000;
         setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
 // fall back to normal scale
-#else
-        setAxisScaleEngine(QwtPlot::xBottom, new PlotScaleEngine(thisXticks));
-        setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
-        double INTERVAL = 1000.0;
-        setAxisScale(QwtPlot::xBottom, 0.0, INTERVAL, INTERVAL/thisXticks);
-#endif
     } else if(s == log10) {
-#if QWT_VERSION < 0x060100
-        setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
-#else
         setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
-#endif
         setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     } else {
         setAxisScaleEngine(QwtPlot::xBottom, new PlotScaleEngine(thisXticks));
@@ -1122,11 +1127,7 @@ void caCartesianPlot::setYaxisType(axisType s)
         thisYtype = linear;
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
     } else if(s == log10) {
-#if QWT_VERSION < 0x060100
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
-#else
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
-#endif
     } else {
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
     }
@@ -1143,7 +1144,7 @@ void caCartesianPlot::setYaxisType(axisType s)
 
 void caCartesianPlot::setWhiteColors()
 {
-    QColor c = QColor(Qt::white);
+    QColor c = ThemeColors::color(caCartesianPlotColor::NotConnected);
 /* optimized, do not set white to curve to prevent load and flashing
    and still see some old curve if was present
     for(int i=0; i<curveCount; i++) {
@@ -1192,50 +1193,6 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
     //when legend text gets to small, hide it (will give then space for plot)
     setProperty("legendfontsize", f.pointSizeF());
 
-#if QWT_VERSION < 0x060100
-    for(i=0; i < curveCount; i++) {
-
-        if(f.pointSizeF() <= 4.0) {
-            curve[i].setItemAttribute(QwtPlotItem::Legend, false);
-            continue;
-        } else {
-            curve[i].setItemAttribute(QwtPlotItem::Legend, true);
-        }
-
-        switch (SW) {
-        case TEXT:
-            // done now through curve title
-            break;
-
-        case FONT:
-            if(getLegendEnabled()) {
-                if(legend() != (QwtLegend*) Q_NULLPTR) {
-                    QList<QWidget *> list =  legend()->legendItems();
-                    for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
-                        QWidget *w = *it;
-                        w->setFont(f);
-                    }
-                }
-            }
-            break;
-
-        case COLOR:
-            if(legend() != (QwtLegend*) Q_NULLPTR) {
-                QList<QWidget *> list =  legend()->legendItems();
-                for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
-                    QWidget *w = *it;
-                    QPalette palette = w->palette();
-                    palette.setColor( QPalette::WindowText, c); // for ticks
-                    palette.setColor( QPalette::Text, c);       // for ticks' labels
-                    w->setPalette (palette);
-                    w->setFont(f);
-                }
-            }
-            break;
-        }
-
-    }
-#else
 
     i=0;
     foreach (QwtPlotItem *plt_item, itemList()) {
@@ -1303,7 +1260,6 @@ void caCartesianPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
             }
         }
     }
-#endif
 
 }
 

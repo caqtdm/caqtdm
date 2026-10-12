@@ -36,6 +36,12 @@
 #include "qwt_date_scale_engine.h"
 #include "qwt_text.h"
 #include <cmath>
+#include "themecolors.h"
+
+// colour set of the plot helpers (level 2); static: header is shared
+namespace PlotHelperColor {
+    static constexpr const ThemeColor &TrackerBackground = ThemeColors::PlotTracker;
+}
 
 class PlotDateScaleDraw: public QwtDateScaleDraw
 {
@@ -55,7 +61,6 @@ private:
 
 };
 
-#if QWT_VERSION >= 0x060100
 class PlotDateScaleEngine: public QwtDateScaleEngine
 {
 public:
@@ -87,7 +92,6 @@ public:
 private:
     int nbTicks;
 };
-#endif
 
 #ifdef QWT_USE_OPENGL
 class GLCanvas: public QwtPlotGLCanvas
@@ -364,7 +368,7 @@ protected:
         } else {
             newText = (timeOnHover.toString("hh:mm:ss") + QString(" | %1").arg(coordinates.y()));
         }
-        newText.setBackgroundBrush(Qt::white);
+        newText.setBackgroundBrush(ThemeColors::color(PlotHelperColor::TrackerBackground));
         newText.setBorderRadius(1);
 
         return newText;
@@ -395,7 +399,7 @@ public:
 
     virtual QwtText trackerTextF(const QPointF &pos) const
     {
-        QColor bg(Qt::white);
+        QColor bg = ThemeColors::color(PlotHelperColor::TrackerBackground);
         bg.setAlpha(200);
 
         QwtText text("(" + QString::number(pos.x()) + "," + QString::number(pos.y()) + ") ");

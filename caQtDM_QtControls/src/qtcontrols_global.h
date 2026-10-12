@@ -34,15 +34,7 @@
 
 #define NOMINMAX
 
-#if defined(_MSC_VER)
-		#if defined(QTCON_MAKEDLL)     // create a qtControls DLL library
-			#define QTCON_EXPORT  __declspec(dllexport)
-		#else                        // use a qtControls DLL library
-			#define QTCON_EXPORT  __declspec(dllimport)
-		#endif
-#else
-	#define QTCON_EXPORT
-#endif
+#include "qtcontrols_export.h"
 
 #if defined(__OSX__) || defined(__APPLE__)
   #include <cmath>
@@ -76,6 +68,7 @@
 #endif
 
 Q_DECLARE_LOGGING_CATEGORY(caApplyNumericLog)
+Q_DECLARE_LOGGING_CATEGORY(themeColorsLog)
 Q_DECLARE_LOGGING_CATEGORY(caBitnamesLog)
 Q_DECLARE_LOGGING_CATEGORY(caByteLog)
 Q_DECLARE_LOGGING_CATEGORY(caByteControllerLog)

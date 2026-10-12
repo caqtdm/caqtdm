@@ -206,12 +206,8 @@ void caWaterfallPlot::InitData(int numCols)
 
 void caWaterfallPlot::myReplot()
 {
-#if QWT_VERSION >= 0x060100
     QwtPlotCanvas *canvas =  (QwtPlotCanvas *) plot->canvas();
     canvas->replot();
-#else
-    plot->canvas()->replot();
-#endif
 }
 
 template <typename pureData> void caWaterfallPlot::AverageArray(pureData *vec, int size, int arraySize, double *avg, int ratio)

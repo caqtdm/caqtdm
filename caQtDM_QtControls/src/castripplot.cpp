@@ -141,11 +141,9 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
         fillcurve[i]->setZ(i);
         errorcurve[i]->setZ(i+10);
 
-#if QWT_VERSION >= 0x060100
         curve[i]->setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
         fillcurve[i]->setRenderThreadCount( 0 );
         errorcurve[i]->setRenderThreadCount( 0 );
-#endif
         curve[i]->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
         fillcurve[i]->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
         errorcurve[i]->setPaintAttribute(QwtPlotIntervalCurve::ClipPolygons, true);
@@ -433,14 +431,9 @@ void caStripPlot::setYaxisType(yAxisType s)
 {
     thisYaxisType = s;
     if(s == log10) {
-#if QWT_VERSION < 0x060100
-        setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
-        setAxisScaleDraw(QwtPlot::yLeft, new PlotScaleDraw());
-#else
         // Leaves default parameter IsLinear = true, doesn't matter though because we don't want any conversion so far.
         setAxisScaleDraw(QwtPlot::yLeft, new PlotScaleDraw());
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine());
-#endif
     } else {
         setAxisScaleDraw(QwtPlot::yLeft, new PlotScaleDraw());
         setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
@@ -749,21 +742,11 @@ void caStripPlot::setCurveLegendTitle(int index)
 void caStripPlot::refreshLegendTextColor(QColor color)
 {
     if (!legend()) return;
-#if QWT_VERSION < 0x060100
-    const QList<QWidget *> labels = static_cast<QwtLegend *>(legend())->legendItems();
-    for (QWidget *label : labels) {
-        QPalette labelPalette = label->palette();
-        labelPalette.setColor(QPalette::WindowText, color);
-        labelPalette.setColor(QPalette::Text, color);
-        label->setPalette(labelPalette);
-    }
-#else
     for (QwtLegendLabel *label : legend()->findChildren<QwtLegendLabel *>()) {
         QwtText text = label->text();
         text.setColor(color);
         label->setText(text);
     }
-#endif
 }
 
 void caStripPlot::defineCurves(QStringList titles, units unit, double period, int width, int nbCurves)
@@ -1206,50 +1189,6 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
     //when legend text gets to small, hide it (will give then space for plot)
     setProperty("legendfontsize", f.pointSizeF());
 
-#if QWT_VERSION < 0x060100
-    for(int i=0; i < NumberOfCurves; i++) {
-
-        if(f.pointSizeF() <= 4.0) {
-            curve[i]->setItemAttribute(QwtPlotItem::Legend, false);
-            continue;
-        } else {
-            if(!curve[i]->title().text().contains("?fill?")) curve[i]->setItemAttribute(QwtPlotItem::Legend, true);
-        }
-
-        switch (SW) {
-        case TEXT:
-            // done now through curve title
-            break;
-
-        case FONT:
-            if(getLegendEnabled()) {
-                if(legend() != (QwtLegend*) Q_NULLPTR) {
-                    QList<QWidget *> list =  legend()->legendItems();
-                    for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
-                        QWidget *w = *it;
-                        w->setFont(f);
-                    }
-                }
-            }
-            break;
-
-        case COLOR:
-            if(legend() != (QwtLegend*) Q_NULLPTR) {
-                QList<QWidget *> list =  legend()->legendItems();
-                for (QList<QWidget*>::iterator it = list.begin(); it != list.end(); ++it ) {
-                    QWidget *w = *it;
-                    QPalette palette = w->palette();
-                    palette.setColor( QPalette::WindowText, c); // for ticks
-                    palette.setColor( QPalette::Text, c);       // for ticks' labels
-                    w->setPalette (palette);
-                    w->setFont(f);
-                }
-            }
-            break;
-        }
-
-    }
-#else
 
     foreach (QwtPlotItem *plt_item, itemList()) {
         if (plt_item->rtti() == QwtPlotItem::Rtti_PlotCurve) {
@@ -1298,7 +1237,6 @@ void caStripPlot::setLegendAttribute(QColor c, QFont f, LegendAtttribute SW)
     }
     updateLegend();
     if (SW == COLOR) refreshLegendTextColor(c);
-#endif
 
 }
 

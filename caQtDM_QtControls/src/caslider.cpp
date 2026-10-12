@@ -275,11 +275,7 @@ void caSlider::set_Max_Value(double max)
     if (fabs(thisMaximum-max)>std::numeric_limits<double>::epsilon()*10){
         qCDebug(caSliderLog) << "Max:" << max;
         thisMaximum=max;
-#if QWT_VERSION < 0x060100
-        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
-#else
         setScale(thisMinimum, thisMaximum);
-#endif
     }
 
 
@@ -294,11 +290,7 @@ void caSlider::set_Min_Value(double min)
 {
     if (fabs(thisMinimum-min)>std::numeric_limits<double>::epsilon()*10){
         thisMinimum=min;
-#if QWT_VERSION < 0x060100
-        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
-#else
         setScale(thisMinimum, thisMaximum);
-#endif
     }
 }
 
@@ -315,25 +307,6 @@ void caSlider::setAccessW(bool access)
 
 void caSlider::setDirection(Direction dir)
 {
-#if QWT_VERSION < 0x060100
-    ScalePos scalepos = this->scalePosition();
-
-    // when ui file was made with version Qwt6.1.1 and here we use Qwt6.0.1 then
-    // we are in trouble, so make some defaults in this case
-    if(scalepos == -1) {
-        switch (dir) {
-            case Up:
-            case Down:
-               scalepos = QwtSlider::LeftScale;
-               break;
-            case Left:
-            case Right:
-               scalepos = QwtSlider::BottomScale;
-               break;
-         }
-    }
-
-#else
     ScalePosition scalepos = this->scalePosition();
     if(scalepos == -1) {
         switch (dir) {
@@ -347,71 +320,34 @@ void caSlider::setDirection(Direction dir)
                break;
          }
     }
-#endif
 
     thisDirection = dir;
 
-#if QWT_VERSION >= 0x060100
     incrementValue((int) thisIncrement);
     setPageSteps(1);
-#endif
 
     switch (dir) {
     case Up:
-#if QWT_VERSION < 0x060100
-        setScalePosition(QwtSlider::LeftScale);
-#else
         setScalePosition(QwtSlider::TrailingScale);
-#endif
         setOrientation(Qt::Vertical);
-#if QWT_VERSION < 0x060100
-        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
-#else
         setScale(thisMinimum, thisMaximum);
-#endif
         break;
     case Down:
-#if QWT_VERSION < 0x060100
-        setScalePosition(QwtSlider::LeftScale);
-#else
         setScalePosition(QwtSlider::LeadingScale);
-#endif
         setOrientation(Qt::Vertical);
-#if QWT_VERSION < 0x060100
-        if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum ,  thisIncrement, 1);
-        else setRange(thisMinimum, thisMaximum , thisIncrement, 1);
-#else
         if(thisMaximum > thisMinimum) setScale(thisMaximum, thisMinimum);
         else setScale(thisMinimum, thisMaximum);
-#endif
         break;
     case Left:
-#if QWT_VERSION < 0x060100
-        setScalePosition(QwtSlider::BottomScale);
-#else
         setScalePosition(QwtSlider::TrailingScale);
-#endif
         setOrientation(Qt::Horizontal);
-#if QWT_VERSION < 0x060100
-        if(thisMaximum > thisMinimum) setRange(thisMaximum, thisMinimum , thisIncrement, 1);
-        else setRange(thisMinimum, thisMaximum , thisIncrement, 1);
-#else
         if(thisMaximum > thisMinimum) setScale(thisMaximum, thisMinimum);
         else setScale(thisMinimum, thisMaximum);
-#endif
         break;
     case Right:
-#if QWT_VERSION < 0x060100
-        setScalePosition(QwtSlider::BottomScale);
-#else
         setScalePosition(QwtSlider::LeadingScale);
-#endif
         setOrientation(Qt::Horizontal);
-#if QWT_VERSION < 0x060100
-        setRange(thisMinimum, thisMaximum, thisIncrement, 1);
-#else
         setScale(thisMinimum, thisMaximum);
-#endif
         break;
     }
 
@@ -463,12 +399,8 @@ void caSlider::keyPressEvent(QKeyEvent *e) {
     }
 
     if(doIt) {
-#if QWT_VERSION >= 0x060100
         setStepAlignment(false);
         QwtAbstractSlider::setValue(value() + increment * thisIncrement);
-#else
-        QwtDoubleRange::setValue(value() + increment * step());
-#endif
     } else {
         e->ignore();
     }
@@ -500,19 +432,10 @@ void caSlider::mousePressEvent(QMouseEvent *e)
         const int markerPos = transform( value() );
 
         // I have to do the work myself due to the unwanted snapping
-#if QWT_VERSION >= 0x060100
         if(isScrollPosition(e->pos())) {
             QwtSlider::mousePressEvent(e);
             sliderSelected = true;
         } else if(sliderRect().contains(e->pos())) {
-#else
-        QwtAbstractSlider::ScrollMode scrollMode;
-        getScrollMode(p,  scrollMode, direction);
-        if(scrollMode == QwtAbstractSlider::ScrMouse) {
-            QwtSlider::mousePressEvent(e);
-            sliderSelected = true;
-        } else {
-#endif
             if (orientation() == Qt::Horizontal ) {
                 if(thisDirection == Right) {
                     if ( p.x() < markerPos ) direction = -1;
@@ -542,12 +465,7 @@ void caSlider::mouseReleaseEvent( QMouseEvent *e )
 {
     sliderSelected = false;
     if( e->button() == Qt::LeftButton) {
-#if QWT_VERSION < 0x060100
-        stopMoving();
         QwtSlider::mouseReleaseEvent(e);
-#else
-        QwtSlider::mouseReleaseEvent(e);
-#endif
     }
     repeatTimer->stop();
 }
@@ -587,12 +505,8 @@ void caSlider::moveSlider()
     if(!thisAccessW) return;
     double oldVal = thisValue;
 
-#if QWT_VERSION >= 0x060100
     double step = thisIncrement;
     thisValue = thisValue + double(direction) * step;
-#else
-    thisValue = thisValue + double(direction) * step();
-#endif
 
     if(thisValue > thisCtrlMaximum) thisValue = thisCtrlMaximum;
     else if (thisValue <thisCtrlMinimum) thisValue = thisCtrlMinimum;
@@ -626,11 +540,7 @@ void caSlider::mouseMoveEvent( QMouseEvent *e )
 
 void caSlider::setPosition(const QPoint &p)
 {
-#if QWT_VERSION >= 0x060100
        QwtAbstractSlider::setValue( scrolledTo( p ));
-#else
-    QwtDoubleRange::setValue( getValue( p ));
-#endif
 }
 
 void caSlider::setValue( double val )
@@ -741,15 +651,8 @@ bool caSlider::event(QEvent *e)
                 break;
             }
             break;
-#if QWT_VERSION < 0x060100
-        case  LeftScale:
-        case  RightScale:
-        case  TopScale:
-        case  BottomScale:
-#else
         case LeadingScale:
         case TrailingScale:
-#endif
             switch (orientation()) {
 
             case Qt::Vertical: {
@@ -829,19 +732,11 @@ QRect caSlider::createValueRect(QRect sliderRect) const
     if(orientation() == Qt::Horizontal) {
         switch (this->scalePosition()) {
         //Horizontal and scale on top
-#if QWT_VERSION < 0x060100
-        case TopScale:
-#else
         case TrailingScale:
-#endif
             valueRect.setRect(sliderRect.x(), sliderRect.y() - 12 - (valHeight), sliderRect.width(), valHeight);
             break;
         //Horizontal and scale on bottom
-#if QWT_VERSION < 0x060100
-        case BottomScale:
-#else
         case LeadingScale:
-#endif
             valueRect.setRect(sliderRect.x(), sliderRect.height() + 12 , sliderRect.width(), valHeight);
             break;
 
@@ -853,20 +748,12 @@ QRect caSlider::createValueRect(QRect sliderRect) const
         switch (this->scalePosition()) {
 
         //Vertical and scale on left
-#if QWT_VERSION < 0x060100
-        case  LeftScale:
-#else
         case TrailingScale:
-#endif
             valueRect.setRect(0, height() * .5 - valHeight / 2, width() - sliderRect.width(), valHeight);
             break;
 
         //Verticle and scale on right
-#if QWT_VERSION < 0x060100
-        case  RightScale:
-#else
         case LeadingScale:
-#endif
             valueRect.setRect(sliderRect.width() + 6, height() * .5 - valHeight / 2, width() - sliderRect.width() - 6, valHeight);
             break;
 

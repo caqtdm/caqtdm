@@ -1,0 +1,98 @@
+/* dark counterpart of caQtDM_stylesheet.qss, used for panels in a dark scheme
+   (see "Panel theme" in the manual); alarm colours come from the widgets */
+
+caTable {
+       background: #2b2b2b;
+       alternate-background-color: #353535;
+       color: #e8e8e8;
+}
+
+caLineEdit {
+     border-radius: 1px;
+     background: #3a3828;
+     color: #e8e8e8;
+ }
+
+ caLabel {
+     border-radius: 1px;
+     background: #3a3828;
+     color: #e8e8e8;
+ }
+
+caTextEntry {
+    color: #f0a0c8;
+    background-color: #33302a;
+    selection-color: #ffffff;
+    selection-background-color: #5a5230;
+    border: 1px groove #8a8a8a;
+    border-radius: 1px;
+    padding: 1px;
+}
+
+caTextEntry:focus {
+    padding: 0px;
+    border: 2px groove #d06060;
+    border-radius: 1px;
+}
+
+/* when font specified, no font sizing is done any more,  font: 10pt; is not bad */
+QPushButton {
+      color: #e8e8e8;
+      border-color: #6a7fb0;
+      border-radius: 2px;
+      padding: 3px;
+      border-width: 1px;
+
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						   stop:0   rgba(70, 82, 100, 255),
+						   stop:0.5 rgba(58, 68, 84, 255),
+						   stop:1   rgba(48, 58, 74, 255));
+}
+QPushButton:hover {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(84, 98, 120, 255),
+						stop:0.5 rgba(70, 84, 104, 255),
+						stop:1   rgba(58, 72, 92, 255));
+}
+QPushButton:pressed {
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(48, 58, 74, 255),
+						stop:0.5 rgba(58, 68, 84, 255),
+						stop:1   rgba(70, 82, 100, 255));
+}
+
+QPushButton:disabled {
+	color: #808080;
+	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+						stop:0   rgba(60, 66, 76, 255),
+						stop:0.5 rgba(54, 60, 70, 255),
+						stop:1   rgba(48, 54, 64, 255));
+}
+
+
+caChoice > QPushButton {
+text-align: left;
+color: #e8e8e8;
+background-color: #3c3c3c;
+border: 3px #5a5a5a;
+}
+
+caChoice > QPushButton:pressed {
+background-color: #3c3c3c;
+border: 3px #5a5a5a;
+}
+
+caChoice > QPushButton:checked {
+background-color: #505050;
+border: 3px #5a5a5a;
+}
+
+caChoice > QPushButton:default {
+background-color: #3c3c3c;
+border: 3px #5a5a5a;
+}
+
+caMenu{
+    color: #e8e8e8;
+    background: #3a3828;
+}

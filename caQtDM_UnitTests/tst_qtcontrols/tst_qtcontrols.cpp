@@ -35,6 +35,7 @@
 #include "tst_pvdialog.h"
 #include "tst_alhparser.h"
 #include "tst_alarmtree_logic.h"
+#include "tst_themecolors.h"
 
 int main(int argc, char **argv)
 {
@@ -85,6 +86,11 @@ int main(int argc, char **argv)
 
     {
         TestAlarmTreeLogic tc;
+        status |= QTest::qExec(&tc, argc, argv);
+    }
+
+    {
+        TestThemeColors tc;
         status |= QTest::qExec(&tc, argc, argv);
     }
 

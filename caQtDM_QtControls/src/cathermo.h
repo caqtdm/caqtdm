@@ -30,11 +30,8 @@
 #include <qwt_global.h>
 
 #include <qtcontrols_global.h> 
-#if QWT_VERSION < 0x060100
-   #include <qwt_thermo_marker.h>
-#else
-   #include <qwt_thermo_marker_61.h>
-#endif
+#include "themecolors.h"
+#include <qwt_thermo_marker_61.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
 
@@ -142,6 +139,7 @@ public slots:
 
 protected:
     virtual bool event(QEvent *);
+    virtual void changeEvent(QEvent *);
     virtual void drawLiquid ( QPainter *, const QRect & ) const;
 
 private:
@@ -164,6 +162,7 @@ private:
     QColor defaultForeColor;
     float  pointSizePrv;
     bool isShown;
+    ThemeColors::Scheme appliedScheme;
 
     int thisPrecision;
     SourceMode thisPrecMode;

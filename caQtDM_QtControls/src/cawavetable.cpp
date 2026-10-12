@@ -233,13 +233,16 @@ void caWaveTable::setPanelThemePalette(bool legacyLight)
 
     QPalette viewPalette = view->palette();
     for (QPalette::ColorGroup group : {QPalette::Active, QPalette::Inactive, QPalette::Disabled}) {
-        viewPalette.setColor(group, QPalette::Base, Qt::white);
-        viewPalette.setColor(group, QPalette::AlternateBase, QColor(245, 245, 245));
-        viewPalette.setColor(group, QPalette::Text, Qt::black);
+        viewPalette.setColor(group, QPalette::Base, ThemeColors::color(ThemeColors::PaletteBase));
+        viewPalette.setColor(group, QPalette::AlternateBase, ThemeColors::color(ThemeColors::PaletteAlternateBase));
+        viewPalette.setColor(group, QPalette::Text, ThemeColors::color(ThemeColors::PaletteText));
     }
     view->setPalette(viewPalette);
     view->setAutoFillBackground(true);
-    view->setStyleSheet("background-color: white; alternate-background-color: rgb(245, 245, 245); color: black;");
+    view->setStyleSheet(QString("background-color: %1; alternate-background-color: %2; color: %3;")
+                            .arg(ThemeColors::css(ThemeColors::PaletteBase, ThemeColors::Light),
+                                 ThemeColors::css(ThemeColors::PaletteAlternateBase, ThemeColors::Light),
+                                 ThemeColors::css(ThemeColors::PaletteText, ThemeColors::Light)));
 }
 int caWaveTable::getVerticalOffset() const
 {

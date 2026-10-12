@@ -3058,35 +3058,66 @@ Besides ``.ui`` files the viewer can also display in-house developed
 Panel theme
 ~~~~~~~~~~~
 
-caQtDM uses its light compatibility palette by default. To use the system
-application palette for a panel, select the top-level widget of its ``.ui``
+caQtDM uses its light compatibility palette (mode ``legacy``) by default.
+The theme mode of a panel can be one of:
+
+====================  ========================================================
+``legacy``            fixed light palette, all widgets look as in earlier
+                      versions (default; alias ``LegacyLight``)
+``system``            the application palette of the desktop (alias
+                      ``System``); widgets that follow the theme use the dark
+                      scheme when that palette is dark
+``dark``              the dark palette of caQtDM (work in progress: so far
+                      only the default colours of caThermo and caCartesianPlot
+                      follow it, further widgets will be added step by step)
+====================  ========================================================
+
+To select the mode for one panel, select the top-level widget of its ``.ui``
 file in Qt Designer. In the Property Editor, add a dynamic **String** property
-named ``caqtdmThemeMode`` and set its value to ``System``. Set it to
-``LegacyLight`` to select the light palette explicitly. Each included panel
-can set its own property on its own top-level widget.
+named ``caqtdmThemeMode`` and set its value, for example ``system``. Each
+included panel can set its own property on its own top-level widget.
 
 The equivalent property in a ``.ui`` file is::
 
    <property name="caqtdmThemeMode">
-    <string>System</string>
+    <string>system</string>
    </property>
 
 Place it directly inside the top-level ``<widget>`` element. The property
-name must match exactly; the values ``System`` and ``LegacyLight`` are
-case-insensitive.
+name must match exactly; the values are case-insensitive, unknown values
+select ``legacy``.
 
-To override all panels and includes at startup, set the environment variable
-``CAQTDM_PANEL_THEME_MODE`` to ``System`` or ``LegacyLight``. When it is unset
-or has another value, each panel uses its own ``caqtdmThemeMode`` property,
-defaulting to the light palette when the property is absent.
+To override all panels and includes, set the environment variable
+``CAQTDM_THEME`` to ``legacy``, ``system`` or ``dark``. The older variable
+``CAQTDM_PANEL_THEME_MODE`` is still accepted as an alias. When neither is
+set, each panel uses its own ``caqtdmThemeMode`` property, defaulting to
+``legacy`` when the property is absent.
+
+Widget style: native styles (macOS, Windows) draw group boxes, buttons and
+tabs after the desktop appearance and ignore the panel palette. In the modes
+``system`` and ``dark`` caQtDM therefore switches to the ``Fusion`` style,
+which draws everything from the palette, on all platforms. ``legacy`` keeps
+the native style and so looks exactly as before. An explicit ``-style``
+option always wins.
+
+Which colours follow the theme: only widgets in colour mode ``Default`` or
+``Alarm_Default`` take their default colours from the theme, ``Static``
+colours set in the panel are never changed. Widgets without a colour mode
+follow the theme only for colours left at their default value. Alarm colours
+are identical in all modes.
 
 The default ``caQtDM_stylesheet.qss`` or a stylesheet selected with
 ``-stylefile``/``-stylesheet`` is applied only to display panels and included
 panels. It is layered after a panel root's authored stylesheet, so its rules
 take precedence there, while alarm colors continue to be controlled by the
-alarm widgets. The stylesheet is used with the legacy-light palette by default;
-for a panel that explicitly selects ``System``, it is instead layered over the
-system palette. The message window always keeps the application/system theme.
+alarm widgets. Stylesheet files are usually written for the light palette:
+as soon as one is configured, every panel uses mode ``legacy`` regardless of
+the property or the environment variable. To keep dark panels dark, provide a
+dark variant next to the stylesheet with the suffix ``_dark``
+(``caQtDM_stylesheet_dark.qss`` for the default, ``mystyle_dark.qss`` for
+``-stylefile mystyle.qss``). Panels in a dark scheme then get the dark file,
+all other panels the light one; ``caQtDM_Tests`` contains an example of such a
+pair. The message window always keeps the application/system theme.
 
 .. _prc_files:
 

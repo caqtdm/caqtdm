@@ -36,6 +36,8 @@
 #include "fileFunctions.h"
 #include "QDebug"
 #include <QFileDialog>
+#include <QFileInfo>
+#include <QDir>
 #include <QLocale>
 #include <QHostAddress>
 #include <QSet>
@@ -582,6 +584,21 @@ int main(int argc, char *argv[])
         }
     }
 
+    // <name>_dark.qss next to a stylesheet keeps dark panels dark (see PanelThemeApplier)
+    auto loadDarkStyleSheetFor = [](const QString &styleSheetFile) {
+        const QFileInfo info(styleSheetFile);
+        const QString darkFile = info.dir().filePath(info.completeBaseName() + "_dark." + info.suffix());
+        QFile file(darkFile);
+        if (!file.exists()) {
+            qCDebug(caQtDMLog) << "caQtDM -- no dark stylesheet" << darkFile << "found, dark panels use legacy";
+            return;
+        }
+        if (file.open(QFile::ReadOnly)) {
+            PanelThemeApplier::setPanelDarkStyleSheet(QLatin1String(file.readAll()), darkFile);
+            qCInfo(caQtDMLog) << "caQtDM -- file" << darkFile << "loaded as the dark panel stylesheet";
+        }
+    };
+
     searchFile *searchDefaultStyleSheet = new searchFile("caQtDM_stylesheet.qss");
     QString fileNameFound = searchDefaultStyleSheet->findFile();
     if(fileNameFound.isNull()) {
@@ -593,6 +610,7 @@ int main(int argc, char *argv[])
             qCInfo(caQtDMLog) << "caQtDM -- file <caQtDM_stylesheet.qss> loaded as the default panel stylesheet";
             PanelThemeApplier::setPanelStyleSheet(StyleSheet);
             file.close();
+            loadDarkStyleSheetFor(fileNameFound);
         }
     }
     delete searchDefaultStyleSheet;
@@ -635,9 +653,23 @@ int main(int argc, char *argv[])
                 qCInfo(caQtDMLog) << QString("caQtDM -- custom stylesheet file <%1> replaced the default panel stylesheet").arg(fileNameStylesheet);
                 PanelThemeApplier::setPanelStyleSheet(StyleSheet, fileNameFound, true);
                 file.close();
+                loadDarkStyleSheetFor(fileNameFound);
             }
         }
         delete searchCustomStyleSheet;
+    }
+
+    // system and dark panels draw from their palette; only Fusion honours it on
+    // every platform (native styles follow the desktop). legacy keeps the native
+    // look, an explicit -style always wins.
+    if (theme.isEmpty()) {
+        const PanelThemeApplier::Mode mode = PanelThemeApplier::resolveMode(PanelThemeApplier::Legacy);
+        if (mode != PanelThemeApplier::Legacy &&
+            QApplication::style()->objectName().compare("fusion", Qt::CaseInsensitive) != 0) {
+            QApplication::setStyle(QStyleFactory::create("Fusion"));
+            qCInfo(caQtDMLog) << "caQtDM -- theme mode" << PanelThemeApplier::modeName(mode)
+                              << "uses the Fusion style (-style overrides)";
+        }
     }
 
     // load macro definitions from file (located in this directory or in the caQTDM_DISPLAY_PATH)

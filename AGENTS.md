@@ -163,6 +163,52 @@ and `.prc` — any other extension in its file property is replaced by
 - `qtdefinitions.h`: small global defines used everywhere, e.g.
   `qasc(x)` (= `x.toLatin1().constData()`) and `MAX_STRING_LENGTH`.
 
+## Panel theme (dark/light mode, work in progress)
+
+- **Central colours (level 1):** `caQtDM_QtControls/src/themecolors.h` —
+  every colour is a `ThemeColor {light, dark}` of plain ints (C++11
+  `constexpr`); alarm colours are `THEME_FIXED` and checked by
+  `static_assert` to be identical in both schemes. `ThemeColors::color()`
+  and `themed()` are header-only (alarmdefs.h aliases `AL_*` onto them, so
+  plugins that include alarmdefs.h need no QtWidgets); `css()`,
+  `schemeOf()`, `palette()` live in `themecolors.cpp`.
+- **Widget colour sets (level 2):** each widget defines its own names at
+  the top of its `.cpp` (`namespace caThermoColor { constexpr const
+  ThemeColor &Background = ThemeColors::Surface; ... }`) and never uses
+  `ThemeColors::*`/`AL_*` directly. In shared headers mark them `static`
+  (`plotHelperClasses.h`), otherwise the link fails with duplicate symbols.
+- **Which colours follow the theme:** only colour modes `Default` /
+  `Alarm_Default`; `Static` never. Widgets without a colour mode use
+  `ThemeColors::themed(value, X, scheme)`: a value equal to the light
+  default follows the scheme, anything else is an author colour and stays.
+  Without a panel root (Designer, plain tests) the scheme is always light,
+  so Designer and legacy panels render exactly as before.
+- **Modes** (`PanelThemeApplier`, caQtDM_Lib): `legacy` (default, fixed
+  light palette), `system` (application palette, scheme by window
+  lightness), `dark` (own palette). Selection: env `CAQTDM_THEME` (alias
+  `CAQTDM_PANEL_THEME_MODE`) > panel property `caqtdmThemeMode` > legacy.
+  A configured stylesheet file forces `legacy` unless `<name>_dark.qss`
+  exists next to it (loaded in `caQtDM.cpp`, `setPanelDarkStyleSheet`); the
+  applier then picks the file by the panel scheme. The applier sets
+  `caqtdmAppliedThemeRoot`, `caqtdmAppliedThemeScheme` ("light"/"dark")
+  and `caqtdmAppliedLegacyLight` on the content root **before** the
+  palette, so widgets can read the scheme in `changeEvent(PaletteChange)`.
+  Style: in `system`/`dark` the viewer sets Fusion (native styles ignore
+  the palette for group boxes, buttons, tabs); `legacy` keeps the native
+  style, `-style` wins (`caQtDM.cpp` after the stylesheet loading).
+  Runtime switch: `CaQtDM_Lib::changeEvent` (PaletteChange /
+  ApplicationPaletteChange / ThemeChange) and the viewer's `themeChanged()`
+  both call `CaQtDM_Lib::themeChanged()`, which coalesces into one deferred
+  `applyThemeChange()` (QTimer 0 ms) because the application palette is
+  only updated after the ThemeChange event.
+- **Migrated so far:** caThermo, caCartesianPlot (+ plot helpers),
+  caWaveTable/NumericPanelTheme literals. Pattern for further widgets: no
+  colour caching at first show, re-resolve in `changeEvent` on
+  PaletteChange/StyleChange guarded by an `appliedScheme` member (the
+  widget's own `setPalette` triggers PaletteChange again).
+- Tests: `tst_qtcontrols/tst_themecolors.*` (contrast of dark surfaces
+  against the alarm colours >= 3:1), `tst_lib` panel theme tests.
+
 ## caQtDM_Lib: core objects & data flow
 
 - **`knobData`** (`src/knobData.h`, plain C struct, extern "C"): one

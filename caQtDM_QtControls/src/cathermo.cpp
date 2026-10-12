@@ -32,6 +32,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include "alarmdefs.h"
+#include "themecolors.h"
 #include "qwt_scale_map.h"
 #include "qwt_scale_draw.h"
 #include "cathermo.h"
@@ -48,6 +49,26 @@
 #define MAX_FONT_SIZE 20
 
 Q_LOGGING_CATEGORY(caThermoLog, "caqtdm.widgets.cathermo")
+
+// colour set of caThermo (level 2), values come from themecolors.h
+namespace caThermoColor {
+    constexpr const ThemeColor &Background   = ThemeColors::Surface;
+    constexpr const ThemeColor &Fill         = ThemeColors::TextPrimary;
+    constexpr const ThemeColor &ScaleText    = ThemeColors::TextPrimary;
+    constexpr const ThemeColor &FillDefault  = ThemeColors::ThermoFillDefault;
+    constexpr const ThemeColor &PipeDefault  = ThemeColors::ThermoPipeDefault;
+    constexpr const ThemeColor &FallbackBase = ThemeColors::SurfaceSunken;
+    constexpr const ThemeColor &FallbackFill = ThemeColors::TextPrimary;
+    constexpr const ThemeColor &Unset        = ThemeColors::White;
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &LimitOk      = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &LimitViolated= ThemeColors::AlarmMajor;
+}
 
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
 class myThermoScaleEngine: public QwtLinearScaleEngine
@@ -73,25 +94,26 @@ caThermo::caThermo(QWidget *parent) : QwtThermoMarker(parent), m_externalEnabled
     setStyleSheet("");
 
     isShown = false;
+    appliedScheme = ThemeColors::Light;
 
     thisDirection = Up;
     thisColorMode = Static;
     thisLimitsMode = Channel;
 
-    oldBackColor = QColor(Qt::white);
-    oldForeColor = QColor(Qt::white);
+    oldBackColor = ThemeColors::color(caThermoColor::Unset);
+    oldForeColor = ThemeColors::color(caThermoColor::Unset);
     oldColorMode = Default;
 
     // these default could be changed by a stylesheet
-    defaultForeColor = QColor(Qt::darkRed);
-    defaultBackColor = QColor(Qt::lightGray);
+    defaultForeColor = ThemeColors::color(caThermoColor::FillDefault);
+    defaultBackColor = ThemeColors::color(caThermoColor::PipeDefault);
     defaultForeColorOld = defaultBackColor;
     defaultBackColorOld = defaultForeColor;
 
     setAutoFillBackground( true );
-    setBackground(QColor(224,224,224));
-    setForeground(Qt::black);
-    setTextColor(Qt::black);
+    setBackground(ThemeColors::color(caThermoColor::Background));
+    setForeground(ThemeColors::color(caThermoColor::Fill));
+    setTextColor(ThemeColors::color(caThermoColor::ScaleText));
 
     pointSizePrv = 0.0;
 
@@ -123,22 +145,35 @@ void caThermo::setPV(QString const &newPV)
 
 void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
 {
+    const ThemeColors::Scheme scheme = ThemeColors::schemeOf(this);
 
     if((bg != oldBackColor) || (fg != oldForeColor)  || (textColor != oldTextColor) || (mode != oldColorMode)
-            || (defaultBackColorOld != defaultBackColor) || (defaultForeColorOld != defaultForeColor)) {
+            || (defaultBackColorOld != defaultBackColor) || (defaultForeColorOld != defaultForeColor)
+            || (scheme != appliedScheme)) {
 
+        appliedScheme = scheme;
         QPalette thisPalette = palette();
 
+        // only Default/Alarm_Default follow the panel theme; Static keeps the author colours
+        const QColor themeBg = ThemeColors::themed(bg, caThermoColor::Background, scheme);
+        const QColor themeText = ThemeColors::themed(textColor, caThermoColor::ScaleText, scheme);
+        QColor themeDefaultBack = defaultBackColor;
+        QColor themeDefaultFore = defaultForeColor;
+        if(scheme != ThemeColors::Light) {
+            themeDefaultBack = ThemeColors::color(caThermoColor::PipeDefault, scheme);
+            themeDefaultFore = ThemeColors::color(caThermoColor::FillDefault, scheme);
+        }
+
         if(thisColorMode == Default) {
-            if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
-            QColor bgs = defaultBackColor.darker(125);
+            if(!themeDefaultBack.isValid() || !themeDefaultFore.isValid()) return;
+            QColor bgs = themeDefaultBack.darker(125);
             bgs.setAlpha(bg.alpha());
-            qCDebug(caThermoLog) << "default palette fg" << defaultForeColor.red() << defaultForeColor.green() << defaultForeColor.blue() << objectName();
-            qCDebug(caThermoLog) << "default palette bg" << defaultBackColor.red() << defaultBackColor.green() << defaultBackColor.blue() << objectName();
-            thisPalette.setColor(QPalette::ButtonText, defaultForeColor);
-            thisPalette.setColor(QPalette::Text, textColor);
-            thisPalette.setColor(QPalette::WindowText, textColor);
-            thisPalette.setColor(QPalette::Window, bg);
+            qCDebug(caThermoLog) << "default palette fg" << themeDefaultFore.red() << themeDefaultFore.green() << themeDefaultFore.blue() << objectName();
+            qCDebug(caThermoLog) << "default palette bg" << themeDefaultBack.red() << themeDefaultBack.green() << themeDefaultBack.blue() << objectName();
+            thisPalette.setColor(QPalette::ButtonText, themeDefaultFore);
+            thisPalette.setColor(QPalette::Text, themeText);
+            thisPalette.setColor(QPalette::WindowText, themeText);
+            thisPalette.setColor(QPalette::Window, themeBg);
             thisPalette.setColor(QPalette::Base, bgs);
             setPalette(thisPalette);
 
@@ -167,14 +202,14 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
             setPalette(thisPalette);
 
         } else  if(thisColorMode == Alarm_Default) {
-            if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
-            QColor bgs = defaultBackColor.darker(125);
+            if(!themeDefaultBack.isValid() || !themeDefaultFore.isValid()) return;
+            QColor bgs = themeDefaultBack.darker(125);
             bgs.setAlpha(bg.alpha());
             qCDebug(caThermoLog) << "alarm_default palette" << fg.red() << fg.green() << fg.blue();
             thisPalette.setColor(QPalette::ButtonText, fg);
-            thisPalette.setColor(QPalette::Text, textColor);
-            thisPalette.setColor(QPalette::WindowText, textColor);
-            thisPalette.setColor(QPalette::Window, bg);
+            thisPalette.setColor(QPalette::Text, themeText);
+            thisPalette.setColor(QPalette::WindowText, themeText);
+            thisPalette.setColor(QPalette::Window, themeBg);
             thisPalette.setColor(QPalette::Base, bgs);
             setPalette(thisPalette);
         }
@@ -242,11 +277,7 @@ void caThermo::setValue(double val)
 void caThermo::setDirection(Direction dir)
 {
 
-#if QWT_VERSION < 0x060100
-    ScalePos scalepos = this->scalePosition();
-#else
     ScalePosition scalepos = this->scalePosition();
-#endif
 
     thisDirection = dir;
 
@@ -255,37 +286,21 @@ void caThermo::setDirection(Direction dir)
     case Down:
         if(thisScale) {
             setScalePosition(LeftScale);
-#if QWT_VERSION < 0x060100
-            setOrientation(Qt::Vertical, LeftScale);
-#else
             setOrientation(Qt::Vertical);
-#endif
         } else {
 
             setScalePosition(NoScale);
-#if QWT_VERSION < 0x060100
-            setOrientation(Qt::Vertical, NoScale);
-#else
             setOrientation(Qt::Vertical);
-#endif
         }
         break;
     case Left:
     case Right:
         if(thisScale) {
             setScalePosition(BottomScale);
-#if QWT_VERSION < 0x060100
-            setOrientation(Qt::Horizontal, BottomScale);
-#else
             setOrientation(Qt::Horizontal);
-#endif
         } else {
             setScalePosition(NoScale);
-#if QWT_VERSION < 0x060100
-            setOrientation(Qt::Horizontal, NoScale);
-#else
             setOrientation(Qt::Horizontal);
-#endif
         }
         break;
     }
@@ -304,20 +319,22 @@ void caThermo::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
+        c = ThemeColors::color(caThermoColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
+        c = ThemeColors::color(caThermoColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
+        c = ThemeColors::color(caThermoColor::AlarmMajor);
         break;
     case INVALID_ALARM:
+        c = ThemeColors::color(caThermoColor::AlarmInvalid);
+        break;
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c = ThemeColors::color(caThermoColor::NotConnected);
         break;
     default:
-        c=AL_DEFAULT;
+        c = ThemeColors::color(caThermoColor::AlarmDefault);
         break;
     }
 
@@ -347,19 +364,30 @@ void caThermo::setUserAlarmColors(double val)
     case Up:
     case Right:
         if((thisValue < this->minValue()) || (thisValue > this->maxValue())) {
-           setColors(thisBackColor, AL_RED, thisTextColor, thisColorMode);
+           setColors(thisBackColor, ThemeColors::color(caThermoColor::LimitViolated), thisTextColor, thisColorMode);
         } else {
-           setColors(thisBackColor, AL_GREEN, thisTextColor, thisColorMode);
+           setColors(thisBackColor, ThemeColors::color(caThermoColor::LimitOk), thisTextColor, thisColorMode);
         }
         break;
     case Down:
     case Left:
         if((thisValue < this->maxValue()) || (thisValue > this->minValue())) {
-           setColors(thisBackColor, AL_RED, thisTextColor, thisColorMode);
+           setColors(thisBackColor, ThemeColors::color(caThermoColor::LimitViolated), thisTextColor, thisColorMode);
         } else {
-           setColors(thisBackColor, AL_GREEN, thisTextColor, thisColorMode);
+           setColors(thisBackColor, ThemeColors::color(caThermoColor::LimitOk), thisTextColor, thisColorMode);
         }
         break;
+    }
+}
+
+// follow the panel theme when the scheme of the panel root changes
+void caThermo::changeEvent(QEvent *e)
+{
+    QwtThermoMarker::changeEvent(e);
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        if(ThemeColors::schemeOf(this) != appliedScheme) {
+            setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
+        }
     }
 }
 
@@ -377,8 +405,8 @@ bool caThermo::event(QEvent *e)
             qCDebug(caThermoLog) << "default fore color" << defaultForeColor.red() << defaultForeColor.green() << defaultForeColor.blue() << "valid=" << defaultForeColor.isValid();
             qCDebug(caThermoLog) << "default back color" << defaultBackColor.red() << defaultBackColor.green() << defaultBackColor.blue() << "valid=" << defaultBackColor.isValid();
 
-            if(!defaultBackColor.isValid()) defaultBackColor = QColor(255, 248, 220, 255);
-            if(!defaultForeColor.isValid()) defaultForeColor = Qt::black;
+            if(!defaultBackColor.isValid()) defaultBackColor = ThemeColors::color(caThermoColor::FallbackBase);
+            if(!defaultForeColor.isValid()) defaultForeColor = ThemeColors::color(caThermoColor::FallbackFill);
 
             setColors(thisBackColor, thisForeColor, thisTextColor, thisColorMode);
             isShown = true;

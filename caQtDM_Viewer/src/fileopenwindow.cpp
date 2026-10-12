@@ -2246,7 +2246,8 @@ bool FileOpenWindow::event(QEvent *e)
 #else
 bool FileOpenWindow::event(QEvent *e)
 {
-    const bool themeChangeEvent = e->type() == QEvent::ThemeChange;
+    const bool themeChangeEvent = e->type() == QEvent::ThemeChange ||
+                                  e->type() == QEvent::ApplicationPaletteChange;
     const bool handled = QWidget::event(e);
     if (themeChangeEvent) {
         emit themeChanged();

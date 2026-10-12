@@ -9,6 +9,7 @@
 #include <QResizeEvent>
 #include <QVariant>
 #include <QWidget>
+#include "themecolors.h"
 
 class NumericPanelTheme : public QObject
 {
@@ -100,7 +101,7 @@ private:
 
         const QPalette panelPalette = themeRoot->palette();
         const QColor arrowBackground = themeRoot->property("caqtdmAppliedLegacyLight").toBool()
-                                           ? QColor(224, 224, 224)
+                                           ? ThemeColors::color(ThemeColors::ArrowBackground)
                                            : panelPalette.color(QPalette::Button);
         if (numeric->property("caqtdmNumericArrowBackground").value<QColor>() != arrowBackground) {
             numeric->setProperty("caqtdmNumericArrowBackground", arrowBackground);

@@ -32,6 +32,7 @@
 #include <canumeric.h>
 #include <caspinbox.h>
 #include <castripplot.h>
+#include <cathermo.h>
 #include <catogglebutton.h>
 #include <cawavetable.h>
 #include <gensoftpv.h>
@@ -1067,10 +1068,254 @@ void TestCaQtDM_Lib::panelStyleSheetIsScopedAndOverridesRootStyle()
     QWidget systemPanel;
     systemPanel.setProperty("caqtdmThemeMode", "System");
     PanelThemeApplier::apply(&systemPanel);
-    QCOMPARE(systemPanel.palette().color(QPalette::Window), QColor(30, 30, 30));
+    // a stylesheet file is written for the light palette and forces it
+    QCOMPARE(systemPanel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(systemPanel.property("caqtdmAppliedThemeScheme").toString(), QString("light"));
     QVERIFY(systemPanel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+    PanelThemeApplier::setPanelStyleSheet(QString());
+    PanelThemeApplier::apply(&systemPanel);
+    QCOMPARE(systemPanel.palette().color(QPalette::Window), QColor(30, 30, 30));
+    QCOMPARE(systemPanel.property("caqtdmAppliedThemeScheme").toString(), QString("dark"));
     application->setPalette(originalPalette);
 
     Q_UNUSED(field);
     Q_UNUSED(includedField);
+}
+
+void TestCaQtDM_Lib::panelThemeModeParsing()
+{
+    bool ok = false;
+    QCOMPARE(PanelThemeApplier::parseMode("LegacyLight", &ok), PanelThemeApplier::Legacy);
+    QVERIFY(ok);
+    QCOMPARE(PanelThemeApplier::parseMode(" legacy ", &ok), PanelThemeApplier::Legacy);
+    QVERIFY(ok);
+    QCOMPARE(PanelThemeApplier::parseMode("System", &ok), PanelThemeApplier::System);
+    QVERIFY(ok);
+    QCOMPARE(PanelThemeApplier::parseMode("DARK", &ok), PanelThemeApplier::Dark);
+    QVERIFY(ok);
+    QCOMPARE(PanelThemeApplier::parseMode("bogus", &ok), PanelThemeApplier::Legacy);
+    QVERIFY(!ok);
+    QCOMPARE(PanelThemeApplier::parseMode(QString(), &ok), PanelThemeApplier::Legacy);
+    QVERIFY(!ok);
+    QCOMPARE(PanelThemeApplier::modeName(PanelThemeApplier::Dark), QString("dark"));
+    QCOMPARE(PanelThemeApplier::modeName(PanelThemeApplier::System), QString("system"));
+    QCOMPARE(PanelThemeApplier::modeName(PanelThemeApplier::Legacy), QString("legacy"));
+
+    QWidget panel;
+    QCOMPARE(PanelThemeApplier::modeOf(&panel), PanelThemeApplier::Legacy);
+    panel.setProperty("caqtdmThemeMode", "dark");
+    QCOMPARE(PanelThemeApplier::modeOf(&panel), PanelThemeApplier::Dark);
+    QVERIFY(!PanelThemeApplier::usesLegacyLightTheme(&panel));
+}
+
+void TestCaQtDM_Lib::panelThemeDarkModeUsesOwnPalette()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+    QPalette lightSystem = originalPalette;
+    lightSystem.setColor(QPalette::Window, Qt::white);
+    application->setPalette(lightSystem);
+
+    qputenv("CAQTDM_THEME", "dark");
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caThermo thermo(content);
+    thermo.setColorMode(caThermo::Default);
+    PanelThemeApplier::apply(&panel);
+
+    QCOMPARE(content->property("caqtdmAppliedThemeScheme").toString(), QString("dark"));
+    QVERIFY(!content->property("caqtdmAppliedLegacyLight").toBool());
+    QCOMPARE(content->palette().color(QPalette::Window), QColor(48, 48, 48));
+    QCOMPARE(content->palette().color(QPalette::WindowText), QColor(232, 232, 232));
+    QVERIFY(content->autoFillBackground());
+    QCOMPARE(panel.palette().color(QPalette::Window), lightSystem.color(QPalette::Window));
+    // the pilot widget follows the dark panel
+    QCOMPARE(thermo.palette().color(QPalette::Window), QColor(48, 48, 48));
+
+    // CAQTDM_THEME wins over the alias and over the panel property
+    qputenv("CAQTDM_PANEL_THEME_MODE", "System");
+    content->setProperty("caqtdmThemeMode", "legacy");
+    QCOMPARE(PanelThemeApplier::modeOf(&panel), PanelThemeApplier::Dark);
+    qunsetenv("CAQTDM_THEME");
+    QCOMPARE(PanelThemeApplier::modeOf(&panel), PanelThemeApplier::System);
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+
+    // back to legacy: the widget returns to its light defaults
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(content->property("caqtdmAppliedThemeScheme").toString(), QString("light"));
+    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QVERIFY(!content->autoFillBackground());
+    QCOMPARE(thermo.palette().color(QPalette::Window), QColor(224, 224, 224));
+
+    application->setPalette(originalPalette);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+    if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+void TestCaQtDM_Lib::panelThemeSystemSchemeFollowsPaletteLightness()
+{
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "system");
+
+    QPalette dark = originalPalette;
+    dark.setColor(QPalette::Window, QColor(30, 30, 30));
+    application->setPalette(dark);
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(panel.property("caqtdmAppliedThemeScheme").toString(), QString("dark"));
+    QCOMPARE(panel.palette().color(QPalette::Window), QColor(30, 30, 30));
+
+    QPalette light = originalPalette;
+    light.setColor(QPalette::Window, QColor(240, 240, 240));
+    application->setPalette(light);
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(panel.property("caqtdmAppliedThemeScheme").toString(), QString("light"));
+
+    application->setPalette(originalPalette);
+}
+
+void TestCaQtDM_Lib::panelThemeDarkStyleSheetKeepsDarkMode()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    qunsetenv("CAQTDM_THEME");
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+    QPalette light = originalPalette;
+    light.setColor(QPalette::Window, QColor(240, 240, 240));
+    application->setPalette(light);
+
+    PanelThemeApplier::setPanelStyleSheet("QLineEdit { color: blue; }");
+    PanelThemeApplier::setPanelDarkStyleSheet("QLineEdit { color: yellow; }");
+    QVERIFY(PanelThemeApplier::hasPanelDarkStyleSheet());
+
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "dark");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(panel.property("caqtdmAppliedThemeScheme").toString(), QString("dark"));
+    QCOMPARE(panel.palette().color(QPalette::Window), QColor(48, 48, 48));
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: yellow; }"));
+
+    panel.setProperty("caqtdmThemeMode", "legacy");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(panel.property("caqtdmAppliedThemeScheme").toString(), QString("light"));
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+
+    // system picks the file by the application palette
+    panel.setProperty("caqtdmThemeMode", "system");
+    QPalette dark = originalPalette;
+    dark.setColor(QPalette::Window, QColor(30, 30, 30));
+    application->setPalette(dark);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: yellow; }"));
+    application->setPalette(light);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+
+    // without the dark variant the stylesheet forces legacy again
+    PanelThemeApplier::setPanelStyleSheet("QLineEdit { color: blue; }");
+    QVERIFY(!PanelThemeApplier::hasPanelDarkStyleSheet());
+    panel.setProperty("caqtdmThemeMode", "dark");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(panel.property("caqtdmAppliedThemeScheme").toString(), QString("light"));
+    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: blue; }"));
+
+    PanelThemeApplier::setPanelStyleSheet(QString());
+    application->setPalette(originalPalette);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+    if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+void TestCaQtDM_Lib::panelThemeReappliesOnApplicationPaletteChange()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    qunsetenv("CAQTDM_THEME");
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+    QPalette light = originalPalette;
+    light.setColor(QPalette::Window, QColor(240, 240, 240));
+    application->setPalette(light);
+    QTest::qWait(20);
+
+    // the lib registered its panel root (the caInclude parent) in the constructor
+    m_parentAS->setProperty("caqtdmThemeMode", "system");
+    m_caQtDM_Lib->themeChanged();
+    QTest::qWait(20);
+    QCOMPARE(m_parentAS->property("caqtdmAppliedThemeScheme").toString(), QString("light"));
+    QCOMPARE(m_parentAS->palette().color(QPalette::Window), QColor(240, 240, 240));
+
+    // the application palette change alone must re-apply the panels: the event is
+    // posted to top-level widgets and the lib applies deferred, so let the loop run
+    QPalette dark = originalPalette;
+    dark.setColor(QPalette::Window, QColor(30, 30, 30));
+    application->setPalette(dark);
+    QTest::qWait(20);
+    QCOMPARE(m_parentAS->property("caqtdmAppliedThemeScheme").toString(), QString("dark"));
+    QCOMPARE(m_parentAS->palette().color(QPalette::Window), QColor(30, 30, 30));
+
+    application->setPalette(light);
+    QTest::qWait(20);
+    QCOMPARE(m_parentAS->property("caqtdmAppliedThemeScheme").toString(), QString("light"));
+
+    application->setPalette(originalPalette);
+    QTest::qWait(20);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+    if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+void TestCaQtDM_Lib::panelThemeLegacyPaintsItselfOnDarkSystem()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    qunsetenv("CAQTDM_THEME");
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+
+    QPalette dark = originalPalette;
+    dark.setColor(QPalette::Window, QColor(30, 30, 30));
+    dark.setColor(QPalette::WindowText, Qt::white);
+    application->setPalette(dark);
+
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    QVERIFY(!content->autoFillBackground());
+    PanelThemeApplier::apply(&panel);                       // legacy by default
+    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(content->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QVERIFY(content->autoFillBackground());                 // white panel on a dark desktop
+
+    QPalette light = originalPalette;
+    light.setColor(QPalette::Window, QColor(240, 240, 240));
+    application->setPalette(light);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(!content->autoFillBackground());                // unchanged look on a light desktop
+
+    // dark panel on the dark desktop needs no own fill, on the light desktop it does
+    panel.setProperty("caqtdmThemeMode", "dark");          // the mode lives on the .ui root
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(content->autoFillBackground());
+    application->setPalette(dark);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(!content->autoFillBackground());
+
+    application->setPalette(originalPalette);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+    if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
 }

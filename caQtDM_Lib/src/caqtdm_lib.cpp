@@ -85,6 +85,7 @@
 
 #include "caqtdm_lib.h"
 #include "panelthemeapplier.h"
+#include <QTimer>
 #include "caalarmtree.h"      // not part of the QtControls umbrella header
 #include "uiconverter.h"
 #include "fileFunctions.h"
@@ -140,7 +141,7 @@
 #define POPUPDEFENITION "popup.ui"
 
 namespace {
-bool uiUsesLegacyLightTheme(const QByteArray &ui)
+PanelThemeApplier::Mode uiThemeMode(const QByteArray &ui)
 {
     QXmlStreamReader reader(ui);
     bool rootWidgetFound = false;
@@ -150,38 +151,38 @@ bool uiUsesLegacyLightTheme(const QByteArray &ui)
         reader.readNext();
         if (reader.isStartElement()) {
             if (!rootWidgetFound) {
-                if (reader.name() == "widget") {
+                if (reader.name() == QLatin1String("widget")) {
                     rootWidgetFound = true;
                     depth = 1;
                 }
                 continue;
             }
             ++depth;
-            if (depth == 2 && reader.name() == "property" &&
-                reader.attributes().value("name") == "caqtdmThemeMode") {
+            if (depth == 2 && reader.name() == QLatin1String("property") &&
+                reader.attributes().value("name") == QLatin1String("caqtdmThemeMode")) {
                 while (reader.readNextStartElement()) {
-                    if (reader.name() == "string")
-                        return reader.readElementText(QXmlStreamReader::IncludeChildElements)
-                            .compare("System", Qt::CaseInsensitive) != 0;
+                    if (reader.name() == QLatin1String("string"))
+                        return PanelThemeApplier::parseMode(
+                            reader.readElementText(QXmlStreamReader::IncludeChildElements));
                     reader.skipCurrentElement();
                 }
-                return true;
+                return PanelThemeApplier::Legacy;
             }
         } else if (reader.isEndElement() && rootWidgetFound) {
-            if (depth == 1 && reader.name() == "widget") break;
+            if (depth == 1 && reader.name() == QLatin1String("widget")) break;
             --depth;
         }
     }
-    return true;
+    return PanelThemeApplier::Legacy;
 }
 
 class PanelUiLoader : public QUiLoader
 {
 public:
-    void beginPanel(bool legacyLight)
+    void beginPanel(PanelThemeApplier::Mode mode)
     {
         m_root = Q_NULLPTR;
-        m_legacyLight = legacyLight;
+        m_mode = mode;
     }
 
     QWidget *createWidget(const QString &className, QWidget *parent,
@@ -194,7 +195,7 @@ public:
                 // QUiLoader applies the root's QSS only after this method
                 // returns. Seed now so stylesheet-backed descendants start
                 // with the selected panel palette.
-                PanelThemeApplier::seed(m_root, m_legacyLight);
+                PanelThemeApplier::seed(m_root, m_mode);
             }
             return widget;
         }
@@ -203,7 +204,7 @@ public:
 
 private:
     QWidget *m_root = Q_NULLPTR;
-    bool m_legacyLight = true;
+    PanelThemeApplier::Mode m_mode = PanelThemeApplier::Legacy;
 };
 }
 
@@ -708,8 +709,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
                     QBuffer *buffer = new QBuffer();
                     buffer->open(QIODevice::ReadWrite);
                     const QByteArray ui = file->readAll();
-                    loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(
-                        uiUsesLegacyLightTheme(ui)));
+                    loader.beginPanel(PanelThemeApplier::resolveMode(uiThemeMode(ui)));
                     buffer->write(ui);
 
                     buffer->seek(0);
@@ -743,7 +743,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
             QBuffer *buffer = new QBuffer();
             buffer->open(QIODevice::ReadWrite);
-            loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(true));
+            loader.beginPanel(PanelThemeApplier::resolveMode(PanelThemeApplier::Legacy));
             buffer->write(*array);
             delete array;
 
@@ -2930,8 +2930,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                                 QBuffer *buffer = new QBuffer();
                                 buffer->open(QIODevice::ReadWrite);
                                 const QByteArray ui = file->readAll();
-                                loader.beginPanel(PanelThemeApplier::resolveLegacyLightTheme(
-                                    uiUsesLegacyLightTheme(ui)));
+                                loader.beginPanel(PanelThemeApplier::resolveMode(uiThemeMode(ui)));
                                 buffer->write(ui);
 
                                 //QCryptographicHash md5Gen(QCryptographicHash::Md5);
@@ -11511,7 +11510,26 @@ void CaQtDM_Lib::applyPanelTheme(QWidget *root)
     PanelThemeApplier::apply(root);
 }
 
-void CaQtDM_Lib::themeChanged() {
+// the application palette is updated after ThemeChange; apply once, deferred
+void CaQtDM_Lib::themeChanged()
+{
+    if (themeChangePending) return;
+    themeChangePending = true;
+    QTimer::singleShot(0, this, SLOT(applyThemeChange()));
+}
+
+// ApplicationPaletteChange reaches top-level windows only; embedded panels
+// see the propagated PaletteChange of their parent instead
+void CaQtDM_Lib::changeEvent(QEvent *event)
+{
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::ApplicationPaletteChange || event->type() == QEvent::ThemeChange ||
+        event->type() == QEvent::PaletteChange)
+        themeChanged();
+}
+
+void CaQtDM_Lib::applyThemeChange() {
+    themeChangePending = false;
     QApplication* guiApp = qobject_cast<QApplication*>(qApp);
     QPalette palette = guiApp->palette();
     QString oldColorNormalHex = m_normalTextColorHex;
