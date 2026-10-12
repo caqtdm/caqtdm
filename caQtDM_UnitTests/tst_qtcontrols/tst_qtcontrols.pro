@@ -3,6 +3,10 @@ include(../unitTests.pri)
 
 QT += network gui widgets designer
 
+win32 {
+    DEFINES += QWT_DLL
+}
+
 SOURCES += tst_qtcontrols.cpp \
     tst_pvdialog.cpp \
     tst_gensoftpv.cpp \
@@ -47,8 +51,13 @@ LIBS += \
     -L$$(CAQTDM_COLLECT) \
     -lqtcontrols
 
+# tst_themecolors uses the QwtPlot API of caCartesianPlot directly
 macx {
     LIBS += -lz
     LIBS += -F$$(QWTLIB) -framework $$(QWTLIBNAME)
     QMAKE_RPATHDIR += $$(QWTLIB)
+} else {
+    LIBS += \
+        -L$$(QWTHOME)/lib \
+        -l$$(QWTLIBNAME)
 }
