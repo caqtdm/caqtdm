@@ -983,6 +983,45 @@ caQtDM_Viewer {
                     #target.value = 18.0
 
                     QMAKE_MAC_XCODE_SETTINGS += target
+
+                    ###############################################################################
+                    # Code Signing settings needed only for iOS App Store
+                    ###############################################################################
+
+                    #bitcode.name = ENABLE_BITCODE
+                    #bitcode.value = YES
+                    #QMAKE_MAC_XCODE_SETTINGS += bitcode
+
+                    #bitcode_generator.name = BITCODE_GENERATION_MODE
+                    #bitcode_generator.value = bitcode
+                    #QMAKE_MAC_XCODE_SETTINGS += bitcode_generator
+
+                    #provisioning_profile_spec.name=PROVISIONING_PROFILE_SPECIFIER
+                    #provisioning_profile_spec.value = caQtDM Distribution
+                    #provisioning_profile_spec.value = caQtDM Provisioning Profile Development
+                    #QMAKE_MAC_XCODE_SETTINGS += provisioning_profile_spec
+
+                    #signing_identity.name = CODE_SIGN_IDENTITY
+                    #signing_identity.value = $$(CODE_SIGN_IDENTITY)
+                    #QMAKE_MAC_XCODE_SETTINGS += signing_identity
+
+                    #signing_identity.name = CODE_SIGN_IDENTITY
+                    #signing_identity.value = Apple Distribution: Helge Brands (Q6CFPW364S)
+                    #signing_identity.value = Apple Development: Helge Brands (8G5FY9T8QT)
+                    #QMAKE_MAC_XCODE_SETTINGS += signing_identity
+
+                    #setting.name = DEVELOPMENT_TEAM
+                    #setting.value = $$(CERTIFICATNUMBER)
+                    #QMAKE_MAC_XCODE_SETTINGS += setting
+                    #setting.name = DEVELOPMENT_TEAM
+                    #setting.value = Q6CFPW364S
+                    #QMAKE_MAC_XCODE_SETTINGS += setting
+
+                    #payload_dir.target = $$OUT_PWD/Release-iphoneos/Payload
+                    #payload_dir.commands = @test -d $$OUT_PWD/Release-iphoneos/Payload || mkdir -p $$OUT_PWD/Release-iphoneos/Payload
+                    #payload_dir.depends = $$OUT_PWD/Release-iphoneos
+                    #QMAKE_EXTRA_TARGETS += payload_dir
+
                     assetIcon.name = ASSETCATALOG_COMPILER_APPICON_NAME
                     assetIcon.value = AppIcon
                     launchImage.name = ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME
