@@ -1,0 +1,6 @@
+IOS_PLATFORM = iPhoneSimulator
+OP_SYS_CFLAGS += -mios-simulator-version-min=$(IOS_DEPLOYMENT_TARGET)
+OP_SYS_LDFLAGS += -mios-simulator-version-min=$(IOS_DEPLOYMENT_TARGET)
+OPT_CFLAGS_YES = -O2
+OPT_CXXFLAGS_YES = -O2
+include $(CONFIG)/os/CONFIG.Common.iosCommon

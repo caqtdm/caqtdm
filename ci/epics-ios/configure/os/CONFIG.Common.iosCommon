@@ -1,0 +1,35 @@
+# EPICS 7.0.10 iOS target, updated for the Xcode SDK selected by xcrun.
+include $(CONFIG)/os/CONFIG.Common.UnixCommon
+include $(CONFIG)/CONFIG.gnuCommon
+
+VALID_BUILDS = Ioc
+OS_CLASS = iOS
+GNU_DIR = /usr
+XCRUN_SDK_BASE = $(shell echo $(IOS_PLATFORM) | tr A-Z a-z)
+SDK_DIR := $(shell xcrun --sdk $(XCRUN_SDK_BASE) --show-sdk-path)
+
+ARCH_DEP_FLAGS = $(addprefix -arch ,$(ARCH_CLASS))
+ARCH_DEP_CFLAGS += $(ARCH_DEP_FLAGS)
+ARCH_DEP_LDFLAGS += $(ARCH_DEP_FLAGS)
+OP_SYS_CFLAGS += -isysroot $(SDK_DIR)
+OP_SYS_LDFLAGS += -isysroot $(SDK_DIR)
+
+CC_CLANG = clang
+CCC_CLANG = clang++
+CMPLR_CLASS_CLANG = clang
+CMPLR_CLASS = $(CMPLR_CLASS_$(COMPILER))
+
+GNU_LDLIBS_YES =
+CODE_CFLAGS = -fno-common -Wno-unused-value
+CODE_CXXFLAGS = -fno-common
+
+HDEPENDS_METHOD = MKMF
+
+-include $(CONFIG)/os/CONFIG_SITE.Common.iosCommon
+-include $(CONFIG)/os/CONFIG_SITE.$(EPICS_HOST_ARCH).iosCommon
+
+CC := $(shell xcrun --sdk $(XCRUN_SDK_BASE) --find clang)
+CCC := $(shell xcrun --sdk $(XCRUN_SDK_BASE) --find clang++)
+AR := $(shell xcrun --sdk $(XCRUN_SDK_BASE) --find ar) -rc
+LD := $(shell xcrun --sdk $(XCRUN_SDK_BASE) --find ld) -r
+RANLIB := $(shell xcrun --sdk $(XCRUN_SDK_BASE) --find ranlib)
