@@ -42,6 +42,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include "pipereader.h"
+#include <QEventLoop>
+#include <QTimer>
 #include "loggingcategories.h"
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
@@ -511,6 +513,7 @@ int main(int argc, char *argv[])
     // From hereon, everything logged via qDebug or its siblings will be captured by the custom LogHandler.
     GeneralLogHandler::initialize();
     qCInfo(caQtDMLog) << "caQtDM -- initialized logger";
+    qCDebug(caQtDMLog) << "caQtDM -- QT_LOGGING_RULES =" << qgetenv("QT_LOGGING_RULES");
     // Log all arguments the application was started with (before they were processed)
     for (int i = 0; i < arguments.size(); i++) {
         qCDebug(caQtDMLog).nospace() << "Argument: " << i << ": " << arguments[i];
@@ -587,7 +590,21 @@ int main(int argc, char *argv[])
 
     // get data from pipe if any (ui data can be piped to this application, for linux at this time)
     // only when no file is given, attaching is not allowed, in order to get rid of the temporary file when exit
-#if defined linux || defined TARGET_OS_MAC
+#ifdef MOBILE_IOS
+    // Qt for iOS runs main() inside UIApplication's didFinishLaunching until the first exec();
+    // let the launch finish (application active) before any window is created, otherwise the
+    // key window / first responder state (and with it the on-screen keyboard) is left stale
+    if (app.applicationState() != Qt::ApplicationActive) {
+        QEventLoop launchLoop;
+        QObject::connect(&app, &QGuiApplication::applicationStateChanged, &launchLoop,
+                         [&launchLoop](Qt::ApplicationState state) {
+                             if (state == Qt::ApplicationActive) launchLoop.quit();
+                         });
+        QTimer::singleShot(3000, &launchLoop, &QEventLoop::quit);
+        launchLoop.exec();
+        qCDebug(caQtDMLog) << "mobile: application state after launch loop" << app.applicationState();
+    }
+#elif (defined linux || defined TARGET_OS_MAC) && !defined(MOBILE)
     if(fileName.length() <= 0) {
 
         QEventLoop *loop = new QEventLoop();
@@ -669,7 +686,12 @@ int main(int argc, char *argv[])
     FileOpenWindow fileOpenWindow (0, fileName, macroString, attach, minimize, geometry, printscreen, resizing, options);
     fileOpenWindow.setWindowIcon (QIcon(":/caQtDM.ico"));
     if (savetoimage) fileOpenWindow.setProperty("savetoimage", true);
+#ifdef MOBILE
+    qCDebug(caQtDMLog) << "mobile: FileOpenWindow shown =" << fileOpenWindow.debugWindowEnabled();
+    if (fileOpenWindow.debugWindowEnabled()) fileOpenWindow.show();
+#else
     if (!server) fileOpenWindow.show();
+#endif
 #ifdef CAQTDM_X11
     #if QT_VERSION > QT_VERSION_CHECK(5,0,0)
         if (qApp->platformName()== QLatin1String("xcb")){
