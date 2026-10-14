@@ -541,7 +541,12 @@ Start sequence — the single most important rule:
   until something else (e.g. a QComboBox popup) re-activates the panel.
   New panels are activated explicitly in `loadMainWindow()` (immediately
   and once more via a 0 ms timer after the splash screen's
-  `deleteLater()`).
+  `deleteLater()`). The same hazard existed on Android (every `QWindow`
+  is a native `QtWindow` view there, touches are routed by view id, and
+  `setVisible(true)` also calls `requestActivateWindow()`/`raise()`);
+  the old PR #150 "android-panel-clickability" fought the same symptom.
+  The `MOBILE` guard covers Android, but this has only been verified at
+  runtime on iOS (no local Android toolchain; the Android CI only builds).
 
 Touch / keyboard behaviour (Qt widgets on iOS):
 
@@ -551,9 +556,12 @@ Touch / keyboard behaviour (Qt widgets on iOS):
   `WA_InputMethodEnabled`, i.e. focus == on-screen keyboard, which then
   covers the (non-native) popup list. In Qt 6.12 the native picker is
   only used under `Q_OS_MACOS`, not on iOS. `configDialog.cpp` solves it
-  for the start dialog: a press on the combo frame (arrow) drops focus
-  and sets `NoFocus` until release, where the popup is opened manually;
-  the line edit keeps the normal focus path. Toggling
+  for the start dialog (`MOBILE_IOS` only): a press on the combo frame
+  (arrow) drops focus and sets `NoFocus` until release, where the popup
+  is opened manually; the line edit keeps the normal focus path. Android
+  has no `SetFocusOnTouchRelease` hint, gives focus on press and opens
+  the popup on press, so the release lands in the popup — the same
+  filter there would leave the combo stuck at `NoFocus`. Toggling
   `WA_InputMethodEnabled` does NOT work: `QComboBox::inputMethodQuery`
   forwards to the line edit, which answers `ImEnabled` from
   `isEnabled() && !isReadOnly()`, and `QIOSInputContext::showInputPanel()`

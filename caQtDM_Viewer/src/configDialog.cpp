@@ -218,7 +218,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #endif
     urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
     urlComboBox->setFocusPolicy(Qt::StrongFocus);
-#ifdef MOBILE
+#ifdef MOBILE_IOS
     urlComboBox->installEventFilter(this);   // arrow tap without focus/keyboard, see eventFilter
 #endif
     for(int i=0; i< 5; i++) {
@@ -263,7 +263,7 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 #endif
     fileComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
     fileComboBox->setFocusPolicy(Qt::StrongFocus);
-#ifdef MOBILE
+#ifdef MOBILE_IOS
     fileComboBox->installEventFilter(this);   // arrow tap without focus/keyboard, see eventFilter
 #endif
 
@@ -442,7 +442,9 @@ void configDialog::closeEvent(QCloseEvent *event)
 
 bool configDialog::eventFilter(QObject *obj, QEvent *event)
 {
-#ifdef MOBILE
+#ifdef MOBILE_IOS
+    // iOS only: Android gives focus on press and opens the popup on press, the release then
+    // goes to the popup and the focus policy could not be restored here
     const QEvent::Type type = event->type();
     if(type == QEvent::MouseButtonPress || type == QEvent::MouseButtonRelease) {
         QComboBox *combos[2] = { urlComboBox, fileComboBox };
