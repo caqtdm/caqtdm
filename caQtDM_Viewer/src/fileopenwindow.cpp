@@ -192,6 +192,7 @@ void FileOpenWindow::onApplicationStateChange(Qt::ApplicationState state)
              break;
          case Qt::ApplicationActive:
              qCDebug(fileOpenWindowLog) << "application state changed to active";
+             logWindowState("application active");
              pendio = false;
               if (mutexKnobData != (MutexKnobData *) Q_NULLPTR) {
                   for (int i=0; i < mutexKnobData->GetMutexKnobDataSize(); i++) {
@@ -618,6 +619,12 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
 
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
 
+#ifdef MOBILE
+    // register the swipe gesture before the timer can load the first panel: the plugin
+    // initialisation below may process events, and the timer then calls loadMainWindow()
+    fingerSwipeGestureType = QGestureRecognizer::registerRecognizer(new FingerSwipeGestureRecognizer());
+#endif
+
     // start a timer
     startTimer(1000);
 
@@ -772,12 +779,6 @@ FileOpenWindow::FileOpenWindow(QMainWindow* parent,  QString filename, QString m
     }
 
 //************************************************************************************************************************************************
-
-#ifdef MOBILE
-    // add fingerswipe gesture
-    QGestureRecognizer* pRecognizer = new FingerSwipeGestureRecognizer();
-    fingerSwipeGestureType = QGestureRecognizer::registerRecognizer(pRecognizer);
-#endif
 
     // application state handler
 #if QT_VERSION > 0x050000
@@ -1335,6 +1336,18 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
     mainWindow->resize(winsize);
 
 #endif
+#ifdef MOBILE
+    mainWindow->activateWindow();
+    mainWindow->raise();
+    QPointer<QMainWindow> safeWindow = mainWindow;
+    QTimer::singleShot(0, this, [this, safeWindow]() {
+        if (!safeWindow) return;
+        safeWindow->activateWindow();
+        safeWindow->raise();
+        safeWindow->setFocus();
+        logWindowState("after deferred activate");
+    });
+#endif
     qCDebug(fileOpenWindowLog) << "allocate" << fileS.size()+macroS.size()+100;
     asc = (char*) malloc((fileS.size()+macroS.size()+100) * sizeof(char));
     if(macroS.size() > 0) {
@@ -1386,6 +1399,7 @@ QMainWindow *FileOpenWindow::loadMainWindow(const QPoint &position, const QStrin
 #endif
     }
 #endif
+    logWindowState("loadMainWindow end");
     return mainWindow;
 }
 
@@ -1439,13 +1453,22 @@ void FileOpenWindow::Callback_OpenButton()
 /**
  * slot for going to next window (for tablet)
  */
-void FileOpenWindow::cycleWindows()
+void FileOpenWindow::cycleWindows(QWidget *from)
 {
     QList<CaQtDM_Lib *> all = this->findChildren<CaQtDM_Lib *>();
     if(all.count() == 0) return;
-    if(activWindow > all.count()-1) activWindow = 0;
+
+    // next window relative to the one the request came from (swipe), else to the active one,
+    // else continue with the stored index
+    int index = -1;
+    if (from != Q_NULLPTR) index = all.indexOf(qobject_cast<CaQtDM_Lib *>(from));
+    if (index < 0) index = all.indexOf(qobject_cast<CaQtDM_Lib *>(QApplication::activeWindow()));
+    if (index < 0) index = activWindow - 1;
+    activWindow = (index + 1) % all.count();
 
     QWidget *w = all.at(activWindow);
+    qCDebug(fileOpenWindowLog) << "cycleWindows: count=" << all.count() << "from=" << from
+                               << "-> index" << activWindow << w->property("fileString").toString();
     w->activateWindow();
     w->raise();
     w->setFocus();
@@ -1455,7 +1478,7 @@ void FileOpenWindow::cycleWindows()
 
 void FileOpenWindow::nextWindow()
 {
-    cycleWindows();
+    cycleWindows(qobject_cast<QWidget *>(sender()));
 }
 
 void FileOpenWindow::doSomething()
@@ -2226,6 +2249,17 @@ void FileOpenWindow::shellCommand(QString command) {
 #endif
 }
 
+// diagnostic helper: which window/widget currently owns focus and activation
+void FileOpenWindow::logWindowState(const char *where)
+{
+    qCDebug(fileOpenWindowLog) << where
+                               << "focusWindow=" << QGuiApplication::focusWindow()
+                               << "activeWindow=" << QApplication::activeWindow()
+                               << "modalWindow=" << QGuiApplication::modalWindow()
+                               << "activePopup=" << QApplication::activePopupWidget()
+                               << "focusWidget=" << QApplication::focusWidget();
+}
+
 void FileOpenWindow::closeEvent(QCloseEvent* ce)
 {
     Q_UNUSED(ce);
@@ -2233,17 +2267,7 @@ void FileOpenWindow::closeEvent(QCloseEvent* ce)
     Callback_ActionExit();
     ce->ignore();
 }
-#ifdef MOBILE
-bool FileOpenWindow::event(QEvent *e)
-{
-    if (e->type() == QEvent::Show) {
-        qCDebug(fileOpenWindowLog)<<"QEvent::Show!";
-        // Qt 6.5.2 ShowMinimized=crash in QWidget::event better solution = setVisible(false)
-        if (!debugWindow) this->setVisible(false);
-    }
-    return QWidget::event(e);
-}
-#else
+
 bool FileOpenWindow::event(QEvent *e)
 {
     const bool themeChangeEvent = e->type() == QEvent::ThemeChange ||
@@ -2254,7 +2278,6 @@ bool FileOpenWindow::event(QEvent *e)
     }
     return handled;
 }
-#endif
 
 bool FileOpenWindow::eventFilter(QObject *obj, QEvent *event)
 {

@@ -63,6 +63,8 @@ private:
     QPointF m_lastPos;
     QPointF m_decisionPos;
     QPointF m_currentPos;
+    QPointF m_startScreenPos;   // global start position (direction tests)
+    QPoint m_windowPos;         // window position at TouchBegin (restored at TouchEnd/Cancel)
     QWidget *m_central;
     QPixmap m_snapshot;
     bool m_triggered;

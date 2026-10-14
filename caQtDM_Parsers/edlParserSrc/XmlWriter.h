@@ -29,14 +29,11 @@
 #ifndef XMLWRITER_H
 #define XMLWRITER_H
 #include <QtGlobal>
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    #include <qtextcodec.h>
-#else
-    #include <QtCore5Compat/QTextCodec>
-#endif
 #include <qmap.h>
 #include <qstring.h>
 #include <qtextstream.h>
+
+class QTextCodec;
 
 class AttrMap : public QMap<QString, QString>
 {

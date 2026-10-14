@@ -559,6 +559,131 @@ platform.
   `cxx_flags += -arch $$QMAKE_APPLE_DEVICE_ARCHS`, otherwise even parsing
   the .pro files fails.
 
+#### iOS pitfalls (verified against the Qt 6.10.1/6.12.0 sources, Oct 2026)
+
+Start sequence — the single most important rule:
+
+- Qt for iOS (`qtentrypoint_ios.mm`) runs the app's `main()` on its own
+  stack *inside* `applicationDidFinishLaunching`. Only the FIRST
+  `QEventLoop::exec()` longjmps back so that `UIApplicationMain` can
+  finish launching (key window, active state). Everything in `main()`
+  before that first `exec()` therefore runs in the launch phase.
+- Consequence: never create or show a window, and never run a nested
+  `exec()` of a dialog, before the launch has finished. `caQtDM.cpp` has
+  a `MOBILE_IOS` launch loop (wait for `Qt::ApplicationActive`, 3 s
+  timeout) in front of `FileOpenWindow` for exactly this reason. It
+  replaces a side effect of the `PipeReader` block, whose nested
+  `exec()` used to be the first `exec()` on iOS (TARGET_OS_MAC is also
+  defined on iOS). If the loop is removed, the `configDialog::exec()`
+  inside the `FileOpenWindow` constructor becomes the first `exec()`,
+  the dialog is created mid-launch, and UIKit will not show the
+  on-screen keyboard for its line edits any more.
+- `FileOpenWindow` is never shown on MOBILE unless the debug window was
+  enabled in the start dialog (`debugWindowEnabled()`). Do not re-add the
+  old trick of hiding it from inside its own `QEvent::Show`: Qt sends
+  `QShowEvent` before `show_sys()`, so the widget ends up hidden while
+  its `QUIView` is natively visible, full-screen, transparent and the
+  key/focus window — touches then hit a hidden widget and are dropped
+  until something else (e.g. a QComboBox popup) re-activates the panel.
+  New panels are activated explicitly in `loadMainWindow()` (immediately
+  and once more via a 0 ms timer after the splash screen's
+  `deleteLater()`). The same hazard existed on Android (every `QWindow`
+  is a native `QtWindow` view there, touches are routed by view id, and
+  `setVisible(true)` also calls `requestActivateWindow()`/`raise()`);
+  the old PR #150 "android-panel-clickability" fought the same symptom.
+  The `MOBILE` guard covers Android, but this has only been verified at
+  runtime on iOS (no local Android toolchain; the Android CI only builds).
+
+Touch / keyboard behaviour (Qt widgets on iOS):
+
+- `SetFocusOnTouchRelease` is on, so widgets take focus on release. A
+  `QComboBox` opens its popup on release only when it already has focus.
+  For an *editable* combo the focus proxy is the combo itself with
+  `WA_InputMethodEnabled`, i.e. focus == on-screen keyboard, which then
+  covers the (non-native) popup list. In Qt 6.12 the native picker is
+  only used under `Q_OS_MACOS`, not on iOS. `configDialog.cpp` solves it
+  for the start dialog (`MOBILE_IOS` only): a press on the combo frame
+  (arrow) drops focus and sets `NoFocus` until release, where the popup
+  is opened manually; the line edit keeps the normal focus path. Android
+  has no `SetFocusOnTouchRelease` hint, gives focus on press and opens
+  the popup on press, so the release lands in the popup — the same
+  filter there would leave the combo stuck at `NoFocus`. Toggling
+  `WA_InputMethodEnabled` does NOT work: `QComboBox::inputMethodQuery`
+  forwards to the line edit, which answers `ImEnabled` from
+  `isEnabled() && !isReadOnly()`, and `QIOSInputContext::showInputPanel()`
+  is a no-op (the keyboard follows the focus object only).
+- `QIOSWindow::setVisible(true)` auto-activates (makeKeyWindow +
+  becomeFirstResponder); popups are not activated when their transient
+  parent chain contains the focus window; `touchesBegan` auto-activates
+  the touched window. Qt delivers touches asynchronously on iOS.
+
+Diagnostics on iOS:
+
+- Qt's own `qt.qpa.input.methods` (`qImDebug`) and the other `qt.qpa.*`
+  debug output are compiled out in a release Qt (`QT_NO_DEBUG`), which is
+  how the iOS Qt is built — a `QT_LOGGING_RULES` rule for them can never
+  print anything. Use caQtDM categories (`caqtdm.viewer.*`, incl.
+  `caqtdm.viewer.configdialog`) instead; `qCDebug` is only removed by
+  `QT_NO_DEBUG_OUTPUT`, which is not set.
+- `QLoggingRegistry` reads `QT_LOGGING_RULES` on iOS exactly once, at the
+  first category use, which happens in the static platform plugin BEFORE
+  `main()` (the re-read in `QCoreApplication` exists for Android only).
+  A `setenv()` in `main()` is too late. Set the variable in the Xcode
+  scheme (Run → Arguments → Environment); the qmake-generated shared
+  scheme does not contain it and a qmake re-run may drop it again. The
+  `GeneralLogHandler`'s `*.debug=false` is an API rule and is overridden
+  by environment rules. Console output goes to `std::cout`, visible only
+  when the app is launched from Xcode.
+- iOS Simulator: "I/O → Keyboard → Connect Hardware Keyboard" (⇧⌘K) is
+  on by default; the on-screen keyboard is then created as
+  `minimized = YES` with height 0 and never appears, although Qt's focus,
+  `ImEnabled` and input-view placement are all correct. Check with
+  `xcrun simctl spawn <udid> log show --last 5m --predicate
+  'eventMessage CONTAINS[c] "hardware"'` (look for
+  `_hardwareKeyboardAvailable = YES`). The simulator's pasteboard sync
+  can also pop up a modal "paste from CoreSimulatorBridge" permission
+  dialog that swallows taps — take a device screenshot before debugging
+  Qt code.
+- Quick compile check without building in the tree: `clang++
+  -fsyntax-only` with the desktop flags from `caQtDM_Viewer/Makefile`
+  (desktop) and, for the simulator, `xcrun --sdk iphonesimulator`,
+  `-target arm64-apple-ios18.0-simulator`, `-F<Qt_sim>/lib` plus the
+  framework `Headers` dirs, `-DMOBILE -DMOBILE_IOS -DQT_NO_DEBUG`, Qwt
+  sim sources and EPICS `include/os/iOS`. Do not run `make -n` in the
+  tree: it may re-run qmake and bake an empty QWT path into the
+  Makefile. The Xcode project (`caQtDM_Viewer/caQtDM.xcodeproj`) is
+  generated by qmake and pins the Qt version it was generated with; for
+  another Qt it must be regenerated.
+- Swipe panel switching (`caQtDM_Lib/src/fingerswipegesture.cpp`,
+  `CaQtDM_Lib::fingerswipeTriggered`, `FileOpenWindow::cycleWindows`):
+  the recognizer keeps the window-local start (`m_startPos`, for
+  `childAt()`) and the global start (`m_startScreenPos`, for the
+  direction tests against the global `m_currentPos`) apart, triggers
+  only after 10 px of real movement (a tap is not a swipe), restores the
+  original window position and central widget on TouchEnd AND
+  TouchCancel (iOS cancels touches for system gestures), and re-attaches
+  a left-over central widget at the next TouchBegin. Only the finished
+  gesture is evaluated. `cycleWindows(from)` picks the window after the
+  one the swipe came from (`sender()` of `Signal_NextWindow`), not a
+  stale creation-order index — `activWindow` is reset to 0 on every
+  load and never adjusted on close. The Android-only exclusion list of
+  controls at TouchBegin does not exist on iOS. The recognizer is
+  registered in the `FileOpenWindow` constructor BEFORE `startTimer(1000)`:
+  registering it at the end of the constructor (as before) left the first
+  panel without a valid swipe grab, because `mustOpenFile` is already set
+  and plugin initialisation processes events (`archiveSF_plugin.cpp`
+  calls `QApplication::processEvents()`), so the timer loaded the first
+  panel while `fingerSwipeGestureType` was still unset. Symptom: swipes
+  work on every panel except the first one, so after swiping a second
+  panel away it can never be swiped back. The recognizer must NOT set a
+  hot spot: with a hot spot `QGestureManager::deliverEvents` guesses the
+  target widget via `QApplication::topLevelAt()`, which on iOS returns
+  the last created full-screen window instead of the one on top, so the
+  gesture event (and `Signal_NextWindow`) came from the wrong panel and
+  `cycleWindows()` re-raised the window that was already in front.
+  Without a hot spot the gesture context (the window that grabbed the
+  gesture) is the target.
+
 ## caQtDM_Web & qnovnc platform plugin
 
 - caQtDM_Web is the browser variant: caQtDM runs headless in a container

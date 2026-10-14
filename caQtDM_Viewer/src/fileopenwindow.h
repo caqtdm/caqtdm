@@ -111,7 +111,8 @@
      int parseGeometry(const char* string, int* x, int* y, int* width, int* height);
      void parse_and_set_Geometry(QMainWindow *w, QString parsestring);
      void shellCommand(QString command);
-     void cycleWindows();
+     void cycleWindows(QWidget *from = Q_NULLPTR);
+     bool debugWindowEnabled() const { return debugWindow; }
 
      // static so that it can be exercised without constructing the window
      static void setAllEnvironmentVariables(const QString &fileName, MessageWindow *messageWindow);
@@ -274,6 +275,7 @@ signals:
 
 private:
    void setDirectUpdateTypeOnRestart(const QDateTime);
+     void logWindowState(const char *where);
      void closeEvent(QCloseEvent* ce);
      void FlushAllInterfaces();
      void TerminateAllInterfaces();

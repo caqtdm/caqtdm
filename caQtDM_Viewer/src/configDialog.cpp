@@ -24,8 +24,13 @@
  */
 
 #include "configDialog.h"
+#include "loggingcategories.h"
+#include <QMouseEvent>
 
-configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QSize desktopSize, QWidget *parent): QWidget(parent)
+Q_LOGGING_CATEGORY(configDialogLog, "caqtdm.viewer.configdialog")
+
+configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, const QList<QString> &files, QSize desktopSize, QWidget *parent): QWidget(parent),
+    fileComboBox(Q_NULLPTR), urlComboBox(Q_NULLPTR), debugComboBox(Q_NULLPTR)
 { 
     Specials specials;
     int height;
@@ -206,12 +211,16 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // second group, second combo
     urlComboBox = new QComboBox();
+    urlComboBox->setObjectName("urlComboBox");
     urlComboBox->setEditable(true);
 #ifdef MOBILE
     urlComboBox->setCompleter(Q_NULLPTR);
 #endif
     urlComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
     urlComboBox->setFocusPolicy(Qt::StrongFocus);
+#ifdef MOBILE_IOS
+    urlComboBox->installEventFilter(this);   // arrow tap without focus/keyboard, see eventFilter
+#endif
     for(int i=0; i< 5; i++) {
             if(i>=urls.length()) urlComboBox->addItem(QString::number(i+1));
             else  if(urls.at(i).trimmed().length() < 1) urlComboBox->addItem(QString::number(i+1));
@@ -247,12 +256,16 @@ configDialog::configDialog(const bool debugWindow, const QList<QString> &urls, c
 
     // third group, third combo
     fileComboBox = new QComboBox();
+    fileComboBox->setObjectName("fileComboBox");
     fileComboBox->setEditable(true);
 #ifdef MOBILE
     fileComboBox->setCompleter(Q_NULLPTR);
 #endif
     fileComboBox->setInsertPolicy(QComboBox::InsertAtCurrent);
     fileComboBox->setFocusPolicy(Qt::StrongFocus);
+#ifdef MOBILE_IOS
+    fileComboBox->installEventFilter(this);   // arrow tap without focus/keyboard, see eventFilter
+#endif
 
     for(int i=0; i< 5; i++) {
         if(i>=files.length()) fileComboBox->addItem(QString::number(i+1));
@@ -429,6 +442,27 @@ void configDialog::closeEvent(QCloseEvent *event)
 
 bool configDialog::eventFilter(QObject *obj, QEvent *event)
 {
+#ifdef MOBILE_IOS
+    // iOS only: Android gives focus on press and opens the popup on press, the release then
+    // goes to the popup and the focus policy could not be restored here
+    const QEvent::Type type = event->type();
+    if(type == QEvent::MouseButtonPress || type == QEvent::MouseButtonRelease) {
+        QComboBox *combos[2] = { urlComboBox, fileComboBox };
+        for (QComboBox *combo : combos) {
+            if (obj != combo) continue;
+            qCDebug(configDialogLog) << combo->objectName() << type << "hasFocus=" << combo->hasFocus()
+                                     << "popupVisible=" << combo->view()->isVisible();
+            if (type == QEvent::MouseButtonPress) {
+                if (combo->hasFocus()) combo->clearFocus();
+                combo->setFocusPolicy(Qt::NoFocus);
+            } else {
+                combo->setFocusPolicy(Qt::StrongFocus);
+                QPoint pos = static_cast<QMouseEvent *>(event)->position().toPoint();
+                if (combo->rect().contains(pos) && !combo->view()->isVisible()) combo->showPopup();
+            }
+        }
+    }
+#endif
    if(event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
       QKeyEvent *me = static_cast<QKeyEvent *>(event);
       if((me->key() == Qt::Key_Return) && (loop.isRunning())) {

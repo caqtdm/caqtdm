@@ -26,6 +26,7 @@
 **
 ****************************************************************************/
 #include "fingerswipegesture.h"
+#include "caQtDM_Lib_global.h"
 #include <QGesture>
 #include <QWidget>
 #include <QGraphicsObject>
@@ -70,9 +71,16 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
         result = QGestureRecognizer::MayBeGesture;
         if (ev->touchPoints().size() >= 1) {
             QTouchEvent::TouchPoint p1 = ev->touchPoints().first();
-            q->m_startPos = p1.startScenePos();
-            q->m_actPos = p1.startScenePos();
+            q->m_startPos = p1.startScenePos();      // window local, for childAt()
+            q->m_startScreenPos = p1.screenPos();    // global, for the direction tests
+            q->m_actPos = p1.screenPos();
             q->m_touchupdate = false;
+            q->m_windowPos = w1->pos();
+            if (q->m_central != nullptr) {           // a previous swipe was not restored (e.g. cancelled touch)
+                w1->setCentralWidget(q->m_central);
+                q->m_central = nullptr;
+            }
+            qCDebug(caQtDMLibLog) << "swipe begin" << obj << q->m_startScreenPos << q->m_windowPos;
 
                 QWidget *w2 = w1->childAt ((int)q->m_startPos.x(), (int)q->m_startPos.y());
                 if(w2 != (QWidget*) nullptr) {
@@ -160,25 +168,28 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
         }
         break;
     }
-    case QEvent::TouchEnd: {
-        //qDebug() << "TouchEnd" <<q->m_startPos.toPoint().x() << q->m_startPos.toPoint().y();
-        QMainWindow *w1 = (QMainWindow *) obj;
+    case QEvent::TouchEnd:
+    case QEvent::TouchCancel: {
+        const bool cancelled = (event->type() == QEvent::TouchCancel);
         if (q->m_cancelled) {
-            //qDebug() << "TouchEnd ignore";
             result = QGestureRecognizer::Ignore;
             return result;
-        } else if (q->m_triggered) {
-            //qDebug() << "TouchEnd finish";
+        } else if (q->m_triggered && !cancelled) {
             result = QGestureRecognizer::FinishGesture;
         } else {
-            //qDebug() << "TouchEnd cancel";
             result = QGestureRecognizer::CancelGesture;
         }
-        if (q->m_touchupdate)   {
-           //qDebug() << "move";
-           w1->move(q->m_startPos.toPoint().x(), q->m_startPos.toPoint().y());
-           w1->show();
-           if(!q->m_begin) w1->setCentralWidget(q->m_central);
+        qCDebug(caQtDMLibLog) << "swipe end" << event->type() << obj << q->m_currentPos
+                              << "triggered=" << q->m_triggered << "moved=" << q->m_touchupdate;
+        if (q->m_touchupdate) {
+            // back to where the window was, show() re-maximizes on mobile
+            w1->move(q->m_windowPos);
+            w1->show();
+            if (q->m_central != nullptr) {
+                w1->setCentralWidget(q->m_central);
+                q->m_central = nullptr;
+            }
+            q->m_touchupdate = false;
         }
         break;
     }
@@ -188,10 +199,13 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
             QTouchEvent::TouchPoint p1 = ev->touchPoints().first();
             q->m_currentPos = p1.screenPos();
             //qDebug() << "touchupdate" <<q->m_currentPos.toPoint().x() << q->m_currentPos.toPoint().y();
-            // update the hot-spot to be in the middle between start and current point
-            q->setHotSpot(QPointF(p1.screenPos().x() - (q->m_currentPos.x() - q->m_startPos.x()) / 2,
-                                  p1.screenPos().y() - (q->m_currentPos.y() - q->m_startPos.y()) / 2));
+            const bool movedFromStart = (qAbs(q->m_currentPos.x() - q->m_startScreenPos.x()) > 10)
+                                     || (qAbs(q->m_currentPos.y() - q->m_startScreenPos.y()) > 10);
             if (!q->m_triggered) {
+                if (!movedFromStart) {
+                    result = QGestureRecognizer::MayBeGesture;
+                    break;
+                }
                 q->m_triggered = true;
                 result = QGestureRecognizer::TriggerGesture;
             }
@@ -224,9 +238,9 @@ QGestureRecognizer::Result FingerSwipeGestureRecognizer::recognize(QGesture *sta
                     q->m_begin = false;
                 }
                 if(qAbs(q->m_currentPos.x() - q->m_actPos.x()) > 10) {
-                    w1->move(q->m_currentPos.toPoint().x()- q->m_startPos.toPoint().x(), 10);
+                    w1->move(q->m_windowPos.x() + q->m_currentPos.toPoint().x() - q->m_startScreenPos.toPoint().x(), q->m_windowPos.y());
                 } else {
-                    w1->move(10, q->m_currentPos.toPoint().y()- q->m_startPos.toPoint().y());
+                    w1->move(q->m_windowPos.x(), q->m_windowPos.y() + q->m_currentPos.toPoint().y() - q->m_startScreenPos.toPoint().y());
                 }
                 // save last position
                 q->m_actPos = q->m_currentPos;
@@ -247,13 +261,19 @@ void FingerSwipeGestureRecognizer::reset(QGesture *state)
     q->m_lastPos = QPoint();
     q->m_currentPos = QPoint();
     q->m_decisionPos = QPoint();
+    q->m_startScreenPos = QPointF();
+    q->m_windowPos = QPoint();
     q->m_triggered = false;
     q->m_cancelled = false;
     q->m_decision = false;
+    q->m_touchupdate = false;
+    q->m_begin = true;
+    // m_central is intentionally kept: it is restored at the next TouchBegin if still set
     QGestureRecognizer::reset(state);
 }
 
-FingerSwipeGesture::FingerSwipeGesture(QObject *parent): QGesture(parent), m_triggered(false), m_cancelled(false)
+FingerSwipeGesture::FingerSwipeGesture(QObject *parent): QGesture(parent),
+    m_central(nullptr), m_triggered(false), m_cancelled(false), m_touchupdate(false), m_begin(true), m_decision(false)
 { }
 
 FingerSwipeGesture::~FingerSwipeGesture()
@@ -266,28 +286,28 @@ bool FingerSwipeGesture::isLeftToRight() const
     QSize size = qApp->primaryScreen()->size();
     int movelength = size.width() / 3;
     //printf("horiz movelenght=%d\n", movelength);
-    return m_startPos.x()+movelength < m_currentPos.x();
+    return m_startScreenPos.x()+movelength < m_currentPos.x();
 }
 bool FingerSwipeGesture::isRightToLeft() const
 {
     QSize size = qApp->primaryScreen()->size();
     int movelength = size.width() / 3;
     //printf("horiz movelenght=%d\n", movelength);
-    return m_startPos.x() > m_currentPos.x()+movelength;
+    return m_startScreenPos.x() > m_currentPos.x()+movelength;
 }
 bool FingerSwipeGesture::isBottomToTop() const
 {
     QSize size = qApp->primaryScreen()->size();
     int movelength = size.height() / 2;
     //printf("vert movelenght=%d\n", movelength);
-    return m_startPos.y()+movelength < m_currentPos.y();
+    return m_startScreenPos.y()+movelength < m_currentPos.y();
 }
 bool FingerSwipeGesture::isTopToBottom() const
 {
     QSize size = qApp->primaryScreen()->size();
     int movelength = size.height() / 2;
     //printf("vert movelenght=%d\n", movelength);
-    return m_startPos.y() > m_currentPos.y()+movelength;
+    return m_startScreenPos.y() > m_currentPos.y()+movelength;
 }
 
 bool FingerSwipeGesture::isVertical() const

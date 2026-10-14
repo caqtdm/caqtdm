@@ -38,6 +38,8 @@
 	<string>needs only access for GPS channels</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>needs only access for GPS channels</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>caQtDM connects to local EPICS, Modbus, and OPC UA devices.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>caQtDM don&apos;t need to access any photos</string>
 	<key>NSSupportsSuddenTermination</key>

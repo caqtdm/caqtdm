@@ -10828,6 +10828,10 @@ void CaQtDM_Lib::tapAndHoldTriggered(QObject *obj, QTapAndHoldGesture* tapAndHol
 }
 
 void CaQtDM_Lib::fingerswipeTriggered(FingerSwipeGesture *swipe) {
+    // the gesture event also arrives when the swipe starts; only evaluate the finished one
+    if (swipe->state() != Qt::GestureFinished) return;
+    qCDebug(caQtDMLibLog) << "swipe finished" << this << "ltr=" << swipe->isLeftToRight() << "rtl=" << swipe->isRightToLeft()
+                          << "btt=" << swipe->isBottomToTop() << "ttb=" << swipe->isTopToBottom();
     if (swipe->isLeftToRight()) {
         emit Signal_NextWindow();
         //postMessage(QtDebugMsg, (char*) "leftttoright");

@@ -25,13 +25,6 @@
     without limitation.
 */
 #include <QtGlobal>
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    #include <qtextcodec.h>
-#else
-    #include <QtCore5Compat/QTextCodec>
-#endif
-
-
 #include "XmlWriter.h"
 
 #include <QDebug>
