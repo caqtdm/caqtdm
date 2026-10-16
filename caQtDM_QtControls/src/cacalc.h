@@ -75,13 +75,13 @@ class  QTCON_EXPORT caCalc : public  ESimpleLabel
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(varType)
 
 #include "addevent.h"
 
 public:
 #include "caPropHandle.h"
     enum varType { scalar = 0, vector};
+    Q_ENUM(varType)
     enum Properties { calcabcd = 0, channela, channelb, channelc, channeld, initialvalue, pvlist};
 
     QString getPV() const {return thisPV.join(";");}

@@ -114,12 +114,6 @@ class QTCON_EXPORT caCamera : public QWidget
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(zoom)
-    Q_ENUMS(colormap)
-    Q_ENUMS(colormode)
-    Q_ENUMS(ROI_type)
-    Q_ENUMS(ROI_markertype)
-    Q_ENUMS(packingmode)
 
 public:
 #include "caPropHandle.h"
@@ -129,15 +123,21 @@ public:
     enum  ChannelType {CH_X=0, CH_Y};
 
     enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
+    Q_ENUM(ROI_type)
     enum ROI_markertype {box=0, box_crosshairs, line, arrow};
+    Q_ENUM(ROI_markertype)
 
     enum zoom {No=0, Yes};
+    Q_ENUM(zoom)
 
     enum colormap {as_is = 0, color_to_mono, mono_to_wavelength, mono_to_hot, mono_to_heat, mono_to_jet, mono_to_custom};
+    Q_ENUM(colormap)
 
     enum colormode {Mono,Mono12p,Mono10p,Mono10Packed,Mono8, RGB1_CA, RGB2_CA, RGB3_CA, BayerRG_8, BayerGB_8, BayerGR_8, BayerBG_8, BayerRG_12, BayerGB_12, BayerGR_12, BayerBG_12, RGB_8 ,BGR_8 ,RGBA_8 ,BGRA_8 , YUV444, YUV422, YUV411, YUV421};
+    Q_ENUM(colormode)
 
     enum packingmode {packNo, MSB12Bit, LSB12Bit, Reversed};
+    Q_ENUM(packingmode)
 
     enum compressionmode {non = 0, Zlib, JPG };
 

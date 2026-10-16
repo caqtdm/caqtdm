@@ -12,8 +12,6 @@
  */
 class QTCON_EXPORT EArrow : public QWidget {
     Q_OBJECT
-    Q_ENUMS(ArrowMode)
-    Q_ENUMS(ArrowDirection)
     Q_PROPERTY( int lineSize READ getLineSize WRITE setLineSize )
     Q_PROPERTY( QColor lineColor READ getLineColor WRITE setLineColor )
     Q_PROPERTY( QColor brushColor READ getBrushColor WRITE setBrushColor )
@@ -26,8 +24,10 @@ public:
     ~EArrow() {};
 
     enum ArrowMode { LEFT, RIGTH, DOUBLE, NONE};
+    Q_ENUM(ArrowMode)
 
     enum ArrowDirection { VERTICAL, HORIZONTAL, RIGTHBOTTOM, RIGTHTOP };
+    Q_ENUM(ArrowDirection)
 
     void setLineSize( int size );
     int getLineSize() {

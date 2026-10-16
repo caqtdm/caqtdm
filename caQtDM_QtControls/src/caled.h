@@ -47,12 +47,12 @@ class QTCON_EXPORT caLed : public ELed
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(colMode)
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
+    Q_ENUM(colMode)
 
     caLed(QWidget*);
     virtual ~caLed(){}

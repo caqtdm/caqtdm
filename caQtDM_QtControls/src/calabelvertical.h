@@ -50,9 +50,6 @@ class QTCON_EXPORT caLabelVertical : public QWidget, public FontScalingWidget
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(colMode)
-    Q_ENUMS(Direction)
-    Q_ENUMS(Alignment)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
@@ -62,7 +59,9 @@ public:
 
     enum ScaleMode { None, Height, WidthAndHeight};
     enum Alignment { Center, Left, Right};
+    Q_ENUM(Alignment)
     enum Direction {Up, Down};
+    Q_ENUM(Direction)
 
     caLabelVertical(QWidget *parent = 0);
     bool rotateText(float degrees);
@@ -94,6 +93,7 @@ public:
     int getBorderWidth() const {return thisBorderWidth;}
 
     enum colMode {Static, Alarm};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
 
     void setColors(QColor bg, QColor fg);

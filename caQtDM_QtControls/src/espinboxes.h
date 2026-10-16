@@ -28,7 +28,6 @@ class ECommonSpinBox
 class ESpinBox : public QSpinBox, public FontScalingWidget, protected ECommonSpinBox
 {
   Q_OBJECT
-  Q_ENUMS(ScaleMode)
   /* scalable fonts */
   Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
   
@@ -40,6 +39,7 @@ class ESpinBox : public QSpinBox, public FontScalingWidget, protected ECommonSpi
 	 * Please refer to the ESimpleLabel::ScaleMode documentation.
 	 */
 	enum ScaleMode { None, Height, WidthAndHeight, HeightManaged, WidthAndHeightManaged };
+	Q_ENUM(ScaleMode)
 	
     void setFontScaleMode(ScaleMode m) { FontScalingWidget::setScaleMode((int) m); }
     ScaleMode fontScaleMode() { return (ScaleMode) d_scaleMode; }
@@ -74,7 +74,6 @@ class ESpinBox : public QSpinBox, public FontScalingWidget, protected ECommonSpi
 class EDoubleSpinBox : public QDoubleSpinBox, public FontScalingWidget, protected ECommonSpinBox
 {
   Q_OBJECT
-  Q_ENUMS(ScaleMode)
   /* scalable fonts */
   Q_PROPERTY(ScaleMode scaleMode READ scaleMode WRITE setScaleMode)
   public :
@@ -85,6 +84,7 @@ class EDoubleSpinBox : public QDoubleSpinBox, public FontScalingWidget, protecte
 	 * Please refer to the ESimpleLabel::ScaleMode documentation.
 	 */
 	enum ScaleMode { None, Height, WidthAndHeight, HeightManaged, WidthAndHeightManaged };
+	Q_ENUM(ScaleMode)
 	
     void setScaleMode(ScaleMode m) { FontScalingWidget::setScaleMode((int) m); }
     ScaleMode scaleMode() { return (ScaleMode) d_scaleMode; }

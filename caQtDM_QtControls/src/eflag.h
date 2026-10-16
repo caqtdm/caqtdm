@@ -53,8 +53,6 @@ Q_PROPERTY(int numRows READ readNumRows WRITE setNumRows)
 Q_PROPERTY(int numColumns READ readNumColumns WRITE setNumColumns)
 Q_PROPERTY(ESimpleLabel::ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
 
-Q_ENUMS(ScaleMode)
-Q_ENUMS(alignmentHor)
 Q_PROPERTY(QString trueColors   READ trueColors     WRITE setTrueColors   DESIGNABLE true)
 Q_PROPERTY(QString falseColors  READ falseColors    WRITE setFalseColors  DESIGNABLE true)
 Q_PROPERTY(QString trueStrings  READ trueStrings    WRITE setTrueStrings  DESIGNABLE true)
@@ -64,6 +62,7 @@ Q_PROPERTY(QString displayMask  READ getDisplayMask WRITE setDisplayMask  DESIGN
 public:
 
     enum alignmentHor {left, right, center};
+    Q_ENUM(alignmentHor)
 
 	EFlag(QWidget *parent);
 

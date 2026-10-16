@@ -49,21 +49,17 @@ class QTCON_EXPORT caWaveTable : public QTableWidget
     Q_PROPERTY(int columnSize READ getColumnSize WRITE setColumnSize)
 
     Q_PROPERTY(Alignment alignment READ getAlignment WRITE setAlignment)
-    Q_ENUMS(Alignment)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
-    Q_ENUMS(colMode)
 
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
-    Q_ENUMS(SourceMode)
 
     Q_PROPERTY(FormatType formatType READ getFormatType WRITE setFormatType)
     Q_PROPERTY(QString formatString READ getFormatString WRITE setFormatString)
 
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle)
 
-    Q_ENUMS(FormatType)
 
     Q_PROPERTY(QString horizontalString READ getHorizontalString WRITE setHorizontalString )
     Q_PROPERTY(QString verticalString READ getVerticalString WRITE setVerticalString)
@@ -76,10 +72,13 @@ public:
     caWaveTable(QWidget *parent);
 
     enum FormatType {decimal, exponential, compact, hexadecimal, octal, string ,user_defined_format};
+    Q_ENUM(FormatType)
     enum DataType {doubles, longs, characters, strings};
     enum Alignment {Center, Left, Right};
+    Q_ENUM(Alignment)
 
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode; setActualPrecision(thisPrecision);}
 
@@ -87,6 +86,7 @@ public:
     void setPrecision(int prec) {thisPrecision = prec; setActualPrecision(prec);}
 
     enum colMode {Static=0, Alarm};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode) {thisColorMode = colormode;}
 

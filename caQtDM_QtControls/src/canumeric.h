@@ -45,19 +45,18 @@ Q_OBJECT
     Q_PROPERTY(bool autoDigitShift READ getAutoDigitShift WRITE setAutoDigitShift)
 
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
-    Q_ENUMS(SourceMode)
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(colMode)
 
 #include "caElevation.h"
 
 public:
     enum colMode {Static=0, Default, Alarm};
+    Q_ENUM(colMode)
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
@@ -80,6 +79,7 @@ public:
                                            }
 
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
 

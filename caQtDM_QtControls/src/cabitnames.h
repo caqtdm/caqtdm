@@ -33,7 +33,6 @@ class QTCON_EXPORT caBitnames : public EFlag
 {
     Q_OBJECT
 
-    Q_ENUMS(Direction)
 
     Q_PROPERTY(QString channelEnum READ getEnumPV WRITE setEnumPV)
     Q_PROPERTY(QString channelValue READ getValuePV WRITE setValuePV)

@@ -32,7 +32,6 @@ class QTCON_EXPORT caMenu : public QComboBox
 {
     Q_OBJECT
 
-    Q_ENUMS(colMode)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
     Q_PROPERTY(QString channelMask READ getMaskPV WRITE setMaskPV)
@@ -53,6 +52,7 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Default, Static, Alarm};
+    Q_ENUM(colMode)
 
     QString getPV() const;
     void setPV(QString const &newPV);

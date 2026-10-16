@@ -42,10 +42,6 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
 {
     Q_OBJECT
 
-    Q_ENUMS(Direction)
-    Q_ENUMS(Look)
-    Q_ENUMS(FormatType)
-    Q_ENUMS(SourceMode)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
     Q_PROPERTY(Direction direction READ getDirection WRITE setDirection)
@@ -57,7 +53,6 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
     Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
-    Q_ENUMS(colMode)
 
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
 
@@ -72,6 +67,7 @@ class QTCON_EXPORT caThermo : public QwtThermoMarker
 
 public:
     enum FormatType { decimal, exponential, engr_notation, compact, truncated};
+    Q_ENUM(FormatType)
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
@@ -79,10 +75,12 @@ public:
     void setPV(QString const &newPV);
 
     enum Direction {Up, Down, Left, Right};
+    Q_ENUM(Direction)
     Direction getDirection() const { return thisDirection; }
     void setDirection(Direction direction);
 
     enum Look {noLabel, noDeco, Outline, Limits, ChannelV};
+    Q_ENUM(Look)
     Look getLook() const { return thisLook; }
     void setLook(Look look);
 
@@ -99,6 +97,7 @@ public:
     void setTextColor(QColor c);
 
     enum colMode {Default, Static, Alarm_Default, Alarm_Static, Alarm=Alarm_Default};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
@@ -107,6 +106,7 @@ public:
                                          }
 
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
     SourceMode getLimitsMode() const { return thisLimitsMode; }
     void setLimitsMode(SourceMode limitsmode) {thisLimitsMode = limitsmode;}
 
