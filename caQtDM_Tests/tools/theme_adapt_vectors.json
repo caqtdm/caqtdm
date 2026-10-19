@@ -1,0 +1,370 @@
+{
+ "colors": [
+  {
+   "color": "#ffffff",
+   "role": "any",
+   "expected": "#2a2a2a"
+  },
+  {
+   "color": "#ffffff",
+   "role": "background",
+   "expected": "#2a2a2a"
+  },
+  {
+   "color": "#ffffff",
+   "role": "foreground",
+   "expected": "#f0f0f0"
+  },
+  {
+   "color": "#000000",
+   "role": "any",
+   "expected": "#e8e8e8"
+  },
+  {
+   "color": "#000000",
+   "role": "background",
+   "expected": "#000000"
+  },
+  {
+   "color": "#000000",
+   "role": "foreground",
+   "expected": "#e8e8e8"
+  },
+  {
+   "color": "#ececec",
+   "role": "any",
+   "expected": "#333333"
+  },
+  {
+   "color": "#ececec",
+   "role": "background",
+   "expected": "#303030"
+  },
+  {
+   "color": "#ececec",
+   "role": "foreground",
+   "expected": "#e6e6e6"
+  },
+  {
+   "color": "#e0e0e0",
+   "role": "any",
+   "expected": "#343434"
+  },
+  {
+   "color": "#e0e0e0",
+   "role": "background",
+   "expected": "#343434"
+  },
+  {
+   "color": "#e0e0e0",
+   "role": "foreground",
+   "expected": "#dcdcdc"
+  },
+  {
+   "color": "#a0a0a4",
+   "role": "any",
+   "expected": "#5d5d61"
+  },
+  {
+   "color": "#a0a0a4",
+   "role": "background",
+   "expected": "#545458"
+  },
+  {
+   "color": "#a0a0a4",
+   "role": "foreground",
+   "expected": "#afafb2"
+  },
+  {
+   "color": "#808080",
+   "role": "any",
+   "expected": "#808080"
+  },
+  {
+   "color": "#808080",
+   "role": "background",
+   "expected": "#606060"
+  },
+  {
+   "color": "#808080",
+   "role": "foreground",
+   "expected": "#aaaaaa"
+  },
+  {
+   "color": "#404040",
+   "role": "any",
+   "expected": "#c0c0c0"
+  },
+  {
+   "color": "#404040",
+   "role": "background",
+   "expected": "#404040"
+  },
+  {
+   "color": "#404040",
+   "role": "foreground",
+   "expected": "#cbcbcb"
+  },
+  {
+   "color": "#f5deb3",
+   "role": "any",
+   "expected": "#3a3226"
+  },
+  {
+   "color": "#f5deb3",
+   "role": "background",
+   "expected": "#3a3226"
+  },
+  {
+   "color": "#f5deb3",
+   "role": "foreground",
+   "expected": "#f5dcaf"
+  },
+  {
+   "color": "#fff8dc",
+   "role": "any",
+   "expected": "#363224"
+  },
+  {
+   "color": "#fff8dc",
+   "role": "background",
+   "expected": "#363224"
+  },
+  {
+   "color": "#fff8dc",
+   "role": "foreground",
+   "expected": "#fff5cf"
+  },
+  {
+   "color": "#ffffe0",
+   "role": "any",
+   "expected": "#343428"
+  },
+  {
+   "color": "#ffffe0",
+   "role": "background",
+   "expected": "#343428"
+  },
+  {
+   "color": "#ffffe0",
+   "role": "foreground",
+   "expected": "#ffffd1"
+  },
+  {
+   "color": "#9bffff",
+   "role": "any",
+   "expected": "#183838"
+  },
+  {
+   "color": "#9bffff",
+   "role": "background",
+   "expected": "#183838"
+  },
+  {
+   "color": "#9bffff",
+   "role": "foreground",
+   "expected": "#99ffff"
+  },
+  {
+   "color": "#add8e6",
+   "role": "any",
+   "expected": "#22323c"
+  },
+  {
+   "color": "#add8e6",
+   "role": "background",
+   "expected": "#22323c"
+  },
+  {
+   "color": "#add8e6",
+   "role": "foreground",
+   "expected": "#add8e6"
+  },
+  {
+   "color": "#3a5eab",
+   "role": "any",
+   "expected": "#20325a"
+  },
+  {
+   "color": "#3a5eab",
+   "role": "background",
+   "expected": "#20325a"
+  },
+  {
+   "color": "#3a5eab",
+   "role": "foreground",
+   "expected": "#8ba4d8"
+  },
+  {
+   "color": "#ff0000",
+   "role": "any",
+   "expected": "#ff0000"
+  },
+  {
+   "color": "#ff0000",
+   "role": "background",
+   "expected": "#ff0000"
+  },
+  {
+   "color": "#ff0000",
+   "role": "foreground",
+   "expected": "#ff0000"
+  },
+  {
+   "color": "#00cd00",
+   "role": "any",
+   "expected": "#00cd00"
+  },
+  {
+   "color": "#00cd00",
+   "role": "background",
+   "expected": "#00cd00"
+  },
+  {
+   "color": "#00cd00",
+   "role": "foreground",
+   "expected": "#00cd00"
+  },
+  {
+   "color": "#ffff00",
+   "role": "any",
+   "expected": "#ffff00"
+  },
+  {
+   "color": "#ffff00",
+   "role": "background",
+   "expected": "#ffff00"
+  },
+  {
+   "color": "#ffff00",
+   "role": "foreground",
+   "expected": "#ffff00"
+  },
+  {
+   "color": "#800000",
+   "role": "any",
+   "expected": "#f68a8a"
+  },
+  {
+   "color": "#800000",
+   "role": "background",
+   "expected": "#760a0a"
+  },
+  {
+   "color": "#800000",
+   "role": "foreground",
+   "expected": "#ff9797"
+  },
+  {
+   "color": "#0000ff",
+   "role": "any",
+   "expected": "#1515ec"
+  },
+  {
+   "color": "#0000ff",
+   "role": "background",
+   "expected": "#0e0eb1"
+  },
+  {
+   "color": "#0000ff",
+   "role": "foreground",
+   "expected": "#5656ff"
+  },
+  {
+   "color": "#00ffff",
+   "role": "any",
+   "expected": "#15ecec"
+  },
+  {
+   "color": "#00ffff",
+   "role": "background",
+   "expected": "#0eb1b1"
+  },
+  {
+   "color": "#00ffff",
+   "role": "foreground",
+   "expected": "#56ffff"
+  },
+  {
+   "color": "#ffa500",
+   "role": "any",
+   "expected": "#eca015"
+  },
+  {
+   "color": "#ffa500",
+   "role": "background",
+   "expected": "#b1780e"
+  },
+  {
+   "color": "#ffa500",
+   "role": "foreground",
+   "expected": "#ffc356"
+  },
+  {
+   "color": "#e1e1e1",
+   "role": "any",
+   "expected": "#353535"
+  },
+  {
+   "color": "#e1e1e1",
+   "role": "background",
+   "expected": "#353535"
+  },
+  {
+   "color": "#e1e1e1",
+   "role": "foreground",
+   "expected": "#dddddd"
+  },
+  {
+   "color": "#c4c4c3",
+   "role": "any",
+   "expected": "#5a5a5a"
+  },
+  {
+   "color": "#c4c4c3",
+   "role": "background",
+   "expected": "#5a5a5a"
+  },
+  {
+   "color": "#c4c4c3",
+   "role": "foreground",
+   "expected": "#c6c6c5"
+  }
+ ],
+ "pairs": [
+  {
+   "foreground": "#000000",
+   "background": "#f5deb3",
+   "expectedForeground": "#e8e8e8",
+   "expectedBackground": "#3a3226"
+  },
+  {
+   "foreground": "#000000",
+   "background": "#ffffff",
+   "expectedForeground": "#e8e8e8",
+   "expectedBackground": "#2a2a2a"
+  },
+  {
+   "foreground": "#ffffff",
+   "background": "#000000",
+   "expectedForeground": "#f0f0f0",
+   "expectedBackground": "#000000"
+  },
+  {
+   "foreground": "#800000",
+   "background": "#9bffff",
+   "expectedForeground": "#ff9797",
+   "expectedBackground": "#183838"
+  },
+  {
+   "foreground": "#ff0000",
+   "background": "#ffffff",
+   "expectedForeground": "#ff0000",
+   "expectedBackground": "#2a2a2a"
+  }
+ ],
+ "styleSheet": {
+  "input": "QTabBar::tab { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #E1E1E1, stop: 1.0 #D3D3D3); color: black; border: 2px solid #C4C4C3; } caLineEdit { background-color: rgb(245, 222, 179); color: rgba(0, 0, 0, 255); }",
+  "expected": "QTabBar::tab { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #353535, stop: 1.0 #3c3c3c); color: #e8e8e8; border: 2px solid #5a5a5a; } caLineEdit { background-color: rgb(58, 50, 38); color: rgba(232, 232, 232, 255); }"
+ }
+}
