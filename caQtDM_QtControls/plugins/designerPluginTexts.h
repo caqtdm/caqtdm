@@ -33,7 +33,7 @@
 # define CHANNELMASK    "channelMask: Name of pv used in order to mask the items in the puldownmenu,\n16 bits can be used where a bit not set hides the item and set shows it"
 
 // visibility
-# define COLORMODE      "colorMode: Static: Show the object in its here defined colors.\nAlarm: Show the object in alarm colors based on the severity of the associated process variable."
+# define COLORMODE      "colorMode: Static: Show the object in its here defined colors.\nAlarm: Show the object in alarm colors based on the severity of the associated process variable.\nDefault: the default colors follow the panel theme (light/dark), author colors stay."
 # define VISIBILITY     "visibility: StaticV: The object is always displayed.\nIf not zero:The object is displayed if the process variable is not zero.\nIf zero:The object is displayed if the object is zero.\nCalc: Use calc expression to determine its visibility."
 # define TEXTPVA        "channel: Name of PV (processvariable) A used in calculation,\na PV can be prefixed with a plugin name (ex: epics3://)"
 # define TEXTPVB        "channelB: Name of PV (processvariable) B used in calculation,\na PV can be prefixed with a plugin name (ex: epics3://)"

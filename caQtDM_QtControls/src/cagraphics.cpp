@@ -27,11 +27,24 @@
 #include <QPainter>
 #include <QDebug>
 #include "alarmdefs.h"
+#include "themecolors.h"
 
 #include <math.h>
 #include "cagraphics.h"
 
 Q_LOGGING_CATEGORY(caGraphicsLog, "caqtdm.widgets.cagraphics")
+
+// colour set of caGraphics (level 2), values come from themecolors.h
+namespace caGraphicsColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &Line = ThemeColors::TextPrimary;   // constructor default (black)
+    constexpr const ThemeColor &Fill = ThemeColors::TextPrimary;
+}
 
 caGraphics::caGraphics( QWidget *parent) :  QWidget(parent)
 {
@@ -242,30 +255,50 @@ QPolygonF caGraphics::getHead( QPointF p1, QPointF p2 ) {
     return arrowHead;
 }
 
+// Default: the constructor colours (black) follow the panel text colour, author colours stay
+QColor caGraphics::paintLineColor() const
+{
+    if(thisColorMode != Default) return thisLineColor;
+    return ThemeColors::themed(thisLineColor, caGraphicsColor::Line, ThemeColors::schemeOf(this));
+}
+
+QColor caGraphics::paintFillColor() const
+{
+    if(thisColorMode != Default) return thisForeColor;
+    return ThemeColors::themed(thisForeColor, caGraphicsColor::Fill, ThemeColors::schemeOf(this));
+}
+
+// the panel palette changed (theme switch): colours are resolved at paint time
+void caGraphics::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) update();
+}
+
 void caGraphics::setAlarmColors(short status)
 {
     switch (status) {
 
     case NO_ALARM:
-        setForeground(AL_GREEN);
-        setLineColor(AL_GREEN);
+        setForeground(ThemeColors::color(caGraphicsColor::AlarmNoAlarm));
+        setLineColor(ThemeColors::color(caGraphicsColor::AlarmNoAlarm));
         break;
     case MINOR_ALARM:
-        setForeground(AL_YELLOW);
-        setLineColor(AL_YELLOW);
+        setForeground(ThemeColors::color(caGraphicsColor::AlarmMinor));
+        setLineColor(ThemeColors::color(caGraphicsColor::AlarmMinor));
         break;
     case MAJOR_ALARM:
-        setForeground(AL_RED);
-        setLineColor(AL_RED);
+        setForeground(ThemeColors::color(caGraphicsColor::AlarmMajor));
+        setLineColor(ThemeColors::color(caGraphicsColor::AlarmMajor));
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        setForeground(AL_WHITE);
-        setLineColor(AL_WHITE);
+        setForeground(ThemeColors::color(caGraphicsColor::NotConnected));
+        setLineColor(ThemeColors::color(caGraphicsColor::NotConnected));
         break;
     default:
-        setForeground(AL_DEFAULT);
-        setLineColor(AL_DEFAULT);
+        setForeground(ThemeColors::color(caGraphicsColor::AlarmDefault));
+        setLineColor(ThemeColors::color(caGraphicsColor::AlarmDefault));
         break;
     }
 }
@@ -359,15 +392,15 @@ void caGraphics::paintEvent( QPaintEvent *event )
     int y = margin;
 
     if(thisLineStyle == Dash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine, Qt::SquareCap) );
+        painter.setPen( QPen( paintLineColor(), getLineSize(), Qt::DotLine, Qt::SquareCap) );
     } else if (thisLineStyle == BigDash) {
-       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine, Qt::SquareCap) );
+       painter.setPen( QPen( paintLineColor(), getLineSize(), Qt::DashLine, Qt::SquareCap) );
     } else {
-       painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::SquareCap) );
+       painter.setPen( QPen( paintLineColor(), getLineSize(), Qt::SolidLine, Qt::SquareCap) );
     }
 
     if(thisFillStyle == Filled) {
-        painter.setBrush(getForeground());
+        painter.setBrush(paintFillColor());
     }
 
     if(getForm() == Rectangle) {

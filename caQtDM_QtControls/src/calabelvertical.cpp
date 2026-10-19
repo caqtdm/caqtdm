@@ -25,8 +25,19 @@
 
 #include "calabelvertical.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 
 #include <QPainter>
+
+// colour set of caLabelVertical (level 2), values come from themecolors.h
+namespace caLabelVerticalColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+}
 
 caLabelVertical::caLabelVertical(QWidget *parent) : QWidget(parent), FontScalingWidget(this)
 {
@@ -92,27 +103,35 @@ void caLabelVertical::setColors(QColor bg, QColor fg)
 
 void caLabelVertical::setAlarmColors(short status)
 {
+    if(thisColorMode == Default) return;      // like caLabel: the palette paints the text
     QColor c;
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
+        c=ThemeColors::color(caLabelVerticalColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
+        c=ThemeColors::color(caLabelVerticalColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
+        c=ThemeColors::color(caLabelVerticalColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c=ThemeColors::color(caLabelVerticalColor::NotConnected);
         break;
     default:
-        c=AL_DEFAULT;
+        c=ThemeColors::color(caLabelVerticalColor::AlarmDefault);
         break;
     }
     setColors(thisBackColor, c);
+}
+
+// the panel palette changed (theme switch): the Default text colour is read at paint time
+void caLabelVertical::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) update();
 }
 
 bool caLabelVertical::rotateText(float degrees)
@@ -131,7 +150,9 @@ void caLabelVertical::paintEvent(QPaintEvent *)
     int w = QMETRIC_QT456_FONT_WIDTH(fm,thisText);
     int h = fm.height();
     QPainter painter(this);
-    QBrush brush = QBrush(thisBackColor);
+    // Default: no own fill, text from the panel palette (like caLabel)
+    const bool byPalette = (thisColorMode == Default);
+    QBrush brush = QBrush(byPalette ? QColor(0, 0, 0, 0) : thisBackColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
     painter.fillRect(0,0, width(), height(), brush);
@@ -139,7 +160,7 @@ void caLabelVertical::paintEvent(QPaintEvent *)
         painter.setPen( QPen( thisBorderColor, thisBorderWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
         painter.drawRect(thisBorderWidth, thisBorderWidth, width()- 2*thisBorderWidth, height() - 2*thisBorderWidth);
     }
-    painter.setPen(thisForeColor);
+    painter.setPen(byPalette ? palette().color(QPalette::WindowText) : thisForeColor);
     painter.rotate(rotation);
     switch (thisDirection) {
     case Up:

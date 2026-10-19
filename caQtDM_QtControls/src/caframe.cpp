@@ -26,10 +26,16 @@
 #include <QtGui>
 
 #include "caframe.h"
+#include "themecolors.h"
+
+// colour set of caFrame (level 2), values come from themecolors.h
+namespace caFrameColor {
+    constexpr const ThemeColor &LineDefault = ThemeColors::FrameLine;   // Qt::gray
+}
 
 caFrame::caFrame(QWidget *parent) : QFrame(parent)
 {
-    thisBackColor = Qt::gray;
+    thisBackColor = ThemeColors::color(caFrameColor::LineDefault);
     thisBackgroundMode = Outline;
     setVisibility(StaticV);
     setVisibilityMode(All);

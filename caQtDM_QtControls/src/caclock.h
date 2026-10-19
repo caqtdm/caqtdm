@@ -87,7 +87,7 @@ public:
     void updateClock(QTime time);
     void setAlarmColors(short status, bool force = false);
 
-    enum colMode {Static, Alarm};
+    enum colMode {Static, Alarm, Default};   // Default: dial follows the panel theme
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode) {thisColorMode = colormode; setAlarmColors(NO_ALARM);}
 
@@ -133,10 +133,16 @@ private slots:
 
 protected:
     void resizeEvent(QResizeEvent *e);
+    void changeEvent(QEvent *e);
 
 private:
 
     QPalette colorTheme( const QColor &base ) const;
+    QColor effectiveBase() const;            // Default: themed base, else the author colour
+    void setHands(const QColor &base);
+    ThemeColors::Scheme appliedScheme;
+    short lastStatus;
+    QColor handBase;
 
     QString thisPV;
     TimeType thisTimeType;

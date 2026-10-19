@@ -25,9 +25,22 @@
 
 #include "cabytecontroller.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 #include <QGridLayout>
 
 Q_LOGGING_CATEGORY(caByteControllerLog, "caqtdm.widgets.cabytecontroller");
+
+// colour set of caByteController (level 2), values come from themecolors.h
+namespace caByteControllerColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &ClearBit = ThemeColors::ByteClearBit;   // constructor default (Qt::gray)
+    constexpr const ThemeColor &Text     = ThemeColors::TextPrimary;
+}
 
 caByteController::caByteController(QWidget *parent) : QWidget(parent)
 {
@@ -58,6 +71,7 @@ caByteController::caByteController(QWidget *parent) : QWidget(parent)
     signalMapper = new QSignalMapper(this);
     for (int i = 0; i < 32; i++) {
         EPushButton* temp =  new EPushButton(QString::number(i + thisStartBit), this);
+        ThemeColors::markSelfStyled(temp);     // colours come from setColor()
         temp->setFontScaleMode(thisScaleMode);
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         temp->setMinimumSize(2,2); //important for resizing as small as possible
@@ -136,22 +150,38 @@ long caByteController::getValue()
 
 void caByteController::drawByte(long lvalue, QColor trueColor, QColor falseColor)
 {
+    QColor text = thisTextColor;
+    if(thisColorMode == Default) {             // constructor colours follow the panel theme
+        const ThemeColors::Scheme scheme = ThemeColors::schemeOf(this);
+        falseColor = ThemeColors::themed(falseColor, caByteControllerColor::ClearBit, scheme);
+        text = ThemeColors::themed(thisTextColor, caByteControllerColor::Text, scheme);
+    }
     if(thisDirection == Down || thisDirection == Right)  {
         for(int i=0; i<= thisEndBit - thisStartBit; i++) {
             if(bitState(lvalue, i + thisStartBit)) {
-                setColor(i, trueColor, thisTextColor);
+                setColor(i, trueColor, text);
             } else {
-                setColor(i, falseColor, thisTextColor);
+                setColor(i, falseColor, text);
             }
         }
     } else {
         for(int i=0; i<= thisEndBit - thisStartBit; i++) {
             if(bitState(lvalue, i + thisStartBit)) {
-                setColor(thisEndBit - thisStartBit  - i, trueColor, thisTextColor);
+                setColor(thisEndBit - thisStartBit  - i, trueColor, text);
             } else {
-                setColor(thisEndBit - thisStartBit  - i, falseColor, thisTextColor);
+                setColor(thisEndBit - thisStartBit  - i, falseColor, text);
             }
         }
+    }
+}
+
+// the panel palette changed (theme switch): redraw the Default colours
+void caByteController::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if((e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) && thisColorMode == Default) {
+        for(int i = 0; i < 32; i++) prvColor[i] = prvTextcolor[i] = QColor();
+        drawByte(thisValue, thisTrueColor, thisFalseColor);
     }
 }
 
@@ -207,20 +237,20 @@ void caByteController::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
+        c=ThemeColors::color(caByteControllerColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
+        c=ThemeColors::color(caByteControllerColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
+        c=ThemeColors::color(caByteControllerColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c=ThemeColors::color(caByteControllerColor::NotConnected);
         break;
     default:
-        c=AL_DEFAULT;
+        c=ThemeColors::color(caByteControllerColor::AlarmDefault);
         break;
     }
 

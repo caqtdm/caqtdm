@@ -87,7 +87,7 @@ public:
 
     enum ArrowMode { Single, Double};
 
-    enum colMode {Static=0, Alarm};
+    enum colMode {Static=0, Alarm, Default};   // Default: constructor colours follow the panel theme
 
     caGraphics( QWidget *parent = 0 );
 
@@ -160,10 +160,13 @@ public slots:
 signals:
 
 protected:
+    void changeEvent(QEvent *e);
 
     void paintEvent( QPaintEvent* );
 
 private:
+    QColor paintLineColor() const;
+    QColor paintFillColor() const;
 
     QPolygonF getHead( QPointF, QPointF );
     int thisLineSize;

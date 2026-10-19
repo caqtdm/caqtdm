@@ -71,6 +71,14 @@ private slots:
     void panelThemeDarkStyleSheetKeepsDarkMode();
     void panelThemeReappliesOnApplicationPaletteChange();
     void panelThemeLegacyPaintsItselfOnDarkSystem();
+    void panelThemeAdaptsAuthoredColorsInDark();
+    void panelThemeSkipsSelfStyledWidgets();
+    void panelThemeAdaptsFrameRoles();
+    void panelThemeTablesFollowScheme();
+    void panelThemeAdaptsPlotFrameNotCanvas();
+    void panelThemeKeepsDefaultLineColor();
+    void panelThemeKeepsScaleColorOfAlarmDial();
+    void panelThemeRestoresNestedIncludeStyleSheet();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

@@ -36,11 +36,19 @@
 #include "tst_alhparser.h"
 #include "tst_alarmtree_logic.h"
 #include "tst_themecolors.h"
+#include "tst_textwidgets_theme.h"
+#include "tst_buttons_theme.h"
+#include "tst_containers_theme.h"
+#include "tst_painted_theme.h"
 
 int main(int argc, char **argv)
 {
     qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("offscreen"));
     qputenv("QT_QPA_FONTDIR", QByteArrayLiteral("."));
+    // as the viewer does: panel palettes propagate into stylesheet widgets
+#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+    QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles);
+#endif
 
     QApplication app(argc, argv);
     QApplication::setOrganizationName("Paul Scherrer Institut");
@@ -91,6 +99,26 @@ int main(int argc, char **argv)
 
     {
         TestThemeColors tc;
+        status |= QTest::qExec(&tc, argc, argv);
+    }
+
+    {
+        TestTextWidgetsTheme tc;
+        status |= QTest::qExec(&tc, argc, argv);
+    }
+
+    {
+        TestButtonsTheme tc;
+        status |= QTest::qExec(&tc, argc, argv);
+    }
+
+    {
+        TestContainersTheme tc;
+        status |= QTest::qExec(&tc, argc, argv);
+    }
+
+    {
+        TestPaintedTheme tc;
         status |= QTest::qExec(&tc, argc, argv);
     }
 

@@ -34,8 +34,16 @@ public:
     static bool usesLegacyLightTheme(const QWidget *root);
 
     static void seed(QWidget *contentRoot, Mode mode);
+
+    static void propagateThroughOwnPalettes(QWidget *contentRoot);  // see .cpp
     static void seed(QWidget *contentRoot, const QWidget *themeRoot);
     static void apply(QWidget *root);
+
+    // substitution matrix for authored colours (QColor properties and
+    // stylesheets of plain Qt widgets); active in system/dark with a dark
+    // scheme, restores the originals otherwise. Call before scanWidgets().
+    static bool adaptActive(const QWidget *root);
+    static void adaptAuthoredColors(QWidget *root);
 };
 
 #endif

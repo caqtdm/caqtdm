@@ -27,8 +27,21 @@
 
 #include "capolyline.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 
 Q_LOGGING_CATEGORY(caPolyLineLog, "caqtdm.widgets.capolyline")
+
+// colour set of caPolyLine (level 2), values come from themecolors.h
+namespace caPolyLineColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &Line = ThemeColors::TextPrimary;   // constructor default (black)
+    constexpr const ThemeColor &Fill = ThemeColors::TextPrimary;
+}
 
 caPolyLine::caPolyLine(QWidget *parent): QWidget(parent)
 {
@@ -92,30 +105,50 @@ void caPolyLine::setColorMode(colMode colormode)
     thisColorMode = colormode;
 }
 
+// Default: the constructor colours (black) follow the panel text colour, author colours stay
+QColor caPolyLine::paintLineColor() const
+{
+    if(thisColorMode != Default) return thisLineColor;
+    return ThemeColors::themed(thisLineColor, caPolyLineColor::Line, ThemeColors::schemeOf(this));
+}
+
+QColor caPolyLine::paintFillColor() const
+{
+    if(thisColorMode != Default) return thisForeColor;
+    return ThemeColors::themed(thisForeColor, caPolyLineColor::Fill, ThemeColors::schemeOf(this));
+}
+
+// the panel palette changed (theme switch): colours are resolved at paint time
+void caPolyLine::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) update();
+}
+
 void caPolyLine::setAlarmColors(short status)
 {
     switch (status) {
 
     case NO_ALARM:
-        setForeground(AL_GREEN);
-        setLineColor(AL_GREEN);
+        setForeground(ThemeColors::color(caPolyLineColor::AlarmNoAlarm));
+        setLineColor(ThemeColors::color(caPolyLineColor::AlarmNoAlarm));
         break;
     case MINOR_ALARM:
-        setForeground(AL_YELLOW);
-        setLineColor(AL_YELLOW);
+        setForeground(ThemeColors::color(caPolyLineColor::AlarmMinor));
+        setLineColor(ThemeColors::color(caPolyLineColor::AlarmMinor));
         break;
     case MAJOR_ALARM:
-        setForeground(AL_RED);
-        setLineColor(AL_RED);
+        setForeground(ThemeColors::color(caPolyLineColor::AlarmMajor));
+        setLineColor(ThemeColors::color(caPolyLineColor::AlarmMajor));
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        setForeground(AL_WHITE);
-        setLineColor(AL_WHITE);
+        setForeground(ThemeColors::color(caPolyLineColor::NotConnected));
+        setLineColor(ThemeColors::color(caPolyLineColor::NotConnected));
         break;
     default:
-        setForeground(AL_DEFAULT);
-        setLineColor(AL_DEFAULT);
+        setForeground(ThemeColors::color(caPolyLineColor::AlarmDefault));
+        setLineColor(ThemeColors::color(caPolyLineColor::AlarmDefault));
         break;
     }
 }
@@ -240,11 +273,11 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 
     if(thisLineStyle == Dash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DotLine,  Qt::FlatCap));
+        painter.setPen( QPen( paintLineColor(), getLineSize(), Qt::DotLine,  Qt::FlatCap));
     } else if (thisLineStyle == BigDash) {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::DashLine, Qt::FlatCap ));
+        painter.setPen( QPen( paintLineColor(), getLineSize(), Qt::DashLine, Qt::FlatCap ));
     } else {
-        painter.setPen( QPen( getLineColor(), getLineSize(), Qt::SolidLine, Qt::FlatCap));
+        painter.setPen( QPen( paintLineColor(), getLineSize(), Qt::SolidLine, Qt::FlatCap));
     }
 
     if(inDesigner) {
@@ -273,7 +306,7 @@ void caPolyLine::paintEvent(QPaintEvent * /* event */)
     }
 
     if(thisFillStyle == Filled) {
-        painter.setBrush(getForeground());
+        painter.setBrush(paintFillColor());
     }
 
     if(nbPoints > 0) {

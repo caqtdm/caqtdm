@@ -105,6 +105,7 @@ public:
 protected:
        void populateCells();
        void resizeEvent(QResizeEvent *e);
+       void changeEvent(QEvent *e);
 
 signals:
     void clicked(int indx);

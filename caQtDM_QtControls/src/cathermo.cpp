@@ -156,7 +156,9 @@ void caThermo::setColors(QColor bg, QColor fg, QColor textColor, colMode mode)
 
         // only Default/Alarm_Default follow the panel theme; Static keeps the author colours
         const QColor themeBg = ThemeColors::themed(bg, caThermoColor::Background, scheme);
-        const QColor themeText = ThemeColors::themed(textColor, caThermoColor::ScaleText, scheme);
+        // text follows the background it is painted on (an authored light background keeps dark text)
+        const QColor themeText = ThemeColors::themed(textColor, caThermoColor::ScaleText,
+                                                     ThemeColors::schemeFor(themeBg));
         QColor themeDefaultBack = defaultBackColor;
         QColor themeDefaultFore = defaultForeColor;
         if(scheme != ThemeColors::Light) {

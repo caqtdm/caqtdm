@@ -60,6 +60,8 @@
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QStackedWidget>
+#include <QPointer>
+#include <QList>
 
 #include <qtcontrols_global.h>
 
@@ -104,8 +106,6 @@ public:
     void storeArrayIndex(int index, int row, int col);
     void deleteArrayIndex(int pageIndex);
 
-    void setFont(int dir);
-
 public slots:
     void animation(QRect p) {
 #include "animationcode.h"
@@ -130,8 +130,19 @@ signals:
 
 protected:
     virtual void fontChange(const QFont & oldFont);
+    void changeEvent(QEvent *e);
+
+private slots:
+    void refreshTheme();
 
 private:
+    void applyVerticalStyle();          // generated or authored stylesheet of the vertical buttons
+    void restylePages();                // background of the pages created without a stylesheet
+    QString authoredStyleSheet;
+    QList<QPointer<QWidget> > ownedPages;
+    bool refreshPending;                // deferred refreshTheme scheduled
+    bool applyingColors;                // reentrancy guard for changeEvent
+
     struct twoInts {
         int r;
         int c;

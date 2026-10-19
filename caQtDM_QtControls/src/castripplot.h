@@ -27,6 +27,7 @@
 #define caStripPlot_H
 
 #include "plotHelperClasses.h"
+#include "themecolors.h"
 #include <QTime>
 #include <QTimer>
 #include <QThread>
@@ -482,6 +483,7 @@ public slots:
 
 protected:
     void resizeEvent ( QResizeEvent * event);
+    void changeEvent(QEvent *event);
 
 signals:
     void ShowContextMenu(const QPoint&);
@@ -494,6 +496,10 @@ private slots:
      void onSelected(const QPointF& point);
 
 private:
+    QColor effectiveFrameColor() const;      // frame as painted (default follows the scheme)
+    ThemeColors::Scheme scaleScheme() const; // scale/legend follow the own frame
+    QColor effectiveScaleColor() const;
+    ThemeColors::Scheme appliedScheme;
     int HISTORY;
     int timerID;
     double INTERVAL;

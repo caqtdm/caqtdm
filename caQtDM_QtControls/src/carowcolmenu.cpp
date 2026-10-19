@@ -24,6 +24,7 @@
  */
 
 #include "carowcolmenu.h"
+#include "themecolors.h"
 #include <QApplication>
 #include <QGridLayout>
 #include <QMenu>
@@ -63,6 +64,7 @@ caRowColMenu::caRowColMenu(QWidget *parent) : QWidget(parent)
         temp->setFontScaleMode(thisScaleMode);
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         temp->setMinimumSize(2,2); //important for resizing as small as possible
+        ThemeColors::markSelfStyled(temp);     // colours come from updateColors()
         connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
         cellsP.append(temp);
     }
@@ -98,7 +100,9 @@ void caRowColMenu::populateCells()
         l->hide();
         l->setMenu(NULL);
         signalMapper->removeMappings(l);
+        l->deleteLater();                      // a new one is created below
     }
+    cellsI.clear();
 
     foreach(EPushButton *l, cellsP) {
         grid->removeWidget(l);
@@ -117,10 +121,13 @@ void caRowColMenu::populateCells()
             ImagePushButton* temp =  new ImagePushButton("", thisImage);
             temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             temp->setMinimumSize(2,2); //important for resizing as small as possible
+            ThemeColors::markSelfStyled(temp);
             cellsI.append(temp);
             grid->addWidget(temp, 0, 0);
 
-            QMenu* menu = new QMenu();
+            temp->setPalette(ThemeColors::resolvedPalette(palette()));   // created at runtime
+            QMenu* menu = new QMenu(temp);     // popup is a window: give it the panel palette
+            menu->setPalette(ThemeColors::resolvedPalette(palette()));
             for (int i = 0; i < numCells; i++) {
                 QAction *action = new QAction(labels[i], this);
                 signalMapper->setMapping(action, i);
@@ -138,6 +145,8 @@ void caRowColMenu::populateCells()
             ImagePushButton* temp =  new ImagePushButton("", thisImage);
             temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             temp->setMinimumSize(2,2); //important for resizing as small as possible
+            ThemeColors::markSelfStyled(temp);
+            temp->setPalette(ThemeColors::resolvedPalette(palette()));   // created at runtime
             connect(temp, SIGNAL(clicked()), signalMapper, SLOT(map()));
             cellsI.append(temp);
 
@@ -179,6 +188,18 @@ void caRowColMenu::populateCells()
     updateLabel();
     updateColors();
     updateFontScaleMode();
+}
+
+// the panel palette changed: the popup menus are windows and do not inherit it
+void caRowColMenu::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(e->type() == QEvent::PaletteChange) {
+        foreach(ImagePushButton *l, cellsI) {
+            l->setPalette(ThemeColors::resolvedPalette(palette()));
+            if(l->menu() != (QMenu *) Q_NULLPTR) l->menu()->setPalette(ThemeColors::resolvedPalette(palette()));
+        }
+    }
 }
 
 void caRowColMenu::setLabel(QString const &label)

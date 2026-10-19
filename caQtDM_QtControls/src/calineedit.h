@@ -169,6 +169,7 @@ private slots:
 
 protected:
       virtual bool event(QEvent *) override;
+      virtual void changeEvent(QEvent *) override;
       virtual QSize sizeHint() const override;
       virtual QSize minimumSizeHint() const override;
       QSize calculateTextSpace() override;
@@ -180,6 +181,12 @@ protected:
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor defBackColor, defForeColor, defSelectColor;
+    QColor oldDefBackColor, oldDefForeColor;
+    void refreshDefaultColors();
+    void applyDefaultColors();
+    bool applyingColors;              // reentrancy guard for changeEvent
+    bool refreshPending;              // deferred applyDefaultColors scheduled
+    bool defaultsShown;               // defaults read at the first show
     QPalette thisPalette;
     colMode thisColorMode;
     colMode oldColorMode;
@@ -198,7 +205,6 @@ protected:
     FormatType thisFormatType;
     QString thisStyle, oldStyle;
 
-    bool isShown;
     bool isValue;
 
     bool thisFramePresent;

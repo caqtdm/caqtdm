@@ -25,7 +25,21 @@
 
 #include "camessagebutton.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 #include <QApplication>
+
+// colour set of caMessageButton (level 2), values come from themecolors.h
+namespace caMessageButtonColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &StaticButton = ThemeColors::StaticButton;   // default background
+    constexpr const ThemeColor &StaticText   = ThemeColors::Black;
+    constexpr const ThemeColor &StaticBase   = ThemeColors::White;
+}
 
 caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
 {
@@ -35,8 +49,8 @@ caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
 
     setAccessW(true);
     thisColorMode = Static;
-    thisForeColor = Qt::black;
-    thisBackColor = Qt::white;
+    thisForeColor = ThemeColors::color(caMessageButtonColor::StaticText);
+    thisBackColor = ThemeColors::color(caMessageButtonColor::StaticBase);
     thisDisabledForeColor = Qt::gray;
 
     setFontScaleMode(EPushButton::WidthAndHeight);
@@ -45,7 +59,7 @@ caMessageButton::caMessageButton(QWidget *parent) : EPushButton(parent)
     setFocusPolicy((Qt::StrongFocus));
 
     renewStyleSheet = true;
-    setBackground(QColor(0xe8, 0xe8, 0xe8));
+    setBackground(ThemeColors::color(caMessageButtonColor::StaticButton));
 
     setElevation(on_top);
 }
@@ -132,21 +146,21 @@ void caMessageButton::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        bg = AL_GREEN;
+        bg = ThemeColors::color(caMessageButtonColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        bg = AL_YELLOW;
+        bg = ThemeColors::color(caMessageButtonColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        bg = AL_RED;
+        bg = ThemeColors::color(caMessageButtonColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        bg = AL_WHITE;
+        bg = ThemeColors::color(caMessageButtonColor::NotConnected);
         fg = bg;
         break;
     default:
-        bg = AL_DEFAULT;
+        bg = ThemeColors::color(caMessageButtonColor::AlarmDefault);
         fg = thisForeColor;
         break;
     }

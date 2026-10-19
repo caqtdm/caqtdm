@@ -40,6 +40,8 @@
 #include "cawavetable.h"
 #include "cawavetablemodel.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+#include <QTimer>
 
 #define DEFAULT_CSV_SEPARATOR ','
 
@@ -52,6 +54,19 @@ Q_DECLARE_METATYPE(QtMsgType)
 #endif
 
 Q_LOGGING_CATEGORY(caWaveTableLog, "caqtdm.widgets.cawavetable")
+
+// colour set of caWaveTable (level 2), values come from themecolors.h
+namespace caWaveTableColor {
+    constexpr const ThemeColor &AlarmNoAlarm  = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor    = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor    = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid  = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault  = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected  = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlternateBase = ThemeColors::TableAlternateBase;
+    constexpr const ThemeColor &Header        = ThemeColors::TableHeader;
+    constexpr const ThemeColor &Grid          = ThemeColors::TableGrid;
+}
 
 caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
 {
@@ -105,27 +120,9 @@ caWaveTable::caWaveTable(QWidget *parent) : QTableWidget(parent)
             break;
         }
     }
-    if (canSetStyle){
-        qCDebug(caWaveTableLog).noquote() << QString("Style for a child widget of %1 is set by object").arg(parentName);
-        QPalette p = QPalette();
-        p.setColor(QPalette::AlternateBase, QColor(233, 231, 227));
-        setPalette(p);
-        setStyleSheet(
-            "QHeaderView::section{"
-            "border-right:1px solid #D8D8D8;"
-            "border-bottom: 1px solid #D8D8D8;"
-            "background-color:#f0f0f0;"
-            "}"
-            "QTableCornerButton::section{"
-            "border-right:1px solid #D8D8D8;"
-            "border-bottom: 1px solid #D8D8D8;"
-            "background-color:#f0f0f0;"
-            "}"
-            "QScrollBar{"
-            "border-right:1px solid #D8D8D8;"
-            "border-bottom:1px solid #D8D8D8"
-            "}");
-    }
+    if (canSetStyle) qCDebug(caWaveTableLog).noquote() << QString("Style for a child widget of %1 is set by object").arg(parentName);
+    builtInStyleEnabled = canSetStyle;   // a panel stylesheet applied later must not drop it
+    applyBuiltInStyle(true);
 #endif
     setColumnSize(80);
     setAttribute(Qt::WA_Hover);
@@ -196,8 +193,62 @@ void caWaveTable::RedefineRowColumns(int xsav, int ysav, int z, int &x, int &y)
     }
 }
 
+// authored stylesheet (designer/.ui) replaces the built-in look for good
 void caWaveTable::noStyle(QString stylesheet){
+    builtInStyleEnabled = false;
+    ThemeColors::markSelfStyled(this, false);
     this->setStyleSheet(stylesheet);
+}
+
+// Qt6 only: header and alternate-row colours of the built-in look, by scheme
+// (whether the built-in look applies at all is decided once in the constructor)
+void caWaveTable::applyBuiltInStyle(bool initial)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(!builtInStyleEnabled) return;
+    const ThemeColors::Scheme s = ThemeColors::schemeOf(this);
+    applyingColors = true;
+    // keep what external stylesheets put into the palette: replace AlternateBase
+    // only while it still holds our own value (either scheme)
+    QPalette p = palette();
+    const QColor current = p.color(QPalette::AlternateBase);
+    const QColor target = ThemeColors::color(caWaveTableColor::AlternateBase, s);
+    const bool ours = current == ThemeColors::color(caWaveTableColor::AlternateBase, ThemeColors::Light)
+            || current == ThemeColors::color(caWaveTableColor::AlternateBase, ThemeColors::Dark);
+    if((initial || ours) && current != target) {
+        p.setColor(QPalette::AlternateBase, target);
+        setPalette(p);
+    }
+    qCDebug(caWaveTableLog) << "built-in style" << (s == ThemeColors::Dark ? "dark" : "light") << this->objectName();
+    const QString grid = ThemeColors::css(caWaveTableColor::Grid, s);
+    const QString header = ThemeColors::css(caWaveTableColor::Header, s);
+    const QString style = QString(
+            "QHeaderView::section{border-right:1px solid %1;border-bottom: 1px solid %1;background-color:%2;}"
+            "QTableCornerButton::section{border-right:1px solid %1;border-bottom: 1px solid %1;background-color:%2;}"
+            "QScrollBar{border-right:1px solid %1;border-bottom:1px solid %1}").arg(grid, header);
+    if(styleSheet() != style) setStyleSheet(style);
+    ThemeColors::markSelfStyled(this);               // the matrix leaves our sheet alone
+    builtInStyleSheet = styleSheet();              // setPanelThemePalette compares against these
+    builtInPalette = palette();
+    applyingColors = false;
+#endif
+}
+
+// the panel palette changed (theme switch): regenerate the colours, deferred
+void caWaveTable::changeEvent(QEvent *e)
+{
+    QTableWidget::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, SLOT(refreshTheme()));
+    }
+}
+
+void caWaveTable::refreshTheme()
+{
+    refreshPending = false;
+    applyBuiltInStyle(false);
 }
 
 void caWaveTable::setPanelThemePalette(bool legacyLight)
@@ -834,20 +885,20 @@ void caWaveTable::displayText(int index, short status, QString const &text)
             case -1:
                 break;
             case NO_ALARM:
-                this->item(row, column)->setForeground(AL_GREEN);
+                this->item(row, column)->setForeground(ThemeColors::color(caWaveTableColor::AlarmNoAlarm));
                 break;
             case MINOR_ALARM:
-                this->item(row, column)->setForeground(AL_YELLOW);
+                this->item(row, column)->setForeground(ThemeColors::color(caWaveTableColor::AlarmMinor));
                 break;
             case MAJOR_ALARM:
-                this->item(row, column)->setForeground(AL_RED);
+                this->item(row, column)->setForeground(ThemeColors::color(caWaveTableColor::AlarmMajor));
                 break;
             case INVALID_ALARM:
             case NOTCONNECTED:
-                this->item(row, column)->setForeground(AL_WHITE);
+                this->item(row, column)->setForeground(ThemeColors::color(caWaveTableColor::NotConnected));
                 break;
             default:
-                this->item(row, column)->setForeground(AL_DEFAULT);
+                this->item(row, column)->setForeground(ThemeColors::color(caWaveTableColor::AlarmDefault));
                 break;
             }
         }   else {

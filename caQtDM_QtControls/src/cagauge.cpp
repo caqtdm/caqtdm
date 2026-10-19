@@ -24,7 +24,16 @@
  */
 
 #include "cagauge.h"
+#include "themecolors.h"
 #include <QPainter>
+
+// colour set of the gauges (level 2), values come from themecolors.h; text, ticks and
+// outlines use the palette WindowText so that they follow the panel theme
+namespace caGaugeColor {
+    constexpr const ThemeColor &Reference   = ThemeColors::AlarmMajor;    // REF marker (Qt::red)
+    constexpr const ThemeColor &ValueMarker = ThemeColors::GaugeMarker;   // Qt::darkBlue
+    constexpr const ThemeColor &ValueBox    = ThemeColors::PaletteBase;   // translucent value box
+}
 #include <QPaintEvent>
 #include <QApplication>
 #include <eng_notation.h>
@@ -180,7 +189,7 @@ void caLinearGauge::drawColorBar(QPainter *p)
                 p->drawRect(QRectF(widths[i-1], scalePos, widths[i]-widths[i-1], barSize));
             }
             p->setBrush(Qt::NoBrush);
-            p->setPen(Qt::black);
+            p->setPen(palette().color(QPalette::WindowText));
             p->drawRect(0, scalePos, 100, barSize);
         }
         else
@@ -194,7 +203,7 @@ void caLinearGauge::drawColorBar(QPainter *p)
                 p->drawRect(QRectF(0, heights[i], barSize, heights[i-1]-heights[i]));
             }
             p->setBrush(Qt::NoBrush);
-            p->setPen(Qt::black);
+            p->setPen(palette().color(QPalette::WindowText));
             p->drawRect(0, 0, barSize, 100);
         }
     }
@@ -212,7 +221,7 @@ void caLinearGauge::drawColorBar(QPainter *p)
         double v1, v2, min = 0.0, max = 0.0;
         v1 = (m_value-m_minValue)/(m_maxValue-m_minValue);
 
-        p->setPen(Qt::black);
+        p->setPen(palette().color(QPalette::WindowText));
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         p->setBrush(palette().background());
 #else
@@ -305,7 +314,7 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
     f = old = p->font();
     f.setPointSize(3);
     p->setFont(f);
-    p->setPen(Qt::red);
+    p->setPen(ThemeColors::color(caGaugeColor::Reference));
 
     if (m_orientation == Qt::Horizontal)
     {
@@ -340,12 +349,12 @@ void caLinearGauge::drawMarker(QPainter *p, bool drawValue)
         }
     }
     p->setFont(old);
-    p->setPen(Qt::black);
+    p->setPen(palette().color(QPalette::WindowText));
 
     if (drawValue)
-        c = QColor(Qt::darkBlue);
+        c = ThemeColors::color(caGaugeColor::ValueMarker);
     else
-        c = QColor(Qt::red);
+        c = ThemeColors::color(caGaugeColor::Reference);
     c.setAlpha(100);
     p->setBrush(c);
     p->drawPolygon(triangolo);
@@ -569,7 +578,7 @@ void caCircularGauge::drawNeedle(QPainter *p)
     p->setBrush(grad2);
     p->drawPolygon(tr2);
 
-    QPen pen(Qt::black);
+    QPen pen(palette().color(QPalette::WindowText));
     pen.setJoinStyle(Qt::RoundJoin);
     p->setPen(pen);
     p->drawLine(longArm,side1);
@@ -583,7 +592,7 @@ void caCircularGauge::drawNeedle(QPainter *p)
 
 void caCircularGauge::drawScale(QPainter *p)
 {
-    p->setPen(Qt::black);
+    p->setPen(palette().color(QPalette::WindowText));
     p->drawArc(-(m_outerRadius+0), -(m_outerRadius+0), 2*(m_outerRadius+0), 2*(m_outerRadius+0), (int)m_startAngle*16, (int)-m_stopAngle*16);
 
     qreal start = m_startAngle*3.1415927/180.0;
@@ -628,10 +637,10 @@ void caCircularGauge::drawScale(QPainter *p)
         p3 = QPointF((m_outerRadius+3)*cos(angle-shift),-(m_outerRadius+3)*sin(angle-shift));
         tr << p1 << p2 << p3;
 
-        QColor c = QColor(Qt::red);//EColor(Elettra::red);
+        QColor c = ThemeColors::color(caGaugeColor::Reference);
         c.setAlpha(100);
         p->setBrush(c);
-        p->setPen(Qt::black);
+        p->setPen(palette().color(QPalette::WindowText));
         p->drawPolygon(tr);
     }
 }
@@ -707,7 +716,9 @@ void caCircularGauge::drawValue(QPainter *p)
     p->setFont(f);
 
     QRect textRect(x,y+2,w,h);
-    p->setBrush(QColor(255,255,255,100));
+    QColor box = ThemeColors::color(caGaugeColor::ValueBox, ThemeColors::schemeOf(this));   // white / dark, by scheme
+    box.setAlpha(100);
+    p->setBrush(box);
     p->drawRect(textRect);
     p->drawText(x,y+2,w,h, Qt::AlignCenter|Qt::TextDontClip, s);
 

@@ -25,6 +25,8 @@
 
 #include "camenu.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+#include <QTimer>
 #include <QPainter>
 #include <QTimer>
 #include <QLineEdit>
@@ -32,6 +34,17 @@
 #include <QApplication>
 
 Q_LOGGING_CATEGORY(caMenuLog, "caqtdm.widgets.camenu")
+
+// colour set of caMenu (level 2), values come from themecolors.h
+namespace caMenuColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &FocusFrame   = ThemeColors::FocusFrame;
+}
 
 caMenu::caMenu(QWidget *parent) : QComboBox(parent)
 {
@@ -42,7 +55,10 @@ caMenu::caMenu(QWidget *parent) : QComboBox(parent)
     setAttribute(Qt::WA_StyleSheet);
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    isShown = false;
+    applyingColors = false;
+    refreshPending = false;
+    defaultsShown = false;
+    refreshDefaultColors();
     defaultPalette = palette();
     setLabelDisplay(false);
 
@@ -111,10 +127,40 @@ void caMenu::setForeground(QColor c)
     setColors(thisBackColor, thisForeColor);
 }
 
+// default colours: Base/Text as the panel palette and external stylesheets define
+// them for this widget (own stylesheet cleared while reading, see themecolors.h)
+void caMenu::refreshDefaultColors()
+{
+    applyingColors = true;            // clearing the sheet re-enters changeEvent
+    ThemeColors::defaultBaseAndText(this, defBackColor, defForeColor);
+    applyingColors = false;
+    oldDefBackColor = oldDefForeColor = QColor();         // force a new stylesheet
+    oldStyle.clear();
+}
+
+// deferred after an external palette/style change (not from inside the event)
+void caMenu::applyDefaultColors()
+{
+    refreshPending = false;
+    // re-apply what was set last (author colours, alarm or not connected) in the mode of
+    // that call: a palette change must not undo the dispatcher's state
+    const QColor lastBack = oldBackColor;
+    const QColor lastFore = oldForeColor;
+    const colMode lastMode = oldColorMode;
+    const colMode mode = thisColorMode;
+    refreshDefaultColors();
+    thisColorMode = lastMode;
+    setColors(oldBackColor, oldForeColor);
+    thisColorMode = mode;
+}
+
 void caMenu::setColors(QColor bg, QColor fg)
 {
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
-    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
+    if(applyingColors) return;        // setStyleSheet/setPalette re-enter through changeEvent
+    applyingColors = true;
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)
+            || (defBackColor != oldDefBackColor) || (defForeColor != oldDefForeColor)) {
         if(thisColorMode == Default) {
             thisStyle = "caMenu {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);}";
             thisStyle = thisStyle.arg(defBackColor.red()).arg(defBackColor.green()).arg(defBackColor.blue()).arg(defBackColor.alpha()).
@@ -136,6 +182,20 @@ void caMenu::setColors(QColor bg, QColor fg)
     }
 
     oldColorMode = thisColorMode;
+    oldDefBackColor = defBackColor;
+    oldDefForeColor = defForeColor;
+    applyingColors = false;
+}
+
+// the panel palette changed (theme switch): regenerate the colours
+void caMenu::changeEvent(QEvent *e)
+{
+    QComboBox::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, &caMenu::applyDefaultColors);
+    }
 }
 
 void caMenu::setAlarmColors(short status)
@@ -146,21 +206,21 @@ void caMenu::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        bg = AL_GREEN;
+        bg = ThemeColors::color(caMenuColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        bg = AL_YELLOW;
+        bg = ThemeColors::color(caMenuColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        bg = AL_RED;
+        bg = ThemeColors::color(caMenuColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        bg = AL_WHITE;
-        fg = AL_WHITE;
+        bg = ThemeColors::color(caMenuColor::AlarmInvalid);
+        fg = ThemeColors::color(caMenuColor::AlarmInvalid);
         break;
     default:
-        bg = AL_DEFAULT;
+        bg = ThemeColors::color(caMenuColor::AlarmDefault);
         fg = thisForeColor;
         break;
     }
@@ -322,23 +382,9 @@ bool caMenu::eventFilter(QObject *obj, QEvent *event)
 
 bool caMenu::event(QEvent *e)
 {
-    if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
-        // we try to get the default color for the background set through the external stylesheets
-        if(!isShown) {
-          setStyleSheet("");
-          QString c=  palette().color(QPalette::Base).name();
-          defBackColor = QColor(c);
-          qCDebug(caMenuLog) << "default back color" << c << this->objectName();
-          c=  palette().color(QPalette::Text).name();
-          defForeColor = QColor(c);
-          qCDebug(caMenuLog) << "default fore color" << c << this->objectName();
-
-          if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
-          if(!defForeColor.isValid()) defForeColor = Qt::black;
-
-          setColors(thisBackColor, thisForeColor);
-          isShown = true;
-        }
+    if(e->type() == QEvent::Show && !defaultsShown) {
+        defaultsShown = true;
+        applyDefaultColors();
     }
     return QComboBox::event(e);
 }

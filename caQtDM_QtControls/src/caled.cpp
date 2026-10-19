@@ -25,6 +25,17 @@
 
 #include "caled.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+
+// colour set of caLed (level 2), values come from themecolors.h
+namespace caLedColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+}
 
 caLed::caLed(QWidget *parent) : ELed(parent)
 {
@@ -32,6 +43,7 @@ caLed::caLed(QWidget *parent) : ELed(parent)
     thisFalseColor = Qt::gray;
     thisTrueColor = Qt::red;
     thisUndefinedColor = Qt::black;
+    thisBorderColor = Qt::black;              // ELed default, the getter returned an invalid colour
     thisColorMode = Static;
     setTrueValue("1");
     setFalseValue("0");
@@ -95,20 +107,20 @@ void caLed::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        ELed::setColor(AL_GREEN);
+        ELed::setColor(ThemeColors::color(caLedColor::AlarmNoAlarm));
         break;
     case MINOR_ALARM:
-        ELed::setColor(AL_YELLOW);
+        ELed::setColor(ThemeColors::color(caLedColor::AlarmMinor));
         break;
     case MAJOR_ALARM:
-        ELed::setColor(AL_RED);
+        ELed::setColor(ThemeColors::color(caLedColor::AlarmMajor));
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        ELed::setColor(AL_WHITE);
+        ELed::setColor(ThemeColors::color(caLedColor::NotConnected));
         break;
     default:
-        ELed::setColor(AL_DEFAULT);
+        ELed::setColor(ThemeColors::color(caLedColor::AlarmDefault));
         break;
     }
 }

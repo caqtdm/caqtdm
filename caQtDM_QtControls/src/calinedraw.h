@@ -188,6 +188,7 @@ public slots:
 
 protected:
     virtual bool event(QEvent *);
+    virtual void changeEvent(QEvent *);
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
     QSize calculateTextSpace() override;
@@ -212,6 +213,13 @@ private:
     QColor m_ForeColor, m_ForeColorOld;
     QColor m_BackColor, m_BackColorOld;
     QColor m_BackColorDefault, m_ForeColorDefault;
+    QColor m_PaintBackColor, m_PaintForeColor;   // what paintEvent uses
+    QColor m_BackColorDefaultOld, m_ForeColorDefaultOld;
+    void refreshDefaultColors();
+    void applyDefaultColors();
+    bool applyingColors;              // reentrancy guard for changeEvent
+    bool refreshPending;              // deferred applyDefaultColors scheduled
+    bool defaultsShown;               // defaults read at the first show
     colMode m_ColorMode, m_ColorModeOld;
     Alignment m_Alignment;
     Direction m_Direction;
@@ -229,7 +237,6 @@ private:
     short m_AlarmState;
     QColor m_bgAtInitLast;
     QColor m_fgAtInitLast;
-    bool m_IsShown;
     bool m_FramePresent;
     QColor m_FrameColor, m_FrameColorOld;
     int m_FrameLineWidth, m_FrameLineWidthOld;

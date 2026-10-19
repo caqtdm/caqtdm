@@ -202,6 +202,7 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *e);
     virtual void wheelEvent(QWheelEvent *e);
     virtual bool event(QEvent *);
+    virtual void changeEvent(QEvent *);
     virtual void drawSlider ( QPainter *, const QRect & ) const;
 
 private:
@@ -231,6 +232,12 @@ private:
 
     QColor defaultBackColor;
     QColor defaultForeColor;
+    QColor oldDefaultBackColor, oldDefaultForeColor;
+    void refreshDefaultColors();
+    void applyDefaultColors();
+    bool applyingColors;              // reentrancy guard for changeEvent
+    bool refreshPending;              // deferred applyDefaultColors scheduled
+    bool defaultsShown;               // defaults read at the first show
 
     double thisMaximum;
     double thisMinimum;
@@ -247,7 +254,6 @@ private:
     void configureScale();
     QRect createValueRect(QRect sliderRect) const ;
     void paintValue ( QPainter *painter, QRect valueRect) const;
-    bool isShown;
 };
 
 #endif

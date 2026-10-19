@@ -29,13 +29,27 @@
 #include <QApplication>
 #include <QWidget>
 #include <QToolTip>
+#include <QTimer>
 #include "cadoubletabwidget.h"
+#include "themecolors.h"
 
 Q_LOGGING_CATEGORY(caDoubleTabWidgetLog, "caqtdm.widgets.cadoubletabwidget")
+
+// colour set of caDoubleTabWidget (level 2), values come from themecolors.h
+namespace caDoubleTabColor {
+    constexpr const ThemeColor &Page           = ThemeColors::TabPage;
+    constexpr const ThemeColor &ButtonBorder   = ThemeColors::TabButtonBorder;
+    constexpr const ThemeColor &GradientTop    = ThemeColors::TabGradientTop;
+    constexpr const ThemeColor &GradientBottom = ThemeColors::TabGradientBottom;
+    constexpr const ThemeColor &Checked        = ThemeColors::TabChecked;
+    constexpr const ThemeColor &DefaultBorder  = ThemeColors::TabDefaultBorder;
+}
 
 caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
 
 {
+    refreshPending = false;
+    applyingColors = false;
     row = 0;
     col = 0;
     vCount = 0;
@@ -81,7 +95,7 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
     addPages = false;
 
     // colorize horizontal bar
-    setFont(0);
+    applyVerticalStyle();
 
     setRow(0);
     setCol(0);
@@ -91,7 +105,6 @@ caDoubleTabWidget::caDoubleTabWidget(QWidget *parent) : QWidget(parent)
 
 bool caDoubleTabWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    Q_UNUSED(obj);
     QVariant source = qApp->property("APP_SOURCE").value<QVariant>();
     if(source.isValid()) {
         if(!source.isNull()) {
@@ -106,10 +119,7 @@ bool caDoubleTabWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-    if(event->type() == QEvent::Polish){
-        editStyleSheet(this->styleSheet());
-    }
-    return QWidget::event(event);
+    return QWidget::eventFilter(obj, event);
 }
 
 int caDoubleTabWidget::lookupArrayIndex(int row, int col)
@@ -228,8 +238,40 @@ void caDoubleTabWidget::insertPage(int index, QWidget *page)
     qCDebug(caDoubleTabWidgetLog) << "set page title to" << title;
     page->setObjectName(title);
     page->setAutoFillBackground(true);
-    QString style = "QWidget#%1 { background-color : rgb(255,255,200); }";
-    if(page->styleSheet().size() < 1) page->setStyleSheet(style.arg(title));
+    if(page->styleSheet().size() < 1) {          // pages without an authored sheet get ours
+        ownedPages.append(page);
+        ThemeColors::markSelfStyled(page);
+        restylePages();
+    }
+}
+
+// background of the pages we colour ourselves, by scheme
+void caDoubleTabWidget::restylePages()
+{
+    const QString background = ThemeColors::css(caDoubleTabColor::Page, ThemeColors::schemeOf(this));
+    foreach(const QPointer<QWidget> &page, ownedPages) {
+        if(page.isNull()) continue;
+        const QString style = QString("QWidget#%1 { background-color : %2; }").arg(page->objectName(), background);
+        if(page->styleSheet() != style) page->setStyleSheet(style);
+    }
+}
+
+// the panel palette changed (theme switch): regenerate the colours, deferred
+void caDoubleTabWidget::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, SLOT(refreshTheme()));
+    }
+}
+
+void caDoubleTabWidget::refreshTheme()
+{
+    refreshPending = false;
+    applyVerticalStyle();
+    restylePages();
 }
 
 int caDoubleTabWidget::count() const
@@ -298,7 +340,7 @@ void caDoubleTabWidget::addSampleWidget(int dir)
             vTabBar->addButton(button, i);
             buttonLayout->addWidget(button);
         }
-        setFont(1);
+        applyVerticalStyle();
         if(thisVerItems.count() == 0) for(i = 0; i < count; i++) thisVerItems << (QString("Widget %1").arg(i));
     }
     setCurrentIndex(0);
@@ -376,57 +418,64 @@ void caDoubleTabWidget::fontChange(const QFont & oldFont) {
 
 void caDoubleTabWidget::setItemsPadding(QString const &padding) {
     thisVerPadding= padding.split(";");
-    setFont(1);
+    applyVerticalStyle();
 }
 
 
-// set styles
-void caDoubleTabWidget::setFont(int dir)
+// stylesheet of the vertical buttons: an authored sheet wins, otherwise it is
+// generated from the theme (one sheet; the padding of the first button, as before)
+void caDoubleTabWidget::applyVerticalStyle()
 {
-    Q_UNUSED(dir);
-    // style for vertical buttons
-    QString style;
-#ifdef _MSC_VER
-    int *padding=new int[vTabBar->buttons().count()];
-#else
-    int padding[vTabBar->buttons().count()];
-#endif
-    for(int j=0; j<vTabBar->buttons().count(); j++) padding[j] = 0;
-    for(int j=0; j < thisVerPadding.count(); j++) {
-        padding[j] = thisVerPadding.at(j).toInt();
+    if(!authoredStyleSheet.isEmpty()) {
+        qCDebug(caDoubleTabWidgetLog) << "authored style" << authoredStyleSheet.left(80);
+        ThemeColors::markSelfStyled(this, false);
+        if(styleSheet() != authoredStyleSheet) {
+            applyingColors = true;
+            setStyleSheet(authoredStyleSheet);
+            applyingColors = false;
+        }
+        return;
     }
+    if(vTabBar->buttons().count() < 1) return;
 
-    int count =  vTabBar->buttons().count();
-    for(int i = count-1; i >= 0; i--) {
-        style = "QPushButton {border: 2px solid #8f8f91; border-radius: 6px ; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 #f6f7fa, stop: 1 #dadbde);  ";
+    int padding = 0;
+    if(thisVerPadding.count() > 0) padding = thisVerPadding.at(0).toInt();
 
-        // style for vertical list
-        style.append(tr("font-size: %1pt; font-family: %2; ").arg(this->fontInfo().pointSize()).arg(this->fontInfo().family()));
-        if(this->fontInfo().underline())  style.append("text-decoration:underline; ");
+    const ThemeColors::Scheme s = ThemeColors::schemeOf(this);
+    QString style = "QPushButton {border: 2px solid " + ThemeColors::css(caDoubleTabColor::ButtonBorder, s)
+            + "; border-radius: 6px ; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,stop: 0 "
+            + ThemeColors::css(caDoubleTabColor::GradientTop, s) + ", stop: 1 "
+            + ThemeColors::css(caDoubleTabColor::GradientBottom, s) + ");  ";
+
+    // style for vertical list
+    style.append(tr("font-size: %1pt; font-family: %2; ").arg(this->fontInfo().pointSize()).arg(this->fontInfo().family()));
+    if(this->fontInfo().underline())  style.append("text-decoration:underline; ");
 
 #if QT_VERSION < 0x040700
-        if(this->fontInfo().bold()) style.append("font-weight: bold; ");
-        if(this->fontInfo().italic())  style.append("font-style: italic; ");
+    if(this->fontInfo().bold()) style.append("font-weight: bold; ");
+    if(this->fontInfo().italic())  style.append("font-style: italic; ");
 #else
-        if(this->fontInfo().styleName().contains("Bold")) style.append("font-weight: bold; ");
-        if(this->fontInfo().styleName().contains("Italic"))  style.append("font-style: italic; ");
+    if(this->fontInfo().styleName().contains("Bold")) style.append("font-weight: bold; ");
+    if(this->fontInfo().styleName().contains("Italic"))  style.append("font-style: italic; ");
 #endif
 
-        style.append(tr("text-align: left; padding-left: %1px;").arg(padding[i]));
-        style.append("} ");
+    style.append(tr("text-align: left; padding-left: %1px;").arg(padding));
+    style.append("} ");
+    style.append("QPushButton:checked {background-color: " + ThemeColors::css(caDoubleTabColor::Checked, s) + ";}");
+    style.append("QPushButton:default {border-color: " + ThemeColors::css(caDoubleTabColor::DefaultBorder, s) + "; }");
+    style.append("QTabBar::tab  {background-color: " + ThemeColors::css(caDoubleTabColor::Checked, s) + ";}");
 
-        QString pushbtnColor = QString("QPushButton:checked {background-color: rgb( 255, 0, 255);}");
-        style.append(pushbtnColor);
-
-         style.append("QPushButton:default {border-color: navy; }");
-        style.append("QTabBar::tab  {background-color: rgb( 255, 0, 255);}");
-         this->setStyleSheet(style);
+    ThemeColors::markSelfStyled(this);
+    qCDebug(caDoubleTabWidgetLog) << "vertical style" << (s == ThemeColors::Dark ? "dark" : "light") << (style != styleSheet()) << style.left(80);
+    if(style != styleSheet()) {
+        applyingColors = true;
+        setStyleSheet(style);
+        applyingColors = false;
     }
-#ifdef _MSC_VER
-    delete[] padding;
-#endif
 }
 
+// authored stylesheet (designer/.ui); an empty one brings the generated style back
 void caDoubleTabWidget::editStyleSheet(QString styleSheet){
-    this->setStyleSheet(styleSheet);
+    authoredStyleSheet = styleSheet;
+    applyVerticalStyle();
 }

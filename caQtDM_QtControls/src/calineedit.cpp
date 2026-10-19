@@ -24,6 +24,8 @@
  */
 #include "calineedit.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+#include <QTimer>
 #include <QEvent>
 #include <QStyleOptionFrame>
 #include <QStyle>
@@ -44,6 +46,17 @@
 #endif
 
 Q_LOGGING_CATEGORY(caLineEditLog, "caqtdm.widgets.calineedit")
+
+// colour set of caLineEdit (level 2), values come from themecolors.h
+namespace caLineEditColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &FocusFrame   = ThemeColors::FocusFrame;
+}
 
 caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(this)
 {
@@ -69,7 +82,10 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
     specialUnitsAppend = false;
     specialUnitsString = "";
 
-    isShown = false;
+    applyingColors = false;
+    refreshPending = false;
+    defaultsShown = false;
+    refreshDefaultColors();
 
     oldStyle = "";
     thisStyle = "";
@@ -99,7 +115,7 @@ caLineEdit::caLineEdit(QWidget *parent) : QLineEdit(parent), FontScalingWidget(t
 
     thisDatatype = caDOUBLE;
     // default colors will be defined in my event handler by taking them from the palette defined by stylesheet definitions
-    defSelectColor = Qt::red; // this does not appear in the palette
+    defSelectColor = ThemeColors::color(caLineEditColor::FocusFrame); // not in the palette
 
     setPrecisionMode(Channel);
     setLimitsMode(Channel);
@@ -161,11 +177,41 @@ void caLineEdit::setPV(QString const &newPV)
 // the styles are now defined here and not in the style sheet any more
 // while this gives a performance problem, limit the use of it by testing changes
 
+// default colours: Base/Text as the panel palette and external stylesheets define
+// them for this widget (own stylesheet cleared while reading, see themecolors.h)
+void caLineEdit::refreshDefaultColors()
+{
+    applyingColors = true;            // clearing the sheet re-enters changeEvent
+    ThemeColors::defaultBaseAndText(this, defBackColor, defForeColor);
+    applyingColors = false;
+    oldDefBackColor = oldDefForeColor = QColor();         // force a new stylesheet
+    oldStyle.clear();
+}
+
+// deferred after an external palette/style change (not from inside the event)
+void caLineEdit::applyDefaultColors()
+{
+    refreshPending = false;
+    // re-apply what was set last (author colours, alarm or not connected) in the mode of
+    // that call: a palette change must not undo the dispatcher's state
+    const QColor lastBack = oldBackColor;
+    const QColor lastFore = oldForeColor;
+    const colMode lastMode = oldColorMode;
+    const colMode mode = thisColorMode;
+    refreshDefaultColors();
+    thisColorMode = lastMode;
+    setColors(oldBackColor, oldForeColor, thisFrameColor, thisFrameLineWidth);
+    thisColorMode = mode;
+}
+
 void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
 {
     if(!defBackColor.isValid() || !defForeColor.isValid()) return;
+    if(applyingColors) return;        // setStyleSheet/setPalette re-enter through changeEvent
+    applyingColors = true;
 
-    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode) || (frame != oldFrameColor) || lineWidth != oldFrameLineWidth) {
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode) || (frame != oldFrameColor) || lineWidth != oldFrameLineWidth
+            || (defBackColor != oldDefBackColor) || (defForeColor != oldDefForeColor)) {
         QColor lc, dc;
         QColor blc = frame.lighter();
         QColor bdc = frame.darker();
@@ -282,6 +328,9 @@ void caLineEdit::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
     oldFrameColor = frame;
     oldFrameLineWidth = lineWidth;
     oldColorMode = thisColorMode;
+    oldDefBackColor = defBackColor;
+    oldDefForeColor = defForeColor;
+    applyingColors = false;
 }
 
 void caLineEdit::setColorMode(colMode colormode)
@@ -339,25 +388,12 @@ void caLineEdit::setLinewidth(int width)
 
 bool caLineEdit::event(QEvent *e)
 {
+    if(e->type() == QEvent::Show && !defaultsShown) {
+        defaultsShown = true;
+        applyDefaultColors();
+    }
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(text(), calculateTextSpace());
-        // we try to get the default color for the background set through the external stylesheets
-
-        if(!isShown) {
-          setStyleSheet("");
-          QString c=  palette().color(QPalette::Base).name();
-          defBackColor = QColor(c);
-          qCDebug(caLineEditLog) << "default back color" << c << this->objectName();
-          c=  palette().color(QPalette::Text).name();
-          defForeColor = QColor(c);
-          qCDebug(caLineEditLog) << "default fore color" << c << this->objectName();
-
-          if(!defBackColor.isValid()) defBackColor = QColor(255, 248, 220, 255);
-          if(!defForeColor.isValid()) defForeColor = Qt::black;
-
-          setColors(thisBackColor, thisForeColor, thisFrameColor, thisFrameLineWidth);
-          isShown = true;
-        }
 
     // we do this to temporarily disable the widget in order to be able to initiate a drag
     // for context menu it will be enabled again when drag gets initiated (in caQtDM_Lib)
@@ -373,6 +409,17 @@ bool caLineEdit::event(QEvent *e)
         }
     }
     return QLineEdit::event(e);
+}
+
+// the panel palette changed (theme switch): regenerate the colours
+void caLineEdit::changeEvent(QEvent *e)
+{
+    QLineEdit::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, &caLineEdit::applyDefaultColors);
+    }
 }
 
 void caLineEdit::setDatatype(int datatype)
@@ -630,7 +677,7 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case NO_ALARM:
         qCDebug(caLineEditLog) << "no alarm";
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
-            c = AL_GREEN;
+            c = ThemeColors::color(caLineEditColor::AlarmNoAlarm);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
             else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
@@ -641,7 +688,7 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case MINOR_ALARM:
         qCDebug(caLineEditLog) << "minor alarm";
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
-            c = AL_YELLOW;
+            c = ThemeColors::color(caLineEditColor::AlarmMinor);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
             else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
@@ -652,7 +699,7 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case MAJOR_ALARM:
         qCDebug(caLineEditLog) << "serious alarm";
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
-            c = AL_RED;
+            c = ThemeColors::color(caLineEditColor::AlarmMajor);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
             else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
@@ -663,7 +710,7 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case INVALID_ALARM:
         qCDebug(caLineEditLog) << "invalid alarm";
         if(thisColorMode == Alarm_Static) {
-            c =AL_WHITE;
+            c =ThemeColors::color(caLineEditColor::AlarmInvalid);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
             else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {
@@ -673,13 +720,13 @@ void caLineEdit::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
     case NOTCONNECTED:
         qCDebug(caLineEditLog) << "no connection";
-        forceForeAndBackground(AL_WHITE, AL_WHITE, thisFrameColor);
+        forceForeAndBackground(ThemeColors::color(caLineEditColor::NotConnected), ThemeColors::color(caLineEditColor::NotConnected), thisFrameColor);
         break;
 
     default:
         qCDebug(caLineEditLog) << "Alarm default" << status;
         if(thisColorMode == Alarm_Static) {
-            c = AL_DEFAULT;
+            c = ThemeColors::color(caLineEditColor::AlarmDefault);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
             else setForeAndBackground(fgAtInit, c, thisFrameColor);
         } else {

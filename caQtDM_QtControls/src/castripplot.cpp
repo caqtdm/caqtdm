@@ -36,6 +36,23 @@
 #include <qpainter.h>
 #include <QMetaProperty>
 #include "castripplot.h"
+
+// colour set of caStripPlot (level 2), values come from themecolors.h
+namespace caStripPlotColor {
+    constexpr const ThemeColor &Frame       = ThemeColors::StripFrame;
+    constexpr const ThemeColor &Canvas      = ThemeColors::PlotCanvas;
+    constexpr const ThemeColor &CanvasFrame = ThemeColors::PlotCanvasFrame;
+    constexpr const ThemeColor &Scale       = ThemeColors::PlotScale;
+    constexpr const ThemeColor &Grid        = ThemeColors::PlotGrid;
+    constexpr const ThemeColor &GlCanvas    = ThemeColors::PlotGlCanvas;
+    constexpr const ThemeColor &Curve1 = ThemeColors::Curve1;      // white
+    constexpr const ThemeColor &Curve2 = ThemeColors::Curve2;      // red
+    constexpr const ThemeColor &Curve3 = ThemeColors::Curve3;      // yellow
+    constexpr const ThemeColor &Curve4 = ThemeColors::CurveCyan;
+    constexpr const ThemeColor &Curve5 = ThemeColors::Curve6;      // magenta
+    constexpr const ThemeColor &Curve6 = ThemeColors::Curve5;      // green
+    constexpr const ThemeColor &Curve7 = ThemeColors::Curve4;      // blue
+}
 #include <cmath>
 #include <qwt_picker_machine.h>
 #include <qelapsedtimer.h>
@@ -71,6 +88,7 @@ caStripPlot::~caStripPlot() {
 
 caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 {
+    appliedScheme = ThemeColors::Light;
     // initialisations
     initCurves = true;
     timerID = false;
@@ -100,7 +118,7 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
 #ifdef QWT_USE_OPENGL
     qCDebug(caStripPlotLog) << "caStripplot uses opengl";
     GLCanvas *canvas = new GLCanvas();
-    canvas->setPalette( QColor( "khaki" ) );
+    canvas->setPalette( ThemeColors::color(caStripPlotColor::GlCanvas) );
     setCanvas(canvas);
 #endif
 
@@ -163,19 +181,19 @@ caStripPlot::caStripPlot(QWidget *parent): QwtPlot(parent)
     setTitlePlot("");
     setTitleX("");
     setTitleY("");
-    setBackground(Qt::black);
-    setForeground(QColor(133, 190, 232));
-    setScaleColor(Qt::black);
+    setBackground(ThemeColors::color(caStripPlotColor::Canvas));
+    setForeground(ThemeColors::color(caStripPlotColor::Frame));
+    setScaleColor(ThemeColors::color(caStripPlotColor::Scale));
     setGrid(true);
-    setGridColor(Qt::gray);
+    setGridColor(ThemeColors::color(caStripPlotColor::Grid));
     for(int i=0; i< MAXCURVES; i++) setStyle(Lines, i);
-    setColor(Qt::white, 0);
-    setColor(Qt::red, 1);
-    setColor(Qt::yellow, 2);
-    setColor(Qt::cyan, 3);
-    setColor(Qt::magenta, 4);
-    setColor(Qt::green, 5);
-    setColor(Qt::blue, 6);
+    setColor(ThemeColors::color(caStripPlotColor::Curve1), 0);
+    setColor(ThemeColors::color(caStripPlotColor::Curve2), 1);
+    setColor(ThemeColors::color(caStripPlotColor::Curve3), 2);
+    setColor(ThemeColors::color(caStripPlotColor::Curve4), 3);
+    setColor(ThemeColors::color(caStripPlotColor::Curve5), 4);
+    setColor(ThemeColors::color(caStripPlotColor::Curve6), 5);
+    setColor(ThemeColors::color(caStripPlotColor::Curve7), 6);
 
     setXaxisEnabled(true);
     setYaxisEnabled(true);
@@ -683,7 +701,7 @@ void caStripPlot::UpdateScaling()
     } else {
         QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
         QPalette palette = scaleY->palette();
-        palette.setColor( QPalette::WindowText, getScaleColor());
+        palette.setColor( QPalette::WindowText, effectiveScaleColor());
         scaleY->setPalette (palette);
 
         savedTitles = originalTitles;
@@ -735,7 +753,7 @@ QString caStripPlot::legendText(int i)
 void caStripPlot::setCurveLegendTitle(int index)
 {
     QwtText title(legendText(index));
-    title.setColor(thisScaleColor);
+    title.setColor(effectiveScaleColor());
     curve[index]->setTitle(title);
 }
 
@@ -815,7 +833,7 @@ void caStripPlot::defineCurves(QStringList titles, units unit, double period, in
         QwtLegend *lgd = new QwtLegend;
         insertLegend(lgd, QwtPlot::BottomLegend);
         // set color on legend texts
-        setLegendAttribute(thisScaleColor, QFont("arial",9), COLOR);
+        setLegendAttribute(effectiveScaleColor(), QFont("arial",9), COLOR);
     }
     RescaleCurves(width, unit, period);
 
@@ -1381,7 +1399,7 @@ void caStripPlot::setGrid(bool m)
 {
     thisGrid = m;
     if(m) {
-        penGrid = QPen(Qt::gray);
+        penGrid = QPen(thisGridColor.isValid() ? thisGridColor : ThemeColors::color(caStripPlotColor::Grid));
         penGrid.setStyle(Qt::DashLine);
         plotGrid->setPen(penGrid);
         plotGrid->setVisible(penGrid.style() != Qt::NoPen);
@@ -1415,19 +1433,48 @@ QwtPlotCurve::CurveStyle caStripPlot::myStyle(curvStyle s)
     return ms;
 }
 
+QColor caStripPlot::effectiveFrameColor() const
+{
+    return ThemeColors::themed(thisForeColor, caStripPlotColor::Frame, ThemeColors::schemeOf(this));
+}
+
+// an authored light frame keeps dark scale text even in a dark panel (and vice versa)
+ThemeColors::Scheme caStripPlot::scaleScheme() const
+{
+    return ThemeColors::schemeFor(effectiveFrameColor());
+}
+
+QColor caStripPlot::effectiveScaleColor() const
+{
+    return ThemeColors::themed(thisScaleColor, caStripPlotColor::Scale, scaleScheme());
+}
+
+// the panel palette changed (theme switch): frame, scale and legend follow
+void caStripPlot::changeEvent(QEvent *event)
+{
+    QwtPlot::changeEvent(event);
+    if(event->type() != QEvent::PaletteChange && event->type() != QEvent::StyleChange) return;
+    const ThemeColors::Scheme scheme = ThemeColors::schemeOf(this);
+    if(scheme == appliedScheme) return;
+    appliedScheme = scheme;
+    setForeground(thisForeColor);
+}
+
 void caStripPlot::setBackground(QColor c)
 {
     thisBackColor = c;
     QPalette canvasPalette(c);
-    canvasPalette.setColor(QPalette::WindowText, QColor(133, 190, 232));
+    canvasPalette.setColor(QPalette::WindowText, ThemeColors::color(caStripPlotColor::CanvasFrame));
     canvas()->setPalette(canvasPalette);
     replot();
 }
 
+// frame default follows the panel theme; the scale colour depends on the frame
 void caStripPlot::setForeground(QColor c)
 {
     thisForeColor = c;
-    setPalette(QPalette(c));
+    setPalette(QPalette(effectiveFrameColor()));
+    if(thisScaleColor.isValid()) setScaleColor(thisScaleColor);
     replot();
 }
 
@@ -1436,20 +1483,27 @@ void caStripPlot::setScaleColor(QColor c)
     QwtScaleWidget *scaleX =axisWidget(QwtPlot::xBottom);
     QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
     thisScaleColor = c;
+    const QColor e = effectiveScaleColor();
     QPalette palette = scaleX->palette();
-    palette.setColor( QPalette::WindowText, c); // for ticks
-    palette.setColor( QPalette::Text, c);       // for ticks' labels
+    palette.setColor( QPalette::WindowText, e); // for ticks
+    palette.setColor( QPalette::Text, e);       // for ticks' labels
     scaleX->setPalette( palette);
     scaleY->setPalette (palette);
     titleLabel()->setPalette(palette);
     for (int i = 0; i < NumberOfCurves; ++i) {
         if (curve[i] && !curve[i]->title().isEmpty()) {
             QwtText title = curve[i]->title();
-            title.setColor(c);
+            title.setColor(e);
             curve[i]->setTitle(title);
         }
+        // the fill-under min/max band is drawn in the scale colour
+        if (errorcurve[i] != (QwtPlotIntervalCurveNaN *) Q_NULLPTR && thisStyle[i] == FillUnder) {
+            errorcurve[i]->setPen(QPen(e, 0));
+            errorcurve[i]->setBrush(QBrush(e, Qt::SolidPattern));
+        }
     }
-    refreshLegendTextColor(c);
+    refreshLegendTextColor(e);
+    replot();
 }
 
 void caStripPlot::setColor(QColor c, int number)
@@ -1469,8 +1523,8 @@ void caStripPlot::setColor(QColor c, int number)
 
     if(errorcurve[number] != (QwtPlotIntervalCurveNaN *) Q_NULLPTR) {
         if(thisStyle[number] == FillUnder) {
-            errorcurve[number]->setPen(QPen(thisScaleColor,0));
-            errorcurve[number]->setBrush(QBrush(thisScaleColor, Qt::SolidPattern));
+            errorcurve[number]->setPen(QPen(effectiveScaleColor(),0));
+            errorcurve[number]->setBrush(QBrush(effectiveScaleColor(), Qt::SolidPattern));
         } else {
             errorcurve[number]->setPen(QPen(c, 0));
             errorcurve[number]->setBrush(QBrush(c, Qt::SolidPattern));

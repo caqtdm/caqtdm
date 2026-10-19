@@ -32,6 +32,12 @@
 #include <QtUiTools/QUiLoader>
 #include <math.h>
 #include "cainclude.h"
+#include "themecolors.h"
+
+// colour set of caInclude (level 2), values come from themecolors.h
+namespace caIncludeColor {
+    constexpr const ThemeColor &FrameDefault = ThemeColors::FrameLine;   // Qt::gray
+}
 #include "searchfile.h"
 #include "fileFunctions.h"
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -57,7 +63,7 @@ caInclude::caInclude(QWidget *parent) : QWidget(parent)
     prvAdjust= false;
     thisAdjust = true;
     thisSpacingVertical = thisSpacingHorizontal=0;
-    thisFrameColor = Qt::gray;
+    thisFrameColor = ThemeColors::color(caIncludeColor::FrameDefault);
     setVisibility(StaticV);
 
     thisPalette = palette();
@@ -239,14 +245,7 @@ void caInclude::setFileName(QString const &filename)
             frame->setFrameShadow(thisFrameShadow);
             frame->setLineWidth(thisFrameLineWidth);
 
-            QColor thisLightColor = thisFrameColor.lighter();
-            QColor thisDarkColor = thisFrameColor.darker();
-
-            thisPalette.setColor(QPalette::WindowText, thisFrameColor);
-            thisPalette.setColor(QPalette::Light, thisLightColor);
-            thisPalette.setColor(QPalette::Dark, thisDarkColor);
-            thisPalette.setColor(QPalette::Window, thisFrameColor);
-            frame->setPalette(thisPalette);
+            applyFramePalette();
 
             if (gridLayout) {
                 gridLayout->setVerticalSpacing(thisSpacingVertical);
@@ -635,6 +634,18 @@ void caInclude::childResizeCall(double factX,double factY){
 
 }
 
+
+// the frame colour drives the palette of the inner frame (also at runtime, theme switch)
+void caInclude::applyFramePalette()
+{
+    if(frame == (QFrame *) Q_NULLPTR) return;
+    QPalette p = frame->palette();
+    p.setColor(QPalette::WindowText, thisFrameColor);
+    p.setColor(QPalette::Light, thisFrameColor.lighter());
+    p.setColor(QPalette::Dark, thisFrameColor.darker());
+    p.setColor(QPalette::Window, thisFrameColor);
+    frame->setPalette(p);
+}
 
 void caInclude::setLineSize(int size )
 {

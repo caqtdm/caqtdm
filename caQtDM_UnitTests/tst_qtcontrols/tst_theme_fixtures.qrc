@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/theme">
+        <file alias="theme_adapt_vectors.json">../../caQtDM_Tests/tools/theme_adapt_vectors.json</file>
+    </qresource>
+</RCC>

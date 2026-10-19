@@ -66,7 +66,7 @@ public:
 
     void noStyle(QString style) {Q_UNUSED(style);}
 
-    enum colMode {Static=0, Alarm};
+    enum colMode {Static=0, Alarm, Default};   // Default: cleared bits and text follow the panel theme
     enum Direction {Up, Down, Left, Right};
 
     Direction getDirection() const { return thisDirection; }
@@ -124,6 +124,7 @@ signals:
     void clicked(int bit);
 
 protected:
+    void changeEvent(QEvent *e);
     void arrangeCells();
     void resizeEvent(QResizeEvent *e);
 

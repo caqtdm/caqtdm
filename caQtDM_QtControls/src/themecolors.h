@@ -86,6 +86,36 @@ THEME_COLOR(SurfaceSunken,  255, 248, 220,    42,  42,  42);  // fallback base (
 THEME_COLOR(TextPrimary,      0,   0,   0,   232, 232, 232);  // default text/fill
 THEME_COLOR(ArrowBackground,224, 224, 224,    53,  53,  53);  // caNumeric arrow buttons
 
+// --- text widgets ----------------------------------------------------------
+THEME_FIXED(FocusFrame,     255,   0,   0);                   // focus border of entry widgets
+
+// --- containers ------------------------------------------------------------
+THEME_FIXED(FrameLine,      160, 160, 164);                   // Qt::gray, caFrame/caInclude default
+
+// --- buttons ---------------------------------------------------------------
+THEME_FIXED(StaticButton,   232, 232, 232);                   // caMessageButton default (Static)
+THEME_FIXED(DisabledText,   128, 128, 128);                   // "grey" text of disabled buttons
+
+// --- caDoubleTabWidget (generated stylesheet) ------------------------------
+THEME_COLOR(TabPage,           255, 255, 200,    50,  50,  36);  // page background
+THEME_COLOR(TabButtonBorder,   143, 143, 145,   110, 110, 112);  // #8f8f91
+THEME_COLOR(TabGradientTop,    246, 247, 250,    52,  52,  56);  // #f6f7fa
+THEME_COLOR(TabGradientBottom, 218, 219, 222,    46,  46,  50);  // #dadbde
+THEME_FIXED(TabChecked,        255,   0, 255);                   // selected page marker
+THEME_FIXED(TabDefaultBorder,    0,   0, 128);                   // "navy"
+
+// --- gauges / clock ----------------------------------------------------------
+THEME_FIXED(GaugeMarker,      0,   0, 128);                   // value marker (Qt::darkBlue)
+THEME_COLOR(ByteClearBit,    160, 160, 164,    64,  64,  68);  // caByteController cleared bit (Qt::gray)
+THEME_COLOR(ClockBase,       160, 160, 164,    64,  64,  68);  // dial base (Qt::gray)
+THEME_COLOR(ClockScaleText,  253, 253, 255,   232, 232, 232);  // digits (light = today's value)
+THEME_COLOR(StripFrame,      133, 190, 232,    36,  52,  66);  // caStripPlot frame default
+
+// --- tables (built-in Qt6 header style) ------------------------------------
+THEME_COLOR(TableAlternateBase,233, 231, 227,    48,  48,  48);
+THEME_COLOR(TableHeader,       240, 240, 240,    47,  47,  47);  // #f0f0f0
+THEME_COLOR(TableGrid,         216, 216, 216,    58,  58,  58);  // #d8d8d8 / #3a3a3a
+
 // --- caThermo -------------------------------------------------------------
 THEME_COLOR(ThermoFillDefault, 128,   0,   0,   200,  60,  60);  // Qt::darkRed / lighter red
 THEME_COLOR(ThermoPipeDefault, 192, 192, 192,    38,  38,  38);  // Qt::lightGray / dark pipe
@@ -106,6 +136,7 @@ THEME_FIXED(Curve3,         255, 255,   0);
 THEME_FIXED(Curve4,           0,   0, 255);
 THEME_FIXED(Curve5,           0, 255,   0);
 THEME_FIXED(Curve6,         255,   0, 255);
+THEME_FIXED(CurveCyan,        0, 255, 255);                   // caStripPlot curve 4
 
 // --- panel palette roles (light = legacy palette of PR #170) ---------------
 THEME_COLOR(PaletteWindow,          255, 255, 255,    48,  48,  48);
@@ -128,12 +159,16 @@ THEME_COLOR(PaletteLink,              0,  70, 180,   100, 160, 255);
 THEME_COLOR(PaletteLinkVisited,     255,   0, 255,   200, 120, 255);
 THEME_COLOR(PaletteBrightText,      255, 255, 255,   255,  96,  96);
 constexpr ThemeColor PalettePlaceholderText = {{0, 0, 0, 128}, {232, 232, 232, 128}};
-THEME_COLOR(PaletteDisabledText,    190, 190, 190,   128, 128, 128);
+constexpr ThemeColor PaletteDisabledText = {{0, 0, 0, 96}, {255, 255, 255, 112}};  // translucent: reads on any surface
 THEME_COLOR(PaletteDisabledHighlight,145,145, 145,    80,  80,  80);
 
 // dynamic properties set by the panel theme applier on a panel root
 extern QTCON_EXPORT const char *const ThemeRootProperty;    // "caqtdmAppliedThemeRoot"
 extern QTCON_EXPORT const char *const ThemeSchemeProperty;  // "caqtdmAppliedThemeScheme"
+// set by widgets on themselves or on internal children whose colours they
+// regenerate: the substitution matrix leaves such a widget alone
+extern QTCON_EXPORT const char *const SelfStyledProperty;   // "caqtdmThemeSelfStyled"
+QTCON_EXPORT void markSelfStyled(QWidget *widget, bool on = true);
 
 // header-only so that alarmdefs.h can alias AL_* without a link dependency
 inline QColor color(const ThemeColor &c, Scheme s = Light)
@@ -151,7 +186,30 @@ inline QColor themed(const QColor &value, const ThemeColor &c, Scheme s)
 QTCON_EXPORT QString css(const ThemeColor &c, Scheme s);     // "rgb(r, g, b)" for stylesheets
 QTCON_EXPORT Scheme schemeOf(const QPalette &palette);       // window lightness < 128 -> Dark
 QTCON_EXPORT Scheme schemeOf(const QWidget *widget);         // nearest panel root, else Light
+QTCON_EXPORT Scheme schemeFor(const QColor &background);     // lightness < 128 -> Dark
+// Base/Text as Qt resolves them for the widget without its own stylesheet (ancestor
+// sheets propagate into the palette); clears the own sheet, caller regenerates it.
+// Fallbacks: SurfaceSunken / TextPrimary
+QTCON_EXPORT void defaultBaseAndText(QWidget *widget, QColor &base, QColor &text);
 QTCON_EXPORT QPalette palette(Scheme s);                     // complete panel palette
+// copy of a (possibly inherited) palette with every role resolved, e.g. for popup windows
+QTCON_EXPORT QPalette resolvedPalette(const QPalette &source);
+
+// --- substitution matrix for authored panel colours (themeadapt.json) -----
+// Light scheme: identity. Dark scheme: neutral colours follow a lightness ramp,
+// saturated ones a curated table or the ramp with reduced saturation; the
+// alarm colours red/green/yellow are never changed.
+enum AdaptRole { AnyRole = 0, BackgroundRole, ForegroundRole };
+QTCON_EXPORT bool adaptAvailable();                                   // matrix loaded
+QTCON_EXPORT bool isSemanticColor(const QColor &c);
+QTCON_EXPORT QColor adapt(const QColor &authored, Scheme s, AdaptRole r = AnyRole);
+QTCON_EXPORT void adaptPair(QColor &foreground, QColor &background, Scheme s);
+// light or dark version of a foreground, whichever reads on the background (>= 3:1)
+QTCON_EXPORT void ensureContrast(QColor &foreground, const QColor &background, Scheme s);
+QTCON_EXPORT QString adaptStyleSheet(const QString &styleSheet, Scheme s);
+QTCON_EXPORT AdaptRole adaptRoleForProperty(const QString &propertyName);
+QTCON_EXPORT bool adaptExcluded(const QObject *widget, const QString &propertyName);
+QTCON_EXPORT double contrastRatio(const QColor &a, const QColor &b);  // WCAG
 
 }
 

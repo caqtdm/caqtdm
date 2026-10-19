@@ -25,6 +25,7 @@
 
 #include "catogglebutton.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 #include <QtDebug>
 #include <QMessageBox>
 #include <QApplication>
@@ -33,6 +34,16 @@
 #include <QStyle>
 
 Q_LOGGING_CATEGORY(caToggleButtonLog, "caqtdm.widgets.catogglebutton")
+
+// colour set of caToggleButton (level 2), values come from themecolors.h
+namespace caToggleButtonColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+}
 
 caToggleButton::caToggleButton(QWidget *parent) : QCheckBox(parent), FontScalingWidget(this)
 {
@@ -131,20 +142,20 @@ void caToggleButton::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
+        c = ThemeColors::color(caToggleButtonColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
+        c = ThemeColors::color(caToggleButtonColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
+        c = ThemeColors::color(caToggleButtonColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c = ThemeColors::color(caToggleButtonColor::NotConnected);
         break;
     default:
-        c=AL_DEFAULT;
+        c = ThemeColors::color(caToggleButtonColor::AlarmDefault);
         break;
     }
     if(status == NOTCONNECTED) {

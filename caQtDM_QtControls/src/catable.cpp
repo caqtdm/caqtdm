@@ -29,6 +29,8 @@
 #include <QClipboard>
 #include "catable.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+#include <QTimer>
 
 #if defined(_MSC_VER)
     #ifndef snprintf
@@ -37,6 +39,19 @@
 #endif
 
 Q_LOGGING_CATEGORY(caTableLog, "caqtdm.widgets.catable")
+
+// colour set of caTable (level 2), values come from themecolors.h
+namespace caTableColor {
+    constexpr const ThemeColor &AlarmNoAlarm  = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor    = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor    = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid  = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault  = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected  = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlternateBase = ThemeColors::TableAlternateBase;
+    constexpr const ThemeColor &Header        = ThemeColors::TableHeader;
+    constexpr const ThemeColor &Grid          = ThemeColors::TableGrid;
+}
 
 caTable::caTable(QWidget *parent) : QTableWidget(parent)
 {
@@ -51,6 +66,9 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     }
 
     thisItemFont = this->font();
+    refreshPending = false;
+    applyingColors = false;
+    builtInStyleEnabled = false;
 
     setColorMode(Static);
     setAlternatingRowColors(true);
@@ -59,10 +77,8 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
     verticalHeader()->setDefaultSectionSize(20);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-    defaultForeColor = palette().foreground().color();
 #else
     horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-    defaultForeColor = palette().windowText().color();
 
     //Iterate over every parent QWidget and check if any styles have been applied to it in designer --> If at any point any styles have been applied, do not overwrite them, else set the style so it looks like before the update.
     bool canSetStyle = true;
@@ -75,32 +91,63 @@ caTable::caTable(QWidget *parent) : QTableWidget(parent)
             break;
         }
     }
-    if (canSetStyle){
-        qCDebug(caTableLog).noquote() << QString("Style for a child widget of %1 is set by object").arg(parentName);
-        QPalette p = QPalette();
-        p.setColor(QPalette::AlternateBase, QColor(233, 231, 227));
-        setPalette(p);
-        setStyleSheet(
-            "QHeaderView::section{"
-            "border-right:1px solid #D8D8D8;"
-            "border-bottom: 1px solid #D8D8D8;"
-            "background-color:#f0f0f0;"
-            "}"
-            "QTableCornerButton::section{"
-            "border-right:1px solid #D8D8D8;"
-            "border-bottom: 1px solid #D8D8D8;"
-            "background-color:#f0f0f0;"
-            "}"
-            "QScrollBar{"
-            "border-right:1px solid #D8D8D8;"
-            "border-bottom:1px solid #D8D8D8"
-            "}");
-    }
+    if (canSetStyle) qCDebug(caTableLog).noquote() << QString("Style for a child widget of %1 is set by object").arg(parentName);
+    builtInStyleEnabled = canSetStyle;   // a panel stylesheet applied later must not drop it
+    applyBuiltInStyle(true);
 #endif
     createActions();
 
     connect(this, SIGNAL( cellDoubleClicked (int, int) ), this, SLOT(celldoubleclicked( int, int ) ) );
     setFocusPolicy(Qt::ClickFocus);
+}
+
+// Qt6 only: header and alternate-row colours of the built-in look, by scheme
+// (whether the built-in look applies at all is decided once in the constructor)
+void caTable::applyBuiltInStyle(bool initial)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if(!builtInStyleEnabled) return;
+    const ThemeColors::Scheme s = ThemeColors::schemeOf(this);
+    applyingColors = true;
+    // keep what external stylesheets put into the palette: replace AlternateBase
+    // only while it still holds our own value (either scheme)
+    QPalette p = palette();
+    const QColor current = p.color(QPalette::AlternateBase);
+    const QColor target = ThemeColors::color(caTableColor::AlternateBase, s);
+    const bool ours = current == ThemeColors::color(caTableColor::AlternateBase, ThemeColors::Light)
+            || current == ThemeColors::color(caTableColor::AlternateBase, ThemeColors::Dark);
+    if((initial || ours) && current != target) {
+        p.setColor(QPalette::AlternateBase, target);
+        setPalette(p);
+    }
+    qCDebug(caTableLog) << "built-in style" << (s == ThemeColors::Dark ? "dark" : "light") << this->objectName();
+    const QString grid = ThemeColors::css(caTableColor::Grid, s);
+    const QString header = ThemeColors::css(caTableColor::Header, s);
+    const QString style = QString(
+            "QHeaderView::section{border-right:1px solid %1;border-bottom: 1px solid %1;background-color:%2;}"
+            "QTableCornerButton::section{border-right:1px solid %1;border-bottom: 1px solid %1;background-color:%2;}"
+            "QScrollBar{border-right:1px solid %1;border-bottom:1px solid %1}").arg(grid, header);
+    if(styleSheet() != style) setStyleSheet(style);
+    ThemeColors::markSelfStyled(this);               // the matrix leaves our sheet alone
+    applyingColors = false;
+#endif
+}
+
+// the panel palette changed (theme switch): regenerate the colours, deferred
+void caTable::changeEvent(QEvent *e)
+{
+    QTableWidget::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, SLOT(refreshTheme()));
+    }
+}
+
+void caTable::refreshTheme()
+{
+    refreshPending = false;
+    applyBuiltInStyle(false);
 }
 
 void caTable::cellclicked(int row, int col)
@@ -223,24 +270,24 @@ void caTable::displayText(int row, int col, short status, QString const &text)
         case -1:
             break;
         case NO_ALARM:
-            tableItem[row][col]->setForeground(AL_GREEN);
+            tableItem[row][col]->setForeground(ThemeColors::color(caTableColor::AlarmNoAlarm));
             break;
         case MINOR_ALARM:
-            tableItem[row][col]->setForeground(AL_YELLOW);
+            tableItem[row][col]->setForeground(ThemeColors::color(caTableColor::AlarmMinor));
             break;
         case MAJOR_ALARM:
-            tableItem[row][col]->setForeground(AL_RED);
+            tableItem[row][col]->setForeground(ThemeColors::color(caTableColor::AlarmMajor));
             break;
         case INVALID_ALARM:
         case NOTCONNECTED:
-            tableItem[row][col]->setForeground(AL_WHITE);
+            tableItem[row][col]->setForeground(ThemeColors::color(caTableColor::NotConnected));
             break;
         default:
-            tableItem[row][col]->setForeground(AL_DEFAULT);
+            tableItem[row][col]->setForeground(ThemeColors::color(caTableColor::AlarmDefault));
             break;
         }
     }   else {
-        tableItem[row][col]->setForeground(defaultForeColor);
+        tableItem[row][col]->setForeground(QBrush());     // palette text, follows the theme
     }
 }
 

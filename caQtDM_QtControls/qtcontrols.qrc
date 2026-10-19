@@ -9,5 +9,6 @@
         <file>pixmaps/zoomout.png</file>
         <file>pixmaps/exclamation.png</file>
         <file>pixmaps/fileopen.png</file>
+        <file>src/themeadapt.json</file>
     </qresource>
 </RCC>

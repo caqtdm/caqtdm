@@ -25,6 +25,7 @@
 
 #include "cachoice.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 #include <QApplication>
 #include <QGridLayout>
 #include <QMouseEvent>
@@ -35,6 +36,17 @@
 #include <math.h>
 
 Q_LOGGING_CATEGORY(caChoiceLog, "caqtdm.widgets.cachoice")
+
+// colour set of caChoice (level 2), values come from themecolors.h
+namespace caChoiceColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &DisabledText = ThemeColors::DisabledText;    // "grey"
+}
 
 caChoice::caChoice(QWidget *parent) : QWidget(parent)
 {
@@ -139,6 +151,8 @@ void caChoice::arrangeCells(QStringList list, int indx)
             temp = new EPushButton(s, this);
         }
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        ThemeColors::markSelfStyled(temp);     // colours come from our stylesheet
+        temp->setPalette(ThemeColors::resolvedPalette(palette()));   // created at runtime: Qt would not resolve it
         if(thisScaleMode == EPushButton::None) {  // in this case we may use font
             temp->setFont(this->font());
         } else {
@@ -205,6 +219,8 @@ void caChoice::arrangeCells(QStringList list, int indx)
         QString s = "";
         EPushButton* temp = new EPushButton(s, this);
         temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        ThemeColors::markSelfStyled(temp);     // colours come from our stylesheet
+        temp->setPalette(ThemeColors::resolvedPalette(palette()));   // created at runtime: Qt would not resolve it
         if(thisScaleMode == EPushButton::None) {  // in this case we may use font
             temp->setFont(this->font());
         } else {
@@ -243,7 +259,7 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
         }
         style.append("} ");
         style.append("QPushButton:checked {border-width: 3px; border-style: inset;} QPushButton:default {border: 3px; border-style: outset;}");
-        setStyleSheet(style);
+        if(style != styleSheet()) setStyleSheet(style);
         return;
     }
 
@@ -322,7 +338,7 @@ void caChoice::setColors(QColor back, QColor fore, QColor border, alignmentHor a
                 .arg(baseColor.red()).arg(baseColor.green()).arg(baseColor.blue()).arg(baseColor.alpha())
                 .arg(shadowColor2.red()).arg(shadowColor2.green()).arg(shadowColor2.blue()).arg(shadowColor2.alpha());
 
-        disabled.append("; etch-disabled-text: true; color: grey;}");
+        disabled.append("; etch-disabled-text: true; color: " + ThemeColors::css(caChoiceColor::DisabledText, ThemeColors::schemeOf(this)) + ";}");
         style.append(disabled);
         if((QString::compare(style, styleSheet()) != 0)  || (thisColorMode != oldColorMode)) {
             qCDebug(caChoiceLog) << this->objectName() << "setcolors set style" << style;
@@ -356,6 +372,15 @@ void caChoice::setForeground(QColor c)
     setColors(thisBackColor, thisForeColor, thisBorderColor, thisAlignment);
 }
 
+// the panel palette changed: hand it to the cells (created at runtime, see arrangeCells)
+void caChoice::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(e->type() == QEvent::PaletteChange) {
+        foreach(EPushButton *cell, cells) cell->setPalette(ThemeColors::resolvedPalette(palette()));
+    }
+}
+
 void caChoice::setAlarmColors(short status)
 {
         QColor bg, fg;
@@ -363,21 +388,21 @@ void caChoice::setAlarmColors(short status)
         switch (status) {
 
         case NO_ALARM:
-            bg = AL_GREEN;
+            bg = ThemeColors::color(caChoiceColor::AlarmNoAlarm);
             break;
         case MINOR_ALARM:
-            bg = AL_YELLOW;
+            bg = ThemeColors::color(caChoiceColor::AlarmMinor);
             break;
         case MAJOR_ALARM:
-            bg = AL_RED;
+            bg = ThemeColors::color(caChoiceColor::AlarmMajor);
             break;
         case INVALID_ALARM:
         case NOTCONNECTED:
-            bg = AL_WHITE;
+            bg = ThemeColors::color(caChoiceColor::NotConnected);
             fg = bg;
             break;
         default:
-            bg = AL_DEFAULT;
+            bg = ThemeColors::color(caChoiceColor::AlarmDefault);
             fg = thisForeColor;
             break;
         }

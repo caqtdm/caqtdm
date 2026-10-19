@@ -156,6 +156,7 @@ private slots:
 
 protected:
      virtual bool event(QEvent *);
+     virtual void changeEvent(QEvent *);
 
 private:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -177,6 +178,12 @@ private:
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor defBackColor, defForeColor, defSelectColor;
+    QColor oldDefBackColor, oldDefForeColor;
+    void refreshDefaultColors();
+    void applyDefaultColors();
+    bool applyingColors;              // reentrancy guard for changeEvent
+    bool refreshPending;              // deferred applyDefaultColors scheduled
+    bool defaultsShown;               // defaults read at the first show
     QPalette thisPalette;
     bool thisLabelDisplay;
     int thisAccessW;
@@ -188,6 +195,5 @@ private:
     QString localText;
     bool designerVisible[10];
     QString thisPV;
-    bool isShown;
 };
 #endif

@@ -31,6 +31,19 @@
 
 #include "cameter.h"
 
+// colour set of caMeter (level 2), values come from themecolors.h
+namespace caMeterColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &Base      = ThemeColors::ClockBase;        // Qt::gray
+    constexpr const ThemeColor &ScaleText = ThemeColors::ClockScaleText;
+    constexpr const ThemeColor &Needle    = ThemeColors::AlarmMajor;       // Qt::red
+}
+
 #if defined(_MSC_VER)
  #define fmax max
  #define fmin min
@@ -64,9 +77,12 @@ caMeter::~caMeter() {
 caMeter::caMeter(QWidget *parent) : QwtDial(parent)
 {
 
-    thisBaseColor = QColor( Qt::gray);
-    thisScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
-    setScaleDefaultColor(true);
+    thisColorMode = Default;
+    appliedScheme = ThemeColors::Light;
+    lastStatus = NO_ALARM;
+    prevScaleDefaultColor = thisScaleDefaultColor = true;
+    thisBaseColor = ThemeColors::color(caMeterColor::Base);
+    thisScaleColor = prevScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
 
     myDialScaleDraw *ScaleDraw = new myDialScaleDraw(this);
     setScaleDraw(ScaleDraw);
@@ -74,7 +90,7 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     setWrapping(false);
     setReadOnly(true);
     setFocusPolicy(Qt::NoFocus);
-    setPalette( colorTheme(thisBaseColor.darker( 150 ) ) );
+    setPalette( colorTheme(effectiveBase().darker( 150 ) ) );
 
     setOrigin(135.0);
     setScaleArc(0.0, 270.0);
@@ -96,10 +112,9 @@ caMeter::caMeter(QWidget *parent) : QwtDial(parent)
     ScaleDraw->setTickLength( QwtScaleDiv::MajorTick, 6);
     ScaleDraw->setSpacing(3.0);
 
-    QwtDialSimpleNeedle *needle = new QwtDialSimpleNeedle( QwtDialSimpleNeedle::Arrow, true, Qt::red, QColor(Qt::gray).lighter(130));
-    setNeedle(needle);
+    setNeedleColors(effectiveBase());
 
-    setColorMode(Static);
+    setColorMode(Default);
     setScaleEnabled(true);
     setValueDisplayed(true);
     setUnitsEnabled(true);
@@ -150,11 +165,7 @@ void caMeter::drawScaleContents(QPainter *painter, const QPointF &center, double
     painter->setPen(QColor(0,0,0,0));
     painter->drawRect(rect);
 
-    if(thisScaleDefaultColor) {
-       painter->setPen(thisBaseColor.darker( 200 ).lighter( 800 ));
-    } else {
-       painter->setPen(thisScaleColor);
-    }
+    painter->setPen(color);                  // the value follows the scale text colour
     if(thisValueDisplayed) {
        painter->drawText(fontBoundRect, Qt::AlignHCenter , thisLabel);
     }
@@ -275,12 +286,40 @@ QPalette caMeter::colorTheme( const QColor &base ) const
     palette.setColor( QPalette::Light, base.lighter( 170 ) );
     palette.setColor( QPalette::Dark, base.darker( 170 ) );
     if(thisScaleDefaultColor) {
-       palette.setColor( QPalette::Text, base.darker( 200 ).lighter( 800 ) );
+       // light: today's derived value; dark Default dial: the theme's digit colour
+       if(thisColorMode == Default && ThemeColors::schemeOf(this) == ThemeColors::Dark)
+           palette.setColor( QPalette::Text, ThemeColors::color(caMeterColor::ScaleText, ThemeColors::Dark) );
+       else
+           palette.setColor( QPalette::Text, base.darker( 200 ).lighter( 800 ) );
     } else {
        palette.setColor( QPalette::Text, thisScaleColor );
     }
     palette.setColor( QPalette::WindowText, base.darker( 200 ) );
     return palette;
+}
+
+QColor caMeter::effectiveBase() const
+{
+    if(thisColorMode == Default) return ThemeColors::themed(thisBaseColor, caMeterColor::Base, ThemeColors::schemeOf(this));
+    return thisBaseColor;
+}
+
+// needle and knob are derived from the dial base
+void caMeter::setNeedleColors(const QColor &base)
+{
+    needleBase = base;
+    setNeedle(new QwtDialSimpleNeedle( QwtDialSimpleNeedle::Arrow, true, ThemeColors::color(caMeterColor::Needle), base.lighter(130)));
+}
+
+// the panel palette changed (theme switch): rebuild dial and needle for the new scheme
+void caMeter::changeEvent(QEvent *e)
+{
+    QwtDial::changeEvent(e);
+    if(e->type() != QEvent::PaletteChange && e->type() != QEvent::StyleChange) return;
+    const ThemeColors::Scheme scheme = ThemeColors::schemeOf(this);
+    if(scheme == appliedScheme) return;
+    appliedScheme = scheme;
+    setAlarmColors(lastStatus, true);
 }
 
 void caMeter::resizeEvent(QResizeEvent *e)
@@ -314,31 +353,34 @@ void caMeter::setNormalColors()
 
 void caMeter::setAlarmColors(short status, bool force)
 {
+    lastStatus = status;
+    const QColor base = effectiveBase();
+    const bool ownColour = (thisColorMode != Alarm);       // Static and Default ignore the alarm
     QColor c;
 
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caMeterColor::AlarmNoAlarm);
+        if(ownColour) c = base.darker( 150 );
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caMeterColor::AlarmMinor);
+        if(ownColour) c = base.darker( 150 );
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caMeterColor::AlarmMajor);
+        if(ownColour) c = base.darker( 150 );
         break;
     case INVALID_ALARM:
-        c=AL_WHITE;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caMeterColor::AlarmInvalid);
+        if(ownColour) c = base.darker( 150 );
         break;
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c = ThemeColors::color(caMeterColor::NotConnected);
         break;
     default:
-        c= thisBaseColor.darker( 150 );
+        c = base.darker( 150 );
         break;
     }
 
@@ -348,7 +390,7 @@ void caMeter::setAlarmColors(short status, bool force)
       prevScaleColor = thisScaleColor;
       setPalette( colorTheme( c) );
     }
-
+    if(base != needleBase) setNeedleColors(base);
 }
 //#ifndef MOBILE
 #include "moc_cameter.cpp"

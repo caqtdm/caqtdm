@@ -41,6 +41,8 @@
 #include <qnumeric.h>
 #include "qwt_scale_draw.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+#include <QTimer>
 
 #if defined(_MSC_VER)
  #define fmax max
@@ -51,6 +53,20 @@
 #endif
 
 Q_LOGGING_CATEGORY(caSliderLog, "caqtdm.widgets.caslider")
+
+// colour set of caSlider (level 2), values come from themecolors.h
+namespace caSliderColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &FocusFrame   = ThemeColors::FocusFrame;
+    constexpr const ThemeColor &Background   = ThemeColors::Surface;       // Static default
+    constexpr const ThemeColor &Foreground   = ThemeColors::TextPrimary;
+    constexpr const ThemeColor &ScaleValue   = ThemeColors::TextPrimary;   // value text
+}
 
 // I need to overload the scaleengine of qwt in order to get the upper and lower scale ticks drawn
 class mySliderScaleEngine: public QwtLinearScaleEngine
@@ -108,7 +124,10 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
     // is not possible.
     setStyleSheet("");
 
-    isShown = false;
+    applyingColors = false;
+    refreshPending = false;
+    defaultsShown = false;
+    refreshDefaultColors();
     oldStyle = "";
     thisStyle = "";
 
@@ -138,10 +157,10 @@ caSlider::caSlider(QWidget *parent) : QwtSlider(parent)
 
     oldBackColor = QColor(Qt::white);
     oldForeColor = QColor(Qt::white);
-    setScaleValueColor(Qt::black);
+    setScaleValueColor(ThemeColors::color(caSliderColor::ScaleValue));
 
-    setBackground(QColor(224,224,224));
-    setForeground(Qt::black);
+    setBackground(ThemeColors::color(caSliderColor::Background));
+    setForeground(ThemeColors::color(caSliderColor::Foreground));
 
     setPrecision(1);
     setPrecisionMode(Channel);
@@ -195,13 +214,44 @@ void caSlider::setForeground(QColor c)
     setColors(thisBackColor, thisForeColor);
 }
 
+// default colours: Base/Text as the panel palette and external stylesheets define
+// them for this widget (own stylesheet cleared while reading, see themecolors.h)
+void caSlider::refreshDefaultColors()
+{
+    applyingColors = true;            // clearing the sheet re-enters changeEvent
+    ThemeColors::defaultBaseAndText(this, defaultBackColor, defaultForeColor);
+    applyingColors = false;
+    oldDefaultBackColor = oldDefaultForeColor = QColor();         // force a new stylesheet
+    oldStyle.clear();
+}
+
+// deferred after an external palette/style change (not from inside the event)
+void caSlider::applyDefaultColors()
+{
+    refreshPending = false;
+    // re-apply what was set last (author colours, alarm or not connected) in the mode of
+    // that call: a palette change must not undo the dispatcher's state
+    const QColor lastBack = oldBackColor;
+    const QColor lastFore = oldForeColor;
+    const colMode lastMode = oldColorMode;
+    const colMode mode = thisColorMode;
+    refreshDefaultColors();
+    thisColorMode = lastMode;
+    setColors(oldBackColor, oldForeColor);
+    thisColorMode = mode;
+}
+
 void caSlider::setColors(QColor bg, QColor fg)
 {
     if(!defaultBackColor.isValid() || !defaultForeColor.isValid()) return;
+    if(applyingColors) return;        // setStyleSheet/setPalette re-enter through changeEvent
+    applyingColors = true;
 
-    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)) {
+    if((bg != oldBackColor) || (fg != oldForeColor) || (thisColorMode != oldColorMode)
+            || (defaultBackColor != oldDefaultBackColor) || (defaultForeColor != oldDefaultForeColor)) {
 
-        QString thisStyle = "caSlider {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);} caSlider:focus  {border: 1px solid #f00;};";
+        QString thisStyle = "caSlider {background-color: rgba(%1, %2, %3, %4); color: rgba(%5, %6, %7, %8);} caSlider:focus  {border: 1px solid "
+                            + ThemeColors::css(caSliderColor::FocusFrame, ThemeColors::schemeOf(this)) + ";};";
 
         if(thisColorMode == Default) {
             thisStyle = thisStyle.arg(defaultBackColor.red()).arg(defaultBackColor.green()).arg(defaultBackColor.blue()).arg(defaultBackColor.alpha()).
@@ -242,6 +292,20 @@ void caSlider::setColors(QColor bg, QColor fg)
     oldBackColor = bg;
     oldForeColor = fg;
     oldColorMode = thisColorMode;
+    oldDefaultBackColor = defaultBackColor;
+    oldDefaultForeColor = defaultForeColor;
+    applyingColors = false;
+}
+
+// the panel palette changed (theme switch): regenerate the colours
+void caSlider::changeEvent(QEvent *e)
+{
+    QwtSlider::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, &caSlider::applyDefaultColors);
+    }
 }
 
 void caSlider::setMaxValue(double const &maxim){
@@ -575,20 +639,20 @@ void caSlider::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
+        c=ThemeColors::color(caSliderColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
+        c=ThemeColors::color(caSliderColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
+        c=ThemeColors::color(caSliderColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c=ThemeColors::color(caSliderColor::AlarmInvalid);
         break;
     default:
-        c=AL_DEFAULT;
+        c=ThemeColors::color(caSliderColor::AlarmDefault);
         break;
     }
     setColors(c, thisForeColor);
@@ -611,20 +675,11 @@ void caSlider::setNormalColors()
 // here we adapt the scale font size and the handle size to the size of the widget
 bool caSlider::event(QEvent *e)
 {
+    if(e->type() == QEvent::Show && !defaultsShown) {
+        defaultsShown = true;
+        applyDefaultColors();
+    }
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show || e->type() == QEvent::Paint) {
-
-        if(!isShown) {
-            QString c=  palette().color(QPalette::Base).name();
-            defaultBackColor = QColor(c);
-            c =  palette().color(QPalette::Text).name();
-            defaultForeColor = QColor(c);
-
-            if(!defaultBackColor.isValid()) defaultBackColor = QColor(255, 248, 220, 255);
-            if(!defaultForeColor.isValid()) defaultForeColor = Qt::black;
-
-            setColors(thisBackColor, thisForeColor);
-            isShown = true;
-        }
 
         const caSlider* that = this;
 
@@ -768,7 +823,11 @@ QRect caSlider::createValueRect(QRect sliderRect) const
 // Draws the label with the value on the widget
 void caSlider::paintValue(QPainter *painter, QRect valueRect) const
 {
-    painter->setPen(thisScaleValueColor);
+    // the default value colour follows the own (themed) background in the Default modes
+    QColor pen = thisScaleValueColor;
+    if(thisColorMode == Default || thisColorMode == Alarm_Default)
+        pen = ThemeColors::themed(thisScaleValueColor, caSliderColor::ScaleValue, ThemeColors::schemeFor(defaultBackColor));
+    painter->setPen(pen);
     if(orientation() == Qt::Horizontal) {
         painter->drawText( valueRect, Qt::AlignCenter, setScaleLabel(thisValue) );
     } else {

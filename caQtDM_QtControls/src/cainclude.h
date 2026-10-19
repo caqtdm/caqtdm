@@ -153,7 +153,8 @@ public:
     void setFrameShadow(QFrame::Shadow shadow) {thisFrameShadow = shadow; thisFrameUpdate = true; setFileName(newFileName);}
     int getFrameLineWidth() const {return thisFrameLineWidth;}
     void setFrameLineWidth(int lineWidth) {thisFrameLineWidth = lineWidth; thisFrameUpdate = true; setFileName(newFileName);}
-    void setFrameColor(QColor c) {thisFrameColor = c; thisFrameUpdate = true; setFileName(newFileName);}
+    void setFrameColor(QColor c) {thisFrameColor = c; applyFramePalette(); thisFrameUpdate = true; setFileName(newFileName);}
+    void applyFramePalette();           // frame colour into the palette of the inner frame
     QColor getFrameColor() const {return thisFrameColor;}
 
     caInclude( QWidget *parent = 0 );

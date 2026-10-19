@@ -30,7 +30,20 @@
 #endif
 
 #include "caclock.h"
+#include "themecolors.h"
 #include <qwt_dial_needle.h>
+
+// colour set of caClock (level 2), values come from themecolors.h
+namespace caClockColor {
+    constexpr const ThemeColor &Base         = ThemeColors::ClockBase;        // Qt::gray
+    constexpr const ThemeColor &ScaleText    = ThemeColors::ClockScaleText;
+    constexpr const ThemeColor &SecondHand   = ThemeColors::AlarmMajor;       // Qt::red
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+}
 
 #if defined(_MSC_VER)
 #define fmax max
@@ -43,12 +56,13 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     setFocusPolicy(Qt::NoFocus);
 
     thisUpdateRate = Normal;
-    thisBaseColor = QColor( Qt::gray);
-    thisScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
-    setScaleDefaultColor(true);
-
-    const QColor knobColor = thisBaseColor.lighter(130);
-    setPalette( colorTheme( thisBaseColor.darker( 150 ) ) );
+    thisColorMode = Default;
+    appliedScheme = ThemeColors::Light;
+    lastStatus = NO_ALARM;
+    prevScaleDefaultColor = thisScaleDefaultColor = true;
+    thisBaseColor = ThemeColors::color(caClockColor::Base);
+    thisScaleColor = prevScaleColor = thisBaseColor.darker( 200 ).lighter( 800 );
+    setPalette( colorTheme( effectiveBase().darker( 150 ) ) );
 
 
 #if QWT_VERSION < QT_VERSION_CHECK(6, 2, 0)
@@ -63,17 +77,7 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     scaleDraw()->setTickLength( QwtScaleDiv::MajorTick, 6);
     scaleDraw()->setSpacing(3.0);
 
-    for ( int i = 0; i < QwtAnalogClock::NHands; i++) {
-        QColor handColor = thisBaseColor.lighter(150);
-        int width = 5;
-        if ( i == QwtAnalogClock::SecondHand ) {
-            handColor = Qt::red;
-            width = 3;
-        }
-        QwtDialSimpleNeedle *hand = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, handColor, knobColor);
-        hand->setWidth(width);
-        setHand((QwtAnalogClock::Hand)i, hand);
-    }
+    setHands(effectiveBase());
 
     // update the clock every second
     timer = new QTimer(this);
@@ -81,7 +85,42 @@ caClock::caClock(QWidget *parent) : QwtAnalogClock(parent)
     connect(this, SIGNAL(updateTime(QTime)), this, SLOT(setClockTime(QTime)));
 
     setTimeType (InternalTime);
-    setColorMode(Static);
+    setColorMode(Default);
+}
+
+// hands and knob are derived from the dial base
+void caClock::setHands(const QColor &base)
+{
+    handBase = base;
+    const QColor knobColor = base.lighter(130);
+    for ( int i = 0; i < QwtAnalogClock::NHands; i++) {
+        QColor handColor = base.lighter(150);
+        int width = 5;
+        if ( i == QwtAnalogClock::SecondHand ) {
+            handColor = ThemeColors::color(caClockColor::SecondHand);
+            width = 3;
+        }
+        QwtDialSimpleNeedle *hand = new QwtDialSimpleNeedle(QwtDialSimpleNeedle::Arrow, true, handColor, knobColor);
+        hand->setWidth(width);
+        setHand((QwtAnalogClock::Hand)i, hand);
+    }
+}
+
+QColor caClock::effectiveBase() const
+{
+    if(thisColorMode == Default) return ThemeColors::themed(thisBaseColor, caClockColor::Base, ThemeColors::schemeOf(this));
+    return thisBaseColor;
+}
+
+// the panel palette changed (theme switch): rebuild dial and hands for the new scheme
+void caClock::changeEvent(QEvent *e)
+{
+    QwtAnalogClock::changeEvent(e);
+    if(e->type() != QEvent::PaletteChange && e->type() != QEvent::StyleChange) return;
+    const ThemeColors::Scheme scheme = ThemeColors::schemeOf(this);
+    if(scheme == appliedScheme) return;
+    appliedScheme = scheme;
+    setAlarmColors(lastStatus, true);
 }
 
 QPalette caClock::colorTheme( const QColor &base ) const
@@ -94,7 +133,11 @@ QPalette caClock::colorTheme( const QColor &base ) const
     palette.setColor( QPalette::Dark, base.darker( 170 ) );
 
     if(thisScaleDefaultColor) {
-       palette.setColor( QPalette::Text, base.darker( 200 ).lighter( 800 ) );
+       // light: today's derived value; dark Default dial: the theme's digit colour
+       if(thisColorMode == Default && ThemeColors::schemeOf(this) == ThemeColors::Dark)
+           palette.setColor( QPalette::Text, ThemeColors::color(caClockColor::ScaleText, ThemeColors::Dark) );
+       else
+           palette.setColor( QPalette::Text, base.darker( 200 ).lighter( 800 ) );
     } else {
        palette.setColor( QPalette::Text, thisScaleColor );
     }
@@ -129,30 +172,33 @@ void caClock::resizeEvent(QResizeEvent *e)
 
 void caClock::setAlarmColors(short status, bool force)
 {
+    lastStatus = status;
+    const QColor base = effectiveBase();
+    const bool ownColour = (thisColorMode != Alarm);       // Static and Default ignore the alarm
     QColor c;
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caClockColor::AlarmNoAlarm);
+        if(ownColour) c = base.darker( 150 );
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caClockColor::AlarmMinor);
+        if(ownColour) c = base.darker( 150 );
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caClockColor::AlarmMajor);
+        if(ownColour) c = base.darker( 150 );
         break;
     case INVALID_ALARM:
-        c=AL_WHITE;
-        if(thisColorMode == Static) c= thisBaseColor.darker( 150 );
+        c = ThemeColors::color(caClockColor::AlarmInvalid);
+        if(ownColour) c = base.darker( 150 );
         break;
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c = ThemeColors::color(caClockColor::NotConnected);
         break;
     default:
-        c= thisBaseColor.darker( 150 );
+        c = base.darker( 150 );
         break;
     }
     if((prevColor != c) || (thisScaleDefaultColor != prevScaleDefaultColor) || (thisScaleColor != prevScaleColor) || force){
@@ -161,6 +207,7 @@ void caClock::setAlarmColors(short status, bool force)
       prevScaleColor = thisScaleColor;
       setPalette( colorTheme( c) );
     }
+    if(base != handBase) setHands(base);
 }
 //#ifndef MOBILE
 #include "moc_caclock.cpp"

@@ -793,12 +793,27 @@ void caCartesianPlot::setBackgroundColor(QColor c)
 void caCartesianPlot::setForegroundColor(QColor c)
 {
     setPalette(QPalette(ThemeColors::themed(c, caCartesianPlotColor::Frame, ThemeColors::schemeOf(this))));
+    if(thisScaleColor.isValid()) {                 // the scale colour depends on the frame
+        setScalesColor(thisScaleColor);
+        if(thisLegendshow) setLegendAttribute(themedScaleColor(), QFont("arial",7), COLOR);
+    }
     replot();
+}
+
+QColor caCartesianPlot::effectiveFrameColor() const
+{
+    return ThemeColors::themed(thisForeColor, caCartesianPlotColor::Frame, ThemeColors::schemeOf(this));
+}
+
+// an authored light frame keeps dark scale text even in a dark panel (and vice versa)
+ThemeColors::Scheme caCartesianPlot::scaleScheme() const
+{
+    return ThemeColors::schemeFor(effectiveFrameColor());
 }
 
 QColor caCartesianPlot::themedScaleColor() const
 {
-    return ThemeColors::themed(thisScaleColor, caCartesianPlotColor::Scale, ThemeColors::schemeOf(this));
+    return ThemeColors::themed(thisScaleColor, caCartesianPlotColor::Scale, scaleScheme());
 }
 
 void caCartesianPlot::changeEvent(QEvent *event)
@@ -821,7 +836,7 @@ void caCartesianPlot::setGridColor(QColor c)  { thisGridColor  = c; setGridsColo
 
 void caCartesianPlot::setScalesColor(QColor color)
 {
-    const QColor c = ThemeColors::themed(color, caCartesianPlotColor::Scale, ThemeColors::schemeOf(this));
+    const QColor c = ThemeColors::themed(color, caCartesianPlotColor::Scale, scaleScheme());
     QwtScaleWidget *scaleX =axisWidget(QwtPlot::xBottom);
     QwtScaleWidget *scaleY =axisWidget(QwtPlot::yLeft);
     QPalette palette = scaleX->palette();

@@ -33,6 +33,7 @@
 #include <QTimer>
 #include <QApplication>
 #include <QPainter>
+#include "themecolors.h"
 #include <QString>
 #include <math.h>
 #include <qwt_dial.h>
@@ -87,7 +88,7 @@ public:
     QString getPV() const {return thisPV;}
     void setPV(QString const &newPV) {thisPV = newPV;}
 
-    enum colMode {Static, Alarm};
+    enum colMode {Static, Alarm, Default};   // Default: dial follows the panel theme
     enum displayLims {Channel_Limits = 0 , User_Limits};
 
     enum SourceMode {Channel = 0, User};
@@ -152,11 +153,17 @@ public slots:
     }
 
 protected:
+    void changeEvent(QEvent *e);
     virtual void drawScaleContents(QPainter *painter, const QPointF &center, double radius) const;
     void resizeEvent(QResizeEvent *e);
 
 private:
    QPalette colorTheme( const QColor &base ) const;
+   QColor effectiveBase() const;            // Default: themed base, else the author colour
+   void setNeedleColors(const QColor &base);
+   ThemeColors::Scheme appliedScheme;
+   short lastStatus;
+   QColor needleBase;
    QString thisLabel;
    QString thisPV;
    colMode thisColorMode;

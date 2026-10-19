@@ -124,6 +124,7 @@ public slots:
     }
 
 protected:
+    void changeEvent(QEvent *e);
     void arrangeCells(QStringList list, int indx);
     void resizeEvent(QResizeEvent *e);
 

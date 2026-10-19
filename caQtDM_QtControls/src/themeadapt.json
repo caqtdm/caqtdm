@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "comment": "Substitution matrix for authored panel colours in the dark scheme. Lightness ramps are piecewise linear on HSL lightness (0-255); anchors derived from the light/dark palettes of macOS Aqua, Windows 10/11, Fusion, KDE Breeze and GNOME Adwaita. Same file is read by caQtDM_Tests/tools/theme_adapt_report.py.",
+  "neutralSaturation": 0.12,
+  "saturationFactor": 0.85,
+  "minContrast": 3.0,
+  "ramps": {
+    "background": [[0, 0], [64, 64], [100, 90], [128, 96], [160, 88], [180, 68], [200, 60], [224, 52], [236, 48], [255, 42]],
+    "foreground": [[0, 232], [20, 225], [50, 210], [80, 195], [110, 180], [128, 170], [160, 175], [200, 200], [236, 230], [255, 240]],
+    "any": [[0, 232], [64, 192], [96, 160], [128, 128], [160, 96], [200, 72], [224, 60], [240, 48], [255, 42]]
+  },
+  "semantic": ["#ff0000", "#00cd00", "#ffff00"],
+  "curated": {
+    "#f5deb3": "#3a3226",
+    "#fff8dc": "#363224",
+    "#ffffe0": "#343428",
+    "#9bffff": "#183838",
+    "#add8e6": "#22323c",
+    "#3a5eab": "#20325a",
+    "#e6e6e6": "#353535",
+    "#e0e0e0": "#343434",
+    "#c8c8c8": "#3c3c3c",
+    "#e1e1e1": "#353535",
+    "#dddddd": "#373737",
+    "#d8d8d8": "#3a3a3a",
+    "#d3d3d3": "#3c3c3c",
+    "#fafafa": "#2c2c2c",
+    "#f4f4f4": "#2e2e2e",
+    "#e7e7e7": "#353535",
+    "#c4c4c3": "#5a5a5a",
+    "#c2c7cb": "#565a5e"
+  },
+  "exclude": []
+}

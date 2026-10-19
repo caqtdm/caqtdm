@@ -448,6 +448,8 @@ protected:
 
 private:
     QColor themedScaleColor() const;
+    QColor effectiveFrameColor() const;      // frame as painted (default follows the scheme)
+    ThemeColors::Scheme scaleScheme() const; // scale/legend follow the own frame
     ThemeColors::Scheme appliedScheme;
     template <typename pureData>
     void fillData(pureData *array, int size, int curvIndex, int curvType, int curvXY);

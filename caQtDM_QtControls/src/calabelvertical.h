@@ -93,7 +93,7 @@ public:
     void setBorderWidth(int width) {thisBorderWidth = width;  update();}
     int getBorderWidth() const {return thisBorderWidth;}
 
-    enum colMode {Static, Alarm};
+    enum colMode {Static, Alarm, Default};   // Default: no own fill, text from the panel palette
     colMode getColorMode() const { return thisColorMode; }
 
     void setColors(QColor bg, QColor fg);
@@ -114,6 +114,7 @@ public slots:
 
 protected:
     virtual bool event(QEvent *);
+    void changeEvent(QEvent *e);
     virtual QSize sizeHint() const;
     virtual QSize minimumSizeHint() const;
 

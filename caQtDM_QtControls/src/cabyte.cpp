@@ -25,10 +25,21 @@
 
 #include "cabyte.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
 #include <QGridLayout>
 #include <QtDebug>
 
 Q_LOGGING_CATEGORY(caByteLog, "caqtdm.widgets.cabyte")
+
+// colour set of caByte (level 2), values come from themecolors.h
+namespace caByteColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+}
 
 caByte::caByte(QWidget *parent) : QWidget(parent)
 {
@@ -141,20 +152,20 @@ void caByte::setAlarmColors(short status)
     switch (status) {
 
     case NO_ALARM:
-        c=AL_GREEN;
+        c=ThemeColors::color(caByteColor::AlarmNoAlarm);
         break;
     case MINOR_ALARM:
-        c=AL_YELLOW;
+        c=ThemeColors::color(caByteColor::AlarmMinor);
         break;
     case MAJOR_ALARM:
-        c=AL_RED;
+        c=ThemeColors::color(caByteColor::AlarmMajor);
         break;
     case INVALID_ALARM:
     case NOTCONNECTED:
-        c=AL_WHITE;
+        c=ThemeColors::color(caByteColor::NotConnected);
         break;
     default:
-        c=AL_DEFAULT;
+        c=ThemeColors::color(caByteColor::AlarmDefault);
         break;
     }
 

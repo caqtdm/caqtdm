@@ -38,6 +38,12 @@ private slots:
     void thermoDefaultModeFollowsDarkRoot();
     void thermoStaticModeIgnoresDarkRoot();
     void cartesianPlotDefaultsFollowDarkRoot();
+    void stripPlotScaleFollowsFrame();
+    void adaptMatrixLoadsAndIsIdentityInLight();
+    void adaptMatchesPythonVectors();
+    void adaptKeepsAlarmColoursAndTransparency();
+    void adaptStyleSheetKeepsSyntax();
+    void thermoScaleTextFollowsOwnBackground();
 };
 
 #endif

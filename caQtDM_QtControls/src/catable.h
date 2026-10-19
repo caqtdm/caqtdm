@@ -126,8 +126,16 @@ signals:
 private slots:
     void celldoubleclicked(int, int);
     void cellclicked(int, int);
+    void refreshTheme();
+
+protected:
+    void changeEvent(QEvent *e);
 
 private:
+    void applyBuiltInStyle(bool initial);
+    bool builtInStyleEnabled;         // decided once in the constructor
+    bool refreshPending;              // deferred refreshTheme scheduled
+    bool applyingColors;              // reentrancy guard for changeEvent
     enum { MaxRows = 500 };
     enum { MaxCols = 5  };
     QStringList	thisPVS;
@@ -143,8 +151,6 @@ private:
     SourceMode thisPrecMode;
     SourceMode thisLimitsMode;
 
-    QColor defaultBackColor;
-    QColor defaultForeColor;
 
     QString thisScriptCommand, thisScriptParam;
 

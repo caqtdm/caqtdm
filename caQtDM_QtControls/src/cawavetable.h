@@ -193,7 +193,17 @@ signals:
 
     void messageWindowOutput(const QtMsgType type, const QString &message);
 
+private slots:
+    void refreshTheme();
+
+protected:
+    void changeEvent(QEvent *e);
+
 private:
+    void applyBuiltInStyle(bool initial);
+    bool builtInStyleEnabled = false;   // decided once in the constructor
+    bool refreshPending = false;        // deferred refreshTheme scheduled
+    bool applyingColors = false;        // reentrancy guard for changeEvent
     bool eventFilter(QObject *obj, QEvent *event);
     void createActions();
     void enableEdit(QTableWidgetItem* pItem);

@@ -32,9 +32,18 @@
 #include <canumeric.h>
 #include <caspinbox.h>
 #include <castripplot.h>
+#include <cacartesianplot.h>
+#include <cagraphics.h>
+#include <cameter.h>
 #include <cathermo.h>
+#include <calineedit.h>
+#include <themecolors.h>
 #include <catogglebutton.h>
 #include <cawavetable.h>
+#include <caframe.h>
+#include <carelateddisplay.h>
+#include <catable.h>
+#include <epushbutton.h>
 #include <gensoftpv.h>
 
 #include <QLineEdit>
@@ -44,6 +53,7 @@
 #include <QPushButton>
 #include <QTabBar>
 #include <QTabWidget>
+#include <QTextEdit>
 #include <qwt_legend_label.h>
 
 #include <cfloat>
@@ -1300,6 +1310,23 @@ void TestCaQtDM_Lib::panelThemeLegacyPaintsItselfOnDarkSystem()
     QCOMPARE(content->palette().color(QPalette::WindowText), QColor(Qt::black));
     QVERIFY(content->autoFillBackground());                 // white panel on a dark desktop
 
+    // viewer order: the content root is seeded before its children exist, apply()
+    // runs afterwards with the same palette -- the children must still get it
+    PanelThemeApplier::seed(content, PanelThemeApplier::Legacy);
+    QLabel *label = new QLabel("x", content);
+    QTextEdit *text = new QTextEdit(content);
+    caToggleButton *toggle = new caToggleButton(content);
+    QWidget *page = new QWidget(content);                    // own, complete palette: Qt would
+    page->setPalette(ThemeColors::palette(ThemeColors::Light)); // not propagate through it
+    QTextEdit *nested = new QTextEdit(page);
+    panel.show();
+    QCoreApplication::processEvents();
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(label->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(text->palette().color(QPalette::Text), QColor(Qt::black));
+    QCOMPARE(toggle->palette().color(QPalette::WindowText), QColor(Qt::black));
+    QCOMPARE(nested->palette().color(QPalette::Text), QColor(Qt::black));
+
     QPalette light = originalPalette;
     light.setColor(QPalette::Window, QColor(240, 240, 240));
     application->setPalette(light);
@@ -1315,6 +1342,345 @@ void TestCaQtDM_Lib::panelThemeLegacyPaintsItselfOnDarkSystem()
     QVERIFY(!content->autoFillBackground());
 
     application->setPalette(originalPalette);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+    if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+void TestCaQtDM_Lib::panelThemeAdaptsAuthoredColorsInDark()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    const QByteArray originalAdapt = qgetenv("CAQTDM_THEME_ADAPT");
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    qunsetenv("CAQTDM_THEME_ADAPT");
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+    QPalette light = originalPalette;
+    light.setColor(QPalette::Window, QColor(240, 240, 240));
+    application->setPalette(light);
+
+    const QColor wheat(245, 222, 179);
+    QMainWindow panel;
+    panel.setStyleSheet("QTabBar::tab { background: #E1E1E1; color: black; }");
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caLineEdit *field = new caLineEdit(content);
+    field->setColorMode(caLineEdit::Static);
+    field->setBackground(wheat);
+    field->setForeground(Qt::black);
+    QLabel *label = new QLabel(content);
+    label->setStyleSheet("color: black; background-color: wheat;");
+    caLineEdit *alarmField = new caLineEdit(content);
+    alarmField->setColorMode(caLineEdit::Alarm_Static);
+    alarmField->setBackground(wheat);
+    panel.show();                                                         // line edits colour once shown
+    QCoreApplication::processEvents();
+
+    qputenv("CAQTDM_THEME", "dark");
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(field->getBackground(), QColor(0x3a, 0x32, 0x26));          // curated wheat
+    QVERIFY(field->getForeground().lightness() > 200);                   // pair rule
+    QCOMPARE(field->property("caqtdmAuthored.background").value<QColor>(), wheat);
+    QVERIFY(label->styleSheet().contains("background-color: #3a3226"));
+    QVERIFY(label->styleSheet().contains("color: #e8e8e8"));
+    QCOMPARE(alarmField->getBackground(), QColor(0x3a, 0x32, 0x26));
+    alarmField->setAlarmColors(MAJOR_ALARM, 0.0, wheat, Qt::black);
+    QVERIFY(alarmField->styleSheet().contains("255, 0, 0"));              // alarm colours untouched
+    PanelThemeApplier::apply(&panel);                                     // idempotent
+    QCOMPARE(field->getBackground(), QColor(0x3a, 0x32, 0x26));
+    QVERIFY(panel.styleSheet().contains("background: #353535"));          // root stylesheet adapted
+
+    qputenv("CAQTDM_THEME", "legacy");                                    // back to light: originals
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(field->getBackground(), wheat);
+    QCOMPARE(field->getForeground(), QColor(Qt::black));
+    QCOMPARE(label->styleSheet(), QString("color: black; background-color: wheat;"));
+    QVERIFY(panel.styleSheet().startsWith("QTabBar::tab { background: #E1E1E1; color: black; }"));
+
+    qputenv("CAQTDM_THEME", "dark");                                      // panel opt-out
+    panel.setProperty("caqtdmThemeAdapt", false);
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(field->getBackground(), wheat);
+    panel.setProperty("caqtdmThemeAdapt", QVariant());
+    qputenv("CAQTDM_THEME_ADAPT", "0");                                   // global off
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(field->getBackground(), wheat);
+
+    application->setPalette(originalPalette);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+    if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+    if (originalAdapt.isEmpty()) qunsetenv("CAQTDM_THEME_ADAPT"); else qputenv("CAQTDM_THEME_ADAPT", originalAdapt);
+}
+
+namespace {
+// dark theme on a light application palette, restored by the returned lambda
+struct DarkThemeScope {
+    QByteArray theme, override, adapt;
+    QPalette palette;
+    DarkThemeScope()
+    {
+        theme = qgetenv("CAQTDM_THEME");
+        override = qgetenv("CAQTDM_PANEL_THEME_MODE");
+        adapt = qgetenv("CAQTDM_THEME_ADAPT");
+        qunsetenv("CAQTDM_PANEL_THEME_MODE");
+        qunsetenv("CAQTDM_THEME_ADAPT");
+        QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+        palette = application->palette();
+        QPalette light = palette;
+        light.setColor(QPalette::Window, QColor(240, 240, 240));
+        application->setPalette(light);
+        qputenv("CAQTDM_THEME", "dark");
+    }
+    ~DarkThemeScope()
+    {
+        static_cast<QApplication *>(QCoreApplication::instance())->setPalette(palette);
+        if (theme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", theme);
+        if (override.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE"); else qputenv("CAQTDM_PANEL_THEME_MODE", override);
+        if (adapt.isEmpty()) qunsetenv("CAQTDM_THEME_ADAPT"); else qputenv("CAQTDM_THEME_ADAPT", adapt);
+    }
+};
+QString rgbaOf(const QColor &c)
+{
+    return QString("rgba(%1, %2, %3, %4)").arg(c.red()).arg(c.green()).arg(c.blue()).arg(c.alpha());
+}
+}
+
+// widgets marked self-styled (or their internal children) are left alone by the matrix
+void TestCaQtDM_Lib::panelThemeSkipsSelfStyledWidgets()
+{
+    DarkThemeScope scope;
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    QLabel *label = new QLabel(content);
+    label->setStyleSheet("color: black;");
+    ThemeColors::markSelfStyled(label);
+    caRelatedDisplay *related = new caRelatedDisplay(content);
+    related->setStacking(caRowColMenu::Row);
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(label->styleSheet(), QString("color: black;"));
+    const QColor adapted = related->getBackground();
+    QVERIFY(adapted != QColor(Qt::gray));
+    EPushButton *cell = Q_NULLPTR;
+    for (EPushButton *candidate : related->findChildren<EPushButton *>()) {
+        if (!candidate->isHidden()) { cell = candidate; break; }
+    }
+    QVERIFY(cell != Q_NULLPTR);
+    QVERIFY(cell->styleSheet().contains(rgbaOf(adapted)));       // adapted once, through the parent
+
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(related->getBackground(), QColor(Qt::gray));
+    QVERIFY(cell->styleSheet().contains(rgbaOf(QColor(Qt::gray))));
+}
+
+// an Outline frame and the include frame use their colour as a line: foreground ramp
+void TestCaQtDM_Lib::panelThemeAdaptsFrameRoles()
+{
+    DarkThemeScope scope;
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caFrame *outline = new caFrame(content);
+    caFrame *filled = new caFrame(content);
+    filled->setBackgroundMode(caFrame::Filled);
+    caInclude *include = new caInclude(content);
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(outline->getBackground().lightness() > 160);
+    QVERIFY(filled->getBackground().lightness() < 110);
+    QVERIFY(include->getFrameColor() != QColor(Qt::gray));
+    QVERIFY(include->getFrameColor().lightness() > 160);
+    QCOMPARE(include->getIncludeFrame()->palette().color(QPalette::WindowText), include->getFrameColor());
+
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(outline->getBackground(), QColor(Qt::gray));
+    QCOMPARE(filled->getBackground(), QColor(Qt::gray));
+    QCOMPARE(include->getFrameColor(), QColor(Qt::gray));
+    QCOMPARE(include->getIncludeFrame()->palette().color(QPalette::WindowText), QColor(Qt::gray));
+}
+
+// tables: Static text follows the palette, the built-in Qt6 look follows the scheme
+void TestCaQtDM_Lib::panelThemeTablesFollowScheme()
+{
+    DarkThemeScope scope;
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caTable *table = new caTable(content);
+    table->setRowCount(1);
+    table->setColumnCount(3);
+    caWaveTable *waveTable = new caWaveTable(content);
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::apply(&panel);
+    QTest::qWait(20);
+    table->displayText(0, 1, NO_ALARM, "x");
+    QCOMPARE(table->item(0, 1)->foreground().style(), Qt::NoBrush);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QCOMPARE(table->palette().color(QPalette::AlternateBase),
+             ThemeColors::color(ThemeColors::TableAlternateBase, ThemeColors::Dark));
+    QCOMPARE(waveTable->palette().color(QPalette::AlternateBase),
+             ThemeColors::color(ThemeColors::TableAlternateBase, ThemeColors::Dark));
+    QVERIFY(table->property(ThemeColors::SelfStyledProperty).toBool());
+#endif
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::apply(&panel);
+    QTest::qWait(20);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QCOMPARE(table->palette().color(QPalette::AlternateBase),
+             ThemeColors::color(ThemeColors::TableAlternateBase, ThemeColors::Light));
+    QCOMPARE(waveTable->palette().color(QPalette::AlternateBase),
+             ThemeColors::color(ThemeColors::TableAlternateBase, ThemeColors::Light));
+#endif
+}
+
+// plots: the matrix adapts frame and scale colour, never canvas and curves
+void TestCaQtDM_Lib::panelThemeAdaptsPlotFrameNotCanvas()
+{
+    DarkThemeScope scope;
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caCartesianPlot *plot = new caCartesianPlot(content);
+    plot->setForeground(QColor(218, 218, 218));          // authored light frame
+    plot->setBackground(Qt::white);                      // authored canvas
+    plot->setScaleColor(Qt::black);
+    plot->setColor_1(QColor(170, 255, 255));                // light curve: stays
+    plot->setColor_2(Qt::black);                             // no contrast on the dark canvas: flipped
+    plot->setColor_3(Qt::red);                               // semantic: never touched
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(plot->getForeground().lightness() < 110);    // frame surface: background ramp
+    QVERIFY(plot->getScaleColor().lightness() > 160);    // scale text: foreground ramp
+    QVERIFY(plot->getBackground().lightness() < 60);     // canvas: background ramp
+    QCOMPARE(plot->getColor_1(), QColor(170, 255, 255)); // curve keeps its colour
+    QVERIFY(plot->getColor_2().lightness() > 200);       // black curve flipped to light
+    QCOMPARE(plot->getColor_3(), QColor(Qt::red));
+    QCOMPARE(plot->axisWidget(QwtPlot::xBottom)->palette().color(QPalette::Text), plot->getScaleColor());
+
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(plot->getForeground(), QColor(218, 218, 218));
+    QCOMPARE(plot->getScaleColor(), QColor(Qt::black));
+    QCOMPARE(plot->getBackground(), QColor(Qt::white));
+    QCOMPARE(plot->getColor_2(), QColor(Qt::black));
+}
+
+// Default mode widgets theme their line colour themselves, the matrix leaves it alone
+void TestCaQtDM_Lib::panelThemeKeepsDefaultLineColor()
+{
+    DarkThemeScope scope;
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caGraphics *fixed = new caGraphics(content);
+    fixed->setLineColor(QColor(200, 200, 200));
+    caGraphics *themed = new caGraphics(content);
+    themed->setColorMode(caGraphics::Default);
+    themed->setLineColor(QColor(200, 200, 200));
+    panel.show();
+    QCoreApplication::processEvents();
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(fixed->getLineColor() != QColor(200, 200, 200));           // Static: adapted
+    QCOMPARE(themed->getLineColor(), QColor(200, 200, 200));           // Default: untouched
+}
+
+// an Alarm dial keeps its authored scale colour (the dial shows alarm colours, not a theme)
+void TestCaQtDM_Lib::panelThemeKeepsScaleColorOfAlarmDial()
+{
+    DarkThemeScope scope;
+    QMainWindow panel;
+    QWidget *content = new QWidget(&panel);
+    panel.setCentralWidget(content);
+    caMeter *alarm = new caMeter(content);
+    alarm->setColorMode(caMeter::Alarm);
+    alarm->setScaleDefaultColor(false);
+    alarm->setScaleColor(Qt::black);
+    caMeter *fixed = new caMeter(content);
+    fixed->setColorMode(caMeter::Static);
+    fixed->setScaleDefaultColor(false);
+    fixed->setScaleColor(Qt::black);
+    panel.show();
+    QCoreApplication::processEvents();
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    PanelThemeApplier::apply(&panel);
+    QCOMPARE(alarm->getScaleColor(), QColor(Qt::black));               // untouched
+    QVERIFY(fixed->getScaleColor().lightness() > 160);                  // Static: adapted with the base
+}
+
+// a nested include root keeps its own stylesheet across a system light/dark round
+// trip: the enclosing panel must not record the adapted sheet as the authored one
+void TestCaQtDM_Lib::panelThemeRestoresNestedIncludeStyleSheet()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    const QByteArray originalOverride = qgetenv("CAQTDM_PANEL_THEME_MODE");
+    qunsetenv("CAQTDM_THEME");
+    qunsetenv("CAQTDM_PANEL_THEME_MODE");
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+    QPalette light = originalPalette;
+    light.setColor(QPalette::Window, QColor(240, 240, 240));
+    light.setColor(QPalette::Base, QColor(255, 255, 255));
+    QPalette dark = originalPalette;
+    dark.setColor(QPalette::Window, QColor(30, 30, 30));
+    dark.setColor(QPalette::Base, QColor(40, 40, 40));
+    application->setPalette(light);
+    QTest::qWait(20);
+
+    QWidget panel;
+    panel.setProperty("caqtdmThemeMode", "system");
+    // an include loaded from a QMainWindow .ui: the sheet sits on the window,
+    // the theme root property on its central widget
+    QMainWindow *included = new QMainWindow(&panel);
+    included->setWindowFlags(Qt::Widget);
+    included->setCentralWidget(new QWidget(included));
+    included->setProperty("caqtdmThemeMode", "system");
+    const QString authored = "caLineEdit { background: lightyellow; color: black; }";
+    included->setStyleSheet(authored);
+    caLineEdit *edit = new caLineEdit(included->centralWidget());
+    edit->setColorMode(caLineEdit::Default);
+    panel.show();
+    // load order: the include is applied before the enclosing panel
+    PanelThemeApplier::apply(included);
+    PanelThemeApplier::apply(&panel);
+    QTest::qWait(20);
+    QCOMPARE(included->styleSheet(), authored);
+    QVERIFY(edit->styleSheet().contains("rgba(255, 255, 224, 255)"));
+
+    application->setPalette(dark);
+    QTest::qWait(20);
+    PanelThemeApplier::apply(included);
+    PanelThemeApplier::apply(&panel);
+    QTest::qWait(20);
+    QVERIFY(!included->styleSheet().contains("lightyellow"));
+    QVERIFY(!edit->styleSheet().contains("rgba(255, 255, 224, 255)"));
+
+    application->setPalette(light);
+    QTest::qWait(20);
+    PanelThemeApplier::apply(included);
+    PanelThemeApplier::apply(&panel);
+    QTest::qWait(20);
+    QCOMPARE(included->styleSheet(), authored);
+    QVERIFY(edit->styleSheet().contains("rgba(255, 255, 224, 255)"));
+
+    application->setPalette(originalPalette);
+    QTest::qWait(20);
     if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
     if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
     else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);

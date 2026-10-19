@@ -63,7 +63,7 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum LineStyle {Solid = 0, Dash, BigDash};
-    enum colMode {Static=0, Alarm};
+    enum colMode {Static=0, Alarm, Default};   // Default: constructor colours follow the panel theme
 
     enum FillStyle {Filled = 0, Outline};
     enum PolyStyle {Polyline = 0, Polygon};
@@ -121,6 +121,7 @@ public slots:
     }
 
 protected:
+    void changeEvent(QEvent *e);
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -128,6 +129,8 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
+    QColor paintLineColor() const;
+    QColor paintFillColor() const;
     QString thisXYpairs;
     QString XYpairs;
     QColor thisLineColor, oldLineColor;

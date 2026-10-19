@@ -16,7 +16,11 @@ SOURCES += tst_qtcontrols.cpp \
     tst_caimage.cpp \
     tst_alhparser.cpp \
     tst_alarmtree_logic.cpp \
-    tst_themecolors.cpp
+    tst_themecolors.cpp \
+    tst_textwidgets_theme.cpp \
+    tst_buttons_theme.cpp \
+    tst_containers_theme.cpp \
+    tst_painted_theme.cpp
 
 HEADERS += tst_pvdialog.h \
     tst_gensoftpv.h \
@@ -28,7 +32,12 @@ HEADERS += tst_pvdialog.h \
     fakeformwindow.h \
     tst_alhparser.h \
     tst_alarmtree_logic.h \
-    tst_themecolors.h
+    tst_themecolors.h \
+    tst_theme_helpers.h \
+    tst_textwidgets_theme.h \
+    tst_buttons_theme.h \
+    tst_containers_theme.h \
+    tst_painted_theme.h
 
 # --- Tested classes below ---
 
@@ -40,7 +49,7 @@ SOURCES += ../../caQtDM_QtControls/src/pvdialog.cpp
 SOURCES += ../../caQtDM_Parsers/alhParserSrc/alhmodel.cpp \
     ../../caQtDM_Parsers/alhParserSrc/alhconfigparser.cpp \
     ../../caQtDM_Parsers/alhParserSrc/alhuigenerator.cpp
-RESOURCES += tst_alh_fixtures.qrc
+RESOURCES += tst_alh_fixtures.qrc tst_theme_fixtures.qrc
 
 INCLUDEPATH += ../../caQtDM_QtControls/src \
     ../../caQtDM_Lib/src \

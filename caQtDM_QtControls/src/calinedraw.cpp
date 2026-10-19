@@ -27,6 +27,8 @@
 
 #include "calinedraw.h"
 #include "alarmdefs.h"
+#include "themecolors.h"
+#include <QTimer>
 #include "qevent.h"
 
 #include <QPainter>
@@ -42,6 +44,17 @@
 #endif
 
 Q_LOGGING_CATEGORY(caLineDrawLog, "caqtdm.widgets.calinedraw")
+
+// colour set of caLineDraw (level 2), values come from themecolors.h
+namespace caLineDrawColor {
+    constexpr const ThemeColor &AlarmNoAlarm = ThemeColors::AlarmNoAlarm;
+    constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
+    constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
+    constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
+    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
+    constexpr const ThemeColor &FocusFrame   = ThemeColors::FocusFrame;
+}
 
 caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
 {
@@ -60,7 +73,10 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     }
 
     m_Text = "text";
-    m_IsShown = false;
+    applyingColors = false;
+    refreshPending = false;
+    defaultsShown = false;
+    refreshDefaultColors();
     m_BackColor = QColor(255,255,255,0);
     m_ForeColor = Qt::black;
     m_BackColorOld = Qt::black;
@@ -93,7 +109,7 @@ caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(thi
     m_AlarmState = 0;
     m_markAllText = false;
 
-    brush = QBrush(m_BackColor);
+    setColors(m_BackColor, m_ForeColor, m_FrameColor);
     setText(" ");
 }
 
@@ -132,53 +148,96 @@ void caLineDraw::setForeground(QColor c)
     setColors(m_BackColor, m_ForeColor, m_FrameColor);
 }
 
+// default colours: Base/Text as the panel palette and external stylesheets define
+// them for this widget (own stylesheet cleared while reading, see themecolors.h)
+void caLineDraw::refreshDefaultColors()
+{
+    applyingColors = true;            // clearing the sheet re-enters changeEvent
+    ThemeColors::defaultBaseAndText(this, m_BackColorDefault, m_ForeColorDefault);
+    applyingColors = false;
+    m_BackColorDefaultOld = m_ForeColorDefaultOld = QColor();         // force a new stylesheet
+}
+
+// deferred after an external palette/style change (not from inside the event)
+void caLineDraw::applyDefaultColors()
+{
+    refreshPending = false;
+    // re-apply what was set last (author colours, alarm or not connected) in the mode of
+    // that call: a palette change must not undo the dispatcher's state
+    const QColor lastBack = m_BackColorOld;
+    const QColor lastFore = m_ForeColorOld;
+    const colMode lastMode = m_ColorModeOld;
+    const colMode mode = m_ColorMode;
+    refreshDefaultColors();
+    m_ColorMode = lastMode;
+    setColors(m_BackColorOld, m_ForeColorOld, m_FrameColor);
+    m_ColorMode = mode;
+}
+
 void caLineDraw::setColors(QColor bg, QColor fg, QColor frame)
 {
     if(!m_BackColorDefault.isValid() || !m_ForeColorDefault.isValid()) return;
+    if(applyingColors) return;        // setStyleSheet/setPalette re-enter through changeEvent
+    applyingColors = true;
 
-    if((bg != m_BackColorOld) || (fg != m_ForeColorOld) || (m_ColorMode != m_ColorModeOld) || (frame != m_FrameColorOld)) {
+    if((bg != m_BackColorOld) || (fg != m_ForeColorOld) || (m_ColorMode != m_ColorModeOld) || (frame != m_FrameColorOld)
+            || (m_BackColorDefault != m_BackColorDefaultOld) || (m_ForeColorDefault != m_ForeColorDefaultOld)) {
 
         m_FrameColorTop = frame.darker();
         m_FrameColorBottom = frame.lighter();
 
         // default = (colors from stylesheet)
         if(m_ColorMode == Default) {
-            m_BackColor = m_BackColorDefault;
-            m_ForeColor = m_ForeColorDefault;
+            m_PaintBackColor = m_BackColorDefault;
+            m_PaintForeColor = m_ForeColorDefault;
 
         // alarm default = alarm colors on foreground or background (colors from alarms and stylesheet)
         // when major alarm and background handling take the background from stylesheet (normally would be white)
         } else if(m_ColorMode == Alarm_Default) {
 
             if(m_AlarmState == MAJOR_ALARM && m_AlarmHandling == onBackground) {
-                m_BackColor = bg;
-                m_ForeColor = m_BackColorDefault;
+                m_PaintBackColor = bg;
+                m_PaintForeColor = m_BackColorDefault;
             } else {
                 if(m_AlarmHandling == onForeground) {
-                    m_BackColor = m_BackColorDefault;
-                    m_ForeColor = fg;
+                    m_PaintBackColor = m_BackColorDefault;
+                    m_PaintForeColor = fg;
                 } else {
-                    m_BackColor = bg;
-                    m_ForeColor = m_ForeColorDefault;
+                    m_PaintBackColor = bg;
+                    m_PaintForeColor = m_ForeColorDefault;
                 }
             }
 
         // alarm alarm colors on foreground or background (colors from color properties)
         } else if(m_ColorMode == Alarm_Static) {
-            m_BackColor = bg;
-            m_ForeColor = fg;
+            m_PaintBackColor = bg;
+            m_PaintForeColor = fg;
 
         // static (colors from color properties)
         } else {
-            m_BackColor = bg;
-            m_ForeColor = fg;
+            m_PaintBackColor = bg;
+            m_PaintForeColor = fg;
         }
-        brush = QBrush(m_BackColor);
+        brush = QBrush(m_PaintBackColor);
         update();
     }
     m_BackColorOld = bg;
     m_ForeColorOld = fg;
     m_ColorModeOld = m_ColorMode;
+    m_BackColorDefaultOld = m_BackColorDefault;
+    m_ForeColorDefaultOld = m_ForeColorDefault;
+    applyingColors = false;
+}
+
+// the panel palette changed (theme switch): regenerate the colours
+void caLineDraw::changeEvent(QEvent *e)
+{
+    QWidget::changeEvent(e);
+    if(applyingColors || refreshPending) return;
+    if(e->type() == QEvent::PaletteChange || e->type() == QEvent::StyleChange) {
+        refreshPending = true;
+        QTimer::singleShot(0, this, &caLineDraw::applyDefaultColors);
+    }
 }
 
 void caLineDraw::forceForeAndBackground(QColor fg, QColor bg)
@@ -222,7 +281,7 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case NO_ALARM:
         qCDebug(caLineDrawLog) << "no alarm";
         if(m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default) {
-            c = AL_GREEN;
+            c = ThemeColors::color(caLineDrawColor::AlarmNoAlarm);
             if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
             else setForeAndBackground(fgAtInit, c);
         } else {
@@ -233,7 +292,7 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case MINOR_ALARM:
         qCDebug(caLineDrawLog) << "minor alarm";
         if(m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default) {
-            c = AL_YELLOW;
+            c = ThemeColors::color(caLineDrawColor::AlarmMinor);
             if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
             else setForeAndBackground(fgAtInit, c);
         } else {
@@ -244,7 +303,7 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case MAJOR_ALARM:
         qCDebug(caLineDrawLog) << "serious alarm";
         if(m_ColorMode == Alarm_Static || m_ColorMode == Alarm_Default) {
-            c = AL_RED;
+            c = ThemeColors::color(caLineDrawColor::AlarmMajor);
             if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
             else setForeAndBackground(fgAtInit, c);
         } else {
@@ -255,7 +314,7 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
     case INVALID_ALARM:
         qCDebug(caLineDrawLog) << "invalid alarm";
         if(m_ColorMode == Alarm_Static) {
-            c =AL_WHITE;
+            c =ThemeColors::color(caLineDrawColor::AlarmInvalid);
             if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
             else setForeAndBackground(fgAtInit, c);
         } else {
@@ -265,13 +324,13 @@ void caLineDraw::setAlarmColors(short status, double value, QColor bgAtInit, QCo
 
     case NOTCONNECTED:
         qCDebug(caLineDrawLog) << "no connection";
-        forceForeAndBackground(AL_WHITE, AL_WHITE);
+        forceForeAndBackground(ThemeColors::color(caLineDrawColor::NotConnected), ThemeColors::color(caLineDrawColor::NotConnected));
         break;
 
     default:
         qCDebug(caLineDrawLog) << "Alarm default" << status;
         if(m_ColorMode == Alarm_Static) {
-            c = AL_DEFAULT;
+            c = ThemeColors::color(caLineDrawColor::AlarmDefault);
             if(m_AlarmHandling == onForeground) setForeAndBackground(c, bgAtInit);
             else setForeAndBackground(fgAtInit, c);
         } else {
@@ -628,7 +687,7 @@ QColor caLineDraw::invertColor(QColor color){
 void caLineDraw::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    painter.setPen(m_ForeColor);
+    painter.setPen(m_PaintForeColor);
     painter.setBackground(brush);
     painter.setBackgroundMode(Qt::OpaqueMode);
     painter.fillRect(rect(), brush);
@@ -713,7 +772,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
             rectangleToDraw.setWidth(horizontalAdvance);
             rectangleToDraw = rectangleToDraw.normalized();
 
-            painter.setPen(m_ForeColor);
+            painter.setPen(m_PaintForeColor);
 
             if(m_LettersBoundingRects.size() <= m_Text.size()){
                 m_LettersBoundingRects << rectangleToDraw;
@@ -726,7 +785,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
             }
 
             if(m_markAllText || isCurrentFieldMarked){
-                QColor invForeColor = invertColor(m_ForeColor);
+                QColor invForeColor = invertColor(m_PaintForeColor);
                 QColor invBrushColor = invertColor(brush.color());
                 if (brush.color().alpha()==0) invBrushColor.setAlpha(128); // if this is not done the Background is BLACK!
 
@@ -743,7 +802,7 @@ void caLineDraw::paintEvent(QPaintEvent *)
         }
     }
 
-    painter.setPen(m_ForeColor);
+    painter.setPen(m_PaintForeColor);
     painter.setBrush(brush);
 
 
@@ -761,23 +820,12 @@ void caLineDraw::paintEvent(QPaintEvent *)
 
 bool caLineDraw::event(QEvent *e)
 {
+    if(e->type() == QEvent::Show && !defaultsShown) {
+        defaultsShown = true;
+        applyDefaultColors();
+    }
     if(e->type() == QEvent::Resize || e->type() == QEvent::Show) {
         FontScalingWidget::rescaleFont(m_Text, calculateTextSpace());
-
-        // we try to get the default color for the background set through the external stylesheets
-        if(!m_IsShown) {
-            QString c = palette().color(QPalette::Base).name();
-            m_BackColorDefault = QColor(c);
-            qCDebug(caLineDrawLog) << "default back color" << c << this->objectName();
-            c = palette().color(QPalette::Text).name();
-            m_ForeColorDefault = QColor(c);
-            qCDebug(caLineDrawLog) << "default fore color" << c << this->objectName();
-            if(!m_BackColorDefault.isValid()) m_BackColorDefault = QColor(255, 248, 220, 255);
-            if(!m_ForeColorDefault.isValid()) m_ForeColorDefault = Qt::black;
-
-            setColors(m_BackColor, m_ForeColor, m_FrameColor);
-            m_IsShown = true;
-        }
     }
 
     return QWidget::event(e);

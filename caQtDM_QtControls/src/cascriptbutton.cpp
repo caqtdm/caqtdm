@@ -48,6 +48,8 @@ caScriptButton::caScriptButton(QWidget *parent) : QWidget(parent)
 
     thisForeColor = Qt::black;
     thisBackColor = Qt::gray;
+    thisHoverColor = thisBackColor.lighter(120);   // no stylesheet yet: the button stays native
+    thisBorderColor = thisBackColor.darker(150);
 
     thisShowExecution = false;
 
@@ -131,8 +133,8 @@ EPushButton::ScaleMode caScriptButton::fontScaleMode()
 }
 
 void caScriptButton::changeEvent(QEvent *e) {
-    Q_UNUSED(e);
-    setFontScaleModeL(thisScaleMode);
+    QWidget::changeEvent(e);
+    if(e->type() == QEvent::FontChange) setFontScaleModeL(thisScaleMode);
 }
 
 void caScriptButton::setScriptDisplay(defaultDisplay m)

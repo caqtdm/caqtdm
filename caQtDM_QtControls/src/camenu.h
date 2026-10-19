@@ -98,11 +98,18 @@ public slots:
 
 protected:
      virtual bool event(QEvent *);
+     virtual void changeEvent(QEvent *);
 private:
     QString thisPV, thisMaskPV;
     QColor thisForeColor, oldForeColor;
     QColor thisBackColor, oldBackColor;
     QColor defBackColor, defForeColor, defSelectColor;
+    QColor oldDefBackColor, oldDefForeColor;
+    void refreshDefaultColors();
+    void applyDefaultColors();
+    bool applyingColors;              // reentrancy guard for changeEvent
+    bool refreshPending;              // deferred applyDefaultColors scheduled
+    bool defaultsShown;               // defaults read at the first show
     QPalette thisPalette;
     bool thisLabelDisplay;
     int thisAccessW;
@@ -112,7 +119,6 @@ private:
     QString thisStyle, oldStyle;
     QStringList nonMaskedStrings, maskedStrings;
     int thisMaskValue;
-    bool isShown;
     bool updateAlarmStatus_once_Later;
     QColor updateAlarmStatus_bg;
     QColor updateAlarmStatus_fg;

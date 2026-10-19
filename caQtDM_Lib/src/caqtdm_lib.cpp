@@ -941,6 +941,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     savedFile[0] = fi.baseName();
     savedMacro[0] = macro;
 
+    // authored colours through the theme matrix before widgets snapshot them
+    PanelThemeApplier::adaptAuthoredColors(myWidget);
     scanWidgets(myWidget->findChildren<QWidget *>(), macro);
 
     // build a list for getting all soft pv
@@ -2728,15 +2730,6 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
             gridLayout->setHorizontalSpacing(spacingHorizontal);
         }
 
-        QColor thisFrameColor= includeWidget->getFrameColor();
-        QColor thisLightColor = thisFrameColor.lighter();
-        QColor thisDarkColor = thisFrameColor.darker();
-
-        QPalette thisPalette = includeWidget->palette();
-        thisPalette.setColor(QPalette::WindowText, thisFrameColor);
-        thisPalette.setColor(QPalette::Light, thisLightColor);
-        thisPalette.setColor(QPalette::Dark, thisDarkColor);
-        thisPalette.setColor(QPalette::Window, thisFrameColor);
         if (m_boxLayout) includeWidget->setLayout(m_boxLayout);
         if (m_boxLayout) m_boxLayout->addWidget(frame);
 
@@ -2745,7 +2738,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
 
         frame->setFrameShadow(includeWidget->getFrameShadow());
         frame->setLineWidth(includeWidget->getFrameLineWidth());
-        frame->setPalette(thisPalette);
+        includeWidget->applyFramePalette();
         frame->setGeometry(includeWidget->geometry());
         frame->move(0,0);
 
@@ -3073,6 +3066,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                     cainclude_path = fi.path() + "/";
 
                     // recurse (DFS) to lower widgets
+                    PanelThemeApplier::adaptAuthoredColors(thisW);
                     scanWidgets(thisW->findChildren<QWidget *>(), macroS);
                     applyPanelTheme(thisW);
 
@@ -5955,7 +5949,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = bytecontrollerWidget->getColorMode();
-            if(colorMode == caByteController::Static) {
+            if(colorMode == caByteController::Static || colorMode == caByteController::Default) {
                 if(!bytecontrollerWidget->property("Connect").value<bool>()) {
                     bytecontrollerWidget->setProperty("Connect", true);
                 }
@@ -6198,7 +6192,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = graphicsWidget->getColorMode();
-            if(colorMode == caGraphics::Static) {
+            if(colorMode == caGraphics::Static || colorMode == caGraphics::Default) {
                 // done at initialisation, we have to set it back after no connect
                 if(!graphicsWidget->property("Connect").value<bool>()) {
                     QColor fg = graphicsWidget->property("FColor").value<QColor>();
@@ -6223,7 +6217,7 @@ void CaQtDM_Lib::Callback_UpdateWidget(int indx, QWidget *w,
 
         if(data.edata.connected) {
             int colorMode = polylineWidget->getColorMode();
-            if(colorMode == caPolyLine::Static) {
+            if(colorMode == caPolyLine::Static || colorMode == caPolyLine::Default) {
                 // done at initialisation, we have to set it back after no connect
                 if(!polylineWidget->property("Connect").value<bool>()) {
                     QColor fg = polylineWidget->property("FColor").value<QColor>();
@@ -8564,11 +8558,13 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
     } else if(caGraphics* graphicsWidget = qobject_cast<caGraphics *>(w)) {
         GetDefinedCalcString(caGraphics, graphicsWidget, calcString);
         if(graphicsWidget->getColorMode() == caGraphics::Alarm) qstrncpy(colMode, "Alarm", sizeof(colMode));
+        else if(graphicsWidget->getColorMode() == caGraphics::Default) qstrncpy(colMode, "Default", sizeof(colMode));
         else qstrncpy(colMode, "Static", sizeof(colMode));
 
     } else if(caPolyLine* polylineWidget = qobject_cast<caPolyLine *>(w)) {
         GetDefinedCalcString(caPolyLine, polylineWidget, calcString);
         if(polylineWidget->getColorMode() == caPolyLine::Alarm) qstrncpy(colMode, "Alarm", sizeof(colMode));
+        else if(polylineWidget->getColorMode() == caPolyLine::Default) qstrncpy(colMode, "Default", sizeof(colMode));
         else qstrncpy(colMode, "Static", sizeof(colMode));
 
     } else if(caCalc* calcWidget = qobject_cast<caCalc *>(w)) {
@@ -8673,6 +8669,7 @@ void CaQtDM_Lib::DisplayContextMenu(QWidget* w)
 
     } else if(caByteController* bytecontrollerWidget = qobject_cast<caByteController *>(w)) {
         if(bytecontrollerWidget->getColorMode() == caByteController::Alarm) qstrncpy(colMode, "Alarm", sizeof(colMode));
+        else if(bytecontrollerWidget->getColorMode() == caByteController::Default) qstrncpy(colMode, "Default", sizeof(colMode));
         else qstrncpy(colMode, "Static", sizeof(colMode));
 
     } else if(caScriptButton* scriptbuttonWidget =  qobject_cast< caScriptButton *>(w)) {
@@ -9471,11 +9468,11 @@ int CaQtDM_Lib::InitVisibility(QWidget* widget, knobData* kData, QMap<QString, Q
         getVisibilityChannels(imageWidget);
         visibilityCalc = imageWidget->getVisibilityCalc();
     } else if (caGraphics *graphicsWidget = qobject_cast<caGraphics *>(widget)) {
-        if(graphicsWidget->getVisibility() == caGraphics::StaticV && graphicsWidget->getColorMode() == caGraphics::Static) return 0;
+        if(graphicsWidget->getVisibility() == caGraphics::StaticV && graphicsWidget->getColorMode() != caGraphics::Alarm) return 0;
         getVisibilityChannels(graphicsWidget);
         visibilityCalc = graphicsWidget->getVisibilityCalc();
     } else if (caPolyLine *polylineWidget = qobject_cast<caPolyLine *>(widget)) {
-        if(polylineWidget->getVisibility() == caPolyLine::StaticV && polylineWidget->getColorMode() == caPolyLine::Static) return 0;
+        if(polylineWidget->getVisibility() == caPolyLine::StaticV && polylineWidget->getColorMode() != caPolyLine::Alarm) return 0;
         getVisibilityChannels(polylineWidget);
         visibilityCalc = polylineWidget->getVisibilityCalc();
     } else if (caInclude *includeWidget = qobject_cast<caInclude *>(widget)) {
