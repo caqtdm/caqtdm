@@ -1,5 +1,13 @@
 #!/bin/bash
 
+  # machine-specific values (not under version control) win over the defaults below
+  _env_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -f "$_env_dir/caQtDM_Env.local" ]; then
+    echo "====== using $_env_dir/caQtDM_Env.local"
+    . "$_env_dir/caQtDM_Env.local"
+  fi
+  unset _env_dir
+
   if [ -z "$QTHOME" ];                then export   QTHOME=/usr;
   fi
   if [ -z "$QWTHOME" ];               then export   QWTHOME=/usr;
@@ -41,7 +49,8 @@
   
   if [ -z "$PYTHONVERSION" ];   then  export  PYTHONVERSION=2.6;
   fi
-  if [ -z "$PYTHONINCLUDE" ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
+  # the default include dir only when it exists: on macOS a set PYTHONINCLUDE switches PYTHONCALC on
+  if [ -z "$PYTHONINCLUDE" ] && [ -d /usr/include/python$PYTHONVERSION ];   then  export  PYTHONINCLUDE=/usr/include/python$PYTHONVERSION;
   fi
   if [ -z "$PYTHONLIB" ];   then  export  PYTHONLIB=/usr/lib/;
   fi 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source caQtDM_Env
-export PATH=$PATH:${QTHOME}/bin
+export PATH=${QTHOME}/bin:$PATH          # this Qt's macdeployqt, not another one in PATH
 
 pwd
 
@@ -9,6 +9,21 @@ echo
 echo ========== Collect Files for Mac Bundle ============
 echo
 chmod -R 777 ./caQtDM_Binaries/caQtDM.app
+
+echo
+echo ========== add qwt framework from QWTLIB ============
+echo
+# the qwt of the build environment, not whatever macdeployqt would resolve; it must
+# be linked against the same Qt as caQtDM (a Homebrew-linked qwt pulls a second Qt)
+if [ ! -d "${QWTLIB}/qwt.framework" ]; then
+  echo "ERROR: ${QWTLIB}/qwt.framework not found (QWTLIB from caQtDM_Env)"; exit 1
+fi
+if otool -L "${QWTLIB}/qwt.framework/Versions/Current/qwt" | grep -q "/opt/homebrew"; then
+  echo "ERROR: ${QWTLIB}/qwt.framework is linked against Homebrew Qt, rebuild qwt with ${QTHOME}/bin/qmake"; exit 1
+fi
+rm -rf ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/qwt.framework
+mkdir -p ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks
+cp -R "${QWTLIB}/qwt.framework" ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks/
 
 echo
 echo ========== add plugin dirs ============
@@ -27,15 +42,17 @@ cp ${QTHOME}/plugins/platforms/libqcocoa.dylib  ./caQtDM_Binaries/caQtDM.app/Con
 echo
 echo ========== macdeployqt caQtDM ============
 echo
-macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM -libpath=./caQtDM_Binaries -libpath=/Users/brands/Documents/Entwicklung/epics/base-7.0.8.1/lib/darwin-aarch64 -libpath=${QWTLIB} -libpath=/Users/brands/Documents/Entwicklung/qt/zmqbuild/lib
+macdeployqt ./caQtDM_Binaries/caQtDM.app -executable=./caQtDM_Binaries/caQtDM.app/Contents/MacOS/caQtDM -libpath=./caQtDM_Binaries -libpath=${EPICSLIB} -libpath=${QWTLIB} -libpath=${ZMQLIB}
 
 echo
 echo ========== change plugin libs =============
 echo
 echo ++++++++++ libepics3_plugin controls lib ++++++++
 install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change @loader_path/../../Frameworks/libca.4.14.2.dylib @rpath/libca.4.14.2.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
-install_name_tool -change @loader_path/../../Frameworks/libCom.3.22.0.dylib @rpath/libCom.3.22.0.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+# EPICS library names carry their version: take them from the bundle
+for epicslib in $(ls ./caQtDM_Binaries/caQtDM.app/Contents/Frameworks | grep -E '^lib(ca|Com)\.[0-9.]+dylib$'); do
+  install_name_tool -change @loader_path/../../Frameworks/$epicslib @rpath/$epicslib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics3_plugin.dylib
+done
 
 echo ++++++++++ libepics4_plugin controls lib ++++++++
 install_name_tool -change libcaQtDM_Lib.dylib @rpath/libcaQtDM_Lib.dylib ./caQtDM_Binaries/caQtDM.app/Contents/Plugins/controlsystems/libepics4_plugin.dylib
@@ -230,5 +247,9 @@ productbuild --identifier ch.psi.caqtdm.osx --distribution ./caQtDM_Binaries/Dis
 
 #productbuild --distribution ./caQtDM_Binaries/Distribution.xml --sign "${CAQTDM_MAC_INSTALLSIGN}" --resources ./caQtDM_Viewer/src  --package-path ./caQtDM_Binaries/ './caQtDM_Binaries/caqtdmdist.pkg'
 
+# install_name_tool invalidated the seal macdeployqt made; on Apple silicon the
+# kernel kills a bundle with a broken signature at launch (SIGKILL, Invalid Page)
+echo ========== codesign caQtDM.app ============
+codesign --force --deep --sign "${CAQTDM_MAC_CODESIGN:--}" ./caQtDM_Binaries/caQtDM.app
 
 cd ..

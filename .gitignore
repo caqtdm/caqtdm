@@ -3,6 +3,7 @@ docs/build
 # Qt Creator
 *.pro.user
 *.pro.user.*
+caQtDM_Env.local
 .qtc_clangd/
 *.qtc_*
 build/
