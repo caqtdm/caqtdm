@@ -188,8 +188,11 @@ and `.prc` — any other extension in its file property is replaced by
   lightness), `dark` (own palette). Selection: env `CAQTDM_THEME` (alias
   `CAQTDM_PANEL_THEME_MODE`) > panel property `caqtdmThemeMode` > legacy.
   A configured stylesheet file forces `legacy` unless `<name>_dark.qss`
-  exists next to it (loaded in `caQtDM.cpp`, `setPanelDarkStyleSheet`); the
-  applier then picks the file by the panel scheme. The applier sets
+  exists; both files are located like panels (`checkFileAndDownload`, then
+  `searchFile` along `CAQTDM_DISPLAY_PATH`; the twin first with the given
+  directory part, then by bare name), loaded in `caQtDM.cpp`
+  (`setPanelDarkStyleSheet`); the applier then picks the file by the panel
+  scheme. The applier sets
   `caqtdmAppliedThemeRoot`, `caqtdmAppliedThemeScheme` ("light"/"dark")
   and `caqtdmAppliedLegacyLight` on the content root **before** the
   palette, so widgets can read the scheme in `changeEvent(PaletteChange)`.
@@ -201,13 +204,145 @@ and `.prc` — any other extension in its file property is replaced by
   both call `CaQtDM_Lib::themeChanged()`, which coalesces into one deferred
   `applyThemeChange()` (QTimer 0 ms) because the application palette is
   only updated after the ThemeChange event.
+- **Substitution matrix (authored colours in dark panels):**
+  `caQtDM_QtControls/src/themeadapt.json` (qrc `:/src/themeadapt.json`,
+  env override `CAQTDM_THEME_ADAPT_FILE`) + `ThemeColors::adapt/adaptPair/
+  adaptStyleSheet` in `themecolors.cpp`; identical algorithm in
+  `caQtDM_Tests/tools/theme_adapt_report.py` (offline report, Python 3
+  stdlib), cross-checked by `tst_themecolors` through
+  `caQtDM_Tests/tools/theme_adapt_vectors.json` (regenerate with
+  `--vectors` after changing the JSON or the algorithm, in BOTH places).
+  The `foreground` of caGraphics/caPolyLine is their fill and runs as a
+  surface (BackgroundRole, no pair rule); a widget whose authored surface
+  (background, or the fill of a Filled graphic) is opaque and either dark
+  (WCAG luminance below `darkSurfaceLuminance`, 0.2) or a saturated signal
+  colour (chroma max-min from `signalChroma`, 0.6) is "dark-built":
+  background, foreground and lineColor stay as authored (`isDarkBuilt`,
+  Python `dark_built`, role `kept`; thresholds in `themeadapt.json`). In
+  colour mode `Alarm` the dispatcher owns `foreground`/`lineColor` of
+  caGraphics/caPolyLine and `foreground` of caLabelVertical: the matrix only
+  records them (`alarmOwnedProperty`, Python role `alarm`), so a theme pass
+  never overwrites a displayed alarm colour. Only the top-level panel root
+  paints itself on a mismatching desktop (`paintPanel`); the panel's
+  `apply()` switches auto-fill off on nested include roots again, which are
+  applied before it and would otherwise cover the panel surface with the
+  light `PaletteWindow` (239) — the Windows "white includes" finding.
+  Surfaces keep their chroma (max-min times `saturationFactor`), not
+  their HSL saturation (pastel tints would turn into deep colours); the
+  pair rule reads text on a transparent background against the scheme's
+  window colour (`window` in the JSON == `PaletteWindow`, checked by
+  `tst_themecolors`). The report tool mirrors `themeDrivenProperty`
+  (role `theme`), `scaleOnAlarmDial`, skips bit-colour pairs of
+  caByte/caLed and marks transparent pairs as `pair(window)`.
+  Authored `<palette>` blocks are a third channel: `recordAuthoredPalettes
+  (root, ui)` (right after both QUiLoader loads in `caqtdm_lib.cpp`) reads
+  them from the .ui XML by object name into `caqtdmAuthored.palette` — the
+  live palette cannot tell authored roles from roles pinned by a stylesheet
+  polish or Qt's resolve-mask union — and `adaptAuthoredPalette` adapts the
+  set roles (surface roles as BackgroundRole, text roles as ForegroundRole;
+  Base/Text, Window/WindowText, Button/ButtonText as pairs through
+  `ensureContrast`, a surface without its text role gets the scheme text,
+  dark-built surfaces keep the palette). Skipped: Qwt widgets, ca widgets
+  that build their palette in code (`codePalettes`), internals of
+  non-container ca widgets; `AlternateBase` of caTable/caWaveTable stays
+  with the widgets. Only the authored mask is written (stylesheet roles come
+  back with the root's repolish in `applyPanelStyleSheet`). The report tool
+  emits `palette.<Role>` rows with the same exclusions.
+  Runtime: `PanelThemeApplier::adaptAuthoredColors(root)` before
+  `scanWidgets()` and inside `apply()`; generic over writable QColor
+  `Q_PROPERTY`s (originals in `caqtdmAuthored.<name>`), root stylesheet
+  via `applyPanelStyleSheet`, stylesheets of plain Qt widgets only (ca
+  widgets regenerate theirs from the adapted properties). Active for
+  system/dark with a dark scheme; opt-out `caqtdmThemeAdapt=false` on the
+  root, `CAQTDM_THEME_ADAPT=0` globally; category
+  `caqtdm.lib.panelthemeadapt`. Every panel root (main panel and each
+  caInclude copy) is registered in `panelThemeRoots` and re-applied on a
+  runtime switch; the enclosing panel's walk skips nested roots (widget
+  whose content root carries `caqtdmAppliedThemeRoot`, i.e. the include's
+  QMainWindow too) and everything below them, so an include's stylesheet
+  is owned by its own `apply()` only (`isNestedRoot`, regression
+  `panelThemeRestoresNestedIncludeStyleSheet`). The authored originals
+  are recorded at load for every non-legacy panel (record-only pass, so
+  later alarm colours in the properties are never taken for authored
+  ones); the lib's load-time copies `BColor`/`FColor`/`LColor` (re-applied
+  by the dispatcher on reconnect and alarm updates) are kept on the
+  current scheme by `syncDispatcherSnapshot`, and `applyThemeChange()`
+  ends with `MutexKnobData::RedisplayPanel(myWidget)`, which pushes the
+  last data of every monitor through the widgets again so alarm and
+  not-connected colours come back (caCalc skipped). caLineEdit and
+  caMultiLineString keep the text readable on an alarm background in the
+  dark scheme (`textOnAlarm`, `ensureContrast`; light scheme untouched).
 - **Migrated so far:** caThermo, caCartesianPlot (+ plot helpers),
-  caWaveTable/NumericPanelTheme literals. Pattern for further widgets: no
-  colour caching at first show, re-resolve in `changeEvent` on
-  PaletteChange/StyleChange guarded by an `appliedScheme` member (the
-  widget's own `setPalette` triggers PaletteChange again).
+  caWaveTable/NumericPanelTheme literals; wave 1 text widgets caLineEdit
+  (+caTextEntry), caMultiLineString, caMenu, replaceMacro, caSlider,
+  caLineDraw; wave 2 buttons and containers caMessageButton, caToggleButton,
+  caChoice, caRowColMenu (caRelatedDisplay/caShellCommand), caScriptButton,
+  caFrame, caInclude (`applyFramePalette()` also at runtime), caDoubleTabWidget,
+  caTable, caWaveTable. Pattern for painted widgets: no colour caching at first
+  show, re-resolve in `changeEvent` on PaletteChange/StyleChange guarded
+  by an `appliedScheme` member (the widget's own `setPalette` triggers
+  PaletteChange again). Pattern for stylesheet widgets (wave 1): default
+  colours come from `ThemeColors::defaultBaseAndText(this, …)`, which
+  clears the own stylesheet and reads the own `palette()` — only this
+  keeps rules of external stylesheets (`caLineEdit {background: …}` in
+  caQtDM_stylesheet.qss) as defaults; read in the constructor, at the
+  first Show and deferred (`QTimer::singleShot(0)`, `refreshPending`)
+  after an external PaletteChange/StyleChange, never per `setColors`;
+  `applyingColors` swallows the synchronous events of the own
+  `setStyleSheet`. Qt note: with `AA_UseStyleSheetPropagationInWidgetStyles`
+  a child created under a parent with a set palette does not resolve its
+  palette until the parent's palette changes again, and a change only travels
+  through widgets whose own palette changes too — `PanelThemeApplier::seed()`
+  therefore sets an intermediate palette (one WindowText bit flipped) before
+  the panel palette, and `apply()` toggles every descendant with an own
+  palette (`propagateThroughOwnPalettes`). The loader seeds before the
+  children exist and `apply()` runs afterwards with the same palette; without
+  this, legacy panels on a dark desktop kept the dark application text
+  colours (QTextBrowser, caToggleButton, QTabBar have class-specific theme
+  palettes on macOS). Tests use `switchRoot/settleRoot` from
+  `tst_theme_helpers.h`. **Self-styled marker:** a widget that generates its
+  own colours (built-in table header sheet, caDoubleTabWidget buttons/pages)
+  or writes sheets onto internal children (caRowColMenu, caChoice cells) sets
+  `ThemeColors::markSelfStyled()` on itself or on those children; the matrix
+  skips marked widgets (`adaptWidget`), otherwise a child sheet generated from
+  an already adapted parent colour would be adapted a second time and restored
+  wrongly on the way back to light. An authored stylesheet clears the marker
+  (`caWaveTable::noStyle`, `caDoubleTabWidget::editStyleSheet`). The matrix
+  treats `background` of a widget whose `backgroundMode` is `Outline` and any
+  `frameColor` as a line colour (ForegroundRole), and the `foreground` of a
+  plot (its frame surface) as a background. Plots: frame, scale and canvas
+  are adapted; curve colours (`color_N`) are never ramped, they only get the
+  pair rule's lightness flip when they lose contrast to the adapted canvas
+  (`ThemeColors::ensureContrast`), red/green/yellow never. caCartesianPlot
+  and caStripPlot derive their default scale/legend colour from the effective
+  frame (`scaleScheme()`), not from the panel scheme. The gauges paint text,
+  ticks and outlines with the palette WindowText (fixed `Qt::black` before);
+  caClock has `Default` (constructor default, dial from `ClockBase`), `Static`
+  keeps `baseColor`, which the matrix leaves alone in Default
+  (`themeDrivenProperty`). The legacy Disabled text is translucent black so it
+  reads on wheat panels like the native macOS palette did. Wave 3 rest:
+  caGraphics, caPolyLine, caLabelVertical, caByteController got `Default` at
+  the enum end (constructor default stays `Static` for parity with caLabel and
+  unchanged panels; Designer omits default-valued properties), caMeter like
+  caClock with `Default` as constructor default. caByte and caLed keep
+  `Static`/`Alarm` only (bit/LED colours, no text). In Default the painted
+  widgets resolve their constructor colours at paint time (`themed()`,
+  `changeEvent` → `update()`), and the matrix leaves `lineColor` alone as well. Widgets without a colour
+  mode (caRowColMenu, caScriptButton, caFrame) stay matrix-driven, and the
+  tables keep `Static`/`Alarm` only: `Static` already follows the palette
+  (`QBrush()` foreground), no `Default` value was added. Popup menus are
+  windows and do not inherit the panel palette: caRowColMenu gives them
+  `ThemeColors::resolvedPalette(palette())`.
 - Tests: `tst_qtcontrols/tst_themecolors.*` (contrast of dark surfaces
   against the alarm colours >= 3:1), `tst_lib` panel theme tests.
+- **Translucent palette roles:** `ThemeColors::defaultBaseAndText` (Default
+  colours of the wave-1 text widgets, caMenu included) replaces a Base/Text
+  with alpha < 255 by the scheme palette, so a field or a combo popup never
+  paints the transparent colour a panel stylesheet propagated.
+- **Popups:** caRowColMenu gives its QMenu `popupPalette()` (panel palette
+  with translucent roles replaced by the scheme palette): a panel stylesheet
+  rule like `background: rgba(105, 105, 105, 0)` propagates a transparent
+  Window colour down the tree and would leave the menu see-through.
 
 ## caQtDM_Lib: core objects & data flow
 
@@ -272,9 +407,12 @@ and `.prc` — any other extension in its file property is replaced by
 Mandatory — `all.pro` aborts with `error()` otherwise:
 `QTHOME`, `QWTHOME`, `EPICS_BASE`, `EPICS_HOST_ARCH`.
 
-Paths/libs (defaults are set by `caQtDM_Env`, only if not already set):
+Paths/libs (defaults are set by `caQtDM_Env`, only if not already set;
+`caQtDM_Env` first sources an optional, git-ignored `caQtDM_Env.local` next
+to it for machine-specific values, e.g. the Qt/Qwt/EPICS paths of the
+Qt Creator kit on the developer's Mac):
 
-- `QWTINCLUDE`, `QWTLIB`, `QWTVERSION`, `QWTLIBNAME` — `QWTLIBNAME` is
+- `QWTINCLUDE`, `QWTLIB`, `QWTLIBNAME` — `QWTLIBNAME` is
   `qwt`, `qwt-qt5` or `qwt-qt6` depending on the distro (a common Linux
   pitfall).
 - `EPICSINCLUDE`, `EPICSLIB` (= `$EPICS_BASE/lib/$EPICS_HOST_ARCH`),
