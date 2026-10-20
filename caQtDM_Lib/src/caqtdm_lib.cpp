@@ -645,6 +645,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
     controlsInterfaces = interfaces;
     pepPrint = pepprint;
     firstResize = true;
+    allowResize = true;
+    constructed = false;
     loopTimer = 0;
     prcFile = false;
 
@@ -1080,6 +1082,8 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
     qstrncpy(asc,"unresolved macros present, press context in display to obtain a list",MAX_STRING_LENGTH);
     if(unknownMacrosList.count() > 0) postMessage(QtCriticalMsg, asc);
+
+    constructed = true;
 }
 
 /**
@@ -8353,8 +8357,11 @@ void CaQtDM_Lib::showFullWindow()
 void CaQtDM_Lib::resizeFullWindow(QRect& q)
 {
     QMainWindow *main = this->findChild<QMainWindow *>();
-    main->centralWidget()->setProperty("mainlayoutPresent",true);
-    main->centralWidget()->setProperty("allowResize",false);
+    // main is NULL for QWidget based panels
+    if(main != (QMainWindow*) Q_NULLPTR && main->centralWidget() != (QWidget*) Q_NULLPTR) {
+        main->centralWidget()->setProperty("mainlayoutPresent",true);
+        main->centralWidget()->setProperty("allowResize",false);
+    }
     if ((q.width()>0)&&(q.height()>0)){
         this->resize(q.width(),q.height());
         this->setFixedSize(q.width(),q.height());
@@ -10861,6 +10868,9 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
 {
     double factX, factY;
 
+    // not yet constructed, on macOS the native window may already exist
+    if(!constructed) return;
+
     qCDebug(caQtDMLibLog) << "resize" << event->size();
     QMainWindow *main = this->findChild<QMainWindow *>();
     // it seems that when mainwindow was fixed by user, then the window stays empty ?
@@ -10883,7 +10893,8 @@ void CaQtDM_Lib::resizeEvent ( QResizeEvent * event )
     // when noresizing then fix the size, however for prc files, we will later shrink the display to a minimumsize, so do not fix then
 
     if(!allowResize) {
-        if(!prcFile) main->setFixedSize(myWidget->size());
+        // main is NULL for QWidget based panels, for QMainWindow panels main == myWidget
+        if(!prcFile && myWidget != (QWidget*) Q_NULLPTR) myWidget->setFixedSize(myWidget->size());
         return;
     }
 

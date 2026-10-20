@@ -501,6 +501,7 @@ public:
 
     bool firstResize;
     bool allowResize;
+    bool constructed;
     bool pepPrint;
     bool prcFile;
 
