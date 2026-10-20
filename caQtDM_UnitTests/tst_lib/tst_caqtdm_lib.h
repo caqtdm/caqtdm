@@ -79,6 +79,11 @@ private slots:
     void panelThemeKeepsDefaultLineColor();
     void panelThemeKeepsScaleColorOfAlarmDial();
     void panelThemeRestoresNestedIncludeStyleSheet();
+    void panelThemeSyncsDispatcherSnapshots();
+    void panelThemeRedisplaysAlarmAfterSwitch();
+    void panelThemeKeepsTransparentTextReadable();
+    void panelThemeAdaptsFillsAsSurfaces();
+    void panelThemeKeepsDarkBuiltPairs();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

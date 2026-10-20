@@ -53,7 +53,6 @@ namespace caLineDrawColor {
     constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
     constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
     constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
-    constexpr const ThemeColor &FocusFrame   = ThemeColors::FocusFrame;
 }
 
 caLineDraw::caLineDraw(QWidget *parent) : QWidget(parent), FontScalingWidget(this), caWidgetInterface()
@@ -164,8 +163,6 @@ void caLineDraw::applyDefaultColors()
     refreshPending = false;
     // re-apply what was set last (author colours, alarm or not connected) in the mode of
     // that call: a palette change must not undo the dispatcher's state
-    const QColor lastBack = m_BackColorOld;
-    const QColor lastFore = m_ForeColorOld;
     const colMode lastMode = m_ColorModeOld;
     const colMode mode = m_ColorMode;
     refreshDefaultColors();

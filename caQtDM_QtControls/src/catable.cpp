@@ -45,7 +45,6 @@ namespace caTableColor {
     constexpr const ThemeColor &AlarmNoAlarm  = ThemeColors::AlarmNoAlarm;
     constexpr const ThemeColor &AlarmMinor    = ThemeColors::AlarmMinor;
     constexpr const ThemeColor &AlarmMajor    = ThemeColors::AlarmMajor;
-    constexpr const ThemeColor &AlarmInvalid  = ThemeColors::AlarmInvalid;
     constexpr const ThemeColor &AlarmDefault  = ThemeColors::AlarmDefault;
     constexpr const ThemeColor &NotConnected  = ThemeColors::AlarmInvalid;
     constexpr const ThemeColor &AlternateBase = ThemeColors::TableAlternateBase;

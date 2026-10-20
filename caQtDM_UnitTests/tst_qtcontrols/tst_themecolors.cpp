@@ -21,7 +21,6 @@
 #include "tst_themecolors.h"
 #include "tst_theme_helpers.h"
 
-#include <QApplication>
 #include <QTest>
 #include <QWidget>
 #include <cmath>
@@ -328,6 +327,33 @@ void TestThemeColors::adaptMatchesPythonVectors()
     const QJsonObject sheet = root.value("styleSheet").toObject();
     QCOMPARE(ThemeColors::adaptStyleSheet(sheet.value("input").toString(), ThemeColors::Dark),
              sheet.value("expected").toString());
+}
+
+// pastel surfaces keep their chroma (not their HSL saturation), saturated
+// colours map as before; text on a transparent background reads on the window
+void TestThemeColors::adaptKeepsPastelChromaAndTransparentText()
+{
+    const QColor pale = ThemeColors::adapt(QColor(0xda, 0xda, 0xff), ThemeColors::Dark, ThemeColors::BackgroundRole);
+    QVERIFY2(pale.hslSaturationF() < 0.5, qPrintable(pale.name()));
+    QVERIFY2(qAbs(pale.lightness() - 48) <= 3, qPrintable(pale.name()));   // ramp: 236 -> 48
+    QVERIFY(closeTo(ThemeColors::adapt(QColor(0x80, 0, 0), ThemeColors::Dark, ThemeColors::BackgroundRole), QColor(0x76, 0x0a, 0x0a)));
+    QVERIFY(closeTo(ThemeColors::adapt(QColor(0, 0, 0xff), ThemeColors::Dark, ThemeColors::BackgroundRole), QColor(0x0e, 0x0e, 0xb1)));
+
+    const QColor window = ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Dark);
+    QColor blue(0, 0, 255), transparent(255, 255, 255, 0);
+    ThemeColors::adaptPair(blue, transparent, ThemeColors::Dark);
+    QCOMPARE(transparent, QColor(255, 255, 255, 0));
+    QVERIFY2(ThemeColors::contrastRatio(blue, window) >= 3.0, qPrintable(blue.name()));
+    QColor red(255, 0, 0), transparent2(255, 255, 255, 0);
+    ThemeColors::adaptPair(red, transparent2, ThemeColors::Dark);
+    QCOMPARE(red, QColor(255, 0, 0));                                      // semantic text stays
+
+    // the python twin reads the window colours from the json: keep them equal
+    QFile file(":/src/themeadapt.json");
+    QVERIFY(file.open(QFile::ReadOnly));
+    const QJsonObject json = QJsonDocument::fromJson(file.readAll()).object().value("window").toObject();
+    QCOMPARE(QColor(json.value("light").toString()), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
+    QCOMPARE(QColor(json.value("dark").toString()), window);
 }
 
 void TestThemeColors::adaptKeepsAlarmColoursAndTransparency()

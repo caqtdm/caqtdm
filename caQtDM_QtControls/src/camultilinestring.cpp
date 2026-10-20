@@ -146,14 +146,20 @@ void caMultiLineString::applyDefaultColors()
     refreshPending = false;
     // re-apply what was set last (author colours, alarm or not connected) in the mode of
     // that call: a palette change must not undo the dispatcher's state
-    const QColor lastBack = oldBackColor;
-    const QColor lastFore = oldForeColor;
     const colMode lastMode = oldColorMode;
     const colMode mode = thisColorMode;
     refreshDefaultColors();
     thisColorMode = lastMode;
     setColors(oldBackColor, oldForeColor, thisFrameColor, thisFrameLineWidth);
     thisColorMode = mode;
+}
+
+// dark scheme: the (pair-adapted) text colour must stay readable on the alarm colour
+static QColor textOnAlarm(QColor text, const QColor &alarm, const QWidget *widget)
+{
+    const ThemeColors::Scheme scheme = ThemeColors::schemeOf(widget);
+    if (scheme == ThemeColors::Dark) ThemeColors::ensureContrast(text, alarm, scheme);
+    return text;
 }
 
 void caMultiLineString::setColors(QColor bg, QColor fg, QColor frame, int lineWidth)
@@ -191,9 +197,10 @@ void caMultiLineString::setColors(QColor bg, QColor fg, QColor frame, int lineWi
                             arg(lineWidth).
                             arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
                 } else {
+                    const QColor alarmText = textOnAlarm(defForeColor, bg, this);
                     thisStyle = thisStyle.
                             arg(bg.red()).arg(bg.green()).arg(bg.blue()).arg(bg.alpha()).
-                            arg(defForeColor.red()).arg(defForeColor.green()).arg(defForeColor.blue()).arg(defForeColor.alpha()).
+                            arg(alarmText.red()).arg(alarmText.green()).arg(alarmText.blue()).arg(alarmText.alpha()).
                             arg(lineWidth).
                             arg(frame.red()).arg(frame.green()).arg(frame.blue()).arg(frame.alpha());
                 }
@@ -340,7 +347,7 @@ void caMultiLineString::setAlarmColors(short status, double value, QColor bgAtIn
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = ThemeColors::color(caMultiLineStringColor::AlarmNoAlarm);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
-            else setForeAndBackground(fgAtInit, c, thisFrameColor);
+            else setForeAndBackground(textOnAlarm(fgAtInit, c, this), c, thisFrameColor);
         } else {
             setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
@@ -351,7 +358,7 @@ void caMultiLineString::setAlarmColors(short status, double value, QColor bgAtIn
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = ThemeColors::color(caMultiLineStringColor::AlarmMinor);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
-            else setForeAndBackground(fgAtInit, c, thisFrameColor);
+            else setForeAndBackground(textOnAlarm(fgAtInit, c, this), c, thisFrameColor);
         } else {
             setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
@@ -362,7 +369,7 @@ void caMultiLineString::setAlarmColors(short status, double value, QColor bgAtIn
         if(thisColorMode == Alarm_Static || thisColorMode == Alarm_Default) {
             c = ThemeColors::color(caMultiLineStringColor::AlarmMajor);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
-            else setForeAndBackground(fgAtInit, c, thisFrameColor);
+            else setForeAndBackground(textOnAlarm(fgAtInit, c, this), c, thisFrameColor);
         } else {
             setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
@@ -373,7 +380,7 @@ void caMultiLineString::setAlarmColors(short status, double value, QColor bgAtIn
         if(thisColorMode == Alarm_Static) {
             c =ThemeColors::color(caMultiLineStringColor::AlarmInvalid);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
-            else setForeAndBackground(fgAtInit, c, thisFrameColor);
+            else setForeAndBackground(textOnAlarm(fgAtInit, c, this), c, thisFrameColor);
         } else {
             setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }
@@ -389,7 +396,7 @@ void caMultiLineString::setAlarmColors(short status, double value, QColor bgAtIn
         if(thisColorMode == Alarm_Static) {
             c = ThemeColors::color(caMultiLineStringColor::AlarmDefault);
             if(thisAlarmHandling == onForeground) setForeAndBackground(c, bgAtInit, thisFrameColor);
-            else setForeAndBackground(fgAtInit, c, thisFrameColor);
+            else setForeAndBackground(textOnAlarm(fgAtInit, c, this), c, thisFrameColor);
         } else {
             setForeAndBackground(fgAtInit, bgAtInit, thisFrameColor);
         }

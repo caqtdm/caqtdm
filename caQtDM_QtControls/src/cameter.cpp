@@ -37,7 +37,6 @@ namespace caMeterColor {
     constexpr const ThemeColor &AlarmMinor   = ThemeColors::AlarmMinor;
     constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
     constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
-    constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
     constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
     constexpr const ThemeColor &Base      = ThemeColors::ClockBase;        // Qt::gray
     constexpr const ThemeColor &ScaleText = ThemeColors::ClockScaleText;

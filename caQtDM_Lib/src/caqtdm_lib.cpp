@@ -11548,7 +11548,17 @@ void CaQtDM_Lib::applyThemeChange() {
         PanelThemeApplier::apply(panelRoot.data());
     }
 
- }
+    // the matrix rewrote authored colours: show the last data again so alarm and
+    // not-connected colours come back (legacy panels are never adapted)
+    bool redisplay = false;
+    for (const QPointer<QWidget> &panelRoot : panelThemeRoots) {
+        if (!panelRoot.isNull() && !PanelThemeApplier::usesLegacyLightTheme(panelRoot.data())) redisplay = true;
+    }
+    if (redisplay && mutexKnobDataP != (MutexKnobData *) Q_NULLPTR) {
+        mutexKnobDataP->RedisplayPanel(myWidget);
+        qCDebug(caQtDMLibLog) << "redisplayed the monitors of" << myWidget << "after the theme change";
+    }
+}
 
 
 #include "loadPlugins.h"

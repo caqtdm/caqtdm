@@ -42,6 +42,7 @@ private slots:
     void adaptMatrixLoadsAndIsIdentityInLight();
     void adaptMatchesPythonVectors();
     void adaptKeepsAlarmColoursAndTransparency();
+    void adaptKeepsPastelChromaAndTransparentText();
     void adaptStyleSheetKeepsSyntax();
     void thermoScaleTextFollowsOwnBackground();
 };

@@ -4,7 +4,6 @@
 #include <QFile>
 #include <QLabel>
 #include <QMainWindow>
-#include <QTimer>
 #include <QMetaProperty>
 #include <QPalette>
 #include <QWidget>
@@ -249,11 +248,6 @@ bool PanelThemeApplier::usesLegacyLightTheme(const QWidget *root)
     return modeOf(root) == Legacy;
 }
 
-bool PanelThemeApplier::resolveLegacyLightTheme(bool panelLegacyLight)
-{
-    return resolveMode(panelLegacyLight ? Legacy : System) == Legacy;
-}
-
 void PanelThemeApplier::apply(QWidget *root)
 {
     if (!root) return;
@@ -298,12 +292,6 @@ void PanelThemeApplier::apply(QWidget *root)
     logPalette("panel root", root);
     logPalette("panel content root", target);
     if (QWidget *sample = target->findChild<QLabel *>()) logPalette("sample QLabel", sample);
-}
-
-void PanelThemeApplier::seed(QWidget *contentRoot, const QWidget *themeRoot)
-{
-    if (!contentRoot || !themeRoot) return;
-    seed(contentRoot, modeOf(themeRoot));
 }
 
 // Qt propagates a palette change only through widgets whose own palette changed
@@ -412,11 +400,57 @@ bool isCurveColor(const QWidget *widget, const QString &name)
     return widget->inherits("QwtPlot") && name.startsWith(QLatin1String("color_"));
 }
 
+// caGraphics/caPolyLine: "foreground" is the fill, a surface when fillstyle is Filled
+bool hasFillStyle(const QWidget *widget)
+{
+    return widget->metaObject()->indexOfProperty("fillstyle") >= 0;
+}
+
+bool isFilledGraphic(const QWidget *widget)
+{
+    const QMetaObject *meta = widget->metaObject();
+    const int index = meta->indexOfProperty("fillstyle");
+    if (index < 0 || !meta->property(index).isEnumType()) return false;
+    const QMetaProperty fill = meta->property(index);
+    const char *key = fill.enumerator().valueToKey(fill.read(widget).toInt());
+    return key && qstrcmp(key, "Filled") == 0;
+}
+
+// the surface the author gave a widget: its background, for a filled graphic its
+// fill; a surface that is already dark marks a widget built for a dark panel
+QColor authoredSurface(const QWidget *widget)
+{
+    QString name = QLatin1String("background");
+    if (hasFillStyle(widget)) {
+        if (!isFilledGraphic(widget)) return QColor();
+        name = QLatin1String("foreground");
+    }
+    const QMetaObject *meta = widget->metaObject();
+    const int index = meta->indexOfProperty(qPrintable(name));
+    if (index < 0) return QColor();
+    const QVariant original = widget->property(qPrintable(QString::fromLatin1(AuthoredPrefix) + name));
+    return original.isValid() ? original.value<QColor>() : meta->property(index).read(widget).value<QColor>();
+}
+
+bool isDarkBuilt(const QWidget *widget)
+{
+    const QColor surface = authoredSurface(widget);
+    return surface.isValid() && surface.alpha() == 255 && surface.lightness() <= 128;
+}
+
+bool surfaceOrText(const QString &name)
+{
+    return name == QLatin1String("background") || name == QLatin1String("foreground")
+        || name == QLatin1String("lineColor");
+}
+
 // an Outline frame uses "background" as its line colour; the "foreground" of a
-// plot is its frame surface (the canvas is "background" and stays excluded)
+// plot is its frame surface (the canvas is "background" and stays excluded); the
+// "foreground" of a graphic is its fill
 ThemeColors::AdaptRole roleFor(const QWidget *widget, const QString &name)
 {
-    if (name == QLatin1String("foreground") && widget->inherits("QwtPlot")) return ThemeColors::BackgroundRole;
+    if (name == QLatin1String("foreground") && (widget->inherits("QwtPlot") || hasFillStyle(widget)))
+        return ThemeColors::BackgroundRole;
     if (name == QLatin1String("background")) {
         const QMetaObject *meta = widget->metaObject();
         const int index = meta->indexOfProperty("backgroundMode");
@@ -429,17 +463,34 @@ ThemeColors::AdaptRole roleFor(const QWidget *widget, const QString &name)
     return ThemeColors::adaptRoleForProperty(name);
 }
 
+// the dispatcher keeps load-time copies of these colours for reconnects and
+// alarm updates (HandleWidget, caqtdm_lib.cpp); keep them on the current scheme
+void syncDispatcherSnapshot(QWidget *widget, const QString &name, const QColor &target)
+{
+    const char *key = name == QLatin1String("background") ? "BColor"
+                    : name == QLatin1String("foreground") ? "FColor"
+                    : name == QLatin1String("lineColor") ? "LColor" : Q_NULLPTR;
+    if (!key || !widget->property(key).isValid()) return;
+    if (widget->property(key).value<QColor>() != target) widget->setProperty(key, target);
+}
+
 // one widget: every writable QColor property, the pair foreground/background,
 // and the stylesheet of plain Qt widgets (ca widgets regenerate theirs and
-// mark themselves or their internal children as self-styled)
-int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme)
+// mark themselves or their internal children as self-styled); recordOnly just
+// stores the authored values
+int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme, bool recordOnly)
 {
     int changed = 0;
     if (widget->property(ThemeColors::SelfStyledProperty).toBool()) return changed;
     const QMetaObject *meta = widget->metaObject();
     const bool themeByMode = followsThemeByMode(widget);
+    // a widget the author already built dark keeps its surface and text colours
+    const bool darkBuilt = !recordOnly && active && !themeByMode && isDarkBuilt(widget);
+    if (darkBuilt)
+        qCDebug(panelThemeAdaptLog) << widget->metaObject()->className() << widget->objectName()
+                                    << "kept (dark surface)";
     QColor foreground, background, canvas;
-    bool hasForeground = false, hasBackground = false, hasCanvas = false;
+    bool hasForeground = false, hasBackground = false;
     QList<QMetaProperty> curves;
     for (int i = 0; i < meta->propertyCount(); ++i) {
         const QMetaProperty property = meta->property(i);
@@ -456,17 +507,19 @@ int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme)
             original = property.read(widget);
             widget->setProperty(qPrintable(key), original);
         }
+        if (recordOnly) continue;
         const QColor authored = original.value<QColor>();
         QColor target = authored;
-        if (active) target = ThemeColors::adapt(authored, scheme, roleFor(widget, name));
+        if (active && !(darkBuilt && surfaceOrText(name))) target = ThemeColors::adapt(authored, scheme, roleFor(widget, name));
         if (name == "foreground") { foreground = authored; hasForeground = true; }
-        if (name == "background") { background = authored; hasBackground = true; canvas = target; hasCanvas = true; }
+        if (name == "background") { background = authored; hasBackground = true; canvas = target; }
         if (property.read(widget).value<QColor>() != target) {
             property.write(widget, target);
             ++changed;
             qCDebug(panelThemeAdaptLog) << widget->metaObject()->className() << widget->objectName()
                                         << name << authored.name() << "->" << target.name();
         }
+        syncDispatcherSnapshot(widget, name, target);
     }
     for (const QMetaProperty &property : curves) {
         const QString key = QString::fromLatin1(AuthoredPrefix) + QString::fromLatin1(property.name());
@@ -475,8 +528,9 @@ int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme)
             original = property.read(widget);
             widget->setProperty(qPrintable(key), original);
         }
+        if (recordOnly) continue;
         QColor target = original.value<QColor>();
-        if (active && hasCanvas) ThemeColors::ensureContrast(target, canvas, scheme);
+        if (active && hasBackground) ThemeColors::ensureContrast(target, canvas, scheme);
         if (property.read(widget).value<QColor>() != target) {
             property.write(widget, target);
             ++changed;
@@ -484,7 +538,8 @@ int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme)
                                         << property.name() << original.value<QColor>().name() << "->" << target.name();
         }
     }
-    if (active && hasForeground && hasBackground && !widget->inherits("QwtPlot")) {   // plot: frame, not text
+    // pair rule: not for plots (frame), graphics (fill) or dark-built widgets
+    if (active && hasForeground && hasBackground && !darkBuilt && !widget->inherits("QwtPlot") && !hasFillStyle(widget)) {
         QColor fg = foreground, bg = background;
         ThemeColors::adaptPair(fg, bg, scheme);
         if (widget->property("foreground").value<QColor>() != fg) {
@@ -493,6 +548,7 @@ int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme)
             qCDebug(panelThemeAdaptLog) << widget->metaObject()->className() << widget->objectName()
                                         << "foreground (pair)" << foreground.name() << "->" << fg.name();
         }
+        syncDispatcherSnapshot(widget, QLatin1String("foreground"), fg);
     }
     if (!hasColorProperty(widget) && !widget->testAttribute(Qt::WA_StyleSheet) &&
         !widget->property(qPrintable(QString::fromLatin1(AuthoredPrefix) + "styleSheet")).isValid() &&
@@ -506,6 +562,7 @@ int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme)
             original = widget->styleSheet();
             widget->setProperty(qPrintable(key), original);
         }
+        if (recordOnly) return changed;
         const QString authored = original.toString();
         const QString target = active ? ThemeColors::adaptStyleSheet(authored, scheme) : authored;
         if (widget->styleSheet() != target) {
@@ -536,15 +593,21 @@ void PanelThemeApplier::adaptAuthoredColors(QWidget *root)
     if (!root) return;
     const bool active = adaptActive(root);
     const ThemeColors::Scheme scheme = active ? ThemeColors::Dark : ThemeColors::Light;
-    // a panel never adapted needs no restore pass
-    if (!active && !root->property("caqtdmAdapted").toBool()) return;
+    // a panel never adapted needs no restore pass; it still records the authored
+    // values at load time (later the properties may hold alarm colours)
+    const bool recordOnly = !active && !root->property("caqtdmAdapted").toBool();
+    if (recordOnly && modeOf(root) == Legacy) return;
     root->setProperty("caqtdmAdapted", active);
     int changed = 0;
     QWidget *const content = contentRoot(root);
     QList<QWidget *> widgets = root->findChildren<QWidget *>();
     for (QWidget *widget : widgets) {
         if (widget == content || isNestedRoot(widget) || insideNestedRoot(widget, root, content)) continue;
-        changed += adaptWidget(widget, active, scheme);
+        changed += adaptWidget(widget, active, scheme, recordOnly);
+    }
+    if (recordOnly) {
+        qCDebug(panelThemeAdaptLog) << "recorded the authored colours of panel" << root->objectName();
+        return;
     }
     qCInfo(panelThemeAdaptLog) << "caQtDM --" << (active ? "adapted" : "restored") << changed
                                << "authored colours in panel" << root->objectName();

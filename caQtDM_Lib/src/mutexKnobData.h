@@ -96,6 +96,9 @@ public:
     bool getSuppressUpdates() const;
     void setSuppressUpdates(bool newSuppressUpdates);
 
+    // re-emit the last data of every monitor of a panel (theme switch)
+    void RedisplayPanel(QWidget *panel);
+
 signals:
 
     void Signal_UpdateWidget(int, QWidget*, const QString&, const QString&, const QString&, const knobData&);
@@ -125,6 +128,8 @@ private:
 
     bool suppressUpdates;
     UpdateType myUpdateType;
+
+    void copyDataString(const knobData *kData, char *dataString);
 
     bool doDefaultUnitReplacements;
     QList<QPair<QString,QString> > createUnitReplacementPairList(QStringList replaceUnitsList);

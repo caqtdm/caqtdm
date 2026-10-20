@@ -587,25 +587,41 @@ int main(int argc, char *argv[])
         }
     }
 
-    // <name>_dark.qss next to a stylesheet keeps dark panels dark (see PanelThemeApplier)
-    auto loadDarkStyleSheetFor = [](const QString &styleSheetFile) {
-        const QFileInfo info(styleSheetFile);
-        const QString darkFile = info.dir().filePath(info.completeBaseName() + "_dark." + info.suffix());
-        QFile file(darkFile);
-        if (!file.exists()) {
-            qCDebug(caQtDMLog) << "caQtDM -- no dark stylesheet" << darkFile << "found, dark panels use legacy";
+    // stylesheets are located like panels: downloaded when a URL display path is
+    // configured (mobile), then searched along CAQTDM_DISPLAY_PATH
+    QString searchedDisplayPath;
+    auto locateStyleSheet = [&searchedDisplayPath](const QString &name) -> QString {
+        fileFunctions filefunction;
+        filefunction.checkFileAndDownload(name);
+        searchFile *search = new searchFile(name);
+        const QString found = search->findFile();
+        searchedDisplayPath = search->displayPath();
+        delete search;
+        return found;
+    };
+    // <name>_dark.qss (same directory part as the given name, found along the same
+    // paths) keeps dark panels dark, see PanelThemeApplier
+    auto loadDarkStyleSheetFor = [&locateStyleSheet, &searchedDisplayPath](const QString &styleSheetName) {
+        const QFileInfo info(styleSheetName);
+        const QString darkBase = info.completeBaseName() + "_dark." + info.suffix();
+        QString darkName = darkBase;
+        if (!info.path().isEmpty() && info.path() != ".") darkName = info.path() + "/" + darkBase;
+        QString darkFile = locateStyleSheet(darkName);
+        if (darkFile.isNull() && darkName != darkBase) darkFile = locateStyleSheet(darkBase);   // then along the paths
+        if (darkFile.isNull()) {
+            qCDebug(caQtDMLog) << "caQtDM -- no dark stylesheet" << darkName << "found in" << searchedDisplayPath << ", dark panels use legacy";
             return;
         }
+        QFile file(darkFile);
         if (file.open(QFile::ReadOnly)) {
             PanelThemeApplier::setPanelDarkStyleSheet(QLatin1String(file.readAll()), darkFile);
             qCInfo(caQtDMLog) << "caQtDM -- file" << darkFile << "loaded as the dark panel stylesheet";
         }
     };
 
-    searchFile *searchDefaultStyleSheet = new searchFile("caQtDM_stylesheet.qss");
-    QString fileNameFound = searchDefaultStyleSheet->findFile();
+    QString fileNameFound = locateStyleSheet("caQtDM_stylesheet.qss");
     if(fileNameFound.isNull()) {
-        qCInfo(caQtDMLog) << QString("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%1> defined?").arg(searchDefaultStyleSheet->displayPath());
+        qCInfo(caQtDMLog) << QString("caQtDM -- file <caQtDM_stylesheet.qss> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%1> defined?").arg(searchedDisplayPath);
     } else {
         QFile file(fileNameFound);
         if (file.open(QFile::ReadOnly)) {
@@ -613,10 +629,9 @@ int main(int argc, char *argv[])
             qCInfo(caQtDMLog) << "caQtDM -- file <caQtDM_stylesheet.qss> loaded as the default panel stylesheet";
             PanelThemeApplier::setPanelStyleSheet(StyleSheet);
             file.close();
-            loadDarkStyleSheetFor(fileNameFound);
+            loadDarkStyleSheetFor("caQtDM_stylesheet.qss");
         }
     }
-    delete searchDefaultStyleSheet;
 
     // get data from pipe if any (ui data can be piped to this application, for linux at this time)
     // only when no file is given, attaching is not allowed, in order to get rid of the temporary file when exit
@@ -659,10 +674,9 @@ int main(int argc, char *argv[])
 #endif
 
      if(fileNameStylesheet.length() > 0) {
-        searchFile *searchCustomStyleSheet = new searchFile(fileNameStylesheet);
-        fileNameFound = searchCustomStyleSheet->findFile();
+        fileNameFound = locateStyleSheet(fileNameStylesheet);
         if(fileNameFound.isNull()) {
-            qCInfo(caQtDMLog) << QString("caQtDM -- custom stylesheet file <%1> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%2> defined?").arg(fileNameStylesheet).arg(searchCustomStyleSheet->displayPath());
+            qCInfo(caQtDMLog) << QString("caQtDM -- custom stylesheet file <%1> could not be loaded, is 'CAQTDM_DISPLAY_PATH' <%2> defined?").arg(fileNameStylesheet).arg(searchedDisplayPath);
         } else {
             QFile file(fileNameFound);
             if (file.open(QFile::ReadOnly)) {
@@ -670,10 +684,9 @@ int main(int argc, char *argv[])
                 qCInfo(caQtDMLog) << QString("caQtDM -- custom stylesheet file <%1> replaced the default panel stylesheet").arg(fileNameStylesheet);
                 PanelThemeApplier::setPanelStyleSheet(StyleSheet, fileNameFound, true);
                 file.close();
-                loadDarkStyleSheetFor(fileNameFound);
+                loadDarkStyleSheetFor(fileNameStylesheet);
             }
         }
-        delete searchCustomStyleSheet;
     }
 
     // system and dark panels draw from their palette; only Fusion honours it on

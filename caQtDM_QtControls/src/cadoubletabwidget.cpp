@@ -413,7 +413,6 @@ void caDoubleTabWidget::fontChange(const QFont & oldFont) {
     style.append("} ");
     hTabBar->setStyleSheet(style);
 
-//    setFont(1);
 }
 
 void caDoubleTabWidget::setItemsPadding(QString const &padding) {

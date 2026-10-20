@@ -115,6 +115,7 @@ private:
     enum {MAXITEMS = 16};
     QList<EPushButton*> cellsP;
     QList<ImagePushButton*> cellsI;
+    QPalette popupPalette() const;
     QGridLayout  *grid;
     Stacking     thisStacking;
     int          numCells;

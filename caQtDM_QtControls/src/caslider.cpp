@@ -61,7 +61,6 @@ namespace caSliderColor {
     constexpr const ThemeColor &AlarmMajor   = ThemeColors::AlarmMajor;
     constexpr const ThemeColor &AlarmInvalid = ThemeColors::AlarmInvalid;
     constexpr const ThemeColor &AlarmDefault = ThemeColors::AlarmDefault;
-    constexpr const ThemeColor &NotConnected = ThemeColors::AlarmInvalid;
     constexpr const ThemeColor &FocusFrame   = ThemeColors::FocusFrame;
     constexpr const ThemeColor &Background   = ThemeColors::Surface;       // Static default
     constexpr const ThemeColor &Foreground   = ThemeColors::TextPrimary;
@@ -231,8 +230,6 @@ void caSlider::applyDefaultColors()
     refreshPending = false;
     // re-apply what was set last (author colours, alarm or not connected) in the mode of
     // that call: a palette change must not undo the dispatcher's state
-    const QColor lastBack = oldBackColor;
-    const QColor lastFore = oldForeColor;
     const colMode lastMode = oldColorMode;
     const colMode mode = thisColorMode;
     refreshDefaultColors();

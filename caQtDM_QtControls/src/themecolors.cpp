@@ -322,10 +322,18 @@ QColor adapt(const QColor &authored, Scheme s, AdaptRole role)
     authored.getHslF(&h, &sat, &l, &a);
     const Ramp &ramp = role == BackgroundRole ? m.rampBackground
                      : role == ForegroundRole ? m.rampForeground : m.rampAny;
-    const double lightness = interpolate(ramp, l * 255.0) / 255.0;
-    const double saturation = (role != ForegroundRole && sat >= m.neutralSaturation)
-                                  ? sat * m.saturationFactor : sat;
-    return QColor::fromHslF(h < 0 ? 0 : h, saturation, qBound(0.0, lightness, 1.0), a);
+    const double lightness = qBound(0.0, interpolate(ramp, l * 255.0) / 255.0, 1.0);
+    double saturation = sat;
+    if (role != ForegroundRole && sat >= m.neutralSaturation) {
+        // surfaces: keep the chroma (max - min) rather than the HSL saturation,
+        // which is near 1 for pastel tints and would turn them into deep colours
+        const int hi = qMax(authored.red(), qMax(authored.green(), authored.blue()));
+        const int lo = qMin(authored.red(), qMin(authored.green(), authored.blue()));
+        const double chroma = (hi - lo) / 255.0 * m.saturationFactor;
+        const double range = 1.0 - qAbs(2.0 * lightness - 1.0);
+        saturation = qMin(sat * m.saturationFactor, range > 0.0 ? chroma / range : 0.0);
+    }
+    return QColor::fromHslF(h < 0 ? 0 : h, saturation, lightness, a);
 }
 
 void adaptPair(QColor &foreground, QColor &background, Scheme s)
@@ -333,7 +341,9 @@ void adaptPair(QColor &foreground, QColor &background, Scheme s)
     if (s != Dark || !matrix().loaded) return;
     foreground = adapt(foreground, s, ForegroundRole);
     background = adapt(background, s, BackgroundRole);
-    ensureContrast(foreground, background, s);
+    // a transparent background shows the panel: read against the window colour
+    const QColor against = background.alpha() == 0 ? color(PaletteWindow, s) : background;
+    ensureContrast(foreground, against, s);
 }
 
 void ensureContrast(QColor &foreground, const QColor &background, Scheme s)

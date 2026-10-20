@@ -154,6 +154,16 @@ void TestButtonsTheme::rowColMenuMenuFollowsRootPalette()
     QCOMPARE(buttons.first()->menu()->palette().color(QPalette::Window), lightWindow);
     for (EPushButton *cell : menu->findChildren<EPushButton *>())
         QVERIFY(cell->property(ThemeColors::SelfStyledProperty).toBool());
+
+    // a transparent Window colour (stylesheet "background: rgba(.., 0)" on the panel)
+    // must not reach the popup: it stays opaque in the colours of the scheme
+    QPalette seeThrough = root->palette();
+    seeThrough.setColor(QPalette::Window, QColor(105, 105, 105, 0));
+    root->setPalette(seeThrough);
+    QCoreApplication::processEvents();
+    const QColor popupWindow = buttons.first()->menu()->palette().color(QPalette::Window);
+    QCOMPARE(popupWindow.alpha(), 255);
+    QCOMPARE(popupWindow, ThemeColors::palette(ThemeColors::Light).color(QPalette::Window));
 }
 
 void TestButtonsTheme::scriptButtonStaysNativeUntilColoured()

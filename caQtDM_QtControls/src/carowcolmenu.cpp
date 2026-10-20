@@ -127,7 +127,7 @@ void caRowColMenu::populateCells()
 
             temp->setPalette(ThemeColors::resolvedPalette(palette()));   // created at runtime
             QMenu* menu = new QMenu(temp);     // popup is a window: give it the panel palette
-            menu->setPalette(ThemeColors::resolvedPalette(palette()));
+            menu->setPalette(popupPalette());
             for (int i = 0; i < numCells; i++) {
                 QAction *action = new QAction(labels[i], this);
                 signalMapper->setMapping(action, i);
@@ -190,6 +190,22 @@ void caRowColMenu::populateCells()
     updateFontScaleMode();
 }
 
+// palette for the popup menus: the panel palette, but opaque. A stylesheet rule
+// like "background: rgba(105, 105, 105, 0)" on the panel propagates a transparent
+// Window colour down the tree, and a popup painted with it is see-through.
+QPalette caRowColMenu::popupPalette() const
+{
+    QPalette p = ThemeColors::resolvedPalette(palette());
+    const QPalette opaque = ThemeColors::palette(ThemeColors::schemeOf(this));
+    const QPalette::ColorRole roles[] = { QPalette::Window, QPalette::Base, QPalette::Button,
+                                          QPalette::WindowText, QPalette::Text, QPalette::ButtonText,
+                                          QPalette::Highlight, QPalette::HighlightedText };
+    for (const QPalette::ColorRole role : roles) {
+        if (p.color(role).alpha() < 255) p.setColor(role, opaque.color(role));
+    }
+    return p;
+}
+
 // the panel palette changed: the popup menus are windows and do not inherit it
 void caRowColMenu::changeEvent(QEvent *e)
 {
@@ -197,7 +213,7 @@ void caRowColMenu::changeEvent(QEvent *e)
     if(e->type() == QEvent::PaletteChange) {
         foreach(ImagePushButton *l, cellsI) {
             l->setPalette(ThemeColors::resolvedPalette(palette()));
-            if(l->menu() != (QMenu *) Q_NULLPTR) l->menu()->setPalette(ThemeColors::resolvedPalette(palette()));
+            if(l->menu() != (QMenu *) Q_NULLPTR) l->menu()->setPalette(popupPalette());
         }
     }
 }

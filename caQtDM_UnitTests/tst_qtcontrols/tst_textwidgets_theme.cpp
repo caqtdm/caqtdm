@@ -101,8 +101,24 @@ void TestTextWidgetsTheme::lineEditStaticAndAlarmKeepColours()
     alarm->setAlarmColors(MAJOR_ALARM, 0.0, wheat, Qt::black);
     QVERIFY(alarm->styleSheet().contains("background-color: rgba(255, 0, 0, 255)"));
     QVERIFY(alarm->styleSheet().contains("color: " + rgba(darkBase)));     // text takes the panel base
+    alarm->setAlarmColors(NO_ALARM, 0.0, wheat, Qt::black);                 // light palette text on green: flipped
+    QVERIFY(alarm->styleSheet().contains("background-color: rgba(0, 205, 0, 255)"));
+    QVERIFY(!alarm->styleSheet().contains("color: " + rgba(darkText)));
     alarm->setAlarmColors(NOTCONNECTED, 0.0, wheat, Qt::black);
     QVERIFY(alarm->styleSheet().contains("background-color: rgba(255, 255, 255, 255)"));
+
+    // alarm on the background: a pair-adapted light text must stay readable on it (dark only)
+    const QColor lightText(232, 232, 232);
+    caLineEdit *onAlarm = new caLineEdit(root.data());
+    onAlarm->setColorMode(caLineEdit::Alarm_Static);
+    onAlarm->setAlarmHandling(caLineEdit::onBackground);
+    settleRoot(root.data());
+    onAlarm->setAlarmColors(NO_ALARM, 0.0, wheat, lightText);
+    QVERIFY(onAlarm->styleSheet().contains("background-color: rgba(0, 205, 0, 255)"));
+    QVERIFY(!onAlarm->styleSheet().contains("color: " + rgba(lightText)));
+    switchRoot(root.data(), "light");
+    onAlarm->setAlarmColors(NO_ALARM, 0.0, wheat, lightText);
+    QVERIFY(onAlarm->styleSheet().contains("color: " + rgba(lightText)));  // light scheme: untouched
 }
 
 void TestTextWidgetsTheme::multiLineStringDefaultFollowsPalette()

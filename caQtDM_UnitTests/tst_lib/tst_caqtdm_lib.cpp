@@ -34,6 +34,7 @@
 #include <castripplot.h>
 #include <cacartesianplot.h>
 #include <cagraphics.h>
+#include <calabel.h>
 #include <cameter.h>
 #include <cathermo.h>
 #include <calineedit.h>
@@ -51,7 +52,6 @@
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QPushButton>
-#include <QTabBar>
 #include <QTabWidget>
 #include <QTextEdit>
 #include <qwt_legend_label.h>
@@ -1415,7 +1415,7 @@ void TestCaQtDM_Lib::panelThemeAdaptsAuthoredColorsInDark()
 }
 
 namespace {
-// dark theme on a light application palette, restored by the returned lambda
+// dark theme on a light application palette, restored by the destructor
 struct DarkThemeScope {
     QByteArray theme, override, adapt;
     QPalette palette;
@@ -1684,4 +1684,207 @@ void TestCaQtDM_Lib::panelThemeRestoresNestedIncludeStyleSheet()
     if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
     if (originalOverride.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
     else qputenv("CAQTDM_PANEL_THEME_MODE", originalOverride);
+}
+
+namespace {
+// system mode on a light application palette; restored by the destructor
+struct SystemThemeScope {
+    QByteArray theme, override;
+    QPalette palette, light, dark;
+    QApplication *application;
+    SystemThemeScope()
+    {
+        theme = qgetenv("CAQTDM_THEME");
+        override = qgetenv("CAQTDM_PANEL_THEME_MODE");
+        qunsetenv("CAQTDM_THEME");
+        qunsetenv("CAQTDM_PANEL_THEME_MODE");
+        application = static_cast<QApplication *>(QCoreApplication::instance());
+        palette = application->palette();
+        light = palette;
+        light.setColor(QPalette::Window, QColor(240, 240, 240));
+        dark = palette;
+        dark.setColor(QPalette::Window, QColor(30, 30, 30));
+        application->setPalette(light);
+        QTest::qWait(20);
+    }
+    ~SystemThemeScope()
+    {
+        application->setPalette(palette);
+        QTest::qWait(20);
+        if (theme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", theme);
+        if (override.isEmpty()) qunsetenv("CAQTDM_PANEL_THEME_MODE");
+        else qputenv("CAQTDM_PANEL_THEME_MODE", override);
+    }
+};
+}
+
+// the dispatcher's load-time colour copies (BColor/FColor/LColor) follow the
+// scheme, so a reconnect or alarm update after a switch uses adapted colours
+void TestCaQtDM_Lib::panelThemeSyncsDispatcherSnapshots()
+{
+    SystemThemeScope scope;
+    m_parentAS->setProperty("caqtdmThemeMode", "system");
+    const QString variable = "themeSnapshotVar";
+    registerInternalGenSoftPV(m_caQtDM_Lib, m_internalPlugin, m_parentAS, variable, "100", "0");
+
+    const QColor wheat(245, 222, 179);
+    caLineEdit *field = new caLineEdit(m_parentAS);
+    field->setColorMode(caLineEdit::Static);
+    field->setBackground(wheat);
+    field->setForeground(Qt::black);
+    field->setPV("internal://" + variable);
+    m_caQtDM_Lib->HandleWidget(field, "", false, false);
+    QMetaObject::invokeMethod(m_internalPlugin, "updateChannels", Qt::DirectConnection);
+    QCOMPARE(field->property("BColor").value<QColor>(), wheat);
+    QCOMPARE(field->property("FColor").value<QColor>(), QColor(Qt::black));
+
+    scope.application->setPalette(scope.dark);                           // system -> dark
+    QTest::qWait(20);
+    const QColor adapted = ThemeColors::adapt(wheat, ThemeColors::Dark, ThemeColors::BackgroundRole);
+    QCOMPARE(field->property("caqtdmAuthored.background").value<QColor>(), wheat);
+    QCOMPARE(field->getBackground(), adapted);
+    QCOMPARE(field->property("BColor").value<QColor>(), adapted);
+    QVERIFY(field->property("FColor").value<QColor>().lightness() > 200);  // pair rule
+
+    scope.application->setPalette(scope.light);                          // back: authored
+    QTest::qWait(20);
+    QCOMPARE(field->property("BColor").value<QColor>(), wheat);
+    QCOMPARE(field->property("FColor").value<QColor>(), QColor(Qt::black));
+    // the widgets stay: their monitors are redisplayed again when the scope restores the palette
+}
+
+// a theme switch rewrites the authored colours; the panel shows its last data
+// again so alarm colours come back, and the authored originals never hold them
+void TestCaQtDM_Lib::panelThemeRedisplaysAlarmAfterSwitch()
+{
+    SystemThemeScope scope;
+    m_parentAS->setProperty("caqtdmThemeMode", "system");
+    const QString variable = "themeAlarmVar";
+    genSoftPV *softpv = new genSoftPV(m_parentAS);
+    softpv->setVariable(variable);
+    softpv->setDataType(genSoftPV::Double);
+    softpv->setHopr("100");
+    softpv->setLopr("0");
+    softpv->setHihi("50");
+    m_caQtDM_Lib->HandleWidget(softpv, "", true, true);
+    QMetaObject::invokeMethod(m_internalPlugin, "updateChannels", Qt::DirectConnection);
+
+    caGraphics *graphics = new caGraphics(m_parentAS);
+    graphics->setColorMode(caGraphics::Alarm);
+    graphics->setForeground(Qt::black);
+    graphics->setLineColor(Qt::black);
+    graphics->setChannelA("internal://" + variable);
+    const QColor wheat(245, 222, 179);
+    caLineEdit *field = new caLineEdit(m_parentAS);
+    field->setColorMode(caLineEdit::Alarm_Static);
+    field->setAlarmHandling(caLineEdit::onBackground);
+    field->setBackground(wheat);
+    field->setForeground(Qt::black);
+    field->setPV("internal://" + variable);
+    m_caQtDM_Lib->themeChanged();                    // like load: originals recorded before any monitor
+    QTest::qWait(20);
+    m_caQtDM_Lib->HandleWidget(graphics, "", false, false);
+    m_caQtDM_Lib->HandleWidget(field, "", false, false);
+    QMetaObject::invokeMethod(m_internalPlugin, "updateChannels", Qt::DirectConnection);
+
+    writeInternalField(m_internalPlugin, variable, "VAL", 100.0);        // above HIHI: MAJOR
+    const QColor red(255, 0, 0);
+    QCOMPARE(graphics->getLineColor(), red);
+    QVERIFY(field->styleSheet().contains("255, 0, 0"));
+
+    scope.application->setPalette(scope.dark);                           // system -> dark
+    QTest::qWait(20);
+    QCOMPARE(graphics->property("caqtdmAuthored.lineColor").value<QColor>(), QColor(Qt::black));
+    QCOMPARE(graphics->property("caqtdmAuthored.foreground").value<QColor>(), QColor(Qt::black));
+    QCOMPARE(graphics->getLineColor(), red);                             // redisplayed
+    QVERIFY(field->styleSheet().contains("255, 0, 0"));
+
+    scope.application->setPalette(scope.light);
+    QTest::qWait(20);
+    QCOMPARE(graphics->getLineColor(), red);
+    QVERIFY(field->styleSheet().contains("255, 0, 0"));
+}
+
+// a label with a transparent background shows the panel: its text is read
+// against the window colour of the scheme, the background stays transparent
+void TestCaQtDM_Lib::panelThemeKeepsTransparentTextReadable()
+{
+    DarkThemeScope scope;
+    QWidget panel;
+    caLabel *label = new caLabel(&panel);
+    label->setColorMode(caLabel::Static);
+    label->setForeground(QColor(0, 0, 255));
+    label->setBackground(QColor(255, 255, 255, 0));
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(label->getBackground().alpha(), 0);
+    const QColor window = ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Dark);
+    QVERIFY2(ThemeColors::contrastRatio(label->getForeground(), window) >= 3.0,
+             qPrintable(label->getForeground().name()));
+
+    qputenv("CAQTDM_THEME", "legacy");                                    // restore
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(label->getForeground(), QColor(0, 0, 255));
+}
+
+// the fill of a graphic is a surface (background ramp), its line keeps the any
+// ramp; a graphic the author filled dark keeps fill and line
+void TestCaQtDM_Lib::panelThemeAdaptsFillsAsSurfaces()
+{
+    DarkThemeScope scope;
+    QWidget panel;
+    caGraphics *light = new caGraphics(&panel);
+    light->setFillStyle(caGraphics::Filled);
+    light->setForeground(QColor(0xda, 0xda, 0xda));
+    light->setLineColor(Qt::black);
+    caGraphics *dark = new caGraphics(&panel);
+    dark->setFillStyle(caGraphics::Filled);
+    dark->setForeground(QColor(0x82, 0x04, 0x00));
+    dark->setLineColor(QColor(0x82, 0x04, 0x00));
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QVERIFY2(light->getForeground().lightness() < 110, qPrintable(light->getForeground().name()));
+    QVERIFY2(light->getLineColor().lightness() > 200, qPrintable(light->getLineColor().name()));
+    QCOMPARE(dark->getForeground(), QColor(0x82, 0x04, 0x00));
+    QCOMPARE(dark->getLineColor(), QColor(0x82, 0x04, 0x00));
+
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(light->getForeground(), QColor(0xda, 0xda, 0xda));
+    QCOMPARE(light->getLineColor(), QColor(Qt::black));
+}
+
+// text on an authored dark surface keeps its colour coding; the same text on a
+// light surface is adapted with the surface
+void TestCaQtDM_Lib::panelThemeKeepsDarkBuiltPairs()
+{
+    DarkThemeScope scope;
+    QWidget panel;
+    const QColor pink(0xae, 0x4e, 0xbc), grey(0x5a, 0x5a, 0x5a), wheat(245, 222, 179);
+    caLineEdit *built = new caLineEdit(&panel);
+    built->setColorMode(caLineEdit::Static);
+    built->setBackground(grey);
+    built->setForeground(pink);
+    caLineEdit *light = new caLineEdit(&panel);
+    light->setColorMode(caLineEdit::Static);
+    light->setBackground(wheat);
+    light->setForeground(pink);
+    panel.show();
+    QCoreApplication::processEvents();
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(built->getBackground(), grey);
+    QCOMPARE(built->getForeground(), pink);
+    QCOMPARE(light->getBackground(), QColor(0x3a, 0x32, 0x26));
+    QVERIFY(light->getForeground() != pink);                                  // ramped with the surface
+    QVERIFY(ThemeColors::contrastRatio(light->getForeground(), light->getBackground()) >= 3.0);
+
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(light->getBackground(), wheat);
+    QCOMPARE(light->getForeground(), pink);
 }

@@ -30,13 +30,11 @@ public:
     static Mode modeOf(const QWidget *root);       // panel property, then resolveMode()
 
     // compatibility wrappers (legacy == LegacyLight, !legacy == System)
-    static bool resolveLegacyLightTheme(bool panelLegacyLight);
     static bool usesLegacyLightTheme(const QWidget *root);
 
     static void seed(QWidget *contentRoot, Mode mode);
 
     static void propagateThroughOwnPalettes(QWidget *contentRoot);  // see .cpp
-    static void seed(QWidget *contentRoot, const QWidget *themeRoot);
     static void apply(QWidget *root);
 
     // substitution matrix for authored colours (QColor properties and

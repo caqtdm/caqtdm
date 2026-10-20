@@ -558,6 +558,53 @@ extern "C" long long C_CurrentTimeMs() {
     return QDateTime::currentMSecsSinceEpoch();
 }
 
+// string/enum/char data travel as a bounded copy of dataB
+void MutexKnobData::copyDataString(const knobData *kData, char *dataString)
+{
+    dataString[0] = '\0';
+    const int caFieldType = kData->edata.fieldtype;
+    if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
+        if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
+            memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
+            dataString[kData->edata.dataSize] = '\0';
+        } else {
+            memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
+            dataString[STRING_EXCHANGE_SIZE-1] = '\0';
+        }
+    }
+}
+
+// after a theme switch the authored colours were rewritten: push the last data of
+// every monitor of this panel through the widgets again, so alarm and not-connected
+// colours come back; caCalc has no colours and would only recompute
+void MutexKnobData::RedisplayPanel(QWidget *panel)
+{
+    if(suppressUpdates || panel == (QWidget*) Q_NULLPTR) return;
+    char units[40];
+    char fec[40];
+    char dataString[STRING_EXCHANGE_SIZE];
+    const int size = GetMutexKnobDataSize();
+    for(int i=0; i < size; i++) {
+        QMutexLocker locker(&mutex);
+        knobData *kPtr = &KnobData[i];
+        if((kPtr->index == -1) || ((QWidget*) kPtr->thisW != panel)) continue;
+        QWidget *dispW = (QWidget*) kPtr->dispW;
+        if((dispW == (QWidget*) Q_NULLPTR) || qobject_cast<caCalc *>(dispW)) continue;
+        const int index = kPtr->index;
+        units[0] = fec[0] = dataString[0] = '\0';
+        if(kPtr->edata.connected) {
+            qstrncpy(units, kPtr->edata.units,caqtdm_string_t_length);
+            qstrncpy(fec, kPtr->edata.fec,caqtdm_string_t_length);
+            copyDataString(kPtr, dataString);
+        } else {
+            kPtr->edata.unconnectCount = 0;
+        }
+        kPtr->edata.displayCount = kPtr->edata.monitorCount;
+        locker.unlock();
+        UpdateWidget(index, dispW, units, fec, dataString, KnobData[index]);
+    }
+}
+
 /**
  * update array with the received data
  */
@@ -609,19 +656,9 @@ void MutexKnobData::SetMutexKnobDataReceived(knobData *kData) {
     if(myUpdateType == UpdateDirect) {
         if (!suppressUpdates ) {
             QWidget *dispW = (QWidget*) kData->dispW;
-            dataString[0] = '\0';
             qstrncpy(units, kData->edata.units,caqtdm_string_t_length);
             qstrncpy(fec, kData->edata.fec,caqtdm_string_t_length);
-            int caFieldType= kData->edata.fieldtype;
-            if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kData->edata.dataB != (void*) Q_NULLPTR) {
-                if(kData->edata.dataSize < STRING_EXCHANGE_SIZE) {
-                    memcpy(dataString, (char*) kData->edata.dataB, (size_t) kData->edata.dataSize);
-                    dataString[kData->edata.dataSize] = '\0';
-                } else {
-                    memcpy(dataString, (char*) kData->edata.dataB, STRING_EXCHANGE_SIZE);
-                    dataString[STRING_EXCHANGE_SIZE-1] = '\0';
-                }
-            }
+            copyDataString(kData, dataString);
 
             kData->edata.displayCount = kData->edata.monitorCount;
             locker.unlock();
@@ -788,20 +825,9 @@ void MutexKnobData::timerEvent(QTimerEvent *)
                 QMutexLocker locker(&mutex);
                 int index = kPtr->index;
                 QWidget *dispW = (QWidget*) kPtr->dispW;
-                dataString[0] = '\0';
                 qstrncpy(units, kPtr->edata.units,caqtdm_string_t_length);
                 qstrncpy(fec, kPtr->edata.fec,caqtdm_string_t_length);
-                int caFieldType= kPtr->edata.fieldtype;
-
-                if((caFieldType == DBF_STRING || caFieldType == DBF_ENUM || caFieldType == DBF_CHAR) && kPtr->edata.dataB != (void*) Q_NULLPTR) {
-                    if(kPtr->edata.dataSize < STRING_EXCHANGE_SIZE) {
-                        memcpy(dataString, (char*) kPtr->edata.dataB, (size_t) kPtr->edata.dataSize);
-                        dataString[kPtr->edata.dataSize] = '\0';
-                    } else {
-                        memcpy(dataString, (char*) kPtr->edata.dataB, STRING_EXCHANGE_SIZE);
-                        dataString[STRING_EXCHANGE_SIZE-1] = '\0';
-                    }
-                }
+                copyDataString(kPtr, dataString);
 
                 kPtr->edata.displayCount = kPtr->edata.monitorCount;
                 locker.unlock();

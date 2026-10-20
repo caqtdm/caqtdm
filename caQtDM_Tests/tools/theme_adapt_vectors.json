@@ -329,6 +329,81 @@
    "color": "#c4c4c3",
    "role": "foreground",
    "expected": "#c6c6c5"
+  },
+  {
+   "color": "#dadaff",
+   "role": "any",
+   "expected": "#232342"
+  },
+  {
+   "color": "#dadaff",
+   "role": "background",
+   "expected": "#202040"
+  },
+  {
+   "color": "#dadaff",
+   "role": "foreground",
+   "expected": "#ceceff"
+  },
+  {
+   "color": "#aaaaff",
+   "role": "any",
+   "expected": "#1e1e66"
+  },
+  {
+   "color": "#aaaaff",
+   "role": "background",
+   "expected": "#14145c"
+  },
+  {
+   "color": "#aaaaff",
+   "role": "foreground",
+   "expected": "#a6a6ff"
+  },
+  {
+   "color": "#ebf1b5",
+   "role": "any",
+   "expected": "#575c29"
+  },
+  {
+   "color": "#ebf1b5",
+   "role": "background",
+   "expected": "#4d521f"
+  },
+  {
+   "color": "#ebf1b5",
+   "role": "foreground",
+   "expected": "#eaf0b2"
+  },
+  {
+   "color": "#ffffc0",
+   "role": "any",
+   "expected": "#575721"
+  },
+  {
+   "color": "#ffffc0",
+   "role": "background",
+   "expected": "#4f4f19"
+  },
+  {
+   "color": "#ffffc0",
+   "role": "foreground",
+   "expected": "#ffffb8"
+  },
+  {
+   "color": "#00aaff",
+   "role": "any",
+   "expected": "#15a4ec"
+  },
+  {
+   "color": "#00aaff",
+   "role": "background",
+   "expected": "#0e7bb1"
+  },
+  {
+   "color": "#00aaff",
+   "role": "foreground",
+   "expected": "#56c7ff"
   }
  ],
  "pairs": [
@@ -361,6 +436,24 @@
    "background": "#ffffff",
    "expectedForeground": "#ff0000",
    "expectedBackground": "#2a2a2a"
+  },
+  {
+   "foreground": "#0000ff",
+   "background": "#00ffffff",
+   "expectedForeground": "#d1d1ff",
+   "expectedBackground": "#00ffffff"
+  },
+  {
+   "foreground": "#ff0000",
+   "background": "#00ffffff",
+   "expectedForeground": "#ff0000",
+   "expectedBackground": "#00ffffff"
+  },
+  {
+   "foreground": "#000000",
+   "background": "#dadaff",
+   "expectedForeground": "#e8e8e8",
+   "expectedBackground": "#202040"
   }
  ],
  "styleSheet": {
