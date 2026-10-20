@@ -1,6 +1,7 @@
 #ifndef PANELTHEMEAPPLIER_H
 #define PANELTHEMEAPPLIER_H
 
+#include <QByteArray>
 #include <QString>
 
 #include "caQtDM_Lib_global.h"
@@ -42,6 +43,10 @@ public:
     // scheme, restores the originals otherwise. Call before scanWidgets().
     static bool adaptActive(const QWidget *root);
     static void adaptAuthoredColors(QWidget *root);
+    // the <palette> blocks of the loaded .ui, stored on the widgets by object
+    // name (the live palette cannot tell authored roles from pinned ones);
+    // call right after loading, before adaptAuthoredColors()
+    static void recordAuthoredPalettes(QWidget *root, const QByteArray &ui);
 };
 
 #endif

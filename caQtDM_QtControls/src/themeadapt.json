@@ -4,7 +4,9 @@
   "neutralSaturation": 0.12,
   "saturationFactor": 0.85,
   "minContrast": 3.0,
-  "window": {"light": "#ffffff", "dark": "#303030"},
+  "window": {"light": "#efefef", "dark": "#303030"},
+  "darkSurfaceLuminance": 0.2,
+  "signalChroma": 0.6,
   "ramps": {
     "background": [[0, 0], [64, 64], [100, 90], [128, 96], [160, 88], [180, 68], [200, 60], [224, 52], [236, 48], [255, 42]],
     "foreground": [[0, 232], [20, 225], [50, 210], [80, 195], [110, 180], [128, 170], [160, 175], [200, 200], [236, 230], [255, 240]],

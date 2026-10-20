@@ -84,6 +84,9 @@ private slots:
     void panelThemeKeepsTransparentTextReadable();
     void panelThemeAdaptsFillsAsSurfaces();
     void panelThemeKeepsDarkBuiltPairs();
+    void panelThemeLeavesAlarmOwnedColours();
+    void panelThemeIncludesStayTransparentOnDarkDesktop();
+    void panelThemeAdaptsAuthoredPalettes();
 
 private:
     FakeFileOpenWindow *m_fakeFileOpenWindow;

@@ -134,6 +134,26 @@ void TestTextWidgetsTheme::multiLineStringDefaultFollowsPalette()
     QVERIFY(text->styleSheet().contains("background-color: " + rgba(lightBase)));
 }
 
+// a transparent Base (panel stylesheet "background: rgba(.., 0)") must not reach
+// the generated stylesheet: field and popup list would be see-through
+void TestTextWidgetsTheme::defaultColoursStayOpaque()
+{
+    QScopedPointer<QWidget> root(darkRoot());
+    QPalette seeThrough = root->palette();
+    seeThrough.setColor(QPalette::Base, QColor(105, 105, 105, 0));
+    seeThrough.setColor(QPalette::Text, QColor(200, 200, 200, 0));
+    root->setPalette(seeThrough);
+    caLineEdit *edit = new caLineEdit(root.data());
+    caMenu *menu = new caMenu(root.data());
+    settleRoot(root.data());
+    root->show();
+    QCoreApplication::processEvents();
+    QVERIFY2(edit->styleSheet().contains("background-color: " + rgba(darkBase)), qPrintable(edit->styleSheet()));
+    QVERIFY2(edit->styleSheet().contains("color: " + rgba(darkText)), qPrintable(edit->styleSheet()));
+    QVERIFY2(menu->styleSheet().contains("background-color: " + rgba(darkBase)), qPrintable(menu->styleSheet()));
+    QVERIFY(!menu->styleSheet().contains(", 0)"));
+}
+
 void TestTextWidgetsTheme::menuDefaultFollowsPalette()
 {
     QScopedPointer<QWidget> root(darkRoot());

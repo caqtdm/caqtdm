@@ -34,6 +34,7 @@
 #include <castripplot.h>
 #include <cacartesianplot.h>
 #include <cagraphics.h>
+#include <calabelvertical.h>
 #include <calabel.h>
 #include <cameter.h>
 #include <cathermo.h>
@@ -49,6 +50,7 @@
 
 #include <QLineEdit>
 #include <QLabel>
+#include <QTextBrowser>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QPushButton>
@@ -770,7 +772,7 @@ void TestCaQtDM_Lib::panelThemeDefaultsToLegacyLight()
 
     PanelThemeApplier::apply(&panel);
 
-    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(content->palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
     QVERIFY(!panel.testAttribute(Qt::WA_SetPalette));
     QVERIFY(content->testAttribute(Qt::WA_SetPalette));
     QVERIFY(!inherited.testAttribute(Qt::WA_SetPalette));
@@ -834,7 +836,7 @@ void TestCaQtDM_Lib::panelThemeIncludesRemainIndependent()
     PanelThemeApplier::apply(&included);
     PanelThemeApplier::apply(&panel);
 
-    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(panel.palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
     QCOMPARE(included.palette().color(QPalette::Window),
              QApplication::palette().color(QPalette::Window));
     QCOMPARE(included.palette().color(QPalette::WindowText),
@@ -1079,7 +1081,7 @@ void TestCaQtDM_Lib::panelStyleSheetIsScopedAndOverridesRootStyle()
     systemPanel.setProperty("caqtdmThemeMode", "System");
     PanelThemeApplier::apply(&systemPanel);
     // a stylesheet file is written for the light palette and forces it
-    QCOMPARE(systemPanel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(systemPanel.palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
     QCOMPARE(systemPanel.property("caqtdmAppliedThemeScheme").toString(), QString("light"));
     QVERIFY(systemPanel.styleSheet().endsWith("QLineEdit { color: blue; }"));
     PanelThemeApplier::setPanelStyleSheet(QString());
@@ -1158,7 +1160,7 @@ void TestCaQtDM_Lib::panelThemeDarkModeUsesOwnPalette()
     // back to legacy: the widget returns to its light defaults
     PanelThemeApplier::apply(&panel);
     QCOMPARE(content->property("caqtdmAppliedThemeScheme").toString(), QString("light"));
-    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(content->palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
     QVERIFY(!content->autoFillBackground());
     QCOMPARE(thermo.palette().color(QPalette::Window), QColor(224, 224, 224));
 
@@ -1237,7 +1239,7 @@ void TestCaQtDM_Lib::panelThemeDarkStyleSheetKeepsDarkMode()
     panel.setProperty("caqtdmThemeMode", "dark");
     PanelThemeApplier::apply(&panel);
     QCOMPARE(panel.property("caqtdmAppliedThemeScheme").toString(), QString("light"));
-    QCOMPARE(panel.palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(panel.palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
     QVERIFY(panel.styleSheet().endsWith("QLineEdit { color: blue; }"));
 
     PanelThemeApplier::setPanelStyleSheet(QString());
@@ -1306,7 +1308,7 @@ void TestCaQtDM_Lib::panelThemeLegacyPaintsItselfOnDarkSystem()
     panel.setCentralWidget(content);
     QVERIFY(!content->autoFillBackground());
     PanelThemeApplier::apply(&panel);                       // legacy by default
-    QCOMPARE(content->palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(content->palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
     QCOMPARE(content->palette().color(QPalette::WindowText), QColor(Qt::black));
     QVERIFY(content->autoFillBackground());                 // white panel on a dark desktop
 
@@ -1876,9 +1878,22 @@ void TestCaQtDM_Lib::panelThemeKeepsDarkBuiltPairs()
     panel.show();
     QCoreApplication::processEvents();
 
+    caLineEdit *signal = new caLineEdit(&panel);                 // saturated signal colour: kept
+    signal->setColorMode(caLineEdit::Static);
+    signal->setBackground(QColor(0x00, 0xaa, 0xff));
+    signal->setForeground(Qt::black);
+    caLineEdit *grey160 = new caLineEdit(&panel);                // neutral mid grey: adapted
+    grey160->setColorMode(caLineEdit::Static);
+    grey160->setBackground(QColor(0xa0, 0xa0, 0xa0));
+    grey160->setForeground(Qt::black);
+
     PanelThemeApplier::adaptAuthoredColors(&panel);
     QCOMPARE(built->getBackground(), grey);
     QCOMPARE(built->getForeground(), pink);
+    QCOMPARE(signal->getBackground(), QColor(0x00, 0xaa, 0xff));
+    QCOMPARE(signal->getForeground(), QColor(Qt::black));
+    QVERIFY(grey160->getBackground() != QColor(0xa0, 0xa0, 0xa0));
+    QVERIFY(grey160->getForeground().lightness() > 200);
     QCOMPARE(light->getBackground(), QColor(0x3a, 0x32, 0x26));
     QVERIFY(light->getForeground() != pink);                                  // ramped with the surface
     QVERIFY(ThemeColors::contrastRatio(light->getForeground(), light->getBackground()) >= 3.0);
@@ -1887,4 +1902,133 @@ void TestCaQtDM_Lib::panelThemeKeepsDarkBuiltPairs()
     PanelThemeApplier::adaptAuthoredColors(&panel);
     QCOMPARE(light->getBackground(), wheat);
     QCOMPARE(light->getForeground(), pink);
+}
+
+// colour mode Alarm: the dispatcher owns foreground/lineColor of a graphic, a
+// theme pass must not write the authored colours over the displayed alarm colour
+void TestCaQtDM_Lib::panelThemeLeavesAlarmOwnedColours()
+{
+    DarkThemeScope scope;
+    QWidget panel;
+    caGraphics *graphics = new caGraphics(&panel);
+    graphics->setColorMode(caGraphics::Alarm);
+    graphics->setFillStyle(caGraphics::Filled);
+    graphics->setForeground(QColor(0x64, 0x00, 0x64));
+    graphics->setLineColor(QColor(0x64, 0x00, 0x64));
+    caLabelVertical *label = new caLabelVertical(&panel);
+    label->setColorMode(caLabelVertical::Alarm);
+    label->setForeground(Qt::black);
+    panel.show();
+    QCoreApplication::processEvents();
+    PanelThemeApplier::adaptAuthoredColors(&panel);                        // records the originals
+    graphics->setAlarmColors(NO_ALARM);                                    // dispatcher: green
+    label->setAlarmColors(MAJOR_ALARM);
+    const QColor green = graphics->getForeground();
+    QCOMPARE(green, ThemeColors::color(ThemeColors::AlarmNoAlarm));
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);                        // theme pass
+    QCOMPARE(graphics->getForeground(), green);
+    QCOMPARE(graphics->getLineColor(), green);
+    QCOMPARE(label->getForeground(), ThemeColors::color(ThemeColors::AlarmMajor));
+    QCOMPARE(graphics->property("caqtdmAuthored.foreground").value<QColor>(), QColor(0x64, 0x00, 0x64));
+}
+
+// legacy on a dark desktop: the panel paints itself, an include root inside it
+// stays transparent and shows the panel surface
+void TestCaQtDM_Lib::panelThemeIncludesStayTransparentOnDarkDesktop()
+{
+    const QByteArray originalTheme = qgetenv("CAQTDM_THEME");
+    qunsetenv("CAQTDM_THEME");
+    QApplication *application = static_cast<QApplication *>(QCoreApplication::instance());
+    const QPalette originalPalette = application->palette();
+    QPalette dark = originalPalette;
+    dark.setColor(QPalette::Window, QColor(30, 30, 30));
+    application->setPalette(dark);
+    QTest::qWait(20);
+
+    QWidget panel;
+    QWidget *included = new QWidget(&panel);
+    PanelThemeApplier::apply(included);                                    // include applied first
+    PanelThemeApplier::apply(&panel);
+    QVERIFY(panel.autoFillBackground());
+    QVERIFY(!included->autoFillBackground());
+    QCOMPARE(panel.palette().color(QPalette::Window), ThemeColors::color(ThemeColors::PaletteWindow, ThemeColors::Light));
+
+    application->setPalette(originalPalette);
+    QTest::qWait(20);
+    if (originalTheme.isEmpty()) qunsetenv("CAQTDM_THEME"); else qputenv("CAQTDM_THEME", originalTheme);
+}
+
+// the <palette> blocks of a .ui (recorded by object name) are adapted role by
+// role, also on self-styled tables; a surface without its text role gets a
+// readable text; a widget building its palette in code is left alone; the
+// original palette returns in the light scheme
+void TestCaQtDM_Lib::panelThemeAdaptsAuthoredPalettes()
+{
+    DarkThemeScope scope;
+    QWidget panel;
+    panel.setObjectName("Form");
+    QTextBrowser *browser = new QTextBrowser(&panel);
+    browser->setObjectName("textBrowser");
+    QPalette light = browser->palette();
+    light.setColor(QPalette::Base, QColor(0xe8, 0xe5, 0xe3));                // only Base authored
+    browser->setPalette(light);
+    QLabel *label = new QLabel("x", &panel);
+    label->setObjectName("label");
+    QPalette labelPalette = label->palette();
+    labelPalette.setColor(QPalette::Window, QColor(0xaa, 0xff, 0xff));
+    labelPalette.setColor(QPalette::WindowText, Qt::black);
+    label->setPalette(labelPalette);
+    caWaveTable *table = new caWaveTable(&panel);
+    table->setObjectName("table");
+    QPalette tablePalette = table->palette();
+    tablePalette.setColor(QPalette::Base, QColor(0xe0, 0xdf, 0xde));
+    table->setPalette(tablePalette);
+    caCartesianPlot *plot = new caCartesianPlot(&panel);                     // palette built in code
+    plot->setObjectName("plot");
+    QPalette plotPalette = plot->palette();
+    plotPalette.setColor(QPalette::Base, QColor(0xe0, 0xdf, 0xde));
+    plot->setPalette(plotPalette);
+    panel.show();
+    QCoreApplication::processEvents();
+
+    auto block = [](const char *cls, const char *name, const char *role, int r, int g, int b) {
+        return QString("<widget class=\"%1\" name=\"%2\"><property name=\"palette\"><palette><active>"
+                       "<colorrole role=\"%3\"><brush brushstyle=\"SolidPattern\"><color alpha=\"255\">"
+                       "<red>%4</red><green>%5</green><blue>%6</blue></color></brush></colorrole></active>"
+                       "</palette></property></widget>").arg(cls, name, role).arg(r).arg(g).arg(b);
+    };
+    const QString ui = "<ui version=\"4.0\"><widget class=\"QWidget\" name=\"Form\">"
+            + block("QTextBrowser", "textBrowser", "Base", 0xe8, 0xe5, 0xe3)
+            + QString("<widget class=\"QLabel\" name=\"label\"><property name=\"palette\"><palette><active>"
+                      "<colorrole role=\"Window\"><brush brushstyle=\"SolidPattern\"><color alpha=\"255\">"
+                      "<red>170</red><green>255</green><blue>255</blue></color></brush></colorrole>"
+                      "<colorrole role=\"WindowText\"><brush brushstyle=\"SolidPattern\"><color alpha=\"255\">"
+                      "<red>0</red><green>0</green><blue>0</blue></color></brush></colorrole>"
+                      "</active></palette></property></widget>")
+            + block("caWaveTable", "table", "Base", 0xe0, 0xdf, 0xde)
+            + block("caCartesianPlot", "plot", "Base", 0xe0, 0xdf, 0xde)
+            + "</widget></ui>";
+    PanelThemeApplier::recordAuthoredPalettes(&panel, ui.toUtf8());
+    QVERIFY(browser->property("caqtdmAuthored.palette").isValid());
+    QVERIFY(plot->property("caqtdmAuthored.palette").isValid());             // recorded, but never written
+
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    const QColor base = browser->palette().color(QPalette::Base);
+    const QColor text = browser->palette().color(QPalette::Text);
+    QVERIFY2(base.lightness() < 110, qPrintable(base.name()));
+    QVERIFY2(ThemeColors::contrastRatio(text, base) >= 3.0, qPrintable(text.name() + " on " + base.name()));
+    QVERIFY(label->palette().color(QPalette::Window).lightness() < 110);
+    QVERIFY(label->palette().color(QPalette::WindowText).lightness() > 200);
+    const QColor tableBase = table->palette().color(QPalette::Base);
+    QVERIFY2(tableBase.lightness() < 110, qPrintable(tableBase.name()));
+    QVERIFY(ThemeColors::contrastRatio(table->palette().color(QPalette::Text), tableBase) >= 3.0);
+    QCOMPARE(plot->palette().color(QPalette::Base), QColor(0xe0, 0xdf, 0xde));
+
+    qputenv("CAQTDM_THEME", "legacy");
+    PanelThemeApplier::adaptAuthoredColors(&panel);
+    QCOMPARE(browser->palette().color(QPalette::Base), QColor(0xe8, 0xe5, 0xe3));
+    QCOMPARE(browser->palette().color(QPalette::Text), panel.palette().color(QPalette::Text));
+    QCOMPARE(label->palette().color(QPalette::Window), QColor(0xaa, 0xff, 0xff));
+    QCOMPARE(table->palette().color(QPalette::Base), QColor(0xe0, 0xdf, 0xde));
 }

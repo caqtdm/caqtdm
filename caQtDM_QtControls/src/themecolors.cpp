@@ -75,6 +75,11 @@ void defaultBaseAndText(QWidget *widget, QColor &base, QColor &text)
     text = p.color(QPalette::Text);
     if (!base.isValid()) base = color(SurfaceSunken);
     if (!text.isValid()) text = color(TextPrimary);
+    // a panel stylesheet "background: rgba(.., 0)" propagates translucent roles;
+    // a field or popup painted with them is see-through: use the scheme palette
+    const Scheme s = schemeOf(widget);
+    if (base.alpha() < 255) base = color(PaletteBase, s);
+    if (text.alpha() < 255) text = color(PaletteText, s);
 }
 
 Scheme schemeOf(const QWidget *widget)
@@ -165,7 +170,9 @@ struct AdaptMatrix {
     QSet<QRgb> semantic;
     QHash<QRgb, QRgb> curated;
     QVector<QPair<QString, QString> > exclude;   // (class, property)
-    AdaptMatrix() : loaded(false), neutralSaturation(0.12), saturationFactor(0.85), minContrast(3.0) {}
+    double darkSurfaceLuminance, signalChroma;
+    AdaptMatrix() : loaded(false), neutralSaturation(0.12), saturationFactor(0.85), minContrast(3.0),
+                    darkSurfaceLuminance(0.2), signalChroma(0.6) {}
 };
 
 QRgb rgbKey(const QColor &c)
@@ -205,6 +212,8 @@ AdaptMatrix loadMatrix()
     m.neutralSaturation = o.value("neutralSaturation").toDouble(0.12);
     m.saturationFactor = o.value("saturationFactor").toDouble(0.85);
     m.minContrast = o.value("minContrast").toDouble(3.0);
+    m.darkSurfaceLuminance = o.value("darkSurfaceLuminance").toDouble(0.2);
+    m.signalChroma = o.value("signalChroma").toDouble(0.6);
     const QJsonObject ramps = o.value("ramps").toObject();
     m.rampBackground = readRamp(ramps.value("background"));
     m.rampForeground = readRamp(ramps.value("foreground"));
@@ -288,6 +297,10 @@ AdaptRole roleForCssProperty(const QString &property)
 }
 
 }
+
+double relativeLuminance(const QColor &c) { return luminance(c); }
+double darkSurfaceLuminance() { return matrix().darkSurfaceLuminance; }
+double signalChroma() { return matrix().signalChroma; }
 
 bool adaptAvailable()
 {

@@ -33,6 +33,7 @@ private slots:
     void lineEditStaticAndAlarmKeepColours();
     void multiLineStringDefaultFollowsPalette();
     void menuDefaultFollowsPalette();
+    void defaultColoursStayOpaque();
     void replaceMacroDefaultFollowsPalette();
     void sliderDefaultFollowsPalette();
     void lineDrawDefaultFollowsPalette();

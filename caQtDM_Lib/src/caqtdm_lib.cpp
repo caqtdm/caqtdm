@@ -716,6 +716,7 @@ CaQtDM_Lib::CaQtDM_Lib(QWidget *parent, QString filename, QString macro, MutexKn
 
                     myWidget = loader.load(buffer, this);
                     delete buffer;
+                    PanelThemeApplier::recordAuthoredPalettes(myWidget, ui);
                     qCDebug(fileIOLog) << "load= " << filename;
                 }
             }
@@ -2932,6 +2933,7 @@ void CaQtDM_Lib::HandleWidget(QWidget *w1, QString macro, bool firstPass, bool t
                                 buffer->seek(0);
 
                                 thisW = loader.load(buffer, this);
+                                PanelThemeApplier::recordAuthoredPalettes(thisW, ui);
                                 QApplication::processEvents();
                                 //qDebug() << "iload= " << fileName << buffer->size() << md5Gen.result().toHex();
                                 //qDebug() << thisW->findChildren<QWidget *>();

@@ -23,6 +23,7 @@
 
 #include <QImage>
 #include <QTest>
+#include <QFontMetrics>
 
 #include "alarmdefs.h"
 #include "caclock.h"
@@ -124,7 +125,16 @@ void TestPaintedTheme::labelVerticalDefaultFollowsScheme()
     QCoreApplication::processEvents();
     QVERIFY(!hasLightPixel(label->grab().toImage()));                // Static: black text
     label->setColorMode(caLabelVertical::Default);
-    QVERIFY(hasLightPixel(label->grab().toImage()));                 // Default: palette text
+    // Default: palette text. First the palette (did the dark root reach the label?),
+    // then the pixels (was the text painted with it?), so a failure names its cause
+    const QColor text = label->palette().color(QPalette::WindowText);
+    QVERIFY2(text.lightness() >= 200, qPrintable("label palette text is " + text.name()));
+    // a build container without fonts renders no glyphs (Arch package check)
+    if (QFontMetrics(label->font()).horizontalAdvance(label->text()) <= 0)
+        QSKIP("no font available, text pixels cannot be checked");
+    QVERIFY2(hasLightPixel(label->grab().toImage()),
+             qPrintable("no light pixel, text " + text.name() + " font " + label->font().toString()
+                        + " size " + QString::number(label->width()) + "x" + QString::number(label->height())));
     label->setAlarmColors(MAJOR_ALARM);                              // ignored in Default
     QCOMPARE(label->getForeground(), QColor(Qt::black));
 }

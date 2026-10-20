@@ -6,6 +6,8 @@
 #include <QMainWindow>
 #include <QMetaProperty>
 #include <QPalette>
+#include <QMetaEnum>
+#include <QXmlStreamReader>
 #include <QWidget>
 
 #include "caQtDM_Lib_global.h"
@@ -248,6 +250,8 @@ bool PanelThemeApplier::usesLegacyLightTheme(const QWidget *root)
     return modeOf(root) == Legacy;
 }
 
+namespace { bool hasThemeRootAncestor(const QWidget *root); }
+
 void PanelThemeApplier::apply(QWidget *root)
 {
     if (!root) return;
@@ -269,8 +273,16 @@ void PanelThemeApplier::apply(QWidget *root)
     if (!target->property(AuthoredAutoFillProperty).isValid())
         target->setProperty(AuthoredAutoFillProperty, target->autoFillBackground());
     const bool applicationIsDark = ThemeColors::schemeOf(QApplication::palette()) == ThemeColors::Dark;
-    const bool paintPanel = (mode == Dark && !applicationIsDark) || (mode == Legacy && applicationIsDark);
+    // only the top-level panel paints itself; an include root stays transparent
+    // and shows the surface of the panel it sits in
+    const bool paintPanel = !hasThemeRootAncestor(root)
+        && ((mode == Dark && !applicationIsDark) || (mode == Legacy && applicationIsDark));
     target->setAutoFillBackground(paintPanel || target->property(AuthoredAutoFillProperty).toBool());
+    // includes are applied before their panel: take their auto-fill back here
+    for (QWidget *nested : target->findChildren<QWidget *>()) {
+        if (nested == target || !nested->property(ThemeRootProperty).toBool()) continue;
+        nested->setAutoFillBackground(nested->property(AuthoredAutoFillProperty).toBool());
+    }
     for (caWaveTable *table : target->findChildren<caWaveTable *>()) {
         bool belongsToNestedPanel = false;
         for (QWidget *parent = table->parentWidget(); parent && parent != target;
@@ -432,10 +444,40 @@ QColor authoredSurface(const QWidget *widget)
     return original.isValid() ? original.value<QColor>() : meta->property(index).read(widget).value<QColor>();
 }
 
+QString colorModeKey(const QWidget *widget);
+
+// dark (low luminance) or a saturated signal colour: the author chose it for
+// effect, the widget keeps its colours (thresholds from themeadapt.json)
+bool darkBuiltSurface(const QColor &surface)
+{
+    if (!surface.isValid() || surface.alpha() != 255) return false;
+    const int hi = qMax(surface.red(), qMax(surface.green(), surface.blue()));
+    const int lo = qMin(surface.red(), qMin(surface.green(), surface.blue()));
+    return ThemeColors::relativeLuminance(surface) < ThemeColors::darkSurfaceLuminance()
+        || (hi - lo) / 255.0 >= ThemeColors::signalChroma();
+}
+
 bool isDarkBuilt(const QWidget *widget)
 {
-    const QColor surface = authoredSurface(widget);
-    return surface.isValid() && surface.alpha() == 255 && surface.lightness() <= 128;
+    return darkBuiltSurface(authoredSurface(widget));
+}
+
+// in colour mode Alarm these properties carry the alarm colour written by the
+// dispatcher: the matrix must not write authored values over them
+bool alarmOwnedProperty(const QWidget *widget, const QString &name)
+{
+    if (colorModeKey(widget) != QLatin1String("Alarm")) return false;
+    if (hasFillStyle(widget))
+        return name == QLatin1String("foreground") || name == QLatin1String("lineColor");
+    return widget->inherits("caLabelVertical") && name == QLatin1String("foreground");
+}
+
+// a root below another theme root is an include: it is painted by its panel
+bool hasThemeRootAncestor(const QWidget *root)
+{
+    for (const QWidget *w = root->parentWidget(); w; w = w->parentWidget())
+        if (w->property(ThemeRootProperty).toBool()) return true;
+    return false;
 }
 
 bool surfaceOrText(const QString &name)
@@ -474,13 +516,146 @@ void syncDispatcherSnapshot(QWidget *widget, const QString &name, const QColor &
     if (widget->property(key).value<QColor>() != target) widget->setProperty(key, target);
 }
 
+bool alarmOwnedProperty(const QWidget *widget, const QString &name);
+
 // one widget: every writable QColor property, the pair foreground/background,
 // and the stylesheet of plain Qt widgets (ca widgets regenerate theirs and
 // mark themselves or their internal children as self-styled); recordOnly just
 // stores the authored values
+// an authored <palette> block (the palette channel is adapted even for
+// self-styled widgets, whose flag protects their stylesheet): every role set is
+// adapted like a colour property, a surface role without its text role gets a
+// readable text role, the original palette comes back in the light scheme
+ThemeColors::AdaptRole paletteRoleClass(QPalette::ColorRole role)
+{
+    switch (role) {
+    case QPalette::WindowText: case QPalette::Text: case QPalette::ButtonText: case QPalette::BrightText:
+    case QPalette::ToolTipText: case QPalette::HighlightedText:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+    case QPalette::PlaceholderText:
+#endif
+        return ThemeColors::ForegroundRole;
+    case QPalette::Window: case QPalette::Base: case QPalette::Button: case QPalette::AlternateBase:
+    case QPalette::ToolTipBase: case QPalette::Light: case QPalette::Midlight: case QPalette::Mid:
+    case QPalette::Dark: case QPalette::Shadow:
+        return ThemeColors::BackgroundRole;
+    default:
+        return ThemeColors::AnyRole;
+    }
+}
+
+const QPalette::ColorGroup PaletteGroups[] = { QPalette::Active, QPalette::Inactive, QPalette::Disabled };
+
+// a role the widget's own code keeps up to date: never recorded or written
+bool widgetOwnedRole(const QWidget *widget, QPalette::ColorRole role)
+{
+    return role == QPalette::AlternateBase && (widget->inherits("caTable") || widget->inherits("caWaveTable"));
+}
+
+QPalette withoutOwnedRoles(const QWidget *widget, const QPalette &authored)
+{
+    QPalette palette;
+    for (int r = 0; r < QPalette::NColorRoles; ++r) {
+        const QPalette::ColorRole role = static_cast<QPalette::ColorRole>(r);
+        if (widgetOwnedRole(widget, role)) continue;
+        for (QPalette::ColorGroup group : PaletteGroups)
+            if (authored.isBrushSet(group, role)) palette.setBrush(group, role, authored.brush(group, role));
+    }
+    return palette;
+}
+
+bool hasOwnRoles(const QPalette &palette)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return palette.resolveMask() != 0;
+#else
+    return palette.resolve() != 0;
+#endif
+}
+
+QStringList ownRoleNames(const QPalette &palette)
+{
+    QStringList names;
+    const QMetaEnum roles = QMetaEnum::fromType<QPalette::ColorRole>();
+    for (int r = 0; r < QPalette::NColorRoles; ++r)
+        if (palette.isBrushSet(QPalette::Active, static_cast<QPalette::ColorRole>(r))) names << QString::fromLatin1(roles.valueToKey(r));
+    return names;
+}
+
+bool sameRoles(const QPalette &current, const QPalette &target)      // the roles set in target only
+{
+    for (int r = 0; r < QPalette::NColorRoles; ++r) {
+        for (QPalette::ColorGroup group : PaletteGroups) {
+            const QPalette::ColorRole role = static_cast<QPalette::ColorRole>(r);
+            if (target.isBrushSet(group, role) && current.brush(group, role) != target.brush(group, role)) return false;
+        }
+    }
+    return true;
+}
+
+// a widget whose own palette can only come from the panel author: not a Qwt
+// widget, not a ca widget that builds its palette in code (caTable/caWaveTable
+// only add AlternateBase and keep the authored roles) and not inside a ca widget
+// (their internals set palettes in code); the containers caFrame, caInclude and
+// caDoubleTabWidget hold authored widgets
+bool authoredPaletteWidget(const QWidget *widget)
+{
+    static const char *const codePalettes[] = { "caAlarmTree", "caChoice", "caClock", "caCartesianPlot", "caFrame",
+                                                "caInclude", "caMeter", "caRowColMenu", "caSlider", "caStripPlot", "caThermo" };
+    if (QString::fromLatin1(widget->metaObject()->className()).startsWith(QLatin1String("Qwt"))) return false;
+    for (const char *cls : codePalettes)
+        if (widget->inherits(cls)) return false;
+    for (const QWidget *p = widget->parentWidget(); p; p = p->parentWidget()) {
+        if (p->property(ThemeRootProperty).toBool()) break;
+        if (!QString::fromLatin1(p->metaObject()->className()).startsWith(QLatin1String("ca"))) continue;
+        if (!p->inherits("caFrame") && !p->inherits("caInclude") && !p->inherits("caDoubleTabWidget")) return false;
+    }
+    return true;
+}
+
+int adaptAuthoredPalette(QWidget *widget, bool active, ThemeColors::Scheme scheme, bool recordOnly)
+{
+    if (!authoredPaletteWidget(widget)) return 0;
+    const QString key = QString::fromLatin1(AuthoredPrefix) + "palette";
+    const QVariant original = widget->property(qPrintable(key));   // from recordAuthoredPalettes()
+    if (!original.isValid() || recordOnly) return 0;
+    const QPalette authored = original.value<QPalette>();
+    if (!hasOwnRoles(authored)) return 0;
+    // a dark or signal-coloured authored surface keeps the whole palette
+    const QColor surface = authored.isBrushSet(QPalette::Active, QPalette::Base) ? authored.color(QPalette::Active, QPalette::Base)
+                         : authored.isBrushSet(QPalette::Active, QPalette::Window) ? authored.color(QPalette::Active, QPalette::Window) : QColor();
+    QPalette target = authored;
+    if (active && !darkBuiltSurface(surface)) {
+        for (int r = 0; r < QPalette::NColorRoles; ++r) {
+            const QPalette::ColorRole role = static_cast<QPalette::ColorRole>(r);
+            for (QPalette::ColorGroup group : PaletteGroups) {
+                if (!authored.isBrushSet(group, role)) continue;
+                target.setColor(group, role, ThemeColors::adapt(authored.color(group, role), scheme, paletteRoleClass(role)));
+            }
+        }
+        // text on an authored surface: the adapted pair, or a readable text from the scheme
+        const QPalette::ColorRole pairs[][2] = { { QPalette::Text, QPalette::Base }, { QPalette::WindowText, QPalette::Window },
+                                                 { QPalette::ButtonText, QPalette::Button } };
+        const QPalette schemePalette = ThemeColors::palette(scheme);
+        for (const QPalette::ColorRole *pair : pairs) {
+            if (!authored.isBrushSet(QPalette::Active, pair[1])) continue;
+            QColor text = authored.isBrushSet(QPalette::Active, pair[0]) ? target.color(QPalette::Active, pair[0])
+                                                                          : schemePalette.color(pair[0]);
+            ThemeColors::ensureContrast(text, target.color(QPalette::Active, pair[1]), scheme);
+            target.setColor(QPalette::Active, pair[0], text);
+            target.setColor(QPalette::Inactive, pair[0], text);
+        }
+    }
+    if (sameRoles(widget->palette(), target)) return 0;
+    widget->setPalette(target);
+    qCDebug(panelThemeAdaptLog) << widget->metaObject()->className() << widget->objectName()
+                                << (active ? "palette adapted" : "palette restored");
+    return 1;
+}
+
 int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme, bool recordOnly)
 {
-    int changed = 0;
+    int changed = adaptAuthoredPalette(widget, active, scheme, recordOnly);
     if (widget->property(ThemeColors::SelfStyledProperty).toBool()) return changed;
     const QMetaObject *meta = widget->metaObject();
     const bool themeByMode = followsThemeByMode(widget);
@@ -507,7 +682,7 @@ int adaptWidget(QWidget *widget, bool active, ThemeColors::Scheme scheme, bool r
             original = property.read(widget);
             widget->setProperty(qPrintable(key), original);
         }
-        if (recordOnly) continue;
+        if (recordOnly || alarmOwnedProperty(widget, name)) continue;
         const QColor authored = original.value<QColor>();
         QColor target = authored;
         if (active && !(darkBuilt && surfaceOrText(name))) target = ThemeColors::adapt(authored, scheme, roleFor(widget, name));
@@ -586,6 +761,65 @@ bool PanelThemeApplier::adaptActive(const QWidget *root)
     if (optOut.isValid() && !optOut.toBool()) return false;
     const Mode mode = modeOf(root);
     return mode != Legacy && schemeFor(mode) == ThemeColors::Dark;
+}
+
+void PanelThemeApplier::recordAuthoredPalettes(QWidget *root, const QByteArray &ui)
+{
+    if (!root || ui.isEmpty()) return;
+    QXmlStreamReader xml(ui);
+    QStringList widgets;                                           // open <widget> names
+    const QMetaEnum roles = QMetaEnum::fromType<QPalette::ColorRole>();
+    int recorded = 0;
+    while (!xml.atEnd()) {
+        xml.readNext();
+        const QString tag = xml.name().toString();
+        if (xml.isStartElement() && tag == QLatin1String("widget")) {
+            widgets.append(xml.attributes().value(QLatin1String("name")).toString());
+        } else if (xml.isEndElement() && tag == QLatin1String("widget")) {
+            if (!widgets.isEmpty()) widgets.removeLast();
+        } else if (xml.isStartElement() && tag == QLatin1String("property") && !widgets.isEmpty()
+                   && xml.attributes().value(QLatin1String("name")) == QLatin1String("palette")) {
+            QPalette palette;
+            QPalette::ColorGroup group = QPalette::Active;
+            int role = -1;
+            bool solid = true;
+            while (!xml.atEnd() && !(xml.isEndElement() && xml.name() == QLatin1String("property"))) {
+                xml.readNext();
+                if (!xml.isStartElement()) continue;
+                const QString inner = xml.name().toString();
+                if (inner == QLatin1String("active")) group = QPalette::Active;
+                else if (inner == QLatin1String("inactive")) group = QPalette::Inactive;
+                else if (inner == QLatin1String("disabled")) group = QPalette::Disabled;
+                else if (inner == QLatin1String("colorrole")) role = roles.keyToValue(qPrintable(xml.attributes().value(QLatin1String("role")).toString()));
+                else if (inner == QLatin1String("brush")) {
+                    const QString style = xml.attributes().value(QLatin1String("brushstyle")).toString();
+                    solid = style.isEmpty() || style == QLatin1String("SolidPattern");
+                } else if (inner == QLatin1String("color")) {
+                    int rgb[3] = { 0, 0, 0 };
+                    const int alpha = xml.attributes().hasAttribute(QLatin1String("alpha")) ? xml.attributes().value(QLatin1String("alpha")).toInt() : 255;
+                    while (!xml.atEnd() && !(xml.isEndElement() && xml.name() == QLatin1String("color"))) {
+                        xml.readNext();
+                        if (!xml.isStartElement()) continue;
+                        const QString channel = xml.name().toString();
+                        const int index = channel == QLatin1String("red") ? 0 : channel == QLatin1String("green") ? 1 : channel == QLatin1String("blue") ? 2 : -1;
+                        const int value = xml.readElementText().toInt();
+                        if (index >= 0) rgb[index] = value;
+                    }
+                    if (role >= 0 && solid) palette.setColor(group, static_cast<QPalette::ColorRole>(role), QColor(rgb[0], rgb[1], rgb[2], alpha));
+                }
+            }
+            const QString &name = widgets.last();
+            QWidget *widget = root->objectName() == name ? root : root->findChild<QWidget *>(name);
+            if (!widget) continue;
+            palette = withoutOwnedRoles(widget, palette);
+            if (!hasOwnRoles(palette)) continue;
+            widget->setProperty(qPrintable(QString::fromLatin1(AuthoredPrefix) + "palette"), QVariant::fromValue(palette));
+            ++recorded;
+            qCDebug(panelThemeAdaptLog) << widget->metaObject()->className() << name << "authored palette" << ownRoleNames(palette);
+        }
+    }
+    if (xml.hasError()) qCDebug(panelThemeAdaptLog) << "palette scan stopped:" << xml.errorString();
+    qCDebug(panelThemeAdaptLog) << "recorded" << recorded << "authored palettes in panel" << root->objectName();
 }
 
 void PanelThemeApplier::adaptAuthoredColors(QWidget *root)

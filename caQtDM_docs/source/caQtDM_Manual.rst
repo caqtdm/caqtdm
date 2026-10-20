@@ -223,8 +223,6 @@ Example build settings for Debian 12
 	  fi
 	  if [ -z "$QWTLIB" ];                then export   QWTLIB=/usr/lib;
 	  fi
-	  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
-	  fi
 	  # on unix library can be libqwt or libqwt-qt5 or ...
 	  if [ -z "$QWTLIBNAME" ];            then export   QWTLIBNAME=qwt-qt5;
 	  fi
@@ -320,8 +318,6 @@ Please change the qmake call in ./caQtDM_BuildAll to qmake-qt5
 	  if [ -z "$QWTINCLUDE" ];            then export   QWTINCLUDE=/usr/include/qt5/qwt;
 	  fi
 	  if [ -z "$QWTLIB" ];                then export   QWTLIB=${QWTHOME}/lib;
-	  fi
-	  if [ -z "$QWTVERSION" ];            then export   QWTVERSION=6.1;
 	  fi
 	  # on unix library can be libqwt or libqwt-qt5 or ...
 	  if [ -z "$QWTLIBNAME" ];            then export   QWTLIBNAME=qwt-qt5;
@@ -3100,6 +3096,49 @@ which draws everything from the palette, on all platforms. ``legacy`` keeps
 the native style and so looks exactly as before. An explicit ``-style``
 option always wins.
 
+Authored colours in dark panels: a panel designed for a light desktop (fixed
+``Static`` colours, stylesheets with light backgrounds) would show light text on
+light surfaces when the dark palette is applied. In the modes ``system`` and
+``dark`` caQtDM therefore passes authored colours through a substitution
+matrix as soon as the panel scheme is dark: neutral colours follow a lightness
+ramp derived from the light/dark palettes of macOS, Windows, Fusion, KDE and
+GNOME, saturated colours use a curated table or a hue-preserving fallback,
+foreground/background pairs are kept at a contrast of at least 3:1, and the
+alarm colours red, green and yellow are never changed. The matrix is applied to
+the QColor properties of all widgets, to the stylesheet of the panel and to the
+stylesheets of plain Qt widgets; the ``.ui`` file is not modified and the
+original values return when the panel becomes light again. Widgets that
+generate their own colours (the header style of caTable/caWaveTable, the
+buttons and pages of caDoubleTabWidget, the cells of caChoice and
+caRelatedDisplay/caShellCommand) are left alone by the matrix and follow the
+scheme themselves; the ``background`` of a caFrame in ``Outline`` mode and the
+``frameColor`` of caInclude are treated as line colours, the ``foreground`` of a
+filled caGraphics/caPolyLine as its fill surface. A widget whose authored
+surface (an opaque background, or the fill of a filled graphic) is either dark
+(relative luminance below 0.2) or a saturated signal colour (such as the blue,
+orange or green of a command button) is taken as deliberately coloured: its
+background, foreground and line colour stay exactly as authored. Colours that
+the alarm handling writes itself (the fill and line of a caGraphics/caPolyLine
+and the text of a caLabelVertical in colour mode ``Alarm``) are never touched. For the plots frame,
+scale and canvas are adapted; curve colours are never recoloured, only
+lightened or darkened when they would lose contrast on the adapted canvas (red,
+green and yellow never change). The default scale colour of caCartesianPlot and
+caStripPlot follows the plot's own frame. caClock and caMeter have a colour mode ``Default``
+whose dial follows the theme; ``Static`` keeps the ``baseColor``. caGraphics,
+caPolyLine, caLabelVertical and caByteController offer ``Default`` as well: their
+default colours (black lines and text, grey cleared bits) then follow the panel
+theme while author colours stay; ``Static`` remains the default of these widgets. A panel that is
+designed for the dark scheme opts out with the dynamic bool property
+``caqtdmThemeAdapt`` set to ``false`` on its top-level widget; the environment
+variable ``CAQTDM_THEME_ADAPT=0`` switches the matrix off globally. The data
+lives in ``themeadapt.json`` (overridable with ``CAQTDM_THEME_ADAPT_FILE``); the
+script ``caQtDM_Tests/tools/theme_adapt_report.py`` reports what the matrix
+would do to a directory of panels. Logging category
+``caqtdm.lib.panelthemeadapt`` lists every substitution at debug level. The
+panel ``caQtDM_Tests/theme_test.ui`` shows the widgets in their colour modes
+next to an authored light block and two included panels; it is the reference
+for checking a theme change (start it with ``CAQTDM_THEME`` set to each mode).
+
 Which colours follow the theme: only widgets in colour mode ``Default`` or
 ``Alarm_Default`` take their default colours from the theme, ``Static``
 colours set in the panel are never changed. Widgets without a colour mode
@@ -3113,9 +3152,12 @@ take precedence there, while alarm colors continue to be controlled by the
 alarm widgets. Stylesheet files are usually written for the light palette:
 as soon as one is configured, every panel uses mode ``legacy`` regardless of
 the property or the environment variable. To keep dark panels dark, provide a
-dark variant next to the stylesheet with the suffix ``_dark``
+dark variant of the stylesheet with the suffix ``_dark``
 (``caQtDM_stylesheet_dark.qss`` for the default, ``mystyle_dark.qss`` for
-``-stylefile mystyle.qss``). Panels in a dark scheme then get the dark file,
+``-stylefile mystyle.qss``). Both files are searched like panels along
+``CAQTDM_DISPLAY_PATH`` (and downloaded from ``CAQTDM_URL_DISPLAY_PATH`` where
+configured), so the dark variant may live in another directory of the path
+than the light one. Panels in a dark scheme then get the dark file,
 all other panels the light one; ``caQtDM_Tests`` contains an example of such a
 pair. The message window always keeps the application/system theme.
 

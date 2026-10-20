@@ -845,6 +845,9 @@ void caCartesianPlot::setScalesColor(QColor color)
     scaleX->setPalette( palette);
     scaleY->setPalette (palette);
     titleLabel()->setPalette(palette);
+    // the outline of a fill-under curve is drawn in the scale colour
+    for (int i = 0; i < curveCount; ++i)
+        if (thisStyle[i] == FillUnder) curve[i].setPen(QPen(c, 2));
     replot();
 }
 
@@ -869,7 +872,7 @@ void caCartesianPlot::setColor(QColor c, int indx)
             curve[indx].setPen(QPen(c, size));
         }
     } else {
-        curve[indx].setPen(QPen(thisScaleColor, 2));  // normally black
+        curve[indx].setPen(QPen(themedScaleColor(), 2));  // normally black
     }
     replot();
 }

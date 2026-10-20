@@ -139,7 +139,7 @@ THEME_FIXED(Curve6,         255,   0, 255);
 THEME_FIXED(CurveCyan,        0, 255, 255);                   // caStripPlot curve 4
 
 // --- panel palette roles (light = legacy palette of PR #170) ---------------
-THEME_COLOR(PaletteWindow,          255, 255, 255,    48,  48,  48);
+THEME_COLOR(PaletteWindow,          239, 239, 239,    48,  48,  48);   // light: desktop grey, painted on dark desktops
 THEME_COLOR(PaletteWindowText,        0,   0,   0,   232, 232, 232);
 THEME_COLOR(PaletteBase,            255, 255, 255,    42,  42,  42);
 THEME_COLOR(PaletteAlternateBase,   245, 245, 245,    48,  48,  48);
@@ -210,6 +210,9 @@ QTCON_EXPORT QString adaptStyleSheet(const QString &styleSheet, Scheme s);
 QTCON_EXPORT AdaptRole adaptRoleForProperty(const QString &propertyName);
 QTCON_EXPORT bool adaptExcluded(const QObject *widget, const QString &propertyName);
 QTCON_EXPORT double contrastRatio(const QColor &a, const QColor &b);  // WCAG
+QTCON_EXPORT double relativeLuminance(const QColor &c);               // WCAG relative luminance 0..1
+QTCON_EXPORT double darkSurfaceLuminance();                           // matrix: below this a surface is dark-built
+QTCON_EXPORT double signalChroma();                                   // matrix: from this chroma a surface is a signal colour
 
 }
 

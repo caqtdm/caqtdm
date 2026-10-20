@@ -220,6 +220,28 @@ void TestThemeColors::thermoStaticModeIgnoresDarkRoot()
     QCOMPARE(thermo->palette().color(QPalette::Window), QColor(224, 224, 224));
 }
 
+// the outline of a fill-under curve is drawn in the scale colour and must
+// follow it through every theme switch (dark start, then light, then dark)
+void TestThemeColors::cartesianPlotFillUnderPenFollowsScale()
+{
+    QScopedPointer<QWidget> root(darkRoot());
+    caCartesianPlot *plot = new caCartesianPlot(root.data());
+    plot->setStyle_1(caCartesianPlot::FillUnder);
+    plot->setColor_1(Qt::green);
+    root->show();
+    QCoreApplication::processEvents();
+    auto pen = [plot]() {
+        return static_cast<QwtPlotCurve *>(plot->itemList(QwtPlotItem::Rtti_PlotCurve).first())->pen().color();
+    };
+    QCOMPARE(pen(), ThemeColors::color(ThemeColors::PlotScale, ThemeColors::Dark));
+    switchRoot(root.data(), "light");
+    QCOMPARE(pen(), QColor(Qt::black));
+    switchRoot(root.data(), "dark");
+    QCOMPARE(pen(), ThemeColors::color(ThemeColors::PlotScale, ThemeColors::Dark));
+    plot->setScaleColor(Qt::red);                                             // authored scale colour
+    QCOMPARE(pen(), QColor(Qt::red));
+}
+
 void TestThemeColors::cartesianPlotDefaultsFollowDarkRoot()
 {
     QScopedPointer<QWidget> root(darkRoot());
@@ -237,7 +259,7 @@ void TestThemeColors::cartesianPlotDefaultsFollowDarkRoot()
     QCOMPARE(plot->getBackground(), QColor(Qt::black));
 
     switchRoot(root.data(), "light");
-    QCOMPARE(plot->palette().color(QPalette::Window), QColor(Qt::white));
+    QCOMPARE(plot->palette().color(QPalette::Window), QColor(Qt::white));          // PlotFrame
     QCOMPARE(plot->axisWidget(QwtPlot::xBottom)->palette().color(QPalette::Text), QColor(Qt::black));
 
     // an authored scale colour is never themed
