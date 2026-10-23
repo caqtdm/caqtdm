@@ -1042,7 +1042,8 @@ the used version has been solved.
 -  When you convert MEDM displays with the utility adl2ui, this is done
    automatically.
 -  When you do not want a window to be resized, you can specify
-   -noResize on the command line.
+   -noResize on the command line. This also suppresses the maximize,
+   fullscreen and resize actions of a wmSignalPropagator.
 -  Another enhancement existing since version 2.8 is the fact that you
    can hook a digit of the wheelswitch to the keyboard in order to
    modify it with the up and down keys.
@@ -3107,7 +3108,11 @@ foreground/background pairs are kept at a contrast of at least 3:1, and the
 alarm colours red, green and yellow are never changed. The matrix is applied to
 the QColor properties of all widgets, to the stylesheet of the panel and to the
 stylesheets of plain Qt widgets; the ``.ui`` file is not modified and the
-original values return when the panel becomes light again. Widgets that
+original values return when the panel becomes light again. A ``palette`` set
+on a widget in Designer is adapted the same way (surface roles darken, text
+roles lighten, a surface without its text role gets a readable text); widgets
+that build their palette in code, such as caCartesianPlot, caStripPlot,
+caSlider or caThermo, keep it. Widgets that
 generate their own colours (the header style of caTable/caWaveTable, the
 buttons and pages of caDoubleTabWidget, the cells of caChoice and
 caRelatedDisplay/caShellCommand) are left alone by the matrix and follow the
