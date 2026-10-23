@@ -8342,6 +8342,10 @@ void CaQtDM_Lib::showNormalWindow()
 
 void CaQtDM_Lib::showMaxWindow()
 {
+    if(!allowResize) {
+        qCDebug(caQtDMLibLog) << "wm action ignored, resizing not allowed (-noResize/prc)";
+        return;
+    }
     this->showMaximized();
 }
 
@@ -8352,10 +8356,18 @@ void CaQtDM_Lib::showMinWindow()
 
 void CaQtDM_Lib::showFullWindow()
 {
+    if(!allowResize) {
+        qCDebug(caQtDMLibLog) << "wm action ignored, resizing not allowed (-noResize/prc)";
+        return;
+    }
     this->showFullScreen();
 }
 void CaQtDM_Lib::resizeFullWindow(QRect& q)
 {
+    if(!allowResize) {
+        qCDebug(caQtDMLibLog) << "wm action ignored, resizing not allowed (-noResize/prc)";
+        return;
+    }
     QMainWindow *main = this->findChild<QMainWindow *>();
     // main is NULL for QWidget based panels
     if(main != (QMainWindow*) Q_NULLPTR && main->centralWidget() != (QWidget*) Q_NULLPTR) {
