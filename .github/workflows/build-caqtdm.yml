@@ -54,6 +54,7 @@ jobs:
           zeromq \
           git \
           qt6-5compat \
+          ttf-dejavu \
           cmake \
           ninja \
           openssl \

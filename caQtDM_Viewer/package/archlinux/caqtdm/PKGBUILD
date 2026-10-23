@@ -25,6 +25,9 @@ makedepends=(
     'git'
     'qt6-5compat'
 )
+checkdepends=(
+    'ttf-dejavu'
+)
 provides=("caqtdm=${pkgver}")
 conflicts=('caqtdm')
 source=("$_pkgsrc::git+${_caqtdm_repo}")
