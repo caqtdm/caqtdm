@@ -1,0 +1,202 @@
+name: caQtDM FreeBSD Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore:
+      - 'caQtDM_docs/**'
+      - 'caQtDM_Tests/**'
+  pull_request:
+    paths-ignore:
+      - 'caQtDM_docs/**'
+      - 'caQtDM_Tests/**'
+
+jobs:
+  build:
+    runs-on: [self-hosted, freebsd]
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Prepare build environment
+        run: |
+          set -euo pipefail
+          for tool in qmake6 gmake python3.12 pkg git tar; do
+            command -v "$tool" >/dev/null || { echo "::error::Missing build tool: $tool"; exit 1; }
+          done
+
+          export EPICS_BASE=/usr/local/epics/base-7.0.11
+          EPICS_HOST_ARCH="$("$EPICS_BASE/startup/EpicsHostArch")"
+          EPICSLIB="$EPICS_BASE/lib/$EPICS_HOST_ARCH"
+          QWTLIB=/usr/local/lib/qt6
+          QWTINCLUDE=/usr/local/include/qt6/qwt6
+          PYTHONINCLUDE=/usr/local/include/python3.12
+          PYTHONLIB=/usr/local/lib
+          QWTVERSION="$(pkg query '%v' qwt6-qt6)"
+
+          for file in \
+            "$EPICS_BASE/include/epicsVersion.h" \
+            "$EPICSLIB/libca.so" \
+            "$QWTINCLUDE/qwt_global.h" \
+            "$QWTLIB/libqwt.so" \
+            "$QWTLIB/mkspecs/modules/qt_lib_serialbus.pri" \
+            "$QWTLIB/mkspecs/modules/qt_lib_positioning.pri" \
+            "$PYTHONINCLUDE/Python.h" \
+            "$PYTHONLIB/libpython3.12.so"; do
+            test -f "$file" || { echo "::error::Missing build dependency: $file"; exit 1; }
+          done
+
+          CI_SOURCE="$(mktemp -d "${RUNNER_TEMP:-/tmp}/caqtdm-freebsd.XXXXXX")"
+          echo "CI_SOURCE=$CI_SOURCE" >> "$GITHUB_ENV"
+          git archive HEAD | tar -xf - -C "$CI_SOURCE"
+          mkdir -p "$CI_SOURCE/caQtDM_Binaries/designer" "$CI_SOURCE/caQtDM_Binaries/controlsystems"
+
+          {
+            echo "CAQTDM_COLLECT=$CI_SOURCE/caQtDM_Binaries"
+            echo "QTCONTROLS_LIBS=$CI_SOURCE/caQtDM_Binaries"
+            echo "QTBASE=$CI_SOURCE/caQtDM_Binaries"
+            echo "QTHOME=/usr/local"
+            echo "QWTHOME=/usr/local"
+            echo "QWTINCLUDE=$QWTINCLUDE"
+            echo "QWTLIB=$QWTLIB"
+            echo "QWTLIBNAME=qwt"
+            echo "QWTVERSION=$QWTVERSION"
+            echo "EPICS_BASE=$EPICS_BASE"
+            echo "EPICS_HOST_ARCH=$EPICS_HOST_ARCH"
+            echo "EPICSINCLUDE=$EPICS_BASE/include"
+            echo "EPICSLIB=$EPICSLIB"
+            echo "PYTHONVERSION=3.12"
+            echo "PYTHONINCLUDE=$PYTHONINCLUDE"
+            echo "PYTHONLIB=$PYTHONLIB"
+            echo "CAQTDM_MODBUS=1"
+            echo "CAQTDM_GPS=1"
+            echo "QTDM_RPATH=$EPICSLIB:$QWTLIB:/usr/local/caqtdm"
+          } >> "$GITHUB_ENV"
+
+      - name: Build caQtDM and unit tests
+        run: |
+          set -euo pipefail
+          cd "$CI_SOURCE"
+          qmake6 all.pro CONFIG+=caqtdm_with_tests
+          gmake -j"$(sysctl -n hw.ncpu)"
+          test -x "$CAQTDM_COLLECT/caQtDM"
+          test -f "$CAQTDM_COLLECT/controlsystems/libmodbus_plugin.so"
+          test -f "$CAQTDM_COLLECT/controlsystems/libgps_plugin.so"
+
+      - name: Run unit tests
+        run: |
+          set -euo pipefail
+          export HOME="$CI_SOURCE/test-home"
+          export XDG_DATA_HOME="$HOME/.local/share"
+          mkdir -p "$XDG_DATA_HOME"
+          export QT_QPA_PLATFORM=offscreen
+          export LD_LIBRARY_PATH="$EPICSLIB:$QWTLIB:$CAQTDM_COLLECT:$CAQTDM_COLLECT/controlsystems:${LD_LIBRARY_PATH:-}"
+          gmake -C "$CI_SOURCE/caQtDM_UnitTests" check
+
+      - name: Create EPICS Base package
+        run: |
+          set -euo pipefail
+          epics_root="$CI_SOURCE/epics-package-root"
+          epics_files="$epics_root$EPICS_BASE"
+          epics_metadata="$CI_SOURCE/epics-package-metadata"
+          package_arch="$(pkg config ABI)"
+
+          mkdir -p "$epics_files" "$epics_metadata" "$CI_SOURCE/packages"
+          for directory in bin lib include cfg configure db dbd templates startup; do
+            cp -R "$EPICS_BASE/$directory" "$epics_files/"
+          done
+          cp "$EPICS_BASE/LICENSE" "$epics_files/"
+          cat > "$epics_files/configure/CONFIG_SITE.local" <<EOF
+          EPICS_HOST_ARCH=$EPICS_HOST_ARCH
+          INSTALL_LOCATION=.
+          FINAL_LOCATION=$EPICS_BASE
+          EOF
+
+          cat > "$epics_metadata/+MANIFEST" <<EOF
+          name: epics-base
+          version: 7.0.11
+          origin: science/epics-base
+          comment: EPICS Base libraries and tools
+          maintainer: helge.brands@psi.ch
+          www: https://epics-controls.org/
+          prefix: /usr/local
+          arch: $package_arch
+          desc: "EPICS Base 7.0.11 tools, libraries, headers and build support."
+          EOF
+
+          find "$epics_root/usr/local" \( -type f -o -type l \) -print | sed "s#^$epics_root##" | sort > "$epics_metadata/pkg-plist"
+          for file in "$EPICS_BASE/include/epicsVersion.h" "$EPICSLIB/libca.so" "$EPICS_BASE/startup/EpicsHostArch"; do
+            grep -Fx "$file" "$epics_metadata/pkg-plist"
+          done
+          pkg create -r "$epics_root" -m "$epics_metadata" -p "$epics_metadata/pkg-plist" -o "$CI_SOURCE/packages"
+          test -f "$CI_SOURCE/packages/epics-base-7.0.11.pkg"
+          pkg info -F "$CI_SOURCE/packages/epics-base-7.0.11.pkg"
+
+      - name: Create caQtDM package
+        run: |
+          set -euo pipefail
+          package_root="$CI_SOURCE/package-root"
+          package_files="$package_root/usr/local/caqtdm"
+          package_metadata="$CI_SOURCE/package-metadata"
+          package_version="$(sed -n 's/^CAQTDM_VERSION = V\([0-9.]*\)$/\1/p' "$CI_SOURCE/caQtDM_Viewer/qtdefs.pri").g${GITHUB_SHA:0:8}"
+          package_arch="$(pkg config ABI)"
+
+          mkdir -p "$package_files" "$package_root/usr/local/bin" "$package_metadata" "$CI_SOURCE/packages"
+          cp -R "$CAQTDM_COLLECT/." "$package_files/"
+          rm -f "$package_files/"*.a
+          printf '#!/bin/sh\nexec /usr/local/caqtdm/caQtDM "$@"\n' > "$package_root/usr/local/bin/caqtdm"
+          chmod 755 "$package_root/usr/local/bin/caqtdm"
+          ln -s caqtdm "$package_root/usr/local/bin/caQtDM"
+
+          cat > "$package_metadata/+MANIFEST" <<EOF
+          name: caqtdm
+          version: $package_version
+          origin: science/caqtdm
+          comment: Qt display manager for EPICS control systems
+          maintainer: helge.brands@psi.ch
+          www: https://caqtdm.github.io/
+          prefix: /usr/local
+          arch: $package_arch
+          desc: "caQtDM with EPICS, Modbus and GPS plugins. Requires EPICS Base at /usr/local/epics/base-7.0.11."
+          EOF
+
+          printf 'deps: {\n' >> "$package_metadata/+MANIFEST"
+          for dependency in qt6-base qt6-5compat qt6-positioning qt6-serialbus qt6-svg qt6-tools qwt6-qt6 python312; do
+            read -r dependency_version dependency_origin < <(pkg query '%v %o' "$dependency")
+            printf '  "%s": {version: "%s", origin: "%s"},\n' "$dependency" "$dependency_version" "$dependency_origin" >> "$package_metadata/+MANIFEST"
+          done
+          printf '  "epics-base": {version: "7.0.11", origin: "science/epics-base"}\n' >> "$package_metadata/+MANIFEST"
+          printf '}\n' >> "$package_metadata/+MANIFEST"
+
+          find "$package_root/usr/local" \( -type f -o -type l \) -print | sed "s#^$package_root##" | sort > "$package_metadata/pkg-plist"
+          pkg create -r "$package_root" -m "$package_metadata" -p "$package_metadata/pkg-plist" -o "$CI_SOURCE/packages"
+          test -f "$CI_SOURCE/packages/caqtdm-$package_version.pkg"
+          pkg info -F "$CI_SOURCE/packages/caqtdm-$package_version.pkg"
+          pkg info -d -F "$CI_SOURCE/packages/caqtdm-$package_version.pkg" | grep -F 'epics-base-7.0.11'
+
+      - name: Upload caQtDM package
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          path: ${{ env.CI_SOURCE }}/packages/caqtdm-*.pkg
+          if-no-files-found: error
+          archive: false
+
+      - name: Upload EPICS Base package
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          path: ${{ env.CI_SOURCE }}/packages/epics-base-7.0.11.pkg
+          if-no-files-found: error
+          archive: false
+
+      - name: Clean temporary build
+        if: always()
+        run: |
+          if [[ -n "${CI_SOURCE:-}" && "$CI_SOURCE" == "${RUNNER_TEMP:-/tmp}"/caqtdm-freebsd.* ]]; then
+            rm -rf "$CI_SOURCE"
+          fi

@@ -54,6 +54,6 @@ macx {
     QMAKE_RPATHDIR += $$(QWTLIB)
 } else {
     LIBS += \
-        -L$$(QWTHOME)/lib \
+        -L$$(QWTLIB) \
         -l$$(QWTLIBNAME)
 }
