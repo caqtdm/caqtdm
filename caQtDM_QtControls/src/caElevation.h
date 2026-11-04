@@ -24,11 +24,11 @@
  */
 
     Q_PROPERTY(Elevation elevation READ getElevation WRITE setElevation)
-    Q_ENUMS(Elevation)
     
 public:
    
     enum  Elevation {on_top, as_is};
+    Q_ENUM(Elevation)
 
     Elevation getElevation() const {return thisElevation;}
     void setElevation(Elevation s) {thisElevation = s;}

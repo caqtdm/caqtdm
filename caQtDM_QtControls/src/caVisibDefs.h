@@ -30,6 +30,7 @@
       IfZero,
       Calc
     };
+      Q_ENUM(Visibility)
 
     Visibility getVisibility() const {return thisVisibility;}
     void setVisibility(Visibility s) {thisVisibility = s;}

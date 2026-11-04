@@ -82,14 +82,6 @@ class QTCON_EXPORT caStripPlot : public QwtPlot
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
 #endif
 
-    Q_ENUMS(curvStyle)
-    Q_ENUMS(axisScaling)
-    Q_ENUMS(units)
-    Q_ENUMS(xAxisType)
-    Q_ENUMS(yAxisType)
-    Q_ENUMS(yAxisScaling)
-    Q_ENUMS(cpuUsage)
-    Q_ENUMS(PlotPicker)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -194,14 +186,22 @@ public:
     enum {MAXCURVES = 7};
 
     enum cpuUsage {Low, Medium, High};
+    Q_ENUM(cpuUsage)
 
     enum axisScaling {Channel, User};
+    Q_ENUM(axisScaling)
     enum curvStyle {Lines = 1, FillUnder = 5};
+    Q_ENUM(curvStyle)
     enum units {Millisecond = 0, Second, Minute};
+    Q_ENUM(units)
     enum xAxisType {ValueScale, TimeScale, TimeScaleFix};
+    Q_ENUM(xAxisType)
     enum yAxisType {linear=0, log10};
+    Q_ENUM(yAxisType)
     enum yAxisScaling {fixedScale=0, autoScale=1, selectiveAutoScale=2};
+    Q_ENUM(yAxisScaling)
     enum PlotPicker {off = 0, on = 1};
+    Q_ENUM(PlotPicker)
 
     enum LegendAtttribute { COLOR, FONT, TEXT};
 

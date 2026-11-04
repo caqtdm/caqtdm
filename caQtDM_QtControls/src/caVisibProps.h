@@ -29,4 +29,3 @@
     Q_PROPERTY(QString channelB READ getChannelB WRITE setChannelB)
     Q_PROPERTY(QString channelC READ getChannelC WRITE setChannelC)
     Q_PROPERTY(QString channelD READ getChannelD WRITE setChannelD)
-    Q_ENUMS(Visibility)

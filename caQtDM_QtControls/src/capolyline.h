@@ -54,19 +54,19 @@ class QTCON_EXPORT caPolyLine : public QWidget
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
 
-    Q_ENUMS(colMode)
-    Q_ENUMS(LineStyle)
-    Q_ENUMS(FillStyle)
-    Q_ENUMS(PolyStyle)
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum LineStyle {Solid = 0, Dash, BigDash};
+    Q_ENUM(LineStyle)
     enum colMode {Static=0, Alarm};
+    Q_ENUM(colMode)
 
     enum FillStyle {Filled = 0, Outline};
+    Q_ENUM(FillStyle)
     enum PolyStyle {Polyline = 0, Polygon};
+    Q_ENUM(PolyStyle)
 
     QString getXYpairs() const {return thisXYpairs;}
     void setXYpairs(QString const &pairs) {thisXYpairs = XYpairs = pairs; update();}

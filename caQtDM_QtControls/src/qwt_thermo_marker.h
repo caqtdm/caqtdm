@@ -111,8 +111,6 @@ class QTCON_EXPORT QwtThermoMarker: public QWidget, public QwtAbstractScale
 {
     Q_OBJECT
 
-    Q_ENUMS( ScalePos )
-    Q_ENUMS( DisplayType )
 
     Q_PROPERTY( bool alarmEnabled READ alarmEnabled WRITE setAlarmEnabled  DESIGNABLE false)
     Q_PROPERTY( double alarmLevel READ alarmLevel WRITE setAlarmLevel  DESIGNABLE false)
@@ -128,6 +126,7 @@ class QTCON_EXPORT QwtThermoMarker: public QWidget, public QwtAbstractScale
 public:
 
     enum DisplayType {Pipe, Marker, PipeFromCenter};
+    Q_ENUM(DisplayType)
     DisplayType getType() const { return thisType; }
     void setType(DisplayType displaytype) {thisType = displaytype; layoutThermo(true);}
 
@@ -157,6 +156,7 @@ public:
         //! The scale is below the pipe
         BottomScale
     };
+    Q_ENUM(ScalePos)
 
     explicit QwtThermoMarker( QWidget *parent = NULL );
     virtual ~QwtThermoMarker();

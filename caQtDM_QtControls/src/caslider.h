@@ -54,7 +54,6 @@ class QTCON_EXPORT caSlider : public QwtSlider
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
-    Q_ENUMS(colMode)
 
     Q_PROPERTY(SourceMode highLimitMode READ getHighLimitMode WRITE setHighLimitMode)
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
@@ -78,9 +77,6 @@ class QTCON_EXPORT caSlider : public QwtSlider
 
     Q_PROPERTY(bool autoFocus READ getAutoFocus WRITE setAutoFocus)
 
-    Q_ENUMS(Direction)
-    Q_ENUMS(SourceMode)
-    Q_ENUMS(FormatType)
 
 #include "caElevation.h"
 
@@ -91,6 +87,7 @@ public:
     void setPV(QString const &newPV);
 
     enum Direction {Up, Down, Left, Right};
+    Q_ENUM(Direction)
     Direction getDirection() const { return thisDirection; }
     void setDirection(Direction direction);
 
@@ -100,6 +97,7 @@ public:
     void setBackground(QColor c);
 
     enum colMode {Default, Static, Alarm_Default, Alarm_Static, Alarm=Alarm_Default};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
 
     void setColorMode(colMode colormode) {thisColorMode = colormode;
@@ -109,6 +107,7 @@ public:
                                            }
 
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
 
     SourceMode getLimitsMode() const { return thisLimitsMode; }
     void setLimitsMode(SourceMode limitsmode) { thisLimitsMode = limitsmode;}
@@ -129,6 +128,7 @@ public:
     void setFormat(int prec);
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated};
+    Q_ENUM(FormatType)
     void setFormatType(FormatType m) { thisFormatType = m; setFormat(thisPrecision); }
     FormatType getFormatType() { return thisFormatType; }
 

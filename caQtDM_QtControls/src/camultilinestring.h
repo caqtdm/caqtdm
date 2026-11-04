@@ -35,7 +35,6 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
     Q_OBJECT
 
     // things to get rid off
-    Q_ENUMS(Shape Shadow WrapMode)
     Q_PROPERTY(Shape frameShape READ getFrameShape  DESIGNABLE false)
     Q_PROPERTY(Shadow frameShadow READ getFrameShadow  DESIGNABLE false)
     Q_PROPERTY(int lineWidth READ getInt  DESIGNABLE false)
@@ -59,7 +58,6 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
-    Q_ENUMS(colMode)
 
     Q_PROPERTY(bool frame READ getFrame WRITE setFrame DESIGNABLE false)
 
@@ -68,7 +66,6 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
     Q_PROPERTY(int frameLineWidth READ getLineWidth WRITE setLinewidth)
 
     Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling)
-    Q_ENUMS(alertHandling)
 
     Q_PROPERTY(bool fontScaleEnabled READ fontScaleEnabled DESIGNABLE false)
     Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleModeL)
@@ -77,15 +74,17 @@ class QTCON_EXPORT caMultiLineString : public QPlainTextEdit, public FontScaling
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(ScaleMode)
 
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum Shape {NoFrame = 0};
+    Q_ENUM(Shape)
     enum Shadow {Plain = 0x0010};
+    Q_ENUM(Shadow)
     enum WrapMode {noWrap = 0};
+    Q_ENUM(WrapMode)
 
     caMultiLineString( QWidget *parent = 0 );
      ~caMultiLineString(){}
@@ -106,6 +105,7 @@ public:
     void setBackground(QColor c);
 
     enum colMode {Default=0, Static, Alarm_Default, Alarm_Static};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode);
 
@@ -118,10 +118,12 @@ public:
     void setLinewidth(int width);
 
     enum alertHandling { onForeground = 0, onBackground };
+    Q_ENUM(alertHandling)
     alertHandling getAlarmHandling() const { return thisAlarmHandling;}
     void setAlarmHandling(alertHandling alarmHandling) {thisAlarmHandling = alarmHandling;}
 
     enum ScaleMode { None, Height, WidthAndHeight};
+    Q_ENUM(ScaleMode)
     void setTextLine(const QString&);
 
     QString text() const { return QPlainTextEdit::toPlainText(); }

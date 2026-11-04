@@ -37,8 +37,6 @@ class QTCON_EXPORT caToggleButton : public QCheckBox, public FontScalingWidget
 {
     Q_OBJECT
 
-    Q_ENUMS(colMode)
-    Q_ENUMS(ScaleMode)
 
     Q_PROPERTY(bool tristate READ isTristate WRITE setTristate DESIGNABLE false)
 
@@ -64,7 +62,9 @@ public:
     caToggleButton(QWidget *parent);
 
     enum colMode {Default, Static, Alarm};
+    Q_ENUM(colMode)
     enum ScaleMode { None, Height, WidthAndHeight};
+    Q_ENUM(ScaleMode)
 
     QColor getForeground() const {return thisForeColor;}
     void setForeground(QColor c);

@@ -48,7 +48,6 @@ class QTCON_EXPORT caLabel : public ESimpleLabel
     Q_PROPERTY(int midLineWidth READ midLineWidth WRITE setMidLineWidth DESIGNABLE false)
     Q_PROPERTY(int frameWidth READ frameWidth DESIGNABLE false)
 
-    Q_ENUMS(colMode)
 
 #include "caVisibProps.h"
 #include "caVisibDefs.h"
@@ -70,6 +69,7 @@ public:
     void setBorderColor(QColor c);
 
     enum colMode {Static, Alarm, Default};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
 
     void setColors(QColor bg, QColor fg);

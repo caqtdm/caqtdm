@@ -54,9 +54,6 @@ class QTCON_EXPORT EAbstractGauge : public QWidget
 {
 Q_OBJECT
 
-Q_ENUMS(ColorMode)
-Q_ENUMS(displayLims)
-Q_ENUMS(alarmLims)
 
 Q_PROPERTY(double minValue READ minValue WRITE setMinValue)
 Q_PROPERTY(double maxValue READ maxValue WRITE setMaxValue)
@@ -87,7 +84,9 @@ Q_PROPERTY(int numMinorTicks READ numMinorTicks WRITE setNumMinorTicks)
 public:
 
     enum displayLims {Channel_Limits = 0 , User_Limits};
+    Q_ENUM(displayLims)
     enum alarmLims  {Channel_Alarms = 0 , User_Alarms, None};
+    Q_ENUM(alarmLims)
 
 	/**
      * Color Mode to be used to paint the widget
@@ -98,6 +97,7 @@ public:
 		COLORBAR, /**< show a bar with different colors */
 		SINGLECOLOR /**< show a bar whose color represents the state */
 	};
+	Q_ENUM(ColorMode)
 
 	EAbstractGauge(QWidget * = NULL);
     ~EAbstractGauge(){}

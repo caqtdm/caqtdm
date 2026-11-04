@@ -71,11 +71,11 @@ class QTCON_EXPORT ESimpleLabel : public QLabel, public FontScalingWidget
   Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor  DESIGNABLE false)
   Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
   
-  Q_ENUMS(ScaleMode)
   Q_OBJECT
   public:
 	
         enum ScaleMode { None, Height, WidthAndHeight};
+        Q_ENUM(ScaleMode)
 	
 	ESimpleLabel(QWidget *parent);
 	
