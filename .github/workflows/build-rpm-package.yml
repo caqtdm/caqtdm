@@ -118,7 +118,8 @@ jobs:
 
     - name: Install epics-base RPM
       run: |
-        rpm -ivh ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm
+        # self-built, unsigned (RPM 6 enforces signatures)
+        rpm -ivh --nosignature ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm
 
     - name: Install caQtDM build dependencies (RHEL <10, non-Fedora — minimal Qt5 set)
       if: ${{ matrix.rhel_major < 10 && !contains(matrix.image, 'fedora') }}
@@ -205,7 +206,7 @@ jobs:
 
     - name: Verify caQtDM installation
       run: |
-        rpm -ivh ~/rpmbuild/RPMS/*/caqtdm*.rpm
+        rpm -ivh --nosignature ~/rpmbuild/RPMS/*/caqtdm*.rpm
         which caQtDM || echo "caQtDM not in PATH, checking /opt/caqtdm"
         echo "Listing /opt/caqtdm/lib/qt(ver)/caQtDM:"
         ls -lisah /opt/caqtdm/lib/qt*/caQtDM || true
