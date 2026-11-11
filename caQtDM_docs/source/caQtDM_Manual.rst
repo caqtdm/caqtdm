@@ -2136,6 +2136,70 @@ is the equivalent of the Byte Monitor in MEDM.
 
 --------------
 
+.. _genSoftPV:
+
+``genSoftPV``, soft process variable for the internal plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   **Description:**
+      genSoftPV defines one channel of the :ref:`internal plugin <internal>`. The widget itself only shows ``internal://NAME``, the channel is used by other widgets through their channel property as ``internal://NAME``. In the designer the context menu entry *Edit soft PV...* opens a dialog with all settings of the widget.
+      When a panel is loaded, genSoftPV widgets are handled before all other widgets (like the soft variables of caCalc), so the channel exists before the first monitor is created. Macros can be used in the variable name. A genSoftPV without a variable name is reported and ignored. The same definition may appear several times (includes, a panel opened twice); a different definition for an already existing channel is reported in the message window and ignored, the first one stays.
+   **variable**
+      name of the channel, without the ``internal://`` prefix. Other widgets reference it as ``internal://NAME``.
+   **dataType**
+      the EPICS data type of the channel. Values are stored in this native type, with its truncation and wrap around (like a real record). For the integer types the precision is 0 unless set explicitly.
+       ====== =====================================================
+       Double 64 bit floating point (default)
+       Float  32 bit floating point
+       Int    16 bit integer
+       Long   32 bit integer
+       Enum   enumeration, see enumStrings (OFF/ON when none are given)
+       String string, see regex for generated strings
+       Char   8 bit unsigned integer
+       ====== =====================================================
+
+   **mode**
+       ======== ==================================================================
+       Constant the value only changes when a widget writes to the channel (default)
+       Counter  the value advances by step every period milliseconds
+       ======== ==================================================================
+
+      A counter runs between drvl and drvh, without drive limits in the range of the data type. An enum counter cycles through its states, a string counter with a regex pattern through all strings the pattern can produce, an array counts element by element. A counter stops while the severity is INVALID or NOTCONNECTED.
+   **value**
+      initial value (VAL): a number, a text for string channels or a ``;`` separated list for arrays and matrices (numbers, or texts for string arrays). Empty means 0 or an empty text.
+   **step**
+      increment of a counter per period, default 1.0 (negative values count down)
+   **period**
+      counter period in milliseconds, default 1000, minimum 10. The plugin timer runs with a 100 ms raster, shorter periods are caught up in several steps.
+   **drvl**, **drvh**
+      drive limits (DRVL/DRVH): hard limits for written values and the range of a counter. Empty means not defined; both 0 means not configured, following the EPICS convention.
+   **hopr**, **lopr**
+      operating range (HOPR/LOPR): display and input limits used by the widgets, clamped into the drive limits
+   **low**, **lolo**, **high**, **hihi**
+      alarm limits: LOW/HIGH raise a MINOR alarm, LOLO/HIHI a MAJOR alarm, with the alarm status set like in an EPICS record
+   **overflow**
+      default true: a counter wraps around at its range limits; false lets it stop at the limit
+   **persistent**
+      default false: the channel is deleted when its last monitor is gone. With persistent the channel (and a running counter) keeps living in the process.
+   **nelm**
+      maximum number of array elements (NELM), default 1 (scalar)
+   **nord**
+      number of used elements (NORD), -1 (auto) means the full array or the length of the value list. A written array sets NORD to its length, limited to NELM.
+   **matrixRows**, **matrixColumns**
+      both greater than 0 define a row-major matrix of the data type (numeric types only). The element count is fixed to rows times columns, nelm and nord are not used. The value list fills the matrix row by row, a shorter list is padded with 0; a square matrix without a value starts as the identity matrix. A scalar write sets element 0, a partial array write keeps the remaining elements.
+   **units**
+      engineering units (EGU)
+   **precision**
+      number of decimals (PREC), -1 uses the default
+   **enumStrings**
+      states of an enum channel, ``;`` separated, e.g. ``OFF;ON;ERROR``
+   **regex**
+      pattern for string channels. In Constant mode a written string is processed with this pattern and value as the replacement template (like the macro modification). In Counter mode the pattern is a generator: the channel cycles through all strings of the pattern, where literals, character classes like ``[a-z0-9]{2}`` and flat groups like ``(ON|OFF)`` are supported; the numeric value of the channel is the index of the current string. Example: ``STATE-[0-9]{2}``.
+   **channelConfigJSON**
+      read only, not saved: the JSON configuration built from the properties above (with EPICS field names as keys) that is handed to the plugin. Useful to inspect what a channel is really configured with.
+
+--------------
+
 .. _caWaterfallPlot:
 
 ``caWaterfallPlot``
@@ -3446,6 +3510,59 @@ GPS Plugin
 Usage: ``gps://CHANNEL``
 
 TBD
+
+.. _internal:
+
+Internal Plugin
+~~~~~~~~~~~~~~~~~~~~~
+
+Usage: ``internal://NAME[.FIELD]``
+
+The internal plugin provides process local, simulated channels in the native EPICS data types
+(double, float, int, long, enum, string, char). Nothing leaves the caQtDM process, no network and
+no IOC is involved. It is meant for testing and demonstrating panels without an IOC and for keeping
+panel internal state (setpoints, selections, counters) in typed channels. The plugin is always built
+for desktop platforms, it is not available on iOS/Android.
+
+Defining a channel:
+	A channel exists only when a panel contains a :ref:`genSoftPV <genSoftPV>` widget with the same
+	variable name. All other widgets just reference the channel as ``internal://NAME`` in their channel
+	property and share it, also across panels. Without a definition the channel stays disconnected and
+	writes are rejected.
+	The first definition wins: a second genSoftPV with an identical configuration is accepted (the same
+	panel opened twice, an include used several times), a different one is reported in the message window
+	and ignored. The channel is deleted when its last monitor is gone, unless it is defined as ``persistent``.
+
+Behaviour:
+	A channel is either constant (its value changes only when a widget writes to it) or a counter that
+	advances by a step in a configurable period. DRVL/DRVH act as hard write limits and as the counter
+	range, LOW/LOLO/HIGH/HIHI raise MINOR/MAJOR alarms like an EPICS record. Arrays, matrices and string
+	generator channels are available as well. All settings are described with the properties of the
+	:ref:`genSoftPV <genSoftPV>` widget.
+
+Fields:
+	Like with an EPICS record, some fields of a channel can be monitored and written separately as
+	``internal://NAME.FIELD``:
+
+	- VAL: the value (default when no field is given)
+	- SEVR, STAT: alarm severity and status as enums; writable by number or by name (e.g. ``MAJOR``, ``HIHI``), a written value stays until the next value change re-evaluates the alarm limits
+	- LOW, LOLO, HIGH, HIHI: alarm limits
+	- DRVL, DRVH: drive (write) limits
+	- HOPR, LOPR: operating range (display limits)
+	- PREC, EGU: precision and units
+	- NELM (read only), NORD: maximum and used number of array elements
+
+	An unknown field is reported in the message window and the channel is not handled. A limit, the
+	precision or the units changed through a field is handed to the widgets like an EPICS property
+	update, so widgets taking their limits from the channel follow the change.
+
+Diagnostics:
+	Invalid configurations, conflicting definitions and unknown fields are reported in the message window.
+	Debug output of the plugin uses the logging category ``caqtdm.plugins.internal``, e.g.
+	``QT_LOGGING_RULES="caqtdm.plugins.internal.debug=true"``.
+
+Example:
+	``caQtDM_Tests/internalplugintest.ui`` shows counters, alarms, field access, enum and string generator channels.
 
 .. _modbus:
 Modbus Plugin

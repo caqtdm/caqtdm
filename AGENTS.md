@@ -669,9 +669,11 @@ Diagnostics on iOS:
   `caQtDM_docs/build/html`.
 - Publishing: `.github/workflows/docs-deployment.yml` deploys manually
   (workflow_dispatch) to GitHub Pages.
-- Open documentation state: internalPVs are not yet described in the
-  manual (docs are being written separately); the paused caCalc
-  %TimeStamp% plan only foresees a small snippet for the calc list.
+- The internal plugin and genSoftPV are documented in the manual
+  (sections `Internal Plugin` under Plugins, anchor `internal`, and
+  `genSoftPV` after caCalc, anchor `genSoftPV`) — extend those when the
+  plugin changes. Open: the paused caCalc %TimeStamp% plan only foresees
+  a small snippet for the calc list.
 
 ## Working rules (repo-specific)
 
