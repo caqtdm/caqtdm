@@ -53,6 +53,8 @@ private slots:
     void treatMacroWorks();
     void getLongValueFromStringWorks();
     void getDoubleValueFromStringWorks();
+    void waveformWriteReleasesDataMutex_data();
+    void waveformWriteReleasesDataMutex();
     void computeNumericMaxMinPrecUsesChannelDispLimits();
     void computeNumericMaxMinPrecFallsBackWithoutLimits();
     void computeNumericMaxMinPrecIgnoresChannelInUserMode();
