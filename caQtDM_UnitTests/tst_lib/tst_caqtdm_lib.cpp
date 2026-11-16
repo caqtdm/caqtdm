@@ -29,10 +29,127 @@
 #include <cainclude.h>
 #include <canumeric.h>
 #include <caspinbox.h>
+#include <cawavetable.h>
 #include <gensoftpv.h>
 
 #include <cfloat>
 #include <climits>
+
+class WaveWriteProbe : public InternalPlugin
+{
+public:
+    knobData *source = Q_NULLPTR;
+    bool unlocked = true;
+    bool copied = true;
+    bool typed = true;
+    bool fallback = false;
+    int calls = 0;
+    QVector<double> values;
+
+    bool pvSetWave(knobData *, float *f, double *d, int16_t *s, int32_t *l,
+                   char *c, int count, char *, char *) override
+    {
+        record(f, d, s, l, c, count);
+        return !fallback;
+    }
+
+    int pvSetWave(char *, float *f, double *d, int16_t *s, int32_t *l,
+                  char *c, int count, char *, char *) override
+    {
+        record(f, d, s, l, c, count);
+        return 1;
+    }
+
+private:
+    void record(float *f, double *d, int16_t *s, int32_t *l, char *c, int count)
+    {
+        ++calls;
+        QMutex *mutex = static_cast<QMutex *>(source->mutex);
+        const bool acquired = mutex->tryLock();
+        unlocked = unlocked && acquired;
+        if(acquired) mutex->unlock();
+        typed = typed && (int(f != Q_NULLPTR) + int(d != Q_NULLPTR)
+                         + int(s != Q_NULLPTR) + int(l != Q_NULLPTR) + int(c != Q_NULLPTR) == 1);
+        values.clear();
+        for(int i = 0; i < count; ++i) {
+            switch(source->edata.fieldtype) {
+            case caDOUBLE: copied = copied && d != source->edata.dataB; values.append(d[i]); break;
+            case caFLOAT: copied = copied && f != source->edata.dataB; values.append(f[i]); break;
+            case caINT: copied = copied && s != source->edata.dataB; values.append(s[i]); break;
+            case caLONG: copied = copied && l != source->edata.dataB; values.append(l[i]); break;
+            case caCHAR: copied = copied && c != source->edata.dataB; values.append((unsigned char)c[i]); break;
+            }
+        }
+    }
+};
+
+void TestCaQtDM_Lib::waveformWriteReleasesDataMutex_data()
+{
+    QTest::addColumn<int>("type");
+    QTest::addColumn<QString>("text");
+    QTest::addColumn<int>("format");
+    QTest::addColumn<double>("expected");
+    QTest::addColumn<bool>("fallback");
+    QTest::newRow("double") << int(genSoftPV::Double) << "7.5" << int(caWaveTable::decimal) << 7.5 << false;
+    QTest::newRow("float") << int(genSoftPV::Float) << "7.5" << int(caWaveTable::decimal) << 7.5 << false;
+    QTest::newRow("short") << int(genSoftPV::Int) << "7" << int(caWaveTable::decimal) << 7.0 << false;
+    QTest::newRow("long") << int(genSoftPV::Long) << "7" << int(caWaveTable::decimal) << 7.0 << false;
+    QTest::newRow("char") << int(genSoftPV::Char) << "65" << int(caWaveTable::decimal) << 65.0 << false;
+    QTest::newRow("char-text") << int(genSoftPV::Char) << "A" << int(caWaveTable::string) << 65.0 << false;
+    QTest::newRow("legacy-fallback") << int(genSoftPV::Double) << "7.5" << int(caWaveTable::decimal) << 7.5 << true;
+}
+
+void TestCaQtDM_Lib::waveformWriteReleasesDataMutex()
+{
+    QFETCH(int, type);
+    QFETCH(QString, text);
+    QFETCH(int, format);
+    QFETCH(double, expected);
+    QFETCH(bool, fallback);
+    m_mutexKnobData->UpdateMechanism(MutexKnobData::UpdateTimed);
+    genSoftPV *definition = new genSoftPV(m_parentAS);
+    definition->setVariable("waveWriteTest");
+    definition->setDataType(static_cast<genSoftPV::DataType>(type));
+    definition->setNelm(3);
+    definition->setValue("1;2;3");
+    m_caQtDM_Lib->HandleWidget(definition, "", true, true);
+    caWaveTable *table = new caWaveTable(m_parentAS);
+    table->setPV("internal://waveWriteTest");
+    m_caQtDM_Lib->HandleWidget(table, "", false, false);
+    QMetaObject::invokeMethod(m_internalPlugin, "updateChannels", Qt::DirectConnection);
+
+    WaveWriteProbe probe;
+    probe.source = m_mutexKnobData->getMutexKnobDataPV(table, table->getPV());
+    QVERIFY(probe.source);
+    probe.fallback = fallback;
+    const QVariant originalInterface = table->property("Interface");
+    const QByteArray originalData(static_cast<const char *>(probe.source->edata.dataB), probe.source->edata.dataSize);
+    table->setProperty("Interface", QVariantList{QVariant::fromValue(static_cast<void *>(qobject_cast<ControlsInterface *>(&probe)))});
+    m_caQtDM_Lib->TreatRequestedWave(table->getPV(), text,
+                                  static_cast<caWaveTable::FormatType>(format), 1, table);
+    QCOMPARE(probe.calls, fallback ? 2 : 1);
+    QVERIFY2(probe.unlocked, "Plugin called while waveform data mutex is held");
+    QVERIFY2(probe.copied, "Plugin received the monitor buffer instead of a snapshot");
+    QVERIFY2(probe.typed, "Only the matching waveform pointer must be supplied");
+    QCOMPARE(probe.values, QVector<double>({1.0, expected, 3.0}));
+    QCOMPARE(QByteArray(static_cast<const char *>(probe.source->edata.dataB), probe.source->edata.dataSize), originalData);
+
+    // Exercise synchronous publication as well as the non-blocking lock probe.
+    table->setProperty("Interface", originalInterface);
+    if(type == genSoftPV::Char) return; // InternalPlugin::setWaveForPv has no char buffer support.
+    m_caQtDM_Lib->TreatRequestedWave(table->getPV(), text,
+                                  static_cast<caWaveTable::FormatType>(format), 1, table);
+    QVector<double> published;
+    for(int i = 0; i < 3; ++i) {
+        switch(probe.source->edata.fieldtype) {
+        case caDOUBLE: published.append(static_cast<double *>(probe.source->edata.dataB)[i]); break;
+        case caFLOAT: published.append(static_cast<float *>(probe.source->edata.dataB)[i]); break;
+        case caINT: published.append(static_cast<int16_t *>(probe.source->edata.dataB)[i]); break;
+        case caLONG: published.append(static_cast<int32_t *>(probe.source->edata.dataB)[i]); break;
+        }
+    }
+    QCOMPARE(published, QVector<double>({1.0, expected, 3.0}));
+}
 
 // registers a genSoftPV-defined internal channel and pumps one publish cycle
 static genSoftPV *registerInternalGenSoftPV(CaQtDM_Lib *lib, InternalPlugin *plugin, QWidget *host,
