@@ -35,11 +35,11 @@
 class CAQTDM_PLUGINSSHARED_EXPORT bsread_internalchannel : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(internal_types)
 public:
     bsread_internalchannel(QObject *parent = 0,QString channelname="",QString option="");
 
     enum internal_types{in_string,in_enum,in_none};
+    Q_ENUM(internal_types)
 
     void addIndex(int setindex);
     int getIndex(int i) const;

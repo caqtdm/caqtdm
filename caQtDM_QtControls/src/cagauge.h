@@ -54,7 +54,6 @@ class QTCON_EXPORT caLinearGauge : public caAbstractGauge
 {
 Q_OBJECT
 
-Q_ENUMS(FillMode)
 	
 Q_PROPERTY(Qt::Orientation orientation READ orientation WRITE setOrientation)
 Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode)
@@ -70,6 +69,7 @@ public:
 		FROM_ZERO, /** bar filled from zero to value */
 		FROM_REF /** bar filled from reference to value */
 	};
+	Q_ENUM(FillMode)
 	
         caLinearGauge(QWidget * = NULL, Qt::Orientation=Qt::Vertical);
         ~caLinearGauge(){}

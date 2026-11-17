@@ -47,9 +47,6 @@ class QTCON_EXPORT caFrame : public QFrame
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(Visibility)
-    Q_ENUMS(VisibilityMode)
-    Q_ENUMS(BackgroundMode)
 
 
 
@@ -61,9 +58,12 @@ public:
          IfZero,
          Calc
        };
+    Q_ENUM(Visibility)
 
     enum VisibilityMode {All, Background};
+    Q_ENUM(VisibilityMode)
     enum BackgroundMode {Outline, Filled};
+    Q_ENUM(BackgroundMode)
 
        Visibility getVisibility() const {return thisVisibility;}
        void setVisibility(Visibility s) {thisVisibility = s;}

@@ -75,13 +75,11 @@ class  QTCON_EXPORT caInclude : public QWidget
 
 #endif
 
-    Q_ENUMS(Stacking)
 
     Q_PROPERTY(bool adjustSizeToContents READ getAdjustSize WRITE setAdjustSize)
     Q_PROPERTY(int verticalSpacing READ getSpacingVertical WRITE setSpacingVertical)
     Q_PROPERTY(int horizontalSpacing READ getSpacingHorizontal WRITE setSpacingHorizontal)
 
-    Q_ENUMS(myShapes)
     Q_PROPERTY(myShapes frameShape READ getFrameShape WRITE setFrameShape)
     Q_PROPERTY(QFrame::Shadow frameShadow READ getFrameShadow WRITE setFrameShadow)
     Q_PROPERTY(int frameLineWidth READ getFrameLineWidth WRITE setFrameLineWidth)
@@ -99,9 +97,11 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum myShapes {NoFrame=0, Box, Panel};
+    Q_ENUM(myShapes)
 
     enum Properties { maximumLines = 0, numberofItems, maximumColumns, xCorrectionFactor, yCorrectionFactor};
     enum Stacking {Row=0, Column, RowColumn, ColumnRow, Positions};
+    Q_ENUM(Stacking)
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);
 

@@ -70,12 +70,6 @@ class QTCON_EXPORT caCartesianPlot : public QwtPlot
     Q_PROPERTY( bool autoReplot READ autoReplot WRITE setAutoReplot DESIGNABLE false)
 #endif
 
-    Q_ENUMS(curvSymbol)
-    Q_ENUMS(curvStyle)
-    Q_ENUMS(axisScaling)
-    Q_ENUMS(plMode)
-    Q_ENUMS(eraMode)
-    Q_ENUMS(axisType)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -179,6 +173,7 @@ public:
     enum {curveCount = 6};
 
     enum axisScaling { Auto = 0, Channel, User};
+    Q_ENUM(axisScaling)
 
     enum curvSymbol {  NoSymbol = -1,
                        Ellipse,
@@ -196,6 +191,7 @@ public:
                        Star1,
                        Star2,
                        Hexagon};
+    Q_ENUM(curvSymbol)
 
     enum  curvStyle { NoCurve = 0,
       Lines,
@@ -207,18 +203,22 @@ public:
       HorSticks,
       FatDots
     };
+    Q_ENUM(curvStyle)
 
     enum axisType { linear=0, log10, time};
+    Q_ENUM(axisType)
 
     enum plMode {
         PlotNPointsAndStop = 0,
         PlotLastNPoints
     };
+    Q_ENUM(plMode)
 
     enum eraMode {
         ifnotzero = 0,
         ifzero
     };
+    Q_ENUM(eraMode)
 
     enum  CartesianChannelType { CH_X=0, CH_Y, CH_Trigger, CH_Count, CH_Erase, CH_Xscale, CH_Yscale};
 

@@ -52,7 +52,6 @@ class QTCON_EXPORT caMessageButton : public EPushButton
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(colMode)
 
 #include "caElevation.h"
 
@@ -62,6 +61,7 @@ public:
     caMessageButton(QWidget *parent);
 
     enum colMode {Static=0, Alarm, Default};
+    Q_ENUM(colMode)
 
     void setColors(QColor bg, QColor fg,  QColor hover, QColor border, QColor disabledFg);
     void setNormalColors();

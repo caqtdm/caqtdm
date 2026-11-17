@@ -64,8 +64,6 @@ class QTreeView;
 class QTCON_EXPORT caAlarmTree : public QWidget
 {
     Q_OBJECT
-    Q_ENUMS(CommandMode)
-    Q_ENUMS(DisplayFilter)
 
     Q_PROPERTY(QString configFile READ getConfigFile WRITE setConfigFile)
     Q_PROPERTY(QString includeDir READ getIncludeDir WRITE setIncludeDir)
@@ -90,7 +88,9 @@ class QTCON_EXPORT caAlarmTree : public QWidget
 
 public:
     enum CommandMode { Shell, Script, Ask };
+    Q_ENUM(CommandMode)
     enum DisplayFilter { FilterNone, FilterActiveAlarms, FilterUnackAlarms };
+    Q_ENUM(DisplayFilter)
 
     explicit caAlarmTree(QWidget *parent = Q_NULLPTR);
     ~caAlarmTree();

@@ -45,13 +45,11 @@ class QTCON_EXPORT caTable : public QTableWidget
     Q_PROPERTY(QString columnSizes READ getColumnSizes WRITE setColumnSizes)
 
     Q_PROPERTY(colMode colorMode READ getColorMode WRITE setColorMode)
-    Q_ENUMS(colMode)
 
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
 
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
-    Q_ENUMS(SourceMode)
 
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
@@ -70,10 +68,12 @@ public:
     caTable(QWidget *parent);
 
     enum colMode {Static=0, Alarm};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode) {thisColorMode = colormode;}
 
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
     SourceMode getLimitsMode() const { return thisLimitsMode; }

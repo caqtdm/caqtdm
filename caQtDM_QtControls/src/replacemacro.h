@@ -63,8 +63,6 @@ class QTCON_EXPORT replaceMacro : public QWidget
 
 #endif
 
-    Q_ENUMS(Form)
-    Q_ENUMS(colMode)
 
 #include "caElevation.h"
 
@@ -72,8 +70,10 @@ public:
 #include "caPropHandle.h"
 
     enum Form {Value = 0, List, Channel};
+    Q_ENUM(Form)
     enum Properties { macroValue = 0, macroValuesList, macroKey, channel};
     enum colMode {Default, Static};
+    Q_ENUM(colMode)
 
     replaceMacro( QWidget *parent = 0 );
 

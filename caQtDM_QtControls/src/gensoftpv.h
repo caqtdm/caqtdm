@@ -78,13 +78,13 @@ class QTCON_EXPORT genSoftPV : public ESimpleLabel
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(DataType)
-    Q_ENUMS(Mode)
 
 public:
     // append only, .ui files store the enum by name but the config dialog maps by index
     enum DataType { Double = 0, Float, Int, Long, Enum, String, Char };
+    Q_ENUM(DataType)
     enum Mode { Constant = 0, Counter };
+    Q_ENUM(Mode)
 
     genSoftPV(QWidget *parent = 0);
 

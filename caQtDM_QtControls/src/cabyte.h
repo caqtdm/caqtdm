@@ -37,8 +37,6 @@ class QTCON_EXPORT caByte : public QWidget
 {
     Q_OBJECT
 
-    Q_ENUMS(Direction)
-    Q_ENUMS(colMode)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
@@ -59,7 +57,9 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum colMode {Static=0, Alarm};
+    Q_ENUM(colMode)
     enum Direction {Up, Down, Left, Right};
+    Q_ENUM(Direction)
 
     Direction getDirection() const { return thisDirection; }
     void setDirection(Direction direction);

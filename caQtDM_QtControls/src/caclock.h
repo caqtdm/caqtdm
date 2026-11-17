@@ -42,8 +42,6 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
 {
     Q_OBJECT
 
-    Q_ENUMS(TimeType)
-    Q_ENUMS(UpdateRate)
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
     Q_PROPERTY(TimeType timeType READ getTimeType WRITE setTimeType)
@@ -56,14 +54,15 @@ class QTCON_EXPORT caClock : public QwtAnalogClock
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(colMode)
 
 public:
 
    void noStyle(QString style) {Q_UNUSED(style);}
 
     enum UpdateRate {Normal =0, Fast};
+    Q_ENUM(UpdateRate)
     enum TimeType {InternalTime = 0, ReceiveTime};
+    Q_ENUM(TimeType)
 
     caClock(QWidget *parent);
 
@@ -88,6 +87,7 @@ public:
     void setAlarmColors(short status, bool force = false);
 
     enum colMode {Static, Alarm};
+    Q_ENUM(colMode)
     colMode getColorMode() const { return thisColorMode; }
     void setColorMode(colMode colormode) {thisColorMode = colormode; setAlarmColors(NO_ALARM);}
 

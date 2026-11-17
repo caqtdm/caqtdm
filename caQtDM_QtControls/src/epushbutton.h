@@ -35,7 +35,6 @@
 class QTCON_EXPORT EPushButton : public QPushButton, public FontScalingWidget
 {
     Q_OBJECT
-    Q_ENUMS(ScaleMode)
     Q_PROPERTY(ScaleMode fontScaleMode READ fontScaleMode WRITE setFontScaleMode)
     Q_PROPERTY(double fontScaleFactor READ fontScaleFactor WRITE setFontScaleFactor  DESIGNABLE false)
 
@@ -45,6 +44,7 @@ public:
     EPushButton(const QIcon &, const QString &, QWidget *);
 
     enum ScaleMode { None, Height, WidthAndHeight };
+    Q_ENUM(ScaleMode)
     virtual void setFontScaleMode(ScaleMode m) { d_scaleMode = (int) m; FontScalingWidget::setScaleMode((int) m);}
     ScaleMode fontScaleMode() { return (ScaleMode) d_scaleMode; }
     virtual void setText(const QString& text);

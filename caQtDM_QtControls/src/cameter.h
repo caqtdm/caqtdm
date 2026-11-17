@@ -53,7 +53,6 @@ class QTCON_EXPORT caMeter : public QwtDial
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
 
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
-    Q_ENUMS(SourceMode)
 
     Q_PROPERTY(QColor baseColor READ getBaseColor WRITE setBaseColor)
     Q_PROPERTY(bool scaleDefaultColor READ getScaleDefaultColor WRITE setScaleDefaultColor)
@@ -72,11 +71,6 @@ class QTCON_EXPORT caMeter : public QwtDial
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(FormatType)
-    Q_ENUMS(colMode)
-    Q_ENUMS(SourceMode)
-    Q_ENUMS(FormatType)
-    Q_ENUMS(displayLims)
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
@@ -88,9 +82,12 @@ public:
     void setPV(QString const &newPV) {thisPV = newPV;}
 
     enum colMode {Static, Alarm};
+    Q_ENUM(colMode)
     enum displayLims {Channel_Limits = 0 , User_Limits};
+    Q_ENUM(displayLims)
 
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
     SourceMode getPrecisionMode() const { return thisPrecMode; }
     void setPrecisionMode(SourceMode precmode) {thisPrecMode = precmode;}
     int getPrecision() const {return thisPrecision;}
@@ -100,6 +97,7 @@ public:
     void setValueUnits(double value, const QString& units);
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated};
+    Q_ENUM(FormatType)
     void setFormatType(FormatType m) { thisFormatType = m;  setFormat(thisPrecision); invalidate();}
     FormatType getFormatType() { return thisFormatType; }
 

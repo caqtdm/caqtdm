@@ -49,13 +49,11 @@ class QTCON_EXPORT caLineDraw : public QWidget, public FontScalingWidget, public
     Q_PROPERTY(int frameLineWidth READ getLineWidth WRITE setLinewidth)
 
     Q_PROPERTY(alertHandling alarmHandling READ getAlarmHandling WRITE setAlarmHandling)
-    Q_ENUMS(alertHandling)
 
     Q_PROPERTY(int precision READ getPrecision WRITE setPrecision)
     Q_PROPERTY(SourceMode precisionMode READ getPrecisionMode WRITE setPrecisionMode)
 
     Q_PROPERTY(SourceMode limitsMode READ getLimitsMode WRITE setLimitsMode)
-    Q_ENUMS(SourceMode)
 
     Q_PROPERTY(double maxValue READ getMaxValue WRITE setMaxValue)
     Q_PROPERTY(double minValue READ getMinValue WRITE setMinValue)
@@ -67,25 +65,25 @@ class QTCON_EXPORT caLineDraw : public QWidget, public FontScalingWidget, public
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(colMode)
-    Q_ENUMS(Alignment)
-    Q_ENUMS(SourceMode)
-    Q_ENUMS(ScaleMode)
-    Q_ENUMS(alertHandling)
-    Q_ENUMS(FormatType)
-    Q_ENUMS(Direction)
 
 public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum FormatType { decimal, exponential, engr_notation, compact, truncated, utruncated,
-                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric,user_defined_format}; // enumeric = enum as number
+                      hexadecimal, octal, string, sexagesimal, sexagesimal_hms, sexagesimal_dms, enumeric,user_defined_format};
+    Q_ENUM(FormatType) // enumeric = enum as number
     enum ScaleMode { None, Height, WidthAndHeight};
+    Q_ENUM(ScaleMode)
     enum Alignment { Center, Left, Right};
+    Q_ENUM(Alignment)
     enum alertHandling { onForeground = 0, onBackground };
+    Q_ENUM(alertHandling)
     enum colMode {Default=0, Static, Alarm_Default, Alarm_Static};
+    Q_ENUM(colMode)
     enum SourceMode {Channel = 0, User};
+    Q_ENUM(SourceMode)
     enum Direction {Horizontal = 0, Up, Down};
+    Q_ENUM(Direction)
 
     caLineDraw(QWidget *parent = 0);
     ~caLineDraw() {}

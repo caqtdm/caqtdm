@@ -108,10 +108,6 @@ class QTCON_EXPORT caScan2D : public QWidget
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(zoom)
-    Q_ENUMS(colormap)
-    Q_ENUMS(ROI_type)
-    Q_ENUMS(ROI_markertype)
 
 public:
 #include "caPropHandle.h"
@@ -119,11 +115,15 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum ROI_type {none=0, xy_only, xy1_xy2, xyUpleft_xyLowright, xycenter_width_height};
+    Q_ENUM(ROI_type)
     enum ROI_markertype {box=0, box_crosshairs, line, arrow};
+    Q_ENUM(ROI_markertype)
     
     enum zoom {No=0, Yes};
+    Q_ENUM(zoom)
 
     enum colormap {grey=0, spectrum_wavelength, spectrum_hot, spectrum_heat, spectrum_jet, spectrum_custom};
+    Q_ENUM(colormap)
     enum Properties { customcolormap = 0, discretecolormap};
 
     caScan2D(QWidget *parent = 0);

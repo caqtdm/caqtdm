@@ -25,10 +25,10 @@
 
 #include <QRect>
     Q_PROPERTY(eventsignal eventSignal READ getEventSignal WRITE setEventSignal)
-    Q_ENUMS(eventsignal)
 
 public:
     enum eventsignal {Never = 0, onFirstChange, onAnyChange, TriggerZeroToOne, TriggerOneToZero};
+    Q_ENUM(eventsignal)
     eventsignal getEventSignal() const {return thisEventSignal;}
     void setEventSignal(eventsignal signl) {thisEventSignal = signl;}
 

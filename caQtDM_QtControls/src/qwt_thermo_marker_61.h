@@ -81,11 +81,7 @@ class QTCON_EXPORT QwtThermoMarker: public QwtAbstractScale
 {
     Q_OBJECT
 
-    Q_ENUMS( ScalePos )
 
-    Q_ENUMS( ScalePosition )
-    Q_ENUMS( OriginMode )
-    Q_ENUMS( DisplayType )
 
     Q_PROPERTY( Qt::Orientation orientation READ orientation WRITE setOrientation DESIGNABLE false)
     Q_PROPERTY( ScalePosition scalePosition READ scalePosition WRITE setScalePosition )
@@ -113,6 +109,7 @@ class QTCON_EXPORT QwtThermoMarker: public QwtAbstractScale
 public:
 
     enum DisplayType {Pipe, Marker, PipeFromCenter};
+    Q_ENUM(DisplayType)
     DisplayType getType() const { return thisType; }
     void setType(DisplayType displaytype) {thisType = displaytype; layoutThermo(true);}
 
@@ -144,6 +141,7 @@ public:
         //! The scale is below the pipe
         BottomScale
     };
+    Q_ENUM(ScalePosition)
 
     /*!
       Position of the scale
@@ -160,6 +158,7 @@ public:
         //! The scale is left of a vertical or above of a horizontal slider
         TrailingScale
     };
+    Q_ENUM(ScalePos)
 
     /*!
       Origin mode. This property specifies where the beginning of the liquid
@@ -178,6 +177,7 @@ public:
         //! The origin is specified using the origin() property
         OriginCustom
     };
+    Q_ENUM(OriginMode)
 
     explicit QwtThermoMarker( QWidget *parent = NULL );
     virtual ~QwtThermoMarker();

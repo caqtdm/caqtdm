@@ -39,7 +39,6 @@ class QTCON_EXPORT caRowColMenu : public QWidget
 {
     Q_OBJECT
 
-    Q_ENUMS(Stacking)
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
     Q_PROPERTY(QColor background READ getBackground WRITE setBackground)
@@ -64,6 +63,7 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum Stacking {Menu, Row, Column, RowColumn, Hidden};
+    Q_ENUM(Stacking)
     Stacking getStacking() const { return thisStacking; }
     void setStacking(Stacking stacking);
 

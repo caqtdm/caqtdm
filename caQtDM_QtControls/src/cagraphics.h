@@ -68,11 +68,6 @@ class  QTCON_EXPORT caGraphics : public QWidget
     // this will prevent user interference
     Q_PROPERTY(QString styleSheet READ styleSheet WRITE noStyle DESIGNABLE false)
 
-    Q_ENUMS(Form)
-    Q_ENUMS(colMode)
-    Q_ENUMS(LineStyle)
-    Q_ENUMS(FillStyle)
-    Q_ENUMS(ArrowMode)
 
 #include "caVisibDefs.h"
 
@@ -80,14 +75,19 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum LineStyle {Solid = 0, Dash, BigDash};
+    Q_ENUM(LineStyle)
     enum FillStyle {Filled = 0, Outline};
+    Q_ENUM(FillStyle)
     enum Form {Rectangle = 0, Circle, Arc, Triangle, Line, Arrow};
+    Q_ENUM(Form)
 
     enum Properties { arrowsize = 0, arrowmode, startangle, spanangle, tiltangle};
 
     enum ArrowMode { Single, Double};
+    Q_ENUM(ArrowMode)
 
     enum colMode {Static=0, Alarm};
+    Q_ENUM(colMode)
 
     caGraphics( QWidget *parent = 0 );
 

@@ -38,9 +38,6 @@ class QTCON_EXPORT caChoice : public QWidget
 {
     Q_OBJECT
 
-    Q_ENUMS(Stacking)
-    Q_ENUMS(colMode)
-    Q_ENUMS(alignmentHor)
 
     Q_PROPERTY(QString channel READ getPV WRITE setPV)
 
@@ -64,8 +61,11 @@ class QTCON_EXPORT caChoice : public QWidget
 
 public:
     enum alignmentHor {left, right, center};
+    Q_ENUM(alignmentHor)
     enum colMode {Default, Static, Alarm};
+    Q_ENUM(colMode)
     enum Stacking {Row, Column, RowColumn, RowInverse};
+    Q_ENUM(Stacking)
 
     void noStyle(QString style) {Q_UNUSED(style);}
 

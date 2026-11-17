@@ -198,9 +198,6 @@ class QTCON_EXPORT caWaterfallPlot: public QWidget
 {
     Q_OBJECT
 
-    Q_ENUMS(units)
-    Q_ENUMS(intensityScaling)
-    Q_ENUMS(colormap)
 
     Q_PROPERTY(QString Title READ getTitlePlot WRITE setTitlePlot)
     Q_PROPERTY(QString TitleX READ getTitleX WRITE setTitleX)
@@ -239,9 +236,12 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum units {Monitor=0,  Millisecond, Second, Minute};
+    Q_ENUM(units)
     enum intensityScaling {Channel, User};
+    Q_ENUM(intensityScaling)
 
     enum colormap {grey=0, spectrum_wavelength, spectrum_hot, spectrum_heat, spectrum_jet, spectrum_custom};
+    Q_ENUM(colormap)
     enum Properties { customcolormap = 0, discretecolormap};
 
     caWaterfallPlot(QWidget * = NULL);

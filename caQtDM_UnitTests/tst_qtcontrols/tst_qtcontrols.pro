@@ -10,6 +10,7 @@ SOURCES += tst_qtcontrols.cpp \
     tst_caspinbox.cpp \
     tst_caapplynumeric.cpp \
     tst_caimage.cpp \
+    tst_qenum.cpp \
     tst_alhparser.cpp \
     tst_alarmtree_logic.cpp
 
@@ -19,6 +20,7 @@ HEADERS += tst_pvdialog.h \
     tst_caspinbox.h \
     tst_caapplynumeric.h \
     tst_caimage.h \
+    tst_qenum.h \
     tst_numeric_suite.h \
     fakeformwindow.h \
     tst_alhparser.h \

@@ -38,7 +38,6 @@ class QTCON_EXPORT caScriptButton : public QWidget
 {
     Q_OBJECT
 
-    Q_ENUMS(defaultDisplay)
 
     Q_PROPERTY(QString label READ getLabel WRITE setLabel)
     Q_PROPERTY(QColor foreground READ getForeground WRITE setForeground)
@@ -61,6 +60,7 @@ public:
     void noStyle(QString style) {Q_UNUSED(style);}
 
     enum defaultDisplay {Invisible, Visible,CloseOnExit0};
+    Q_ENUM(defaultDisplay)
 
     caScriptButton(QWidget *parent);
 
