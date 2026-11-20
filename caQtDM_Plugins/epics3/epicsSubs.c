@@ -276,6 +276,9 @@ static void dataCallback(struct event_handler_args args)
         kData.edata.connected = info->connected;
         kData.edata.fieldtype = ca_field_type(args.chid);
 
+        const int numericWaveform = args.count > 1
+            || (args.count == 1 && kData.edata.nelm > 1);
+
         C_DataLock(mutexKnobdataPtr, &kData);
 
         switch (ca_field_type(args.chid)) {
@@ -370,7 +373,7 @@ static void dataCallback(struct event_handler_args args)
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
-            if(args.count > 1) {
+            if(numericWaveform) {
                 if((int) (args.count * sizeof(int16_t)) != kData.edata.dataSize) {
                     if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(int16_t));
@@ -393,7 +396,7 @@ static void dataCallback(struct event_handler_args args)
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
-            if(args.count > 1) {
+            if(numericWaveform) {
                 if((int) (args.count * sizeof(int32_t)) != kData.edata.dataSize) {
                     if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(int32_t));
@@ -416,7 +419,7 @@ static void dataCallback(struct event_handler_args args)
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
-            if(args.count > 1) {
+            if(numericWaveform) {
                 if((int) (args.count * sizeof(float)) != kData.edata.dataSize) {
                     if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(float));
@@ -438,7 +441,7 @@ static void dataCallback(struct event_handler_args args)
 
             AssignEpicsValue((double) stsF->value, (long) stsF->value, args.count);
 
-            if(args.count > 1) {
+            if(numericWaveform) {
                 if((int) (args.count * sizeof(double)) != kData.edata.dataSize) {
                     if(kData.edata.dataB != (void*) Q_NULLPTR) free(kData.edata.dataB);
                     kData.edata.dataB = (void*) malloc(args.count * sizeof(double));
