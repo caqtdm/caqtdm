@@ -276,7 +276,7 @@ static void dataCallback(struct event_handler_args args)
         kData.edata.connected = info->connected;
         kData.edata.fieldtype = ca_field_type(args.chid);
 
-        const bool numericWaveform = args.count > 1
+        const int numericWaveform = args.count > 1
             || (args.count == 1 && kData.edata.nelm > 1);
 
         C_DataLock(mutexKnobdataPtr, &kData);
