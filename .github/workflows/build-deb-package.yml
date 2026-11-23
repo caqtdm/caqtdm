@@ -181,7 +181,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: caQtDM_Viewer/package/debian/epics-base/*.deb
-        key: epics-base-deb-7.0.10-${{ matrix.artifact_name }}-${{ hashFiles('caQtDM_Viewer/package/debian/epics-base/create-deb.sh', 'caQtDM_Viewer/package/debian/epics-base/clean.sh', 'caQtDM_Viewer/package/debian/epics-base/install-dependencies.sh', 'caQtDM_Viewer/package/debian/epics-base/debian/control', 'caQtDM_Viewer/package/debian/epics-base/debian/copyright', 'caQtDM_Viewer/package/debian/epics-base/debian/rules') }}
+        key: epics-base-deb-7.0.11-${{ matrix.artifact_name }}-${{ hashFiles('caQtDM_Viewer/package/debian/epics-base/create-deb.sh', 'caQtDM_Viewer/package/debian/epics-base/clean.sh', 'caQtDM_Viewer/package/debian/epics-base/install-dependencies.sh', 'caQtDM_Viewer/package/debian/epics-base/debian/control', 'caQtDM_Viewer/package/debian/epics-base/debian/copyright', 'caQtDM_Viewer/package/debian/epics-base/debian/rules') }}
 
     - name: Build epics-base DEBs
       if: steps.cache-epics-base.outputs.cache-hit != 'true'

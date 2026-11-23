@@ -209,8 +209,8 @@ ENV QWTLIBNAME=qwt
 ENV QWTVERSION=6.3
 ENV EPICS_BASE=/usr/lib/epics
 
-# EPICS Base 7.0.10.
-ARG EPICS_VERSION_TAG=R7.0.10
+# EPICS Base 7.0.11.
+ARG EPICS_VERSION_TAG=R7.0.11
 RUN set -eux; \
     mkdir -p "$(dirname "${EPICS_BASE}")"; \
     git clone --depth 1 --branch "${EPICS_VERSION_TAG}" https://github.com/epics-base/epics-base.git "${EPICS_BASE}"; \

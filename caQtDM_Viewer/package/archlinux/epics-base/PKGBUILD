@@ -3,7 +3,7 @@
 # Contributor: Rafael Silva <perigoso at riseup dot net>
 
 pkgname='epics-base'
-pkgver=7.0.10
+pkgver=7.0.11
 pkgrel=1
 _pkgsrc='epics-base'
 pkgdesc="Experimental Physics and Industrial Control System"

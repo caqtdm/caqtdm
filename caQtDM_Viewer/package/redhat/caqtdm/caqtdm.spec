@@ -3,7 +3,7 @@
 
 #############################################################################
 # special EPICS things
-%define EPICS_TARGET_VERSION -7.0.10
+%define EPICS_TARGET_VERSION -7.0.11
 #############################################################################
 
 %global no_rpath %{getenv:CAQTDM_NORPATH}

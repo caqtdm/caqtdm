@@ -1,4 +1,4 @@
-# EPICS 7.0.10 iOS target, updated for the Xcode SDK selected by xcrun.
+# EPICS 7.0.11 iOS target, updated for the Xcode SDK selected by xcrun.
 include $(CONFIG)/os/CONFIG.Common.UnixCommon
 include $(CONFIG)/CONFIG.gnuCommon
 
