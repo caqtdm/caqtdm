@@ -21,7 +21,7 @@
 #   DOCKER_COPY_SOURCE Copy source into the container instead of bind-mounting
 #   DOCKER_CURRENT     Clone the current git remote and branch in checkout mode
 #   OUTPUT_DIR        Where to write the final AppImage (default: script dir)
-#   QT_VERSION        Qt version built into the image (default: 6.11.1)
+#   QT_VERSION        Qt version built into the image (default: 6.12.1)
 #   QT_BUILD_JOBS     Parallel jobs for the Qt source build (default: auto)
 #   OPENSSL_VERSION   OpenSSL version built into the image (default: 3.5.1)
 #   QWT_VERSION       Qwt version built into the image (default: 6.3.0)
@@ -35,7 +35,7 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 
-QT_VERSION="${QT_VERSION:-6.11.1}"
+QT_VERSION="${QT_VERSION:-6.12.1}"
 QT_BUILD_JOBS="${QT_BUILD_JOBS:-auto}"
 OPENSSL_VERSION="${OPENSSL_VERSION:-3.5.1}"
 QWT_VERSION="${QWT_VERSION:-6.3.0}"
