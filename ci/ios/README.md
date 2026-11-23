@@ -1,6 +1,6 @@
 # iOS CI build
 
-The workflow builds Qt 6.12.0, OpenSSL from the latest patch in the selected
+The workflow builds Qt 6.12.1, OpenSSL from the latest patch in the selected
 3.5 LTS series, Qwt 6.3.0, and EPICS Base R7.0.10 for arm64 iPhoneOS and
 arm64 iOS Simulator. The iOS minimum version is 18.0 across these dependencies
 and the caQtDM app. Qt, OpenSSL, EPICS, and Qwt have separate caches keyed to
