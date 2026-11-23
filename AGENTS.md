@@ -501,9 +501,10 @@ platform.
   conversion (only .ui), control-system plugins imported statically
   (DEFINES BSREAD/EPICS4/ARCHIVE* in fileopenwindow).
 - **Android:** CI is `.github/workflows/build-android.yml` (daily + PR):
-  Qt 6.11.1 is built from source (host `gcc_64` + `android_arm64_v8a`),
-  OpenSSL 3.5.5 (own SSL API level 28), Qwt 6.3, EPICS R7.0.10, NDK 27.2,
-  Android API 36, ABI arm64-v8a; switches CAQTDM_NORPATH/GPS/MODBUS/OPCUA
+  Qt 6.12.1 is built from source (host `gcc_64` + `android_arm64_v8a`),
+  OpenSSL 3.5.5 (own SSL API level 28), Qwt 6.3, EPICS R7.0.10, NDK r30,
+  SDK `android-37.0`, Build Tools 37.0.0, JDK 21, ABI arm64-v8a;
+  switches CAQTDM_NORPATH/GPS/MODBUS/OPCUA
   = 1. Manifest/Gradle/resources live under `caQtDM_Viewer/src/Android/`.
 - **iOS:** no CI workflow — built locally (Qt for iOS + Xcode).
   Assets/Info.plist under `caQtDM_Viewer/src/IOS/`; parser libs for iOS in
