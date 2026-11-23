@@ -23,7 +23,7 @@
 #   OUTPUT_DIR        Where to write the final AppImage (default: script dir)
 #   QT_VERSION        Qt version built into the image (default: 6.11.1)
 #   QT_BUILD_JOBS     Parallel jobs for the Qt source build (default: auto)
-#   OPENSSL_VERSION   OpenSSL version built into the image (default: 3.5.1)
+#   OPENSSL_VERSION   OpenSSL version built into the image (default: 3.5.9)
 #   QWT_VERSION       Qwt version built into the image (default: 6.3.0)
 #   QWT_REF           Qwt git tag or branch (default: v$QWT_VERSION)
 #   QWT_REPOSITORY    Qwt git repository URL (default: official SourceForge git)
@@ -37,7 +37,7 @@ REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 
 QT_VERSION="${QT_VERSION:-6.11.1}"
 QT_BUILD_JOBS="${QT_BUILD_JOBS:-auto}"
-OPENSSL_VERSION="${OPENSSL_VERSION:-3.5.1}"
+OPENSSL_VERSION="${OPENSSL_VERSION:-3.5.9}"
 QWT_VERSION="${QWT_VERSION:-6.3.0}"
 QWT_REF="${QWT_REF:-v${QWT_VERSION}}"
 QWT_REPOSITORY="${QWT_REPOSITORY:-https://git.code.sf.net/p/qwt/git}"
