@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Prepare build environment
         run: |
@@ -181,14 +181,14 @@ jobs:
           pkg info -d -F "$CI_SOURCE/packages/caqtdm-$package_version.pkg" | grep -F 'epics-base-7.0.11'
 
       - name: Upload caQtDM package
-        uses: actions/upload-artifact@v7.0.2
+        uses: actions/upload-artifact@v7
         with:
           path: ${{ env.CI_SOURCE }}/packages/caqtdm-*.pkg
           if-no-files-found: error
           archive: false
 
       - name: Upload EPICS Base package
-        uses: actions/upload-artifact@v7.0.2
+        uses: actions/upload-artifact@v7
         with:
           path: ${{ env.CI_SOURCE }}/packages/epics-base-7.0.11.pkg
           if-no-files-found: error

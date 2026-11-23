@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: caqtdm
           fetch-depth: 0
@@ -143,7 +143,7 @@ jobs:
       # -------------------------------------------------------------------
       - name: Cache Qwt
         id: cache-qwt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QWT_INSTALL_DIR }}
           key: qwt-${{ matrix.qwt-version }}-qt${{ matrix.qt-version }}-${{ matrix.macos-version }}-${{ runner.arch }}
@@ -176,7 +176,7 @@ jobs:
       # -------------------------------------------------------------------
       - name: Cache ZeroMQ
         id: cache-zeromq
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.ZEROMQ_INSTALL_DIR }}
           key: zeromq-${{ matrix.zeromq-version }}-${{ matrix.macos-version }}-${{ runner.arch }}
@@ -209,7 +209,7 @@ jobs:
       # -------------------------------------------------------------------
       - name: Cache EPICS Base
         id: cache-epics
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.EPICS_BASE_DIR }}
           key: epics-${{ matrix.epics-version }}-${{ matrix.macos-version }}-${{ runner.arch }}
@@ -232,7 +232,7 @@ jobs:
       # The version is not pinned; the libpython the app links against follows it.
       # -------------------------------------------------------------------
       - name: Set up Python for PYTHONCALC
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x'  # latest stable Python 3; PYTHONVERSION is derived below
 

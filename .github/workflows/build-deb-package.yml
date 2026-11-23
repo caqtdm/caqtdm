@@ -50,7 +50,7 @@ jobs:
         useradd --comment "caQtDM package builder" --create-home --shell /bin/bash builder
 
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Prepare unprivileged package build
       run: |
