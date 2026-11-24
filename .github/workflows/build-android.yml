@@ -81,6 +81,12 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Set up Gradle cache
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+
       - name: Set up Android SDK
         if: steps.cache-qt.outputs.cache-hit != 'true'
         uses: android-actions/setup-android@v4
@@ -156,6 +162,19 @@ jobs:
 
           QT_SRC_DIR="${QT_SRC_ROOT}/qt-everywhere-src-${QT_VERSION}"
 
+          # Populate Qt's offline Gradle cache before compiling the host tools.
+          cd "${RUNNER_TEMP}"
+          for attempt in 1 2 3; do
+            if cmake +              -DACTION_RESOLVE_GRADLE=ON +              -DQT_ROOT_DIR="${QT_SRC_DIR}/qtbase" +              -DGRADLE_BUILD_VARIANT=Release +              -DQT_ANDROID_SDK_BUILD_TOOLS_REVISION="${ANDROID_BUILD_TOOLS_VERSION}" +              -P "${QT_SRC_DIR}/qtbase/cmake/QtSetupAndroid.cmake"; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Failed to resolve Qt Android Gradle dependencies after $attempt attempts."
+              exit 1
+            fi
+            sleep $((attempt * 10))
+          done
+
           mkdir -p "${RUNNER_TEMP}/qt-build-host"
           cd "${RUNNER_TEMP}/qt-build-host"
           "${QT_SRC_DIR}/configure" -prefix "${QT_HOST_ROOT}" -release -opensource -confirm-license -nomake tests -nomake examples -skip qtwebengine
@@ -175,7 +194,7 @@ jobs:
             -release -opensource -confirm-license \
             -nomake tests -nomake examples -skip qtwebengine \
             -- \
-            -DOPENSSL_ROOT="${OPENSSL_ANDROID_PREFIX}" \
+            -DOPENSSL_ROOT_DIR="${OPENSSL_ANDROID_PREFIX}" \
             -DOPENSSL_INCLUDE_DIR="${OPENSSL_ANDROID_PREFIX}/include" \
             -DOPENSSL_CRYPTO_LIBRARY="${OPENSSL_ANDROID_PREFIX}/lib/libcrypto.so" \
             -DOPENSSL_SSL_LIBRARY="${OPENSSL_ANDROID_PREFIX}/lib/libssl.so"
