@@ -20,7 +20,7 @@ on:
     - cron: '0 2 * * *'
 
 env:
-  QT_VERSION: 6.11.1
+  QT_VERSION: 6.12.1
   QT_BUILD_JOBS: auto
   OPENSSL_VERSION: 3.5.1
   QWT_VERSION: 6.3.0
@@ -28,7 +28,7 @@ env:
   QWT_REPOSITORY: https://git.code.sf.net/p/qwt/git
   EPICS_VERSION_TAG: R7.0.10
   GCC_TOOLSET: "15"
-  DOCKER_IMAGE: caqtdm-appimage-builder:rhel8-gcc15-qt6.11.1
+  DOCKER_IMAGE: caqtdm-appimage-builder:rhel8-gcc15-qt6.12.1
   OUTPUT_DIR: ${{ github.workspace }}/artifacts/appimage
 
 jobs:

@@ -40,7 +40,7 @@ jobs:
       max-parallel: 4
       matrix:
         macos-version: ['macos-26','macos-26-intel','macos-15','macos-15-intel' ]
-        qt-version: ['6.11.1']
+        qt-version: ['6.12.1']
         qwt-version: ['v6.3.0']
         zeromq-version: ['4.3.5']
         epics-version: ['R7.0.10']

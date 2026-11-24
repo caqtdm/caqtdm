@@ -10,22 +10,22 @@ on:
     - cron: '0 2 * * *'
 
 env:
-  QT_VERSION: 6.12.0
+  QT_VERSION: 6.12.1
   OPENSSL_LTS_SERIES: '3.5'
   QWT_VERSION: v6.3.0
   EPICS_VERSION: R7.0.10
   IOS_DEPLOYMENT_TARGET: '18.0'
   QT_ROOT: ${{ github.workspace }}/.ci-cache/Qt
-  QT_HOST_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/macos
-  QT_IOS_DEVICE_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/ios-device
-  QT_IOS_SIMULATOR_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/ios-simulator-arm64
+  QT_HOST_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.1/macos
+  QT_IOS_DEVICE_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.1/ios-device
+  QT_IOS_SIMULATOR_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.1/ios-simulator-arm64
   OPENSSL_IOS_ROOT: ${{ github.workspace }}/.ci-cache/openssl-ios
   EPICS_BASE: ${{ github.workspace }}/.ci-cache/ios-deps/epics-base
   EPICS_HOST_ARCH: darwin-aarch64
 
 jobs:
   build-qt:
-    name: Build Qt 6.12.0 host and iOS SDKs
+    name: Build Qt 6.12.1 host and iOS SDKs
     runs-on: macos-15
     permissions:
       contents: read
