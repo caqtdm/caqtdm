@@ -41,7 +41,7 @@ RUN apk add --no-cache \
     zlib-dev
 
 WORKDIR /build
-RUN git clone --branch R7.0.10 --depth 1 --recursive https://github.com/epics-base/epics-base.git
+RUN git clone --branch R7.0.11 --depth 1 --recursive https://github.com/epics-base/epics-base.git
 WORKDIR /build/epics-base
 RUN make INSTALL_LOCATION=/opt/epics -j$(nproc)
 

@@ -62,7 +62,7 @@ jobs:
           nvchecker
 
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -117,14 +117,14 @@ jobs:
 
     - name: Cache epics-base package
       id: cache-epics-base
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: caQtDM_Viewer/package/archlinux/epics-base/*.pkg.tar.*
         key: epics-base-pkg-${{ runner.os }}-v${{ steps.dep_versions.outputs.epics-base }}-${{ hashFiles('caQtDM_Viewer/package/archlinux/epics-base/PKGBUILD', 'caQtDM_Viewer/package/archlinux/epics-base/*.patch') }}
 
     - name: Cache qt6-opcua package
       id: cache-qt6-opcua
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: caQtDM_Viewer/package/archlinux/qt6-opcua/*.pkg.tar.*
         key: qt6-opcua-pkg-${{ runner.os }}-v${{ steps.dep_versions.outputs.qt6-opcua }}-${{ hashFiles('caQtDM_Viewer/package/archlinux/qt6-opcua/PKGBUILD') }}

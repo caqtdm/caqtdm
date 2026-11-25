@@ -13,7 +13,7 @@ env:
   QT_VERSION: 6.11.1
   OPENSSL_VERSION: 3.5.5
   QWT_VERSION: 6.3
-  EPICS_VERSION: R7.0.10
+  EPICS_VERSION: R7.0.11
   ANDROID_API: "36"
   ANDROID_SSL_API: "28"
   ANDROID_NDK_VERSION: "27.2.12479018"
@@ -44,20 +44,20 @@ jobs:
     steps:
       - name: Restore Qt source cache
         id: cache-qt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QT_ROOT }}
           key: qt-src-build-${{ runner.os }}-qt${{ env.QT_VERSION }}-ndk${{ env.ANDROID_NDK_VERSION }}-abi${{ env.ANDROID_ABI }}-openssl${{ env.OPENSSL_VERSION }}-sslapi${{ env.ANDROID_SSL_API }}
 
       - name: Restore OpenSSL Android cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.OPENSSL_ANDROID_PREFIX }}
           key: android-openssl-${{ runner.os }}-${{ env.OPENSSL_VERSION }}-ndk${{ env.ANDROID_NDK_VERSION }}-api${{ env.ANDROID_SSL_API }}
 
       - name: Checkout repository
         if: steps.cache-qt.outputs.cache-hit != 'true'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Linux build tools
         if: steps.cache-qt.outputs.cache-hit != 'true'
@@ -75,7 +75,7 @@ jobs:
 
       - name: Set up Java
         if: steps.cache-qt.outputs.cache-hit != 'true'
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -108,7 +108,7 @@ jobs:
       - name: Cache OpenSSL Android build
         if: steps.cache-qt.outputs.cache-hit != 'true'
         id: cache-openssl
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.OPENSSL_ANDROID_PREFIX }}
           key: android-openssl-${{ runner.os }}-${{ env.OPENSSL_VERSION }}-ndk${{ env.ANDROID_NDK_VERSION }}-api${{ env.ANDROID_SSL_API }}
@@ -190,7 +190,7 @@ jobs:
       actions: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Install Linux build tools
         run: |
@@ -199,7 +199,7 @@ jobs:
           sudo apt-get install -y build-essential cmake ninja-build perl python3 unzip rsync
 
       - name: Set up Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
@@ -228,13 +228,13 @@ jobs:
 
       - name: Restore Qt source cache
         id: cache-qt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QT_ROOT }}
           key: qt-src-build-${{ runner.os }}-qt${{ env.QT_VERSION }}-ndk${{ env.ANDROID_NDK_VERSION }}-abi${{ env.ANDROID_ABI }}-openssl${{ env.OPENSSL_VERSION }}-sslapi${{ env.ANDROID_SSL_API }}
 
       - name: Restore OpenSSL Android cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.OPENSSL_ANDROID_PREFIX }}
           key: android-openssl-${{ runner.os }}-${{ env.OPENSSL_VERSION }}-ndk${{ env.ANDROID_NDK_VERSION }}-api${{ env.ANDROID_SSL_API }}
@@ -253,14 +253,14 @@ jobs:
 
       - name: Cache Qwt Android deps
         id: cache-qwt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QWT_INSTALL }}
           key: android-qwt-${{ runner.os }}-qt${{ env.QT_VERSION }}-qwt${{ env.QWT_VERSION }}-abi${{ env.ANDROID_ABI }}
 
       - name: Cache EPICS Android deps
         id: cache-epics
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.EPICS_BASE }}
           key: android-epics-${{ runner.os }}-epics${{ env.EPICS_VERSION }}-ndk${{ env.ANDROID_NDK_VERSION }}-abi${{ env.ANDROID_ABI }}-${{ hashFiles('ci/epics-android/**') }}

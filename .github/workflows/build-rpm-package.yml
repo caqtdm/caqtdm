@@ -66,7 +66,7 @@ jobs:
       uses: actions/cache@v6
       with:
         path: /tmp/epics-base-rpm-cache
-        key: epics-base-rpm-7.0.10-${{ matrix.image }}-${{ steps.os-release.outputs.version }}-${{ hashFiles('.github/workflows/build-rpm-package.yml', 'caQtDM_Viewer/package/redhat/epics-base/epics-base.spec', 'caQtDM_Viewer/package/redhat/epics-base/*.patch') }}
+        key: epics-base-rpm-7.0.11-${{ matrix.image }}-${{ steps.os-release.outputs.version }}-${{ hashFiles('.github/workflows/build-rpm-package.yml', 'caQtDM_Viewer/package/redhat/epics-base/epics-base.spec', 'caQtDM_Viewer/package/redhat/epics-base/*.patch') }}
 
     - name: Install build dependencies for epics-base
       run: |
@@ -83,15 +83,15 @@ jobs:
         rpmdev-setuptree
 
         # Download source
-        git clone https://github.com/epics-base/epics-base.git --branch R7.0.10 --depth 1 base-7.0.10
-        cd base-7.0.10
+        git clone https://github.com/epics-base/epics-base.git --branch R7.0.11 --depth 1 base-7.0.11
+        cd base-7.0.11
         git submodule update --init --recursive --jobs "$(nproc)"
         cd ..
-        tar -czf base-7.0.10.tar.gz base-7.0.10
-        rm -rf base-7.0.10
+        tar -czf base-7.0.11.tar.gz base-7.0.11
+        rm -rf base-7.0.11
 
         # Copy source and patches to rpmbuild directories
-        cp base-7.0.10.tar.gz ~/rpmbuild/SOURCES/
+        cp base-7.0.11.tar.gz ~/rpmbuild/SOURCES/
         cp ./*.patch ~/rpmbuild/SOURCES/
         cp epics-base.spec ~/rpmbuild/SPECS/
 
@@ -106,8 +106,8 @@ jobs:
       if: steps.cache-epics-base.outputs.cache-hit != 'true'
       run: |
         mkdir -p /tmp/epics-base-rpm-cache/RPMS /tmp/epics-base-rpm-cache/SRPMS
-        cp ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm /tmp/epics-base-rpm-cache/RPMS/
-        cp ~/rpmbuild/SRPMS/epics-base-7.0.10-*.src.rpm /tmp/epics-base-rpm-cache/SRPMS/
+        cp ~/rpmbuild/RPMS/*/epics-base-7.0.11-*.rpm /tmp/epics-base-rpm-cache/RPMS/
+        cp ~/rpmbuild/SRPMS/epics-base-7.0.11-*.src.rpm /tmp/epics-base-rpm-cache/SRPMS/
 
     - name: Restore epics-base RPMs to rpmbuild
       if: steps.cache-epics-base.outputs.cache-hit == 'true'
@@ -119,7 +119,7 @@ jobs:
     - name: Install epics-base RPM
       run: |
         # self-built, unsigned (RPM 6 enforces signatures)
-        rpm -ivh --nosignature ~/rpmbuild/RPMS/*/epics-base-7.0.10-*.rpm
+        rpm -ivh --nosignature ~/rpmbuild/RPMS/*/epics-base-7.0.11-*.rpm
 
     - name: Install caQtDM build dependencies (RHEL <10, non-Fedora — minimal Qt5 set)
       if: ${{ matrix.rhel_major < 10 && !contains(matrix.image, 'fedora') }}
@@ -176,7 +176,7 @@ jobs:
         cd caQtDM_Viewer/package/redhat/caqtdm
 
         # Set EPICS_BASE environment variable
-        export EPICS_BASE_TARGET=/usr/local/epics/base-7.0.10
+        export EPICS_BASE_TARGET=/usr/local/epics/base-7.0.11
 
         # The create-rpm.sh script will handle the rest
         chmod +x create-rpm.sh

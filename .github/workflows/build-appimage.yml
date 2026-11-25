@@ -26,7 +26,7 @@ env:
   QWT_VERSION: 6.3.0
   QWT_REF: v6.3.0
   QWT_REPOSITORY: https://git.code.sf.net/p/qwt/git
-  EPICS_VERSION_TAG: R7.0.10
+  EPICS_VERSION_TAG: R7.0.11
   GCC_TOOLSET: "15"
   DOCKER_IMAGE: caqtdm-appimage-builder:rhel8-gcc15-qt6.11.1
   OUTPUT_DIR: ${{ github.workspace }}/artifacts/appimage
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4

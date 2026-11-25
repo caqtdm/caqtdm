@@ -27,7 +27,7 @@
 #   QWT_VERSION       Qwt version built into the image (default: 6.3.0)
 #   QWT_REF           Qwt git tag or branch (default: v$QWT_VERSION)
 #   QWT_REPOSITORY    Qwt git repository URL (default: official SourceForge git)
-#   EPICS_VERSION_TAG EPICS Base git tag built into the image (default: R7.0.10)
+#   EPICS_VERSION_TAG EPICS Base git tag built into the image (default: R7.0.11)
 #   GCC_TOOLSET       RHEL/Rocky gcc-toolset version (default: 15)
 
 set -Eeuo pipefail
@@ -41,7 +41,7 @@ OPENSSL_VERSION="${OPENSSL_VERSION:-3.5.1}"
 QWT_VERSION="${QWT_VERSION:-6.3.0}"
 QWT_REF="${QWT_REF:-v${QWT_VERSION}}"
 QWT_REPOSITORY="${QWT_REPOSITORY:-https://git.code.sf.net/p/qwt/git}"
-EPICS_VERSION_TAG="${EPICS_VERSION_TAG:-R7.0.10}"
+EPICS_VERSION_TAG="${EPICS_VERSION_TAG:-R7.0.11}"
 GCC_TOOLSET="${GCC_TOOLSET:-15}"
 
 DOCKER_IMAGE="${DOCKER_IMAGE:-caqtdm-appimage-builder:rhel8-gcc${GCC_TOOLSET}-qt${QT_VERSION}}"

@@ -13,7 +13,7 @@ env:
   QT_VERSION: 6.12.0
   OPENSSL_LTS_SERIES: '3.5'
   QWT_VERSION: v6.3.0
-  EPICS_VERSION: R7.0.10
+  EPICS_VERSION: R7.0.11
   IOS_DEPLOYMENT_TARGET: '18.0'
   QT_ROOT: ${{ github.workspace }}/.ci-cache/Qt
   QT_HOST_ROOT: ${{ github.workspace }}/.ci-cache/Qt/6.12.0/macos
@@ -36,7 +36,7 @@ jobs:
       openssl_sha: ${{ steps.openssl-version.outputs.tag_sha }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Identify Xcode and SDKs
         id: toolchain
@@ -69,21 +69,21 @@ jobs:
 
       - name: Restore Qt source build cache
         id: cache-qt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QT_ROOT }}
           key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-openssl${{ steps.openssl-version.outputs.version }}-${{ steps.openssl-version.outputs.tag_sha }}-${{ steps.toolchain.outputs.key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/ios/build-qt.sh', 'ci/ios/build-openssl.sh') }}
 
       - name: Restore OpenSSL iPhoneOS cache
         id: cache-openssl-device
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.OPENSSL_IOS_ROOT }}/${{ steps.openssl-version.outputs.version }}/iphoneos
           key: openssl-ios-${{ steps.openssl-version.outputs.version }}-${{ steps.openssl-version.outputs.tag_sha }}-iphoneos-arm64-${{ steps.toolchain.outputs.key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/ios/build-openssl.sh') }}
 
       - name: Restore OpenSSL Simulator cache
         id: cache-openssl-simulator
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.OPENSSL_IOS_ROOT }}/${{ steps.openssl-version.outputs.version }}/iphonesimulator-arm64
           key: openssl-ios-${{ steps.openssl-version.outputs.version }}-${{ steps.openssl-version.outputs.tag_sha }}-iphonesimulator-arm64-${{ steps.toolchain.outputs.key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/ios/build-openssl.sh') }}
@@ -122,7 +122,7 @@ jobs:
         run: bash ci/ios/build-qt.sh
 
   build-epics:
-    name: Build EPICS 7.0.10 for iOS SDKs
+    name: Build EPICS 7.0.11 for iOS SDKs
     runs-on: macos-15
     permissions:
       contents: read
@@ -131,7 +131,7 @@ jobs:
       toolchain_key: ${{ steps.toolchain.outputs.key }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Identify Xcode and SDKs
         id: toolchain
@@ -143,9 +143,9 @@ jobs:
           SIM_SDK="$(xcrun --sdk iphonesimulator --show-sdk-version)"
           echo "key=xcode${XCODE_VERSION}-ios${IOS_SDK}-sim${SIM_SDK}" >> "$GITHUB_OUTPUT"
 
-      - name: Cache EPICS 7.0.10 iOS build
+      - name: Cache EPICS 7.0.11 iOS build
         id: cache-epics
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.EPICS_BASE }}
           key: epics-ios-${{ runner.os }}-${{ runner.arch }}-epics${{ env.EPICS_VERSION }}-${{ steps.toolchain.outputs.key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/epics-ios/**') }}
@@ -209,7 +209,7 @@ jobs:
       actions: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Select target directories
         run: |
@@ -222,19 +222,19 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Restore Qt source build cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.QT_ROOT }}
           key: qt-ios-${{ runner.os }}-${{ runner.arch }}-qt${{ env.QT_VERSION }}-openssl${{ needs.build-qt.outputs.openssl_version }}-${{ needs.build-qt.outputs.openssl_sha }}-${{ needs.build-qt.outputs.toolchain_key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/ios/build-qt.sh', 'ci/ios/build-openssl.sh') }}
 
       - name: Restore OpenSSL iOS cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.OPENSSL_IOS_ROOT }}/${{ needs.build-qt.outputs.openssl_version }}/${{ matrix.openssl_install_target }}
           key: openssl-ios-${{ needs.build-qt.outputs.openssl_version }}-${{ needs.build-qt.outputs.openssl_sha }}-${{ matrix.openssl_cache_target }}-${{ needs.build-qt.outputs.toolchain_key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/ios/build-openssl.sh') }}
 
       - name: Restore EPICS iOS cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.EPICS_BASE }}
           key: epics-ios-${{ runner.os }}-${{ runner.arch }}-epics${{ env.EPICS_VERSION }}-${{ needs.build-epics.outputs.toolchain_key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/epics-ios/**') }}
@@ -262,7 +262,7 @@ jobs:
 
       - name: Cache Qwt
         id: cache-qwt
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/.ci-cache/qwt-${{ matrix.epics_arch }}
           key: qwt-ios-${{ runner.os }}-${{ runner.arch }}-${{ env.QWT_VERSION }}-qt${{ env.QT_VERSION }}-${{ matrix.epics_arch }}-${{ needs.build-qt.outputs.toolchain_key }}-ios${{ env.IOS_DEPLOYMENT_TARGET }}-${{ hashFiles('ci/ios/build-qwt.sh', 'ci/ios/build-qt.sh', 'ci/ios/build-openssl.sh') }}
