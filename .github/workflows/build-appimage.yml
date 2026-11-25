@@ -22,7 +22,7 @@ on:
 env:
   QT_VERSION: 6.11.1
   QT_BUILD_JOBS: auto
-  OPENSSL_VERSION: 3.5.1
+  OPENSSL_VERSION: 3.5.9
   QWT_VERSION: 6.3.0
   QWT_REF: v6.3.0
   QWT_REPOSITORY: https://git.code.sf.net/p/qwt/git

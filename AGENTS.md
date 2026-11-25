@@ -502,7 +502,7 @@ platform.
   (DEFINES BSREAD/EPICS4/ARCHIVE* in fileopenwindow).
 - **Android:** CI is `.github/workflows/build-android.yml` (daily + PR):
   Qt 6.11.1 is built from source (host `gcc_64` + `android_arm64_v8a`),
-  OpenSSL 3.5.5 (own SSL API level 28), Qwt 6.3, EPICS R7.0.10, NDK 27.2,
+  OpenSSL 3.5.9 (own SSL API level 28), Qwt 6.3, EPICS R7.0.10, NDK 27.2,
   Android API 36, ABI arm64-v8a; switches CAQTDM_NORPATH/GPS/MODBUS/OPCUA
   = 1. Manifest/Gradle/resources live under `caQtDM_Viewer/src/Android/`.
 - **iOS:** no CI workflow — built locally (Qt for iOS + Xcode).
