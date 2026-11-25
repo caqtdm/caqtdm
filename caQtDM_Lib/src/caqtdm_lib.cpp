@@ -10070,137 +10070,103 @@ void CaQtDM_Lib::TreatRequestedValue(QString pvo, QString text, FormatType fType
   */
 void CaQtDM_Lib::TreatRequestedWave(QString pvo, QString text, caWaveTable::FormatType fType, int index, QWidget *w)
 {
-    char    errmess[SMALL_STRING_LENGTH], sdata[40], asc[MAX_STRING_LENGTH];
-    int32_t data32[1];
-    int16_t data16[1];
-    float   fdata[1];
-    double  value, ddata[1];
-    long    longValue;
-    char    *end = Q_NULLPTR, textValue[SMALL_STRING_LENGTH];
-    bool    match;
-
-    QString pv = pvo.trimmed();
-
-    //ControlsInterface * plugininterface = (ControlsInterface *) w->property("Interface").value<void *>();
-    ControlsInterface *plugininterface = getPluginInterface((QWidget*) w);
+    ControlsInterface *plugininterface = getPluginInterface(w);
     if(plugininterface == (ControlsInterface *) Q_NULLPTR) return;
+    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pvo.trimmed());
+    if(kPtr == (knobData *) Q_NULLPTR || index < 0) return;
 
-    FormatType fTypeNew;
+    FormatType format = decimal;
+    if(fType == caWaveTable::octal) format = octal;
+    else if(fType == caWaveTable::hexadecimal) format = hexadecimal;
+    else if(fType == caWaveTable::string) format = string;
 
-    if(fType == caWaveTable::octal) fTypeNew = octal;
-    else if(fType == caWaveTable::hexadecimal) fTypeNew = hexadecimal;
-    else if(fType == caWaveTable::string) fTypeNew = string;
-    else fTypeNew = decimal;
+    QVector<float> floats;
+    QVector<double> doubles;
+    QVector<int16_t> shorts;
+    QVector<int32_t> longs;
+    QByteArray chars;
+    int count;
+    char textValue[SMALL_STRING_LENGTH];
+    qstrncpy(textValue, qasc(text), sizeof(textValue));
+    char *end = Q_NULLPTR;
 
-    qCDebug(caQtDMLibLog) << "treat requested wave";
-    knobData *kPtr = mutexKnobDataP->getMutexKnobDataPV(w, pv);
-    if(kPtr == (knobData *) Q_NULLPTR)return;
+    {
+        QMutexLocker locker(static_cast<QMutex *>(kPtr->mutex));
+        count = kPtr->edata.valueCount;
+        if(index >= count || kPtr->edata.dataB == (void *) Q_NULLPTR) return;
 
-    if(index >= kPtr->edata.valueCount) return;
-
-    QMutex *datamutex;
-    datamutex = (QMutex*) kPtr->mutex;
-    datamutex->lock();
-
-    qCDebug(caQtDMLibLog) << "fieldtype:" << kPtr->edata.fieldtype;
-    switch (kPtr->edata.fieldtype) {
-
-    case caINT:
-    case caLONG:
-    case caCHAR:
-        qstrncpy(textValue, qasc(text),SMALL_STRING_LENGTH);
-        longValue = getLongValueFromString(textValue, fTypeNew, &end);
-
-        if(kPtr->edata.fieldtype == caLONG) {
-            int32_t* P = (int32_t*) kPtr->edata.dataB;
-            P[index] = (int32_t) longValue;
-            if(!plugininterface->pvSetWave(kPtr,  fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
-                                  (char*) qasc(w->objectName().toLower()), errmess))
-            {
-                plugininterface->pvSetWave((char*) kPtr->pv,  fdata, ddata, data16, P, sdata, kPtr->edata.valueCount,
-                                  (char*) qasc(w->objectName().toLower()), errmess);
-            }
-        } else if(kPtr->edata.fieldtype == caINT) {
-            int16_t* P = (int16_t*) kPtr->edata.dataB;
-            P[index] = (int16_t) longValue;
-            if(!plugininterface->pvSetWave(kPtr, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
-                                  (char*) qasc(w->objectName().toLower()), errmess))
-            {
-                plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, P, data32, sdata, kPtr->edata.valueCount,
-                                  (char*) qasc(w->objectName().toLower()), errmess);
-            }
-        } else {
-            if(fTypeNew == string) {
-                char* P = (char*) kPtr->edata.dataB;
-                P[index] = textValue[0];
-                if(!plugininterface->pvSetWave(kPtr,  fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess))
-                {
-                    plugininterface->pvSetWave((char*) kPtr->pv,  fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess);
-                }
-            } else {
-                char* P = (char*) kPtr->edata.dataB;
-                P[index] = (char) ((int) longValue);
-                if(!plugininterface->pvSetWave(kPtr, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess))
-                {
-                    plugininterface->pvSetWave((char*) kPtr->pv, fdata, ddata, data16, data32, P, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess);
-                }
-            }
+        int elementSize;
+        switch(kPtr->edata.fieldtype) {
+        case caFLOAT: elementSize = sizeof(float); break;
+        case caDOUBLE: elementSize = sizeof(double); break;
+        case caINT: elementSize = sizeof(int16_t); break;
+        case caLONG: elementSize = sizeof(int32_t); break;
+        case caCHAR: elementSize = sizeof(char); break;
+        default:
+            locker.unlock();
+            postMessage(QtDebugMsg, (char *) "Unsupported waveform type for writing");
+            return;
         }
+        if(qint64(count) * elementSize > kPtr->edata.dataSize) return;
 
-
-        break;
-
-    case caSTRING:
-        snprintf(asc, MAX_STRING_LENGTH, "writing of strings for treatRequestedWave is not yet supported\n");
-        postMessage(QtDebugMsg, asc);
-        break;
-
-    case caFLOAT:
-    case caDOUBLE:
-        match = false;
-        // Treat as a double
-        qstrncpy(textValue, qasc(text),SMALL_STRING_LENGTH);
-        value = getDoubleValueFromString(textValue, fTypeNew, &end);
-        if(*end == '\0' && end != textValue) {        // decoded
-            match = true;
-        }
-        if(match) {
+        // Own the write buffer so synchronous plugin updates can replace dataB.
+        switch(kPtr->edata.fieldtype) {
+        case caFLOAT:
+        case caDOUBLE: {
+            const double value = getDoubleValueFromString(textValue, format, &end);
+            if(*end != '\0' || end == textValue) {
+                locker.unlock();
+                char message[MAX_STRING_LENGTH];
+                snprintf(message, sizeof(message), "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
+                postMessage(QtDebugMsg, message);
+                return;
+            }
             if(kPtr->edata.fieldtype == caFLOAT) {
-                float* P = (float*) kPtr->edata.dataB;
-                P[index] = (float) value;
-                if(!plugininterface->pvSetWave(kPtr,  P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess))
-                {
-                    plugininterface->pvSetWave((char*) kPtr->pv,  P, ddata, data16, data32, sdata, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess);
-                }
-            } else  {
-                double* P = (double*) kPtr->edata.dataB;
-                P[index] = value;
-                if(!plugininterface->pvSetWave(kPtr, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess))
-                {
-                    plugininterface->pvSetWave((char*) kPtr->pv, fdata, P, data16, data32, sdata, kPtr->edata.valueCount,
-                                     (char*) qasc(w->objectName().toLower()), errmess);
-                }
+                floats.resize(count);
+                memcpy(floats.data(), kPtr->edata.dataB, count * sizeof(float));
+                floats[index] = (float) value;
+            } else {
+                doubles.resize(count);
+                memcpy(doubles.data(), kPtr->edata.dataB, count * sizeof(double));
+                doubles[index] = value;
             }
-        } else {
-            char asc[MAX_STRING_LENGTH];
-            snprintf(asc, MAX_STRING_LENGTH, "Invalid value: pv=%s value= \"%s\"\n", kPtr->pv, textValue);
-            postMessage(QtDebugMsg, asc);
+            break;
         }
-        break;
-
-    default:
-        snprintf(asc, MAX_STRING_LENGTH, "unhandled epics type (%d) in treatRequestedWave\n", kPtr->edata.fieldtype);
-        postMessage(QtDebugMsg, asc);
+        case caINT: {
+            const long value = getLongValueFromString(textValue, format, &end);
+            shorts.resize(count);
+            memcpy(shorts.data(), kPtr->edata.dataB, count * sizeof(int16_t));
+            shorts[index] = (int16_t) value;
+            break;
+        }
+        case caLONG: {
+            const long value = getLongValueFromString(textValue, format, &end);
+            longs.resize(count);
+            memcpy(longs.data(), kPtr->edata.dataB, count * sizeof(int32_t));
+            longs[index] = (int32_t) value;
+            break;
+        }
+        case caCHAR:
+            chars = QByteArray(static_cast<const char *>(kPtr->edata.dataB), count);
+            chars[index] = format == string ? textValue[0]
+                : (char) ((int) getLongValueFromString(textValue, format, &end));
+            break;
+        }
     }
 
-    datamutex->unlock();
+    float *fdata = floats.isEmpty() ? Q_NULLPTR : floats.data();
+    double *ddata = doubles.isEmpty() ? Q_NULLPTR : doubles.data();
+    int16_t *data16 = shorts.isEmpty() ? Q_NULLPTR : shorts.data();
+    int32_t *data32 = longs.isEmpty() ? Q_NULLPTR : longs.data();
+    char *sdata = chars.isEmpty() ? Q_NULLPTR : chars.data();
+    QByteArray object = w->objectName().toLower().toLatin1();
+    char errmess[SMALL_STRING_LENGTH] = {};
+    // Do not hold the data mutex across a plugin call.
+    if(!plugininterface->pvSetWave(kPtr, fdata, ddata, data16, data32, sdata,
+                                  count, object.data(), errmess)) {
+        plugininterface->pvSetWave(kPtr->pv, fdata, ddata, data16, data32, sdata,
+                                   count, object.data(), errmess);
+    }
 }
 
 
